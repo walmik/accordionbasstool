@@ -12,8 +12,19 @@ public class BestMatchListModel extends AbstractListModel {
 	
 
 	@Override
-	public ButtonComboSequence getElementAt(int index) {
-		
+	public String getElementAt(int index)
+  {
+    String str = "";
+
+    if ((_currSeqs != null) && (index < _currSeqs.length))
+      str = "Option " + index + " (" + _currSeqs[index].getHeur() + ")";
+
+		return str;
+	}
+
+  public ButtonComboSequence getSeqAt(int index)
+  {
+
 		return (_currSeqs != null ? _currSeqs[index] : null);
 	}
 

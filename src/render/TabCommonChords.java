@@ -84,8 +84,7 @@ public class TabCommonChords extends javax.swing.JPanel {
             .addGap(24, 24, 24)
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
               .addComponent(rootCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-              .addComponent(radioNatural))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+              .addComponent(radioNatural)))
           .addComponent(radioSharp, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addGap(2, 2, 2)
         .addComponent(radioFlat, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -131,7 +130,7 @@ public class TabCommonChords extends javax.swing.JPanel {
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
           .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
           .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        .addContainerGap(151, Short.MAX_VALUE))
+        .addContainerGap(42, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 

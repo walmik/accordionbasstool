@@ -13,20 +13,23 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
-import java.util.Iterator;
-import java.util.Vector;
 
-import javax.swing.BorderFactory;
+import javax.swing.DefaultSingleSelectionModel;
 import javax.swing.JPanel;
 
 import music.BassBoard;
+import music.ButtonComboSequence;
 
 
 public class RenderBassBoard extends JPanel
 {
 	final static long serialVersionUID = 1;
 
-
+  RenderBassBoard()
+  {
+    this(BassBoard.bassBoard120(), true);
+  }
+  
 	public RenderBassBoard(BassBoard newBoard, boolean horiz)
 	{
 //		drawers.add(new DrawBassChord());
@@ -56,6 +59,16 @@ public class RenderBassBoard extends JPanel
 	{
 		return _theBoard;
 	}
+
+  public void setSelectedSeq(ButtonComboSequence seq)
+  {
+    _selCombo.setButtonComboSeq(seq);
+  }
+
+  public void setSelectedSeqCombo(int index)
+  {
+    _selCombo.setSelectedIndex(index);
+  }
 	
 //	public void addDrawer(DrawBass drawer)
 //	{
@@ -385,6 +398,62 @@ public class RenderBassBoard extends JPanel
 								_tY);
 		}
 	}
+  
+  public class SelectedButtonCombo extends DefaultSingleSelectionModel
+  {
+    private static final long serialVersionUID = 1L;
+
+    ButtonComboSequence _comboSeq = null;
+
+    public void setButtonComboSeq(ButtonComboSequence seq)
+    {
+      _comboSeq = seq;
+      this.setSelectedIndex(-1);
+    }
+
+    public boolean hasButtonInSeq(int row, int col)
+    {
+      if (_comboSeq == null)
+      {
+        return false;
+      }
+
+      for (int i = 0; i < _comboSeq.getNumCombos(); i++)
+      {
+        if (_comboSeq.getCombo(i).hasButton(row, col))
+        {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    public boolean hasButtonPressed(int row, int col)
+    {
+      int currIndex = this.getSelectedIndex();
+      if ((currIndex < 0) || (_comboSeq == null))
+      {
+        return false; //none selected
+      }
+
+      if (currIndex < _comboSeq.getNumCombos())
+      {
+        // return if button is in the currently selected combo seq
+        return _comboSeq.getCombo(currIndex).hasButton(row, col);
+      }
+
+      if (currIndex == _comboSeq.getNumCombos())
+      {
+        // return true for all buttons in the all comboseqs
+        return hasButtonInSeq(row, col);
+      }
+
+      // some other invalid state?
+      return false;
+    }
+  }
+
 
 	//Member Vars
 	//================================================================================
@@ -406,7 +475,7 @@ public class RenderBassBoard extends JPanel
 
 //	final Vector<DrawBass> drawers = new Vector<DrawBass>();
 	
-	SelectedButtonCombo _selCombo = null;
+	SelectedButtonCombo _selCombo = new SelectedButtonCombo();
 	
 	ButtonDrawer buttonDrawer = new ButtonDrawer();
 	TextDrawer textDrawer = new TextDrawer();

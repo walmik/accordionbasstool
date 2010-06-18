@@ -4,15 +4,14 @@ import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
-import render.RenderBassBoard;
-import render.BassPatterFinderController;
 
 import music.BassBoard;
 import music.ChordParser;
+import render.BoardPanel;
 import render.TabCommonChords;
+import render.TabCustomBass;
 
 
 public class Main {
@@ -77,6 +76,9 @@ public class Main {
 	/**
 	 * @param args
 	 */
+
+  public static BoardPanel _mainBoardPanel = null;
+
 	public static void main(String[] args) {
 		runUnitTests();
 		ChordParser.initChords();
@@ -87,27 +89,26 @@ public class Main {
 		
 		BassBoard board = BassBoard.bassBoard120();
 		
-		RenderBassBoard renderBoard = new RenderBassBoard(board, true);
+		BoardPanel boardPanel = new BoardPanel();
+    boardPanel.setBassBoard(board);
+    _mainBoardPanel = boardPanel;
 		
-		JScrollPane boardScrollPane = new JScrollPane(renderBoard);
-		boardScrollPane.getVerticalScrollBar().setBlockIncrement(24);
-		boardScrollPane.getVerticalScrollBar().setUnitIncrement(8);
 //		boardScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 //		Dimension d = renderBoard.getPreferredSize();
 //		d.width += 25;
 //		boardScrollPane.setPreferredSize(d);
-		BassPatterFinderController seqcontrol = new BassPatterFinderController();
-		seqcontrol.init(renderBoard);
+//		BassPatterFinderController seqcontrol = new BassPatterFinderController();
+//		seqcontrol.init(renderBoard);
 
 		
 		JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
 //		tabs.addTab("Common Chords", new JPanel());
-		tabs.addTab("Advanced", seqcontrol);
+		tabs.addTab("Advanced", new TabCustomBass());
     tabs.addTab("Common Chords", new TabCommonChords());
 		
 		JPanel content = new JPanel();
-		content.setLayout(new BorderLayout(16, 16));
-		content.add(BorderLayout.SOUTH, boardScrollPane);
+		content.setLayout(new BorderLayout(0, 0));
+		content.add(BorderLayout.SOUTH, boardPanel);
 		content.add(BorderLayout.CENTER, tabs);
 
 		jframe.setContentPane(content);

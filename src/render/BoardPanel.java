@@ -11,6 +11,14 @@
 
 package render;
 
+import java.awt.Font;
+import java.util.Hashtable;
+import java.util.Vector;
+import javax.swing.JLabel;
+import music.BoardSearcher;
+import music.ButtonComboSequence;
+import music.Chord;
+
 /**
  *
  * @author Ilya
@@ -31,24 +39,87 @@ public class BoardPanel extends javax.swing.JPanel {
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    jScrollPane1 = new javax.swing.JScrollPane();
-    jTable1 = new javax.swing.JTable();
+    renderBoardScrollPane = new javax.swing.JScrollPane();
+    renderBassBoard = new render.RenderBassBoard();
+    seqListTP = new javax.swing.JPanel();
+    seqListScrollPane = new javax.swing.JScrollPane();
+    seqList = new javax.swing.JList();
+    basslineTP = new javax.swing.JPanel();
+    basslineSlider = new javax.swing.JSlider();
 
-    jTable1.setModel(new javax.swing.table.DefaultTableModel(
-      new Object [][] {
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null}
-      },
-      new String [] {
-        "Title 1", "Title 2", "Title 3", "Title 4"
+    javax.swing.GroupLayout renderBassBoardLayout = new javax.swing.GroupLayout(renderBassBoard);
+    renderBassBoard.setLayout(renderBassBoardLayout);
+    renderBassBoardLayout.setHorizontalGroup(
+      renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGap(0, 1282, Short.MAX_VALUE)
+    );
+    renderBassBoardLayout.setVerticalGroup(
+      renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGap(0, 315, Short.MAX_VALUE)
+    );
+
+    renderBoardScrollPane.setViewportView(renderBassBoard);
+
+    seqListTP.setBorder(javax.swing.BorderFactory.createTitledBorder("Optimal Bass Combos (Best to Worst):"));
+
+    seqList.setModel(new javax.swing.AbstractListModel() {
+      String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+      public int getSize() { return strings.length; }
+      public Object getElementAt(int i) { return strings[i]; }
+    });
+    seqList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+      public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+        seqListValueChanged(evt);
       }
-    ));
-    jTable1.setColumnSelectionAllowed(true);
-    jTable1.setRowHeight(48);
-    jTable1.setShowVerticalLines(false);
-    jScrollPane1.setViewportView(jTable1);
+    });
+    seqListScrollPane.setViewportView(seqList);
+
+    javax.swing.GroupLayout seqListTPLayout = new javax.swing.GroupLayout(seqListTP);
+    seqListTP.setLayout(seqListTPLayout);
+    seqListTPLayout.setHorizontalGroup(
+      seqListTPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addComponent(seqListScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
+    );
+    seqListTPLayout.setVerticalGroup(
+      seqListTPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addComponent(seqListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
+    );
+
+    basslineTP.setBorder(javax.swing.BorderFactory.createTitledBorder("Show Pressed on Board:"));
+
+    basslineSlider.setBackground(new java.awt.Color(255, 255, 255));
+    basslineSlider.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+    basslineSlider.setMajorTickSpacing(1);
+    basslineSlider.setMaximum(0);
+    basslineSlider.setMinorTickSpacing(1);
+    basslineSlider.setPaintLabels(true);
+    basslineSlider.setPaintTrack(false);
+    basslineSlider.setSnapToTicks(true);
+    basslineSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+      public void stateChanged(javax.swing.event.ChangeEvent evt) {
+        basslineSliderStateChanged(evt);
+      }
+    });
+
+    javax.swing.GroupLayout basslineTPLayout = new javax.swing.GroupLayout(basslineTP);
+    basslineTP.setLayout(basslineTPLayout);
+    basslineTPLayout.setHorizontalGroup(
+      basslineTPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(basslineTPLayout.createSequentialGroup()
+        .addGap(5, 5, 5)
+        .addComponent(basslineSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap(574, Short.MAX_VALUE))
+    );
+    basslineTPLayout.setVerticalGroup(
+      basslineTPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(basslineTPLayout.createSequentialGroup()
+        .addGap(5, 5, 5)
+        .addComponent(basslineSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+    );
+
+    renderBoardScrollPane.getVerticalScrollBar().setBlockIncrement(24);
+    renderBoardScrollPane.getVerticalScrollBar().setUnitIncrement(8);
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
@@ -56,22 +127,152 @@ public class BoardPanel extends javax.swing.JPanel {
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
-        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addGroup(layout.createSequentialGroup()
+            .addGap(10, 10, 10)
+            .addComponent(renderBoardScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 1284, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addGroup(layout.createSequentialGroup()
+            .addComponent(seqListTP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(basslineTP, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
-        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(240, Short.MAX_VALUE))
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(seqListTP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(basslineTP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+        .addComponent(renderBoardScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap())
     );
+
+    customInit();
   }// </editor-fold>//GEN-END:initComponents
+
+    private void basslineSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_basslineSliderStateChanged
+      // TODO add your handling code here:
+      renderBassBoard.setSelectedSeqCombo(basslineSlider.getValue());
+			renderBassBoard.repaint();
+    }//GEN-LAST:event_basslineSliderStateChanged
+
+    private void seqListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_seqListValueChanged
+      // TODO add your handling code here:
+      selectComboSeq(seqList.getSelectedIndex());
+    }//GEN-LAST:event_seqListValueChanged
 
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JScrollPane jScrollPane1;
-  private javax.swing.JTable jTable1;
+  private javax.swing.JSlider basslineSlider;
+  private javax.swing.JPanel basslineTP;
+  private render.RenderBassBoard renderBassBoard;
+  private javax.swing.JScrollPane renderBoardScrollPane;
+  private javax.swing.JList seqList;
+  private javax.swing.JScrollPane seqListScrollPane;
+  private javax.swing.JPanel seqListTP;
   // End of variables declaration//GEN-END:variables
 
+
+  //============= Board Setup =========================
+  public void setBassBoard(music.BassBoard newBoard)
+  {
+    renderBassBoard.setBassBoard(newBoard);
+  }
+
+  // Custom Vars
+  private BestMatchListModel _bestMatchListModel;
+  private BoardSearcher _searcher;
+  private ButtonComboSequence _selSeq;
+
+  // Custom Init
+  private void customInit()
+  {
+    _bestMatchListModel = new BestMatchListModel();
+    seqList.setModel(_bestMatchListModel);
+    _searcher = new BoardSearcher();
+
+//    basslineSlider.setPaintLabels(true);
+//		basslineSlider.setPaintTicks(false);
+//		basslineSlider.setPaintTrack(false);
+//		basslineSlider.setSnapToTicks(true);
+		basslineSlider.setEnabled(false);
+    basslineSlider.setVisible(false);
+  }
+
+  private void setLabelTable(Vector<Chord> currChords)
+  {
+    Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+
+    JLabel newLabel = new JLabel("None");
+    newLabel.setFont(basslineSlider.getFont().deriveFont(Font.ITALIC));
+
+		labelTable.put(new Integer(-1), newLabel);
+    
+		basslineSlider.setMinimum(-1);
+
+    // If no chords, just adding "None" and that's it
+    if (currChords == null)
+    {
+      basslineSlider.setMaximum(-1);
+      return;
+    }
+
+    for (int i = 0; i < currChords.size(); i++)
+    {
+      newLabel = new JLabel(currChords.elementAt(i).toString());
+      newLabel.setFont(basslineSlider.getFont());
+      labelTable.put(new Integer(i), newLabel);
+    }
+
+    basslineSlider.setValue(-1);
+
+    basslineSlider.setMaximum(currChords.size() - 1);
+    basslineSlider.setVisible(true);
+
+    basslineSlider.setLabelTable(labelTable);
+
+    basslineSlider.getParent().validate();
+  }
+
+  void computeOptimalCombosFromChords(Vector<Chord> currChords)
+	{
+    setLabelTable(currChords);
+
+		_selSeq = null;
+
+		_bestMatchListModel.setComboSeqs(
+				_searcher.parseSequence(renderBassBoard.getBassBoard(), currChords));
+
+    if ((seqList.getSelectedIndex() < 0) && (_bestMatchListModel.getSize() > 0))
+    {
+      seqList.setSelectedIndex(0);
+      basslineSlider.requestFocus();
+    }
+	}
+
+	private void selectComboSeq(int index)
+	{
+		_selSeq = _bestMatchListModel.getSeqAt(index);
+
+    // Set Board Combo Seq
+		renderBassBoard.setSelectedSeq(_selSeq);
+
+		if (_selSeq == null)
+		{
+			basslineSlider.setMaximum(-1);
+			basslineSlider.setEnabled(false);
+		}
+		else
+		{
+			basslineSlider.setEnabled(true);
+       renderBassBoard.setSelectedSeqCombo(basslineSlider.getValue());
+			//basslineSlider.requestFocus();
+		}
+
+	//	basslineSlider.setValue(-1);
+		renderBassBoard.repaint();
+	}
 }
+

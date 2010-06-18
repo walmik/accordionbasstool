@@ -40,6 +40,14 @@ public class ButtonComboSequence implements Cloneable
 		combos.add(newCombo);
 		heur = 0;
 	}
+
+  public int getHeur()
+  {
+    if (heur == 0)
+      return evalHeuristic();
+    else
+      return heur;
+  }
 	
 	public String toString()
 	{
