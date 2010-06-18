@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jnlp codebase="file:/C:/Users/Ilya/workspace/AccordionBassTool/dist/" href="launch.jnlp" spec="1.0+">
+    <information>
+        <title>AccordionBassTool</title>
+        <vendor>Ilya</vendor>
+        <homepage href=""/>
+        <description>AccordionBassTool</description>
+        <description kind="short">AccordionBassTool</description>
+
+
+    <offline-allowed/>
+</information>
+<security>
+<all-permissions/>
+</security>
+    <resources>
+<j2se version="1.6+"/>
+<jar eager="true" href="AccordionBassTool.jar" main="true"/>
+
+
+    </resources>
+    <application-desc main-class="util.Main">
+
+    </application-desc>
+</jnlp>
