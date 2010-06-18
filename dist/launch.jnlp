@@ -18,7 +18,8 @@
 <jar eager="true" href="AccordionBassTool.jar" main="true"/>
 
 
-    </resources>
+    <jar href="lib/beansbinding-1.2.1.jar"/>
+</resources>
     <application-desc main-class="util.Main">
 
     </application-desc>
