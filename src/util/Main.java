@@ -76,7 +76,6 @@ public class Main {
 		runUnitTests();
 		ChordParser.initChords();
     
-    
     try
     {
       UIManager.setLookAndFeel(
