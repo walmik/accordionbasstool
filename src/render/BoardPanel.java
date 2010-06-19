@@ -25,8 +25,15 @@ import music.Chord;
  */
 public class BoardPanel extends javax.swing.JPanel {
 
+    static BoardPanel _mainBoardPanel = null;
+
     /** Creates new form BoardPanel */
     public BoardPanel() {
+
+      //HACK for now
+      if (BoardPanel._mainBoardPanel == null)
+        BoardPanel._mainBoardPanel = this;
+
         initComponents();
     }
 
@@ -130,7 +137,7 @@ public class BoardPanel extends javax.swing.JPanel {
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
             .addGap(10, 10, 10)
-            .addComponent(renderBoardScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 1284, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(renderBoardScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1284, Short.MAX_VALUE))
           .addGroup(layout.createSequentialGroup()
             .addComponent(seqListTP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)

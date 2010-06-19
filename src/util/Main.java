@@ -1,17 +1,12 @@
 package util;
 
-import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
 
 
-import music.BassBoard;
 import music.ChordParser;
-import render.BoardPanel;
-import render.TabCommonChords;
-import render.TabCustomBass;
+import render.BassToolFrame;
 
 
 public class Main {
@@ -77,43 +72,47 @@ public class Main {
 	 * @param args
 	 */
 
-  public static BoardPanel _mainBoardPanel = null;
-
 	public static void main(String[] args) {
 		runUnitTests();
 		ChordParser.initChords();
+    
+    
+    try
+    {
+ //     UIManager.setLookAndFeel(
+  //            UIManager.getSystemLookAndFeelClassName());
+    } catch (Exception exc)
+    {
+      
+    }
 
-		JFrame jframe = new JFrame("BassLayout");
-		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//jframe.setPreferredSize(new Dimension(335, 500));
-		
-		BassBoard board = BassBoard.bassBoard120();
-		
-		BoardPanel boardPanel = new BoardPanel();
-    boardPanel.setBassBoard(board);
-    _mainBoardPanel = boardPanel;
-		
-//		boardScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-//		Dimension d = renderBoard.getPreferredSize();
-//		d.width += 25;
-//		boardScrollPane.setPreferredSize(d);
-//		BassPatterFinderController seqcontrol = new BassPatterFinderController();
-//		seqcontrol.init(renderBoard);
 
-		
-		JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
-//		tabs.addTab("Common Chords", new JPanel());
-		tabs.addTab("Advanced", new TabCustomBass());
-    tabs.addTab("Common Chords", new TabCommonChords());
-		
-		JPanel content = new JPanel();
-		content.setLayout(new BorderLayout(0, 0));
-		content.add(BorderLayout.SOUTH, boardPanel);
-		content.add(BorderLayout.CENTER, tabs);
+    JFrame frame = new BassToolFrame();
+    frame.setVisible(true);
 
-		jframe.setContentPane(content);
-		jframe.pack();
-		jframe.setVisible(true);
+//		JFrame jframe = new JFrame("BassLayout");
+//		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		//jframe.setPreferredSize(new Dimension(335, 500));
+//
+//		BassBoard board = BassBoard.bassBoard120();
+//
+//		BoardPanel boardPanel = new BoardPanel();
+//    boardPanel.setBassBoard(board);
+//    _mainBoardPanel = boardPanel;
+//
+//		JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
+////		tabs.addTab("Common Chords", new JPanel());
+//		tabs.addTab("Advanced", new TabCustomBass());
+//    tabs.addTab("Common Chords", new TabCommonChords());
+//
+//		JPanel content = new JPanel();
+//		content.setLayout(new BorderLayout(0, 0));
+//		content.add(BorderLayout.SOUTH, boardPanel);
+//		content.add(BorderLayout.CENTER, tabs);
+//
+//		jframe.setContentPane(content);
+//		jframe.pack();
+//		jframe.setVisible(true);
 	}
 	
 	public static void runUnitTests()

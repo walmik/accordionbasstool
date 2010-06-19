@@ -95,7 +95,7 @@ public class TabCustomBass extends javax.swing.JPanel {
       //TODO: err check
       String text = chordTextArea.getText();
       Vector<Chord> currChords = ChordParser.parseChords(new StringParser(text));
-      Main._mainBoardPanel.computeOptimalCombosFromChords(currChords);
+      BoardPanel._mainBoardPanel.computeOptimalCombosFromChords(currChords);
     }//GEN-LAST:event_computeButtonActionPerformed
 
 
