@@ -41,7 +41,7 @@
                   <Component id="seqListTP" min="-2" max="-2" attributes="1"/>
                   <Component id="basslineTP" min="-2" max="-2" attributes="1"/>
               </Group>
-              <EmptySpace pref="7" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
               <Component id="renderBoardScrollPane" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -167,7 +167,7 @@
             <Property name="maximum" type="int" value="0"/>
             <Property name="minorTickSpacing" type="int" value="1"/>
             <Property name="paintLabels" type="boolean" value="true"/>
-            <Property name="paintTrack" type="boolean" value="false"/>
+            <Property name="paintTicks" type="boolean" value="true"/>
             <Property name="snapToTicks" type="boolean" value="true"/>
           </Properties>
           <Events>

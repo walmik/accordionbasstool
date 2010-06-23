@@ -33,8 +33,8 @@ public class BassToolFrame extends javax.swing.JFrame {
 
     splitPane = new javax.swing.JSplitPane();
     toolTabs = new javax.swing.JTabbedPane();
-    tabCommonChords = new render.TabCommonChords();
     tabCustomBass1 = new render.TabCustomBass();
+    tabCommonChords = new render.TabCommonChords();
     boardPanel1 = new render.BoardPanel();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -44,8 +44,8 @@ public class BassToolFrame extends javax.swing.JFrame {
     splitPane.setDividerLocation(235);
     splitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-    toolTabs.addTab("Common Chords", tabCommonChords);
     toolTabs.addTab("Advanced Chords", tabCustomBass1);
+    toolTabs.addTab("Common Chords", tabCommonChords);
 
     splitPane.setTopComponent(toolTabs);
 

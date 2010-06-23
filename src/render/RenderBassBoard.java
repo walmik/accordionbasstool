@@ -25,7 +25,7 @@ public class RenderBassBoard extends JPanel
 {
 	final static long serialVersionUID = 1;
 
-  RenderBassBoard()
+  public RenderBassBoard()
   {
     this(BassBoard.bassBoard120(), true);
   }

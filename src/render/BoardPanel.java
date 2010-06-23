@@ -100,7 +100,7 @@ public class BoardPanel extends javax.swing.JPanel {
     basslineSlider.setMaximum(0);
     basslineSlider.setMinorTickSpacing(1);
     basslineSlider.setPaintLabels(true);
-    basslineSlider.setPaintTrack(false);
+    basslineSlider.setPaintTicks(true);
     basslineSlider.setSnapToTicks(true);
     basslineSlider.addChangeListener(new javax.swing.event.ChangeListener() {
       public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -151,7 +151,7 @@ public class BoardPanel extends javax.swing.JPanel {
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addComponent(seqListTP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(basslineTP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         .addComponent(renderBoardScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addContainerGap())
     );
@@ -212,17 +212,18 @@ public class BoardPanel extends javax.swing.JPanel {
   {
     Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
 
-    JLabel newLabel = new JLabel("None");
-    newLabel.setFont(basslineSlider.getFont().deriveFont(Font.ITALIC));
+    JLabel newLabel;
+    //newLabel = new JLabel("None");
+    //newLabel.setFont(basslineSlider.getFont().deriveFont(Font.ITALIC));
 
-		labelTable.put(new Integer(-1), newLabel);
+		//labelTable.put(new Integer(-1), newLabel);
     
-		basslineSlider.setMinimum(-1);
+		basslineSlider.setMinimum(0);
 
     // If no chords, just adding "None" and that's it
     if (currChords == null)
     {
-      basslineSlider.setMaximum(-1);
+      basslineSlider.setMaximum(0);
       return;
     }
 
@@ -233,7 +234,7 @@ public class BoardPanel extends javax.swing.JPanel {
       labelTable.put(new Integer(i), newLabel);
     }
 
-    basslineSlider.setValue(-1);
+    basslineSlider.setValue(0);
 
     basslineSlider.setMaximum(currChords.size() - 1);
     basslineSlider.setVisible(true);
@@ -252,11 +253,17 @@ public class BoardPanel extends javax.swing.JPanel {
 		_bestMatchListModel.setComboSeqs(
 				_searcher.parseSequence(renderBassBoard.getBassBoard(), currChords));
 
-    if ((seqList.getSelectedIndex() < 0) && (_bestMatchListModel.getSize() > 0))
+    int currSel = seqList.getSelectedIndex();
+
+    if ((currSel < 0) || (currSel >= _bestMatchListModel.getSize()))
     {
+      currSel = 0;
       seqList.setSelectedIndex(0);
-      basslineSlider.requestFocus();
     }
+
+    selectComboSeq(currSel);
+
+    basslineSlider.requestFocus();
 	}
 
 	private void selectComboSeq(int index)
@@ -265,16 +272,16 @@ public class BoardPanel extends javax.swing.JPanel {
 
     // Set Board Combo Seq
 		renderBassBoard.setSelectedSeq(_selSeq);
-
+    renderBassBoard.setSelectedSeqCombo(basslineSlider.getValue());
+    
 		if (_selSeq == null)
 		{
-			basslineSlider.setMaximum(-1);
+			basslineSlider.setMaximum(0);
 			basslineSlider.setEnabled(false);
 		}
 		else
 		{
 			basslineSlider.setEnabled(true);
-       renderBassBoard.setSelectedSeqCombo(basslineSlider.getValue());
 			//basslineSlider.requestFocus();
 		}
 

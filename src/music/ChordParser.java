@@ -125,7 +125,7 @@ public class ChordParser {
 		
 		// Half-Dim 7
 		{
-			String[] chordStr = {"h7", "hd7", "hdim7"};
+			String[] chordStr = {"m7(b5)", "min7(b5)"};
 			Interval[] ival = {Interval.m3, Interval.m3, Interval.M3};
 			primaryChordStrs.add(new ChordString(chordStr, ival));
 			assert(verifyChordOnC(primaryChordStrs, "[C Eb Gb Bb]"));
@@ -146,7 +146,7 @@ public class ChordParser {
 			primaryChordStrs.add(new ChordString(chordStr, ival));
 			assert(verifyChordOnC(primaryChordStrs, "[C Eb Bbb]"));
 		}
-		
+
 		// 9th Chords
 		//-------------------------------
 		
@@ -200,123 +200,6 @@ public class ChordParser {
 		}
 	}
 	
-//	public static boolean matches(String[] tokens, Main.StringParser parser)
-//	{
-//		for (int i = 0; i < tokens.length; i++)
-//		{
-//			if (parser.input().startsWith(tokens[i]))
-//			{
-//				parser.incOffset(tokens[i].length());
-//				return true;
-//			}
-//		}
-//		
-//		return false;
-//	}
-//	
-//	static String[] tMaj7 = {"M7", "maj7"};
-//	
-//	static String[] tMaj = {"M", "maj"};
-//	static String[] tMin = {"m", "min"};
-//	
-//	static String[] tAug = {"+", "aug"};
-//	
-//	static String[] tDimTri = {"dim*", "d*"};
-//	static String[] tDim7 = {"dim7", "d7"};
-//	static String[] tDim7no5 = {"dim", "d"};
-//	
-//	static String[] t7 = {"7"};
-//	static String[] tHalfD = {"7b5", "hdim7"};
-//	
-//	public static Chord newParse(Main.StringParser parser)
-//	{
-//		Vector<Interval> ivals = new Vector<Interval>();
-//		
-//		while (!parser.isDone())
-//		{
-//			// Major 7
-//			if (matches(tMaj7, parser))
-//			{
-//				// If don't have a triad, implies a major triad too
-//				if (ivals.size() == 0)
-//				{
-//					ivals.add(Interval.M3);
-//					ivals.add(Interval.P5);
-//				}
-//				ivals.add(Interval.M7);
-//				break;
-//			}
-//			
-//			// Major			
-//			if (matches(tMaj, parser))
-//			{
-//				ivals.add(Interval.M3);
-//				ivals.add(Interval.P5);				
-//			}
-//			
-//			// Minor			
-//			if (matches(tMin, parser))
-//			{
-//				ivals.add(Interval.m3);
-//				ivals.add(Interval.P5);				
-//			}
-//			
-//			// Augmented			
-//			if (matches(tAug, parser))
-//			{
-//				ivals.add(Interval.M3);
-//				ivals.add(Interval.Aug5);				
-//			}
-//			
-//			// Diminished - standard triad
-//			if (matches(tDimTri, parser))
-//			{
-//				ivals.add(Interval.m3);
-//				ivals.add(Interval.Dim5);				
-//			}
-//			
-//			// Diminished 7	no 5
-//			if (matches(tDim7no5, parser))
-//			{
-//				ivals.add(Interval.m3);
-//				ivals.add(Interval.Dim7);
-//				break;
-//			}
-//			
-//			// Diminished 7 WITH 5	
-//			if (matches(tDim7, parser))
-//			{
-//				ivals.add(Interval.m3);
-//				ivals.add(Interval.Dim5);
-//				ivals.add(Interval.Dim7);
-//				break;
-//			}
-//			
-//			if (matches(t7, parser))
-//			{
-//				if (ivals.size() == 0)
-//				{
-//					ivals.add(Interval.M3);
-//					ivals.add(Interval.m3);
-//				}
-//				
-//				ivals.add(Interval.m7);
-//				break;
-//			}
-//			
-//			if (matches(t7, parser))
-//			{
-//				if (ivals.size() == 0)
-//				{
-//					ivals.add(Interval.M3);
-//					ivals.add(Interval.m3);
-//				}
-//				
-//				ivals.add(Interval.m7);
-//				break;
-//			}
-//		}
-//	}
 	
 	public static Chord parse(Main.StringParser parser)
 	{
@@ -370,22 +253,13 @@ public class ChordParser {
 		}
 		
 		input = parser.input();
-		
-		if (input.startsWith("sus2"))
-		{
-			matchIvals = matchIvals.clone();
-			matchIvals[0] = Interval.M2;
-			parser.incOffset(4);
-			input = parser.input();
-		}
-		
-		if (input.startsWith("sus4"))
-		{
-			matchIvals = matchIvals.clone();
-			matchIvals[0] = Interval.P4;
-			parser.incOffset(4);
-			input = parser.input();			
-		}
+    
+    while (!input.isEmpty())
+    {
+      matchIvals = parseChordMod(input, parser, matchIvals);
+    }
+
+    // Additional Bass
 		
 		if (input.startsWith("/"))
 		{
@@ -401,48 +275,31 @@ public class ChordParser {
 		}
 		
 		return new Chord(rootNote, matchIvals);
-		
-		
-//		int offset = 0;
-//		
-//		while ((offset < input.length()) && Character.isLetterOrDigit(input.charAt(offset)))
-//		{
-//			offset++;
-//		}
-//		
-//		String chordName = input.substring(0, offset);
-//		parser.incOffset(offset);
-//		
-//		// Single note
-//		if (chordName.length() == 0)
-//		{
-//			return new Chord(rootNote, 1);
-//		}
-//		
-//		if (chordName.length() == 1)
-//		{
-//			int ch = chordName.charAt(0);
-//			switch (ch)
-//			{
-//			case '7':
-//				return new Chord(rootNote, Chord.M7);
-//				
-//			case 'm':
-//				return new Chord(rootNote, Chord.MINOR);
-//				
-//			case 'M':
-//				return new Chord(rootNote, Chord.MAJOR);
-//				
-//			case '*':
-//				return new Chord(rootNote, Chord.DIM);
-//			}
-//		}
-//		
-////		if (chordName.startsWith("Maj"))
-////		{
-////			
-////		}
-//		
-//		return null;
-	}
+
+  }
+
+  static Interval[] parseChordMod(String input,
+                                  Main.StringParser parser,
+                                  Interval[] matchIvals)
+  {
+    // Sustained
+		if (input.startsWith("sus2"))
+		{
+			matchIvals = matchIvals.clone();
+			matchIvals[0] = Interval.M2;
+			parser.incOffset(4);
+			input = parser.input();
+		}
+
+		if (input.startsWith("sus4"))
+		{
+			matchIvals = matchIvals.clone();
+			matchIvals[0] = Interval.P4;
+			parser.incOffset(4);
+			input = parser.input();			
+		}
+
+    return matchIvals;
+  }
+
 }
