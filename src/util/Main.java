@@ -6,6 +6,7 @@ import javax.swing.UIManager;
 
 
 import music.ChordParser;
+import music.ChordRegistry;
 import render.BassToolFrame;
 
 
@@ -74,7 +75,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		runUnitTests();
-		ChordParser.initChords();
+		ChordRegistry.initChords();
     
     try
     {

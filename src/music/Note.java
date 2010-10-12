@@ -53,17 +53,14 @@ public class Note
 			}
 		}
 		
-		public static ScaleNote fromString(Main.StringParser parser)
-		{
-			int theChar = 0;
-			
-			String input = parser.input();
-			
-			if (input.length() > 0)
+		public static ScaleNote fromString(String input)
+		{	
+			if (input.length() < 1)
 			{
-				theChar = input.charAt(0);
-				parser.incOffset(1);
+				return null;
 			}
+
+      int theChar = input.charAt(0);
 			
 			switch (theChar)
 			{
@@ -96,14 +93,19 @@ public class Note
 				return G;
 
 			default:
-				parser.incOffset(-1);
-				return A;
+				return null;
 			}
 		}
 	}
 
 	ScaleNote note;
 	short sharpsOrFlats;
+
+  //Default note is C
+  public Note()
+  {
+    this(ScaleNote.C, 0);
+  }
 
 	public Note(ScaleNote n, int sof)
 	{
@@ -148,64 +150,90 @@ public class Note
 		return add(ival.scale(-1));
 	}
 	
-	public static String printNote(ScaleNote note, int sharpsOrFlats)
+	public static String printNote(ScaleNote note, int sharpsOrFlats, boolean html)
 	{
 		String base = note.toString();
+
+    if (html && (sharpsOrFlats != 0))
+      base += "<sup>";
 		
 		if (sharpsOrFlats > 0)
 		{
 			for (int i = 0; i < sharpsOrFlats; i++)
 			{
-				base += "#";
+				//base += (html ? "\u266F" : "#");
+        base += "#";
 			}
 		}
 		else
 		{
 			for (int i = sharpsOrFlats; i < 0; i++)
 			{
-				base += "b";
+				//base += (html ? "\u266D" : "b");
+        base += "b";
 			}
 		}
+
+    if (html && (sharpsOrFlats != 0))
+    {
+      base += "</sup>";
+    }
+
 		
 		return base;		
 	}
 
-	public String toString()
+  public String toString()
+  {
+    return toString(2, false);
+  }
+
+  public String toString(boolean html)
+  {
+    return toString(2, html);
+  }
+
+	private String toString(int maxAccidental, boolean html)
 	{
-		if (sharpsOrFlats >= 2)
+		if (sharpsOrFlats >= maxAccidental)
 		{
 			return printNote(ScaleNote.values()[posmod(note.scaleDist + 1, NUM_NOTES)],
-							 sharpsOrFlats - 2);
+							 sharpsOrFlats - 2, html);
 		}
-		else if (sharpsOrFlats <= -2)
+		else if (sharpsOrFlats <= -maxAccidental)
 		{
 			return printNote(ScaleNote.values()[posmod(note.scaleDist - 1, NUM_NOTES)], 
-							 sharpsOrFlats + 2);			
+							 sharpsOrFlats + 2, html);
 		}
 		else
 		{
-			return printNote(note, sharpsOrFlats);
+			return printNote(note, sharpsOrFlats, html);
 		}
 	}
+  
+  static int lastParserOffset = 0;
+
+  public static Note fromString(Main.StringParser parser)
+  {
+    Note note = fromString(parser.input());
+    
+    if (note != null)
+      parser.incOffset(lastParserOffset);
+
+    return note;
+  }
 	
-	public static Note fromString(Main.StringParser parser)
+	public static Note fromString(String input)
 	{
-		int initialParserOffset = parser.getOffset();
-		ScaleNote scaleNote = ScaleNote.fromString(parser);
-		
-		// if parser offset wasn't incremented, a valid scale note
-		// was not read, so there's not a valid note to be parsed
-		if (parser.getOffset() == initialParserOffset)
-		{
-			return null;
-		}
-		
-		String input = parser.input();
+		ScaleNote scaleNote = ScaleNote.fromString(input);
+
+    if (scaleNote == null)
+      return null;
 
 		int sharpsOrFlats = 0;
 		int offset;
 
-		for (offset = 0; offset < input.length(); offset++)
+		for (offset = 1; offset < input.length(); offset++)
 		{
 			int nextChar = input.charAt(offset);
 			if ((nextChar == '#') && (sharpsOrFlats >= 0))
@@ -221,8 +249,8 @@ public class Note
 				break;
 			}
 		}
-		
-		parser.incOffset(offset);
+
+    lastParserOffset = offset;
 		
 		return new Note(scaleNote, sharpsOrFlats);
 	}

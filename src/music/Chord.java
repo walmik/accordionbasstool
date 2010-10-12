@@ -1,19 +1,14 @@
 package music;
 
 public class Chord 
-{
-	final static Interval[] MAJOR = {Interval.M3, Interval.m3};
-	final static Interval[] MINOR = {Interval.m3, Interval.M3};
-	final static Interval[] DOM7 =  {Interval.M3, Interval.Dim5};
-	final static Interval[] DIM7 =  {Interval.m3, Interval.Dim5};
-	
+{	
 	public final Note[] notes;
 	
 	static class Mask
 	{
 		private int value = 0;
 		
-		Mask()  			{ 	value = 0; 		}
+		Mask()            { 	value = 0; 		}
 		Mask(int val) 		{ 	value = val; 	}
 		
 		Mask(Chord chord)
@@ -81,11 +76,13 @@ public class Chord
 	
 	private Mask mask;
 	
-	public Chord(Note singleN, int dupCount)
+	public Chord(Note singleN, boolean mustRoot)
 	{
+    int dupCount = (mustRoot ? 2 : 1);
+
 		notes = new Note[dupCount];
 		
-		initBassNote(0, singleN, dupCount);
+		initBassNote(singleN, dupCount);
 	}
 	
 
@@ -101,21 +98,23 @@ public class Chord
 		initFromIval(0, note, ivals);
 	}
 	
-	public Chord(Note note, Interval[] ivals, Note bassNote, int dupCount)
+	public Chord(Note note, Interval[] ivals, Note bassNote, boolean mustBeRoot)
 	{
-		assert(bassNote != null || dupCount == 0);
+    int dupCount = (mustBeRoot ? 2 : 1);
+    
+		assert(bassNote != null);
 		
 		notes = new Note[ivals.length + 1 + dupCount];
 		
-		initBassNote(0, bassNote, dupCount);
+		initBassNote(bassNote, dupCount);
 		initFromIval(dupCount, note, ivals);
 	}
 	
-	private void initBassNote(int offset, Note singleN, int count)
+	private void initBassNote(Note singleN, int count)
 	{
 		for (int i = 0; i < count; i++)
 		{
-			notes[offset + i] = singleN;
+			notes[i] = singleN;
 		}	
 	}
 	
@@ -129,6 +128,7 @@ public class Chord
 		}
 
 	}
+
 	public Chord(Chord one, Chord two)
 	{
 		Mask onemask = one.getChordMask();
@@ -165,6 +165,30 @@ public class Chord
 		
 		assert(count == numNotes);
 	}
+
+  // extraBass may be null
+  public Chord(Chord existing, Note newRoot, Note extraBass, boolean mustBeBassRoot)
+  {
+    int extraLen = 0;
+    if (extraBass != null)
+    {
+      extraLen++;
+      if (mustBeBassRoot)
+        extraLen++;
+    }
+
+    this.notes = new Note[existing.notes.length + extraLen];
+
+    if (extraBass != null)
+      initBassNote(extraBass, extraLen);
+
+    Interval ival = newRoot.diff(existing.notes[0]);
+
+    for (int i = 0; i < existing.notes.length; i++)
+		{
+			notes[extraLen + i] = existing.notes[i].add(ival);
+		}
+  }
 		
 	public void transpose(Interval ival)
 	{
@@ -173,7 +197,23 @@ public class Chord
 			notes[i] = notes[i].add(ival);
 		}
 		mask = null;
-	}
+  }
+
+  public String getTransposedString(Note newRoot)
+  {
+    Interval ival = newRoot.diff(notes[0]);
+
+		String str = "";
+
+		for (int i = 0; i < notes.length; i++)
+		{
+      if (i > 0)
+        str += "-";
+			str += notes[i].add(ival).toString();
+		}
+
+		return str;
+  }
 	
 	public boolean isSingleNote()
 	{
@@ -209,16 +249,23 @@ public class Chord
 		return mask;
 	}
 	
-	public String toString()
+	public String toString(String sep, boolean html)
 	{
 		String str = "";
 		
 		for (int i = 0; i < notes.length; i++)
 		{
-			str += notes[i].toString();
+      if (i > 0)
+        str += sep;
+			str += notes[i].toString(html);
 		}
 		
 		return str;
 	}
+
+  public String toString()
+  {
+    return toString("", false);
+  }
 }
 

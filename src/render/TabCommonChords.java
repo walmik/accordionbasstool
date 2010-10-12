@@ -32,111 +32,29 @@ public class TabCommonChords extends javax.swing.JPanel {
   private void initComponents() {
 
     noteModGroup = new javax.swing.ButtonGroup();
-    rootCombo = new javax.swing.JComboBox();
-    jLabel1 = new javax.swing.JLabel();
-    jScrollPane1 = new javax.swing.JScrollPane();
-    jList1 = new javax.swing.JList();
-    rootCombo1 = new javax.swing.JComboBox();
-    jCheckBox1 = new javax.swing.JCheckBox();
-    jLabel2 = new javax.swing.JLabel();
-    jCheckBox2 = new javax.swing.JCheckBox();
-
-    rootCombo.setFont(rootCombo.getFont().deriveFont(rootCombo.getFont().getSize()+14f));
-    rootCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Ab", "A", "A#", "Bb", "B", "C", "C#", "Db", "D", "D#", "Eb", "E", "F", "F#", "Gb", "G", "G#" }));
-    rootCombo.setSelectedIndex(5);
-
-    jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getStyle() | java.awt.Font.BOLD));
-    jLabel1.setText("Chord Root:");
-
-    jList1.setModel(new javax.swing.AbstractListModel() {
-      String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-      public int getSize() { return strings.length; }
-      public Object getElementAt(int i) { return strings[i]; }
-    });
-    jScrollPane1.setViewportView(jList1);
-
-    rootCombo1.setFont(rootCombo1.getFont().deriveFont(rootCombo1.getFont().getSize()+14f));
-    rootCombo1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Ab", "A", "A#", "Bb", "B", "C", "C#", "Db", "D", "D#", "Eb", "E", "F", "F#", "Gb", "G", "G#" }));
-    rootCombo1.setSelectedIndex(5);
-    rootCombo1.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        rootCombo1ActionPerformed(evt);
-      }
-    });
-
-    jCheckBox1.setFont(jCheckBox1.getFont().deriveFont(jCheckBox1.getFont().getStyle() | java.awt.Font.BOLD));
-    jCheckBox1.setText("Add Bass:");
-    jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        jCheckBox1ActionPerformed(evt);
-      }
-    });
-
-    jLabel2.setFont(jLabel2.getFont().deriveFont(jLabel2.getFont().getSize()+13f));
-    jLabel2.setText("/");
-
-    jCheckBox2.setText("Must be lowest bass note");
+    chordPicker1 = new render.ChordPicker();
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addContainerGap()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(rootCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addGap(18, 18, 18)
-        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addGap(18, 18, 18)
-        .addComponent(jLabel2)
-        .addGap(18, 18, 18)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(jCheckBox1)
-          .addComponent(rootCombo1, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(jCheckBox2))
-        .addContainerGap(308, Short.MAX_VALUE))
+        .addGap(132, 132, 132)
+        .addComponent(chordPicker1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap(229, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addContainerGap()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(jLabel1)
-          .addComponent(jCheckBox1))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(rootCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addGroup(layout.createSequentialGroup()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-              .addComponent(rootCombo1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-              .addComponent(jLabel2))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(jCheckBox2)))
-        .addGap(93, 93, 93))
+        .addComponent(chordPicker1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap(79, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 
-    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-      // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBox1ActionPerformed
-
-    private void rootCombo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rootCombo1ActionPerformed
-      // TODO add your handling code here:
-    }//GEN-LAST:event_rootCombo1ActionPerformed
-
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JCheckBox jCheckBox1;
-  private javax.swing.JCheckBox jCheckBox2;
-  private javax.swing.JLabel jLabel1;
-  private javax.swing.JLabel jLabel2;
-  private javax.swing.JList jList1;
-  private javax.swing.JScrollPane jScrollPane1;
+  private render.ChordPicker chordPicker1;
   private javax.swing.ButtonGroup noteModGroup;
-  private javax.swing.JComboBox rootCombo;
-  private javax.swing.JComboBox rootCombo1;
   // End of variables declaration//GEN-END:variables
 
 }

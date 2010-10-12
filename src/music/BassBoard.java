@@ -249,25 +249,25 @@ public class BassBoard
 		switch (row)
 		{
 		case CB_MAJ3:
-			return new Chord(note.add(Interval.M3), 2);
+			return new Chord(note.add(Interval.M3), true);
 			
 		case CB_MIN3:
-			return new Chord(note.add(Interval.m3), 2);
+			return new Chord(note.add(Interval.m3), true);
 			
 		case ROOT:
-			return new Chord(note, 2);
+			return new Chord(note, true);
 			
 		case MAJ:
-			return new Chord(note, Chord.MAJOR);
+			return new Chord(note, ChordRegistry.MAJOR);
 			
 		case MIN:
-			return new Chord(note, Chord.MINOR);
+			return new Chord(note, ChordRegistry.MINOR);
 			
 		case MAJ7:
-			return new Chord(note, Chord.DOM7);
+			return new Chord(note, ChordRegistry.DOM);
 			
 		case DIM:
-			return new Chord(note, Chord.DIM7);
+			return new Chord(note, ChordRegistry.DIM);
 			
 		default:
 			throw new RuntimeException("Invalid Row Specified: " + row);
