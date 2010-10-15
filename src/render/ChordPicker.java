@@ -86,7 +86,6 @@ public class ChordPicker extends javax.swing.JDialog
     });
     notePicker2.setVisible(usingAddedBass);
   }
-  
   ChordDef finalChord = new ChordDef();
 
   public ChordDef getDefaultChordDef()
@@ -150,8 +149,7 @@ public class ChordPicker extends javax.swing.JDialog
 
     //---> Modal Loop Here
 
-    if (changeConfirmed)
-    {
+    if (changeConfirmed) {
       updateCurrChord();
       return finalChord;
     }
@@ -288,20 +286,36 @@ public class ChordPicker extends javax.swing.JDialog
 
     ChordTableModel()
     {
-      loadFromXml("./xml/chorddefs.xml");
+      loadFromXml("chorddefs.xml");
     }
 
-    private void loadFromXml(String url)
+    private Document tryDoc(DocumentBuilderFactory dbf, String url)
     {
       try {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document doc = dbf.newDocumentBuilder().parse(url);
-        Element element = doc.getDocumentElement();
-
-        loadChords(element);
+        return doc;
       } catch (Exception e) {
         e.printStackTrace();
+        return null;
       }
+    }
+
+    private void loadFromXml(String filename)
+    {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+      Document doc = tryDoc(dbf, "./" + filename);
+      if (doc == null) {
+        doc = tryDoc(dbf, "./xml/" + filename);
+      }
+
+      if (doc == null) {
+        return;
+      }
+
+      Element element = doc.getDocumentElement();
+
+      loadChords(element);
     }
 
     private void loadChords(Element root)
@@ -376,8 +390,8 @@ public class ChordPicker extends javax.swing.JDialog
       for (int col = 0; col < allChords.length; col++) {
         for (int row = 0; row < allChords[col].length; row++) {
           String currAbbrev = allChords[col][row].abbrevPlain;
-          if ((currAbbrev.length() > prevMatchLength) &&
-              chordToMatch.startsWith(currAbbrev)) {
+          if ((currAbbrev.length() > prevMatchLength)
+                  && chordToMatch.startsWith(currAbbrev)) {
             bestMatch.x = col;
             bestMatch.y = row;
             prevMatchLength = currAbbrev.length();

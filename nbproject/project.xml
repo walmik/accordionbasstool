@@ -10,10 +10,11 @@
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
             <name>AccordionBassTool</name>
             <source-roots>
-                <root id="src.xml.dir"/>
                 <root id="src.dir" name="src"/>
             </source-roots>
-            <test-roots/>
+            <test-roots>
+                <root id="test.xml.dir"/>
+            </test-roots>
         </data>
     </configuration>
 </project>
