@@ -16,8 +16,11 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
+import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
@@ -38,26 +41,47 @@ import music.Chord;
 public class TabCommonChords extends javax.swing.JPanel
 {
 
-  SeqDataModel dataModel = new SeqDataModel();
-  SeqColumnModel columnModel = new SeqColumnModel();
-
+  SeqDataModel dataModel;
+  SeqColumnModel columnModel;
+  SeqRowHeaderData rowHeaderDataModel;
+  RenderBassBoard renderBoard;
+  ChordPicker chordPicker;
+  
   /** Creates new form TabCommonChords */
   public TabCommonChords()
   {
+    columnModel = new SeqColumnModel();
+    dataModel = new SeqDataModel();
+    rowHeaderDataModel = new SeqRowHeaderData();
+
     initComponents();
+
     chordPicker = new ChordPicker(util.Main._rootFrame, true);
+
+    renderBoard = BassToolFrame.getRenderBoard();
+
+    if (renderBoard != null) {
+      renderBoard.setSelectedButtonCombo(columnModel.selComboModel);
+    }
+
     initTable();
   }
-  
-  ChordPicker chordPicker;
 
   class SeqColumnModel extends DefaultTableColumnModel
   {
 
+    SelectedButtonCombo selComboModel;
+    ButtonComboSequence allComboSeqs[];
+    BoardSearcher searcher;
+
     SeqColumnModel()
     {
-      super();
-      this.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+      selComboModel = new SelectedButtonCombo();
+      selComboModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+      allComboSeqs = new ButtonComboSequence[0];
+      searcher = new BoardSearcher();
+
+      this.setSelectionModel(selComboModel);
     }
 
     void addColumn(int index)
@@ -93,7 +117,8 @@ public class TabCommonChords extends javax.swing.JPanel
     public void moveColumn(int columnIndex, int newIndex)
     {
       super.moveColumn(columnIndex, newIndex);
-      syncModelToView(Math.min(columnIndex, newIndex));
+      if (columnIndex != newIndex)
+        syncModelToView(Math.min(columnIndex, newIndex));
     }
 
     void removeSelectedColumn()
@@ -139,7 +164,6 @@ public class TabCommonChords extends javax.swing.JPanel
         column.setHeaderValue(def);
         //TODO: selection refix?
         computeSeqs(index);
-        //dataModel.fireTableDataChanged();
       }
     }
 
@@ -160,38 +184,34 @@ public class TabCommonChords extends javax.swing.JPanel
       return vec;
     }
 
-    ButtonComboSequence allComboSeqs[];
-    BoardSearcher searcher = new BoardSearcher();
-    music.BassBoard currBassBoard = null;
-
     void computeSeqs(int colIndex)
     {
-      RenderBassBoard renderBoard = render.BassToolFrame.getRenderBoard();
-      if (renderBoard == null)
+      if (renderBoard == null) {
         return;
+      }
 
-      currBassBoard = renderBoard.getBassBoard();
+      music.BassBoard currBassBoard = renderBoard.getBassBoard();
 
       allComboSeqs =
               searcher.parseSequence(
               currBassBoard,
               columnModel.getAllChords());
+      
+      assert(allComboSeqs != null);
 
       dataModel.fireTableStructureChanged();
+      rowHeaderDataModel.fireListDataChanged();
 
-      getSelectionModel().setSelectionInterval(colIndex, colIndex);
+      selComboModel.setSelectionInterval(colIndex, colIndex);
+
       if (seqTable.getRowCount() > 0) {
         seqTable.setRowSelectionInterval(0, 0);
       }
-
-      //assert (allComboSeqs.length == columnModel.getColumnCount());
     }
   }
 
   class SeqDataModel extends AbstractTableModel
   {
-
-    BoardSearcher searcher = new BoardSearcher();
 
     @Override
     public Class<?> getColumnClass(int columnIndex)
@@ -218,11 +238,7 @@ public class TabCommonChords extends javax.swing.JPanel
     @Override
     public int getRowCount()
     {
-      if (columnModel.allComboSeqs != null) {
-        return columnModel.allComboSeqs.length;
-      } else {
-        return 0;
-      }
+      return columnModel.allComboSeqs.length;
     }
 
     @Override
@@ -231,35 +247,33 @@ public class TabCommonChords extends javax.swing.JPanel
       music.ButtonCombo combo =
               columnModel.allComboSeqs[rowIndex].getCombo(columnIndex);
 
-      String info = columnModel.allComboSeqs[rowIndex].debugForceHeur() + ": ";
-      info += combo.toString();
-      return info;
+      return combo.toString();
     }
   }
 
-  class TableSelectionHandler implements ListSelectionListener
+  class SeqRowHeaderData extends AbstractListModel
   {
 
-    @Override
-    public void valueChanged(ListSelectionEvent e)
+    void fireListDataChanged()
     {
-      RenderBassBoard renderBoard =
-              render.BassToolFrame.getRenderBoard();
+      fireContentsChanged(this, 0, columnModel.allComboSeqs.length);
+    }
 
-      if (renderBoard == null)
-        return;
+    @Override
+    public int getSize()
+    {
+      if ((columnModel == null) || (columnModel.allComboSeqs == null))
+        return 0;
+      
+      return columnModel.allComboSeqs.length;
+    }
 
-      if (e.getSource() == columnModel.getSelectionModel()) {
-        int index = seqTable.getSelectedColumn();
-        renderBoard.setSelectedSeqCombo(index);
-        renderBoard.repaint();
-      } else if (e.getSource() == seqTable.getSelectionModel()) {
-        int index = seqTable.getSelectedRow();
-        if (index >= 0) {
-          renderBoard.setSelectedSeq(columnModel.allComboSeqs[index]);
-        }
-        renderBoard.repaint();
-      }
+    @Override
+    public Object getElementAt(int index)
+    {
+      String str = "H: ";
+      str += columnModel.allComboSeqs[index].getHeur();
+      return str;
     }
   }
 
@@ -269,38 +283,55 @@ public class TabCommonChords extends javax.swing.JPanel
 
     seqTable.setDefaultRenderer(String.class, new CellRenderer());
 
-    TableSelectionHandler selHandler = new TableSelectionHandler();
-    seqTable.getSelectionModel().addListSelectionListener(selHandler);
-    columnModel.getSelectionModel().addListSelectionListener(selHandler);
-
     JTableHeader header = seqTable.getTableHeader();
     header.setResizingAllowed(false);
-    header.setReorderingAllowed(true);
+//    header.setReorderingAllowed(false);
+
+    //Create row header table
+    JList rowHeader = new JList(rowHeaderDataModel);
+    rowHeader.setCellRenderer(new RowHeaderRenderer(header));
+    rowHeader.setSelectionModel(seqTable.getSelectionModel());
+    rowHeader.setFixedCellWidth(75);
+    rowHeader.setFixedCellHeight(seqTable.getRowHeight());
+    rowHeader.setOpaque(false);
+    tableScrollPane.setRowHeaderView(rowHeader);
 
     MouseAdapter headerMouse = new HeaderMouseInputHandler();
     header.addMouseListener(headerMouse);
     header.addMouseMotionListener(headerMouse);
 
-    header.setDefaultRenderer(new HeaderRenderer(header));
+    header.setDefaultRenderer(new ColumnHeaderRenderer(header));
 
-//    dataModel.addTableModelListener(new TableModelListener()
-//    {
-//      @Override
-//      public void tableChanged(TableModelEvent e)
-//      {
-//        seqTable.setRowSelectionInterval(0, 0);
-//        seqTable.setColumnSelectionInterval(0, 0);
-//      }
-//    });
-
-
-    columnModel.getSelectionModel().addListSelectionListener(
+    // Row Selection Change
+    seqTable.getSelectionModel().addListSelectionListener(
             new javax.swing.event.ListSelectionListener()
             {
 
               @Override
               public void valueChanged(ListSelectionEvent e)
               {
+                int index = seqTable.getSelectedRow();
+                if ((index >= 0) && (index < columnModel.allComboSeqs.length)) {
+                  columnModel.selComboModel.setButtonComboSeq(columnModel.allComboSeqs[index]);
+                }
+                seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
+              }
+            });
+
+    //Column Selection Change
+    columnModel.getSelectionModel().addListSelectionListener(
+            new javax.swing.event.ListSelectionListener()
+            {
+              int lastSel = -1;
+
+              @Override
+              public void valueChanged(ListSelectionEvent e)
+              {
+                int newSel = seqTable.getSelectedColumn();
+                if (lastSel == newSel)
+                  return;
+
+                lastSel = newSel;
                 seqTable.getTableHeader().repaint();
               }
             });
@@ -348,16 +379,15 @@ public class TabCommonChords extends javax.swing.JPanel
     }
   }
 
-  class HeaderRenderer extends DefaultTableCellRenderer
+  class RowHeaderRenderer extends DefaultListCellRenderer
   {
 
     Font plain, bold;
     Color defColor, selColor;
-    TableCellRenderer defHeader;
-    JTableHeader header;
     Border lowered, raised;
+    JTableHeader header;
 
-    HeaderRenderer(JTableHeader head)
+    RowHeaderRenderer(JTableHeader head)
     {
       header = head;
       initUI();
@@ -369,7 +399,55 @@ public class TabCommonChords extends javax.swing.JPanel
         return;
       }
 
-      defHeader = header.getDefaultRenderer();
+      defColor = header.getBackground();
+      selColor = defColor.darker();
+      lowered = BorderFactory.createLoweredBevelBorder();
+      raised = BorderFactory.createRaisedBevelBorder();
+
+      Font font = header.getFont().deriveFont(18.f);
+      plain = font.deriveFont(Font.PLAIN);
+      bold = font.deriveFont(Font.BOLD);
+    }
+
+    @Override
+    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
+    {
+      this.setText(value.toString());
+
+      if (isSelected) {
+        this.setFont(bold);
+        this.setBackground(selColor);
+        this.setBorder(lowered);
+      } else {
+        this.setFont(plain);
+        this.setBackground(defColor);
+        this.setBorder(raised);
+      }
+
+      return this;
+    }
+  }
+
+  class ColumnHeaderRenderer extends DefaultTableCellRenderer
+  {
+
+    Font plain, bold;
+    Color defColor, selColor;
+    Border lowered, raised;
+    JTableHeader header;
+
+    ColumnHeaderRenderer(JTableHeader head)
+    {
+      header = head;
+      initUI();
+    }
+
+    private void initUI()
+    {
+      if (header == null) {
+        return;
+      }
+
       defColor = header.getBackground();
       selColor = defColor.darker();
       lowered = BorderFactory.createLoweredBevelBorder();
@@ -380,8 +458,6 @@ public class TabCommonChords extends javax.swing.JPanel
       bold = font.deriveFont(Font.BOLD);
 
       this.setHorizontalAlignment(CENTER);
-
-      //header.setPreferredSize(new Dimension(10, 50));
     }
 
     @Override
@@ -565,9 +641,9 @@ public class TabCommonChords extends javax.swing.JPanel
           .addComponent(butAddChord)
           .addComponent(butInsertChord)
           .addComponent(butRemoveChord))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(tableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(454, Short.MAX_VALUE))
+        .addGap(18, 18, 18)
+        .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 528, Short.MAX_VALUE)
+        .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -610,7 +686,6 @@ public class TabCommonChords extends javax.swing.JPanel
     {//GEN-HEADEREND:event_butInsertChordActionPerformed
       columnModel.addColumn(seqTable.getSelectedColumn());
 }//GEN-LAST:event_butInsertChordActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton butAddChord;
   private javax.swing.JButton butInsertChord;

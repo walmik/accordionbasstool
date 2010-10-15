@@ -16,6 +16,8 @@ import java.awt.geom.Path2D;
 
 import javax.swing.DefaultSingleSelectionModel;
 import javax.swing.JPanel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import music.BassBoard;
 import music.ButtonComboSequence;
@@ -60,6 +62,19 @@ public class RenderBassBoard extends JPanel
 		return _theBoard;
 	}
 
+  public void setSelectedButtonCombo(SelectedButtonCombo newSel)
+  {
+    _selCombo = newSel;
+    _selCombo.addListSelectionListener(new ListSelectionListener()
+    {
+      @Override
+      public void valueChanged(ListSelectionEvent e)
+      {
+        repaint();
+      }
+    });
+  }
+
   public void setSelectedSeq(ButtonComboSequence seq)
   {
     _selCombo.setButtonComboSeq(seq);
@@ -67,7 +82,7 @@ public class RenderBassBoard extends JPanel
 
   public void setSelectedSeqCombo(int index)
   {
-    _selCombo.setSelectedIndex(index);
+    _selCombo.setSelectionInterval(index, index);
   }
 	
 //	public void addDrawer(DrawBass drawer)
@@ -398,61 +413,6 @@ public class RenderBassBoard extends JPanel
 								_tY);
 		}
 	}
-  
-  public class SelectedButtonCombo extends DefaultSingleSelectionModel
-  {
-    private static final long serialVersionUID = 1L;
-
-    ButtonComboSequence _comboSeq = null;
-
-    public void setButtonComboSeq(ButtonComboSequence seq)
-    {
-      _comboSeq = seq;
-//      this.setSelectedIndex(-1);
-    }
-
-    public boolean hasButtonInSeq(int row, int col)
-    {
-      if (_comboSeq == null)
-      {
-        return false;
-      }
-
-      for (int i = 0; i < _comboSeq.getNumCombos(); i++)
-      {
-        if (_comboSeq.getCombo(i).hasButton(row, col))
-        {
-          return true;
-        }
-      }
-
-      return false;
-    }
-
-    public boolean hasButtonPressed(int row, int col)
-    {
-      int currIndex = this.getSelectedIndex();
-      if ((currIndex < 0) || (_comboSeq == null))
-      {
-        return false; //none selected
-      }
-
-      if (currIndex < _comboSeq.getNumCombos())
-      {
-        // return if button is in the currently selected combo seq
-        return _comboSeq.getCombo(currIndex).hasButton(row, col);
-      }
-
-      if (currIndex == _comboSeq.getNumCombos())
-      {
-        // return true for all buttons in the all comboseqs
-        return hasButtonInSeq(row, col);
-      }
-
-      // some other invalid state?
-      return false;
-    }
-  }
 
 
 	//Member Vars
