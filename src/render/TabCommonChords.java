@@ -605,6 +605,11 @@ public class TabCommonChords extends javax.swing.JPanel
     butRemoveChord.setFocusable(false);
     butRemoveChord.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
     butRemoveChord.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    butRemoveChord.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        butRemoveChordActionPerformed(evt);
+      }
+    });
 
     butInsertChord.setText("Insert Chord...");
     butInsertChord.setFocusable(false);
@@ -688,6 +693,12 @@ public class TabCommonChords extends javax.swing.JPanel
     {//GEN-HEADEREND:event_butInsertChordActionPerformed
       columnModel.addColumn(seqTable.getSelectedColumn());
 }//GEN-LAST:event_butInsertChordActionPerformed
+
+    private void butRemoveChordActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_butRemoveChordActionPerformed
+    {//GEN-HEADEREND:event_butRemoveChordActionPerformed
+      columnModel.removeSelectedColumn();
+    }//GEN-LAST:event_butRemoveChordActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton butAddChord;
   private javax.swing.JButton butInsertChord;

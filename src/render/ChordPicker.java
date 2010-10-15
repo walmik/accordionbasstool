@@ -288,7 +288,7 @@ public class ChordPicker extends javax.swing.JDialog
 
     ChordTableModel()
     {
-      loadFromXml("C:/Users/Ilya/workspace/AccordionBassTool/xml/chorddefs.xml");
+      loadFromXml("./xml/chorddefs.xml");
     }
 
     private void loadFromXml(String url)
