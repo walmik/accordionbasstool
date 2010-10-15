@@ -6,7 +6,7 @@ package music;
 public class ButtonCombo
 {
 	private BassBoard.Pos[] pos;
-	BassBoard.Pos center;
+	GeoPos center;
 	int heur = 0;
 	Hash hash;
 	
@@ -53,7 +53,7 @@ public class ButtonCombo
 	
 	public String toString()
 	{
-		String str = "<";
+		String str = this.heur + ": <";
 		for (int i = 0; i < pos.length; i++)
 		{
 			BassBoard.Pos currPos = pos[i];
@@ -64,29 +64,31 @@ public class ButtonCombo
 		return str;
 	}
 	
-	public int evalHeur(BassBoard.Pos boardCenter)
+	public int evalHeur(final BassBoard.Pos boardCenter)
 	{
 		return evalHeur(boardCenter, null, null);
 	}
 	
-	public int evalHeur(BassBoard.Pos boardCenter,
-						BassBoard.Pos gMaxP,
-						BassBoard.Pos gMinP)
+	public int evalHeur(final BassBoard.Pos boardCenter,
+						GeoPos boundsMax,
+						GeoPos boundsMin)
 	{
-		if ((heur != 0) && (gMaxP == null && gMinP == null))
+		if ((heur != 0) && (boundsMax == null && boundsMin == null))
 		{
 			return heur;
 		}
 		
-		heur = 0;
+		heur = 1;
 		
-		center = new BassBoard.Pos(0, 0);
-		BassBoard.Pos minP = BassBoard.Pos.maxPos();
-		BassBoard.Pos maxP = BassBoard.Pos.minPos();
-		
+		center = GeoPos.zero();
+		GeoPos minP = GeoPos.maxPos();
+		GeoPos maxP = GeoPos.minPos();
+    GeoPos currPos = GeoPos.zero();
+
+    // Compute center and corners of the buttoncombo
 		for (int i = 0; i < pos.length; i++)
 		{
-			BassBoard.Pos currPos = pos[i];
+			currPos.set(pos[i], boardCenter);
 			center.add(currPos);
 			minP.min(currPos);
 			maxP.max(currPos);
@@ -95,20 +97,21 @@ public class ButtonCombo
 		if (pos.length > 0)
 		{
 			center.divide(pos.length);
-			center.subtract(boardCenter);	
 		}
-		
-		if (gMaxP != null && gMinP != null)
+
+    // Update max min bounds, if provided
+		if (boundsMax != null && boundsMin != null)
 		{
-			gMaxP.max(maxP);
-			gMinP.min(minP);
+			boundsMax.max(maxP);
+			boundsMin.min(minP);
 		}
 		
 		maxP.subtract(minP);
-		
+
+    // Span width + height
 		heur += maxP.absValue();
-	//	heur += center.absValue();
-		heur += (pos.length - 1) * 50; 
+		//heur += center.absValue();
+		heur += (pos.length - 1) * (50 * GeoPos.GRID_SCALE);
 		
 		return heur;
 	}

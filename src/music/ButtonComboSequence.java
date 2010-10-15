@@ -34,6 +34,11 @@ public class ButtonComboSequence implements Cloneable
 	{
 		return combos.size();
 	}
+
+  public BassBoard getBoard()
+  {
+    return board;
+  }
 	
 	public void add(ButtonCombo newCombo)
 	{
@@ -60,6 +65,7 @@ public class ButtonComboSequence implements Cloneable
 		return str;
 	}
 	
+  @Override
 	public ButtonComboSequence clone()
 	{
 		ButtonComboSequence copy = 
@@ -67,6 +73,12 @@ public class ButtonComboSequence implements Cloneable
 		
 		return copy;
 	}
+
+  public int debugForceHeur()
+  {
+    heur = 0;
+    return evalHeuristic();
+  }
 	
 	int evalHeuristic()
 	{
@@ -80,17 +92,19 @@ public class ButtonComboSequence implements Cloneable
 		ButtonCombo prevCombo = null;
 		int dist = 0;
 		
-		BassBoard.Pos center = new BassBoard.Pos(0, 0);
-		BassBoard.Pos minP = BassBoard.Pos.maxPos();
-		BassBoard.Pos maxP = BassBoard.Pos.minPos();
+		GeoPos center = GeoPos.zero();
+		GeoPos minP = GeoPos.maxPos();
+		GeoPos maxP = GeoPos.minPos();
 		
 		ButtonCombo firstCombo = null;
+
+    final BassBoard.Pos boardCenter = board.getCenter();
 		
 		while (combosList.hasMoreElements())
 		{
 			ButtonCombo combo = combosList.nextElement();
 			
-			dist += combo.evalHeur(board.getCenter(), maxP, minP);
+			dist += combo.evalHeur(boardCenter, maxP, minP);
 			
 			if (prevCombo != null)
 			{

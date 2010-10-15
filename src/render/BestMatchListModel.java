@@ -33,10 +33,9 @@ public class BestMatchListModel extends AbstractListModel {
 		return (_currSeqs != null ? _currSeqs.length : 0);
 	}
 	
-	public void setComboSeqs(LinkedList<ButtonComboSequence> seqs)
+	public void setComboSeqs(ButtonComboSequence[] seqs)
 	{
-		_currSeqs = new ButtonComboSequence[seqs.size()];
-		seqs.toArray(_currSeqs);
+		_currSeqs = seqs;
 		this.fireContentsChanged(this, 0, _currSeqs.length);
 	}
 }

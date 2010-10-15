@@ -52,6 +52,14 @@ public class Main {
 			skipWhiteSpace();
 			return fullString.substring(offset);
 		}
+
+    public char nextChar()
+    {
+      if (isDone())
+        return 0;
+
+      return fullString.charAt(offset);
+    }
 		
 		public void incOffset(int inc)
 		{
@@ -73,6 +81,8 @@ public class Main {
 	 * @param args
 	 */
 
+  public static JFrame _rootFrame;
+
 	public static void main(String[] args) {
 		runUnitTests();
 		ChordRegistry.initChords();
@@ -88,6 +98,7 @@ public class Main {
 
 
     JFrame frame = new BassToolFrame();
+    _rootFrame = frame;
     frame.setVisible(true);
 
 //		JFrame jframe = new JFrame("BassLayout");

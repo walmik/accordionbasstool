@@ -254,7 +254,7 @@ public class RenderBassBoard extends JPanel
 		}
 	}
 	
-	//@Override
+	@Override
 	public Dimension getPreferredSize()
 	{
 		int r, c;
@@ -408,7 +408,7 @@ public class RenderBassBoard extends JPanel
     public void setButtonComboSeq(ButtonComboSequence seq)
     {
       _comboSeq = seq;
-      this.setSelectedIndex(-1);
+//      this.setSelectedIndex(-1);
     }
 
     public boolean hasButtonInSeq(int row, int col)

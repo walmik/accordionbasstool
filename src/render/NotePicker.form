@@ -10,7 +10,7 @@
   <Properties>
     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
       <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-        <TitledBorder title="Root:">
+        <TitledBorder justification="1" position="2" title="Root:">
           <Connection PropertyName="titleX" component="Form" name="name" type="property"/>
         </TitledBorder>
       </Border>
@@ -32,47 +32,44 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="rootA" min="-2" max="-2" attributes="0"/>
+              <Component id="rootA" linkSize="2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="rootB" min="-2" max="-2" attributes="0"/>
+              <Component id="rootB" linkSize="2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="rootC" min="-2" max="-2" attributes="0"/>
+              <Component id="rootC" linkSize="2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="rootD" min="-2" max="-2" attributes="0"/>
+              <Component id="rootD" linkSize="2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="rootE" min="-2" max="-2" attributes="0"/>
+              <Component id="rootE" linkSize="2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="rootF" min="-2" max="-2" attributes="0"/>
+              <Component id="rootF" linkSize="2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="rootG" min="-2" max="-2" attributes="0"/>
+              <Component id="rootG" linkSize="2" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
               <Component id="rootFlat" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="rootNatural" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="rootSharp" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="12" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="rootA" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="rootB" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="rootC" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="rootD" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="rootE" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="rootF" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="rootG" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="rootFlat" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="rootNatural" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="rootSharp" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="32767" attributes="0"/>
+          <Group type="103" groupAlignment="3" attributes="0">
+              <Component id="rootA" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="rootB" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="rootC" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="rootD" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="rootE" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="rootF" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="rootG" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="rootFlat" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="rootNatural" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="rootSharp" alignment="3" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -87,8 +84,8 @@
           <Font name="Tahoma" size="11" style="1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="A"/>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[2, 8, 2, 8]"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="getButtonMargins()" type="code"/>
         </Property>
       </Properties>
       <Events>
@@ -104,8 +101,8 @@
           <Font name="Tahoma" size="11" style="1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="B"/>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[2, 8, 2, 8]"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="getButtonMargins()" type="code"/>
         </Property>
       </Properties>
       <Events>
@@ -122,8 +119,8 @@
         </Property>
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="C"/>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[2, 8, 2, 8]"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="getButtonMargins()" type="code"/>
         </Property>
       </Properties>
       <Events>
@@ -139,8 +136,8 @@
           <Font name="Tahoma" size="11" style="1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="D"/>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[2, 8, 2, 8]"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="getButtonMargins()" type="code"/>
         </Property>
       </Properties>
       <Events>
@@ -156,8 +153,8 @@
           <Font name="Tahoma" size="11" style="1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="E"/>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[2, 8, 2, 8]"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="getButtonMargins()" type="code"/>
         </Property>
       </Properties>
       <Events>
@@ -173,8 +170,8 @@
           <Font name="Tahoma" size="11" style="1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="F"/>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[2, 8, 2, 8]"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="getButtonMargins()" type="code"/>
         </Property>
       </Properties>
       <Events>
@@ -190,8 +187,8 @@
           <Font name="Tahoma" size="11" style="1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="G"/>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[2, 8, 2, 8]"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="getButtonMargins()" type="code"/>
         </Property>
       </Properties>
       <Events>
@@ -207,8 +204,8 @@
           <Font name="Tahoma" size="11" style="1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="b"/>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[2, 8, 2, 8]"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="getButtonMargins()" type="code"/>
         </Property>
       </Properties>
       <Events>
@@ -226,8 +223,8 @@
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="-"/>
         <Property name="actionCommand" type="java.lang.String" value=" "/>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[2, 8, 2, 8]"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="getButtonMargins()" type="code"/>
         </Property>
       </Properties>
       <Events>
@@ -243,8 +240,8 @@
           <Font name="Tahoma" size="11" style="1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="#"/>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[2, 8, 2, 8]"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="getButtonMargins()" type="code"/>
         </Property>
       </Properties>
       <Events>

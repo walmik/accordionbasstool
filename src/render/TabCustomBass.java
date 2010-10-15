@@ -53,7 +53,7 @@ public class TabCustomBass extends javax.swing.JPanel {
     chordTextTP.setLayout(chordTextTPLayout);
     chordTextTPLayout.setHorizontalGroup(
       chordTextTPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(chordTextSP, javax.swing.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
+      .addComponent(chordTextSP, javax.swing.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
     );
     chordTextTPLayout.setVerticalGroup(
       chordTextTPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -86,7 +86,7 @@ public class TabCustomBass extends javax.swing.JPanel {
         .addComponent(chordTextTP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addGap(18, 18, 18)
         .addComponent(computeButton)
-        .addContainerGap(49, Short.MAX_VALUE))
+        .addContainerGap(66, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 

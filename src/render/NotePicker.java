@@ -11,8 +11,12 @@
 
 package render;
 
+import java.awt.Insets;
 import java.awt.event.ItemEvent;
+import java.util.Enumeration;
+import javax.swing.AbstractButton;
 import javax.swing.JToggleButton;
+import javax.swing.UIManager;
 import music.Note;
 
 /**
@@ -31,6 +35,36 @@ public class NotePicker extends javax.swing.JPanel {
         noteStr = "C";
         accStr = "";
         note = new Note();
+    }
+
+    public void setNote(Note note)
+    {
+      String noteStr = note.toString(); //normalize to 1 flat or sharp only
+      Enumeration<AbstractButton> noteButs = rootButtonGroup.getElements();
+      while (noteButs.hasMoreElements())
+      {
+        AbstractButton but = noteButs.nextElement();
+        if (noteStr.startsWith(but.getActionCommand()))
+        {
+          but.doClick();
+          break;
+        }
+      }
+
+      if (noteStr.length() == 1)
+        rootNatural.doClick();
+      else if (note.getSharpOrFlat() > 0)
+        rootSharp.doClick();
+      else if (note.getSharpOrFlat() < 0)
+        rootFlat.doClick();
+      else
+        rootNatural.doClick();
+    }
+
+
+    private Insets getButtonMargins()
+    {
+      return new Insets(2, 8, 2, 8);
     }
 
 
@@ -56,13 +90,13 @@ public class NotePicker extends javax.swing.JPanel {
     rootNatural = new javax.swing.JToggleButton();
     rootSharp = new javax.swing.JToggleButton();
 
-    setBorder(javax.swing.BorderFactory.createTitledBorder(getName()));
+    setBorder(javax.swing.BorderFactory.createTitledBorder(null, getName(), javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.TOP));
     setName("Root:"); // NOI18N
 
     rootButtonGroup.add(rootA);
-    rootA.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    rootA.setFont(new java.awt.Font("Tahoma", 1, 11));
     rootA.setText("A");
-    rootA.setMargin(new java.awt.Insets(2, 8, 2, 8));
+    rootA.setMargin(getButtonMargins());
     rootA.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         NoteItemChanged(evt);
@@ -70,9 +104,9 @@ public class NotePicker extends javax.swing.JPanel {
     });
 
     rootButtonGroup.add(rootB);
-    rootB.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    rootB.setFont(new java.awt.Font("Tahoma", 1, 11));
     rootB.setText("B");
-    rootB.setMargin(new java.awt.Insets(2, 8, 2, 8));
+    rootB.setMargin(getButtonMargins());
     rootB.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         NoteItemChanged(evt);
@@ -80,10 +114,10 @@ public class NotePicker extends javax.swing.JPanel {
     });
 
     rootButtonGroup.add(rootC);
-    rootC.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    rootC.setFont(new java.awt.Font("Tahoma", 1, 11));
     rootC.setSelected(true);
     rootC.setText("C");
-    rootC.setMargin(new java.awt.Insets(2, 8, 2, 8));
+    rootC.setMargin(getButtonMargins());
     rootC.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         NoteItemChanged(evt);
@@ -91,9 +125,9 @@ public class NotePicker extends javax.swing.JPanel {
     });
 
     rootButtonGroup.add(rootD);
-    rootD.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    rootD.setFont(new java.awt.Font("Tahoma", 1, 11));
     rootD.setText("D");
-    rootD.setMargin(new java.awt.Insets(2, 8, 2, 8));
+    rootD.setMargin(getButtonMargins());
     rootD.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         NoteItemChanged(evt);
@@ -101,9 +135,9 @@ public class NotePicker extends javax.swing.JPanel {
     });
 
     rootButtonGroup.add(rootE);
-    rootE.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    rootE.setFont(new java.awt.Font("Tahoma", 1, 11));
     rootE.setText("E");
-    rootE.setMargin(new java.awt.Insets(2, 8, 2, 8));
+    rootE.setMargin(getButtonMargins());
     rootE.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         NoteItemChanged(evt);
@@ -111,9 +145,9 @@ public class NotePicker extends javax.swing.JPanel {
     });
 
     rootButtonGroup.add(rootF);
-    rootF.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    rootF.setFont(new java.awt.Font("Tahoma", 1, 11));
     rootF.setText("F");
-    rootF.setMargin(new java.awt.Insets(2, 8, 2, 8));
+    rootF.setMargin(getButtonMargins());
     rootF.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         NoteItemChanged(evt);
@@ -121,9 +155,9 @@ public class NotePicker extends javax.swing.JPanel {
     });
 
     rootButtonGroup.add(rootG);
-    rootG.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    rootG.setFont(new java.awt.Font("Tahoma", 1, 11));
     rootG.setText("G");
-    rootG.setMargin(new java.awt.Insets(2, 8, 2, 8));
+    rootG.setMargin(getButtonMargins());
     rootG.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         NoteItemChanged(evt);
@@ -131,9 +165,9 @@ public class NotePicker extends javax.swing.JPanel {
     });
 
     accButtonGroup.add(rootFlat);
-    rootFlat.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    rootFlat.setFont(new java.awt.Font("Tahoma", 1, 11));
     rootFlat.setText("b");
-    rootFlat.setMargin(new java.awt.Insets(2, 8, 2, 8));
+    rootFlat.setMargin(getButtonMargins());
     rootFlat.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         NoteItemChanged(evt);
@@ -141,11 +175,11 @@ public class NotePicker extends javax.swing.JPanel {
     });
 
     accButtonGroup.add(rootNatural);
-    rootNatural.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    rootNatural.setFont(new java.awt.Font("Tahoma", 1, 11));
     rootNatural.setSelected(true);
     rootNatural.setText("-");
     rootNatural.setActionCommand(" ");
-    rootNatural.setMargin(new java.awt.Insets(2, 8, 2, 8));
+    rootNatural.setMargin(getButtonMargins());
     rootNatural.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         NoteItemChanged(evt);
@@ -153,9 +187,9 @@ public class NotePicker extends javax.swing.JPanel {
     });
 
     accButtonGroup.add(rootSharp);
-    rootSharp.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    rootSharp.setFont(new java.awt.Font("Tahoma", 1, 11));
     rootSharp.setText("#");
-    rootSharp.setMargin(new java.awt.Insets(2, 8, 2, 8));
+    rootSharp.setMargin(getButtonMargins());
     rootSharp.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         NoteItemChanged(evt);
@@ -187,23 +221,24 @@ public class NotePicker extends javax.swing.JPanel {
         .addComponent(rootNatural)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(rootSharp)
-        .addContainerGap(12, Short.MAX_VALUE))
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
+
+    layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {rootA, rootB, rootC, rootD, rootE, rootF, rootG});
+
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(rootA)
-          .addComponent(rootB)
-          .addComponent(rootC)
-          .addComponent(rootD)
-          .addComponent(rootE)
-          .addComponent(rootF)
-          .addComponent(rootG)
-          .addComponent(rootFlat)
-          .addComponent(rootNatural)
-          .addComponent(rootSharp))
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+      .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+        .addComponent(rootA)
+        .addComponent(rootB)
+        .addComponent(rootC)
+        .addComponent(rootD)
+        .addComponent(rootE)
+        .addComponent(rootF)
+        .addComponent(rootG)
+        .addComponent(rootFlat)
+        .addComponent(rootNatural)
+        .addComponent(rootSharp))
     );
   }// </editor-fold>//GEN-END:initComponents
 

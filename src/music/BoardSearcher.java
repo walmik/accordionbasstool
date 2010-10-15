@@ -9,8 +9,10 @@ public class BoardSearcher
 {
 	final static int MAX_SEQS = 20;
 	final static int MAX_COMBOS = 400;
+
+  final static boolean debugOut = false;
 	
-	public LinkedList<ButtonComboSequence> parseSequence(BassBoard board, Vector<Chord> chordSeq)
+	public ButtonComboSequence[] parseSequence(BassBoard board, Vector<Chord> chordSeq)
 	{
 		Enumeration<Chord> eChord = chordSeq.elements();
 		
@@ -36,10 +38,12 @@ public class BoardSearcher
 			{
 				combo = findAllIter(board, chord);
 			}
-			
-			long end = System.currentTimeMillis();
-			
-			System.out.println("Elapsed: " + (end - start));
+
+      if (debugOut)
+      {
+        long end = System.currentTimeMillis();
+        System.out.println("Elapsed: " + (end - start));
+      }
 
 			
 			if (combo == null)
@@ -47,8 +51,9 @@ public class BoardSearcher
 				//TODO handle null case?
 				continue;
 			}
-			
-			System.out.println("Combos " + combo.length);
+
+      if (debugOut)
+        System.out.println("Combos " + combo.length);
 			
 			// Iterate over curr seqs
 			
@@ -119,8 +124,10 @@ public class BoardSearcher
 //		{
 //			System.out.println("#" + currIter.nextIndex() + " " + currIter.next());
 //		}
-		
-		return currSeqs;
+
+    ButtonComboSequence[] seqArray = new ButtonComboSequence[currSeqs.size()];
+    currSeqs.toArray(seqArray);
+		return seqArray;
 	}
 	
 	ButtonCombo[] findAllNotes(BassBoard board, Note note)
@@ -271,8 +278,9 @@ public class BoardSearcher
 				}	
 			}
 		}
-		
-		System.out.println("Num Valid: " + validPos.size());
+
+    if (debugOut)
+      System.out.println("Num Valid: " + validPos.size());
 		
 		ButtonComboLink currLink = new ButtonComboLink();
 		int startIndex = 0;

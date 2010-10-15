@@ -13,80 +13,18 @@ public class BassBoard
 		DIM,
 		CB_MIN3;
 	};
-	
-	static class Pos
-	{
-		static Pos minPos()
-		{
-			return new Pos(-Integer.MAX_VALUE, -Integer.MAX_VALUE);
-		}
-		
-		static Pos maxPos()
-		{
-			return new Pos(Integer.MAX_VALUE, Integer.MAX_VALUE);
-		}
-		
-		public int row;
-		public int col;
-		
-		Pos(int r, int c)
-		{
-			row = r;// - 1;
-			col = c;// - (board.getCols() - 1) / 2;
-		}
-		
-		int rowGeo()
-		{
-			return row;
-		}
-		
-		int colGeo()
-		{
-			return col;// + (row - 1);
-		}
-		
-		void add(Pos pos)
-		{
-			row += pos.row;
-			col += pos.col;
-		}
-		
-		void subtract(Pos pos)
-		{
-			row -= pos.row;
-			col -= pos.col;
-		}
-		
-		void divide(int scale)
-		{
-			row /= scale;
-			col /= scale;
-		}
-		
-		void max(Pos pos)
-		{
-			row = Math.max(row, pos.row);
-			col = Math.max(col, pos.col);
-		}
-		
-		void min(Pos pos)
-		{
-			row = Math.min(row, pos.row);
-			col = Math.min(col, pos.col);
-		}
-		
-		int absValue()
-		{
-			return Math.abs(row) + Math.abs(col);
-		}
-		
-		int manDistTo(BassBoard.Pos another)
-		{
-			int x = Math.abs(row - another.row);
-			int y = Math.abs(col - another.col);
-			return Math.max(x, y);
-		}
-	}
+
+  static class Pos
+  {
+    final int row;
+    final int col;
+
+    Pos(int r, int c)
+    {
+      row = r;
+      col = c;
+    }
+  }
 	
 	public static BassBoard bassBoard120()
 	{

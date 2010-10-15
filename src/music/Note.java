@@ -123,6 +123,11 @@ public class Note
 		return posmod(halfStepValue(), NUM_HALFSTEPS);	
 	}
 
+  public int getSharpOrFlat()
+  {
+    return sharpsOrFlats;
+  }
+
 	public boolean equals(Note other)
 	{
 		return (value() == other.value());
@@ -193,7 +198,7 @@ public class Note
     return toString(2, html);
   }
 
-	private String toString(int maxAccidental, boolean html)
+  private String toString(int maxAccidental, boolean html)
 	{
 		if (sharpsOrFlats >= maxAccidental)
 		{

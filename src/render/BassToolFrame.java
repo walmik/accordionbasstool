@@ -22,6 +22,11 @@ public class BassToolFrame extends javax.swing.JFrame {
         initComponents();
     }
 
+    public static RenderBassBoard getRenderBoard()
+    {
+      return renderBassBoard;
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -32,25 +37,37 @@ public class BassToolFrame extends javax.swing.JFrame {
   private void initComponents() {
 
     splitPane = new javax.swing.JSplitPane();
+    renderBoardScrollPane = new javax.swing.JScrollPane();
+    renderBassBoard = new render.RenderBassBoard();
     toolTabs = new javax.swing.JTabbedPane();
-    tabCustomBass1 = new render.TabCustomBass();
     tabCommonChords = new render.TabCommonChords();
-    boardPanel1 = new render.BoardPanel();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.1");
     setLocationByPlatform(true);
 
-    splitPane.setDividerLocation(235);
     splitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-    toolTabs.addTab("Advanced Chords", tabCustomBass1);
-    toolTabs.addTab("Common Chords", tabCommonChords);
+    javax.swing.GroupLayout renderBassBoardLayout = new javax.swing.GroupLayout(renderBassBoard);
+    renderBassBoard.setLayout(renderBassBoardLayout);
+    renderBassBoardLayout.setHorizontalGroup(
+      renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGap(0, 1280, Short.MAX_VALUE)
+    );
+    renderBassBoardLayout.setVerticalGroup(
+      renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGap(0, 312, Short.MAX_VALUE)
+    );
+
+    renderBoardScrollPane.setViewportView(renderBassBoard);
+
+    renderBoardScrollPane.getVerticalScrollBar().setBlockIncrement(24);
+    renderBoardScrollPane.getVerticalScrollBar().setUnitIncrement(8);
+    splitPane.setRightComponent(renderBoardScrollPane);
+
+    toolTabs.addTab("Chord Sequence Visualizer", tabCommonChords);
 
     splitPane.setTopComponent(toolTabs);
-
-    boardPanel1.setMinimumSize(new java.awt.Dimension(0, 0));
-    splitPane.setRightComponent(boardPanel1);
 
     getContentPane().add(splitPane, java.awt.BorderLayout.CENTER);
 
@@ -69,10 +86,10 @@ public class BassToolFrame extends javax.swing.JFrame {
     }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private render.BoardPanel boardPanel1;
+  private static render.RenderBassBoard renderBassBoard;
+  private javax.swing.JScrollPane renderBoardScrollPane;
   private javax.swing.JSplitPane splitPane;
   private render.TabCommonChords tabCommonChords;
-  private render.TabCustomBass tabCustomBass1;
   private javax.swing.JTabbedPane toolTabs;
   // End of variables declaration//GEN-END:variables
 
