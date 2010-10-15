@@ -16,6 +16,7 @@ import java.awt.Point;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URL;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
@@ -58,8 +59,10 @@ public class ChordPicker extends javax.swing.JDialog
     chordTable.getSelectionModel().addListSelectionListener(tablelist);
     chordTable.getColumnModel().getSelectionModel().addListSelectionListener(tablelist);
 
-    chordTable.setRowSelectionInterval(0, 0);
-    chordTable.setColumnSelectionInterval(0, 0);
+    if ((chordTable.getRowCount() > 0) && (chordTable.getColumnCount() > 0)) {
+      chordTable.setRowSelectionInterval(0, 0);
+      chordTable.setColumnSelectionInterval(0, 0);
+    }
 
     notePicker1.addPropertyChangeListener("Note", new PropertyChangeListener()
     {
@@ -161,6 +164,10 @@ public class ChordPicker extends javax.swing.JDialog
   {
     StringParser parser = new StringParser(chordStr);
     Note newRoot = Note.fromString(parser);
+    if (newRoot == null) {
+      return;
+    }
+
     notePicker1.setNote(newRoot);
 
     //this.rootNote = newRoot;
@@ -289,10 +296,18 @@ public class ChordPicker extends javax.swing.JDialog
       loadFromXml("chorddefs.xml");
     }
 
-    private Document tryDoc(DocumentBuilderFactory dbf, String url)
+    private Document tryDoc(DocumentBuilderFactory dbf, String string)
     {
       try {
-        Document doc = dbf.newDocumentBuilder().parse(url);
+        URL url = getClass().getClassLoader().getResource(string);
+        if (url != null) {
+          string = url.toString();
+        }
+
+        Document doc = dbf.newDocumentBuilder().parse(string);
+
+        System.out.println("Read Doc From: " + string);
+        
         return doc;
       } catch (Exception e) {
         e.printStackTrace();
@@ -304,12 +319,15 @@ public class ChordPicker extends javax.swing.JDialog
     {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
-      Document doc = tryDoc(dbf, "./" + filename);
+      Document doc = tryDoc(dbf, filename);
+      
       if (doc == null) {
         doc = tryDoc(dbf, "./xml/" + filename);
       }
 
       if (doc == null) {
+        groupNames = new String[0];
+        allChords = new ChordDef[0][];
         return;
       }
 
@@ -366,8 +384,8 @@ public class ChordPicker extends javax.swing.JDialog
     @Override
     public int getRowCount()
     {
-      assert ((allChords != null) && (allChords.length > 0));
-      return (simpleMode ? allChords[0].length : maxRows);
+      assert (allChords != null);
+      return (simpleMode && (allChords.length > 0) ? allChords[0].length : maxRows);
     }
 
     @Override

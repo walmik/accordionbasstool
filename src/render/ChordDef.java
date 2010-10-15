@@ -23,6 +23,10 @@ class ChordDef
 
   ChordDef()
   {
+    chord = new Chord(new music.Note(), false);
+    name = "";
+    abbrevHtml = "";
+    abbrevPlain = "";
   }
 
   String getName()
