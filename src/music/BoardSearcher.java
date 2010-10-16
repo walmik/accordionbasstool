@@ -237,8 +237,12 @@ public class BoardSearcher
 		// Build mask cache, use instead of board.getChord access		
 		Chord.Mask[][] masks = board.buildChordMaskCache();
 		Chord.Mask fullChordMask = fullChord.getChordMask();
-		
-		boolean hasSetRoots = fullChordMask.hasRootBassReq();
+
+    // ***************************
+    //TODO: Make this an option strict bass
+    boolean unmaskBassRegister = true;
+		//boolean unmaskBassRegister = !fullChordMask.hasRootBassReq();
+    // ***************************
 		
 		Vector<BassBoard.Pos> validPos = new Vector<BassBoard.Pos>();
 		
@@ -261,16 +265,16 @@ public class BoardSearcher
 		}
 		
 		// Non-chord rows
-		
 		for (int r = 0; r < board.getRows(); r++)
 		{
 			if (board.isSingleBassRow(r))
 			{
 				for (int c = 0; c < board.getCols(); c++)
 				{
-					if (!hasSetRoots)
+					if (unmaskBassRegister) {
 						masks[r][c].unmaskRegister(fullChordMask);
-					
+          }
+
 					if (fullChordMask.contains(masks[r][c]))
 					{
 						validPos.add(new BassBoard.Pos(r, c));

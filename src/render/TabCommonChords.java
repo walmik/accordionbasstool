@@ -28,11 +28,12 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
 import music.BoardSearcher;
 import music.ButtonComboSequence;
 import music.Chord;
+import music.ChordParser;
+import util.Main.StringParser;
 
 /**
  *
@@ -315,8 +316,10 @@ public class TabCommonChords extends javax.swing.JPanel
                 int index = seqTable.getSelectedRow();
                 if ((index >= 0) && (index < columnModel.allComboSeqs.length)) {
                   columnModel.selComboModel.setButtonComboSeq(columnModel.allComboSeqs[index]);
+                  seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
+                } else {
+                  columnModel.selComboModel.setButtonComboSeq(null);
                 }
-                seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
               }
             });
 
@@ -698,7 +701,6 @@ public class TabCommonChords extends javax.swing.JPanel
     {//GEN-HEADEREND:event_butRemoveChordActionPerformed
       columnModel.removeSelectedColumn();
     }//GEN-LAST:event_butRemoveChordActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton butAddChord;
   private javax.swing.JButton butInsertChord;

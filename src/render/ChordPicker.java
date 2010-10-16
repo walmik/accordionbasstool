@@ -307,7 +307,7 @@ public class ChordPicker extends javax.swing.JDialog
         Document doc = dbf.newDocumentBuilder().parse(string);
 
         System.out.println("Read Doc From: " + string);
-        
+
         return doc;
       } catch (Exception e) {
         e.printStackTrace();
@@ -320,7 +320,7 @@ public class ChordPicker extends javax.swing.JDialog
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
       Document doc = tryDoc(dbf, filename);
-      
+
       if (doc == null) {
         doc = tryDoc(dbf, "./xml/" + filename);
       }
@@ -623,6 +623,10 @@ public class ChordPicker extends javax.swing.JDialog
       //this.additionalBassCheckbox.setSelected(!simpleMode);
       this.additionalBassCheckbox.setVisible(!simpleMode);
       this.chordTable.setColumnSelectionInterval(0, 0);
+
+      if (simpleMode && usingAddedBass) {
+        this.additionalBassCheckbox.doClick();
+      }
 
       int rowSel = chordTable.getSelectedRow();
 
