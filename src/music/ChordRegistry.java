@@ -2,13 +2,16 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package music;
 
-import java.util.Hashtable;
+import java.awt.Point;
+import java.net.URL;
 import java.util.Vector;
-import util.Main;
-
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import util.Main.StringParser;
 
 /**
  *
@@ -17,219 +20,204 @@ import util.Main;
 public class ChordRegistry
 {
   // Stradella Chords
-	final static Interval[] MAJOR = {Interval.M3, Interval.m3};
-	final static Interval[] MINOR = {Interval.m3, Interval.M3};
-	final static Interval[] DOM =  {Interval.M3, Interval.Dim5};
-	final static Interval[] DIM =  {Interval.m3, Interval.Dim5};
 
+  final static Interval[] MAJOR = {Interval.M3, Interval.m3};
+  final static Interval[] MINOR = {Interval.m3, Interval.M3};
+  final static Interval[] DOM = {Interval.M3, Interval.Dim5};
+  final static Interval[] DIM = {Interval.m3, Interval.Dim5};
+  public static ChordRegistry mainRegistry;
 
-  public static class ChordEntry
-	{
-    public String name;
-		String[] strings;
-		Interval[] ivals;
-    public String group;
+  //==============================================================
+  class ExtChordDef extends ChordDef
+  {
+    Interval[] ivals;
 
-		ChordEntry(String csname, String[] strs, Interval[] nIvals, String gname)
-		{
-      name = csname;
-			strings = strs;
-			ivals = nIvals;
-      group = gname;
-      
-      Vector<ChordEntry> grouplist = groupedChordStrs.get(gname);
+    ExtChordDef(String _name, String _abb, String _notes)
+    {
+      super(_name, _abb, _notes);
+      ivals = this.chord.extractInterval();
+    }
 
-      if (grouplist == null)
-      {
-        grouplist = new Vector<ChordEntry>();
-        grouplist.add(this);
-        groupedChordStrs.put(group, grouplist);
-      }
-      else
-      {
-        grouplist.add(this);
-      }
+    ExtChordDef()
+    {
+      ivals = new Interval[0];
     }
   }
 
-	static Vector<ChordEntry> primaryChordStrs;
+  //==============================================================
+  public class ChordGroupSet
+  {
+    // Chord Defs (loaded from XML)
+    final ExtChordDef groupedChordDefs[][];
+    public final String groupNames[];
+    public final int maxChordsInGroup;
+    public final String name;
 
-  public static Hashtable<String, Vector<ChordEntry> > groupedChordStrs;
+    ChordGroupSet(String chordSetName)
+    {
+      name = chordSetName;
+      groupedChordDefs = new ExtChordDef[0][];
+      groupNames = new String[0];
+      maxChordsInGroup = 0;
+    }
 
-	// Assert last chord added to vector is the given string of notes
-	static boolean verifyChordOnC(Vector<ChordEntry> chords, String notes)
-	{
-		assert(chords.size() > 0);
+    ChordGroupSet(Element root)
+    {
+      name = root.getAttribute("name");
+      NodeList groups = root.getElementsByTagName("chordgroup");
+      groupNames = new String[groups.getLength()];
+      groupedChordDefs = new ExtChordDef[groupNames.length][];
+      int maxChords = 0;
 
-		Chord theCChord = new Chord(new Note(Note.ScaleNote.C, 0), chords.lastElement().ivals);
-		Chord noteChord = ChordParser.parse(new Main.StringParser(notes));
-		assert(theCChord.equals(noteChord)) : (theCChord.toString() + " != " + noteChord.toString());
-		return true;
-	}
+      for (int i = 0; i < groupedChordDefs.length; i++) {
+        Element group = (Element) groups.item(i);
+        groupNames[i] = group.getAttribute("name");
 
-	public static void initChords()
-	{
-    groupedChordStrs = new Hashtable<String, Vector<ChordEntry> >();
-		primaryChordStrs = new Vector<ChordEntry>();
+        NodeList chords = group.getElementsByTagName("chord");
 
-    // No chord entry
-		{
-      String name = "No Chord";
-			String[] chordStr = {""};
-			Interval[] ival = {};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "Common"));
-			assert(verifyChordOnC(primaryChordStrs, "[C]"));
-		}
+        groupedChordDefs[i] = new ExtChordDef[chords.getLength()];
+        maxChords = Math.max(maxChords, groupedChordDefs[i].length);
 
-		// 7th Chords
-		//----------------------------
-		// Dominant 7, standard
-		{
-      String name = "Dom 7th w/ 5";
-			String[] chordStr = {"7*"};
-			Interval[] ival = {Interval.M3, Interval.m3, Interval.m3};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "7th"));
-			assert(verifyChordOnC(primaryChordStrs, "[C E G Bb]"));
-		}
+        for (int j = 0; j < groupedChordDefs[i].length; j++) {
+          Element chord = (Element) chords.item(j);
+          String name = chord.getAttribute("name");
+          String abbrev = chord.getAttribute("abbrev");
+          String notelist = chord.getAttribute("notes");
+          groupedChordDefs[i][j] = new ExtChordDef(name, abbrev, notelist);
+        }
+      }
 
-		// Dominant 7, no 5
-		{
-      String name = "Dom 7th";
-      String[] chordStr = {"7"};
-			Interval[] ival = ChordRegistry.DOM;
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "Common"));
-			assert(verifyChordOnC(primaryChordStrs, "[C E Bb]"));
-		}
+      maxChordsInGroup = maxChords;
+    }
 
-		// Major 7
-		{
-      String name = "Major 7";
-      String[] chordStr = {"M7", "maj7"};
-			Interval[] ival = {Interval.M3, Interval.m3, Interval.M3};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "7th"));
-			assert(verifyChordOnC(primaryChordStrs, "[C E G B]"));
-		}
+    public ChordDef getChordDef(int groupIndex, int chordIndex)
+    {
+      assert ((chordIndex >= 0) && (groupIndex >= 0));
+      if (chordIndex < groupedChordDefs[groupIndex].length) {
+        return groupedChordDefs[groupIndex][chordIndex];
+      } else {
+        return null;
+      }
+    }
 
-		// Minor-Major 7
-		{
-      String name = "Min-Maj 7";
-      String[] chordStr = {"mM7", "minM7"};
-			Interval[] ival = {Interval.m3, Interval.M3, Interval.M3};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "7th"));
-			assert(verifyChordOnC(primaryChordStrs, "[C Eb G B]"));
-		}
+    public ChordFindResult findChord(StringParser parser)
+    {
+      int prevMatchLength = 0;
+      ChordFindResult bestMatch = new ChordFindResult(0, 0, null);
+      String chordToMatch = parser.input();
+
+      for (int col = 0; col < groupedChordDefs.length; col++) {
+        for (int row = 0; row < groupedChordDefs[col].length; row++) {
+          ExtChordDef currChord = groupedChordDefs[col][row];
+          String currAbbrev = currChord.abbrevPlain;
+          if ((currAbbrev.length() > prevMatchLength)
+                  && chordToMatch.startsWith(currAbbrev)) {
+            bestMatch.x = col;
+            bestMatch.y = row;
+            bestMatch.theDef = currChord;
+            prevMatchLength = currAbbrev.length();
+          }
+        }
+      }
+
+      parser.incOffset(prevMatchLength);
+      return bestMatch;
+    }
+  }
 
 
-		// Augmented-Major 7
-		{
-      String name = "Aug Maj 7";
-			String[] chordStr = {"augM7", "+M7"};
-			Interval[] ival = {Interval.M3, Interval.M3, Interval.m3};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "7th"));
-			assert(verifyChordOnC(primaryChordStrs, "[C E G# B]"));
-		}
+  
+  public final static String ALL_CHORDS = "AllChordSet";
+  public final static String SIMPLE_CHORDS = "SimpleChordSet";
 
-		// Augmented 7
-		{
-      String name = "Aug 7";
-			String[] chordStr = {"aug7", "+7"};
-			Interval[] ival = {Interval.M3, Interval.M3, Interval.Dim3};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "7th"));
-			assert(verifyChordOnC(primaryChordStrs, "[C E G# Bb]"));
-		}
+  private ChordGroupSet[] allSets;
 
-		// Minor 7
-		{
-      String name = "Minor 7";
-			String[] chordStr = {"m7", "min7"};
-			Interval[] ival = {Interval.m3, Interval.M3, Interval.m3};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "7th"));
-			assert(verifyChordOnC(primaryChordStrs, "[C Eb G Bb]"));
-		}
+  public ChordRegistry()
+  {
+  }
 
-		// Half-Dim 7
-		{
-      String name = "Half-Dim 7";
-			String[] chordStr = {"m7(b5)", "min7(b5)"};
-			Interval[] ival = {Interval.m3, Interval.m3, Interval.M3};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "7th"));
-			assert(verifyChordOnC(primaryChordStrs, "[C Eb Gb Bb]"));
-		}
+  private Document tryDoc(DocumentBuilderFactory dbf, String string)
+  {
+    try {
+      URL url = getClass().getClassLoader().getResource(string);
+      if (url != null) {
+        string = url.toString();
+      }
 
-		// Dim 7, standard
-		{
-      String name = "Dim 7 w/ 5";
-			String[] chordStr = {"dim7", "d7"};
-			Interval[] ival = {Interval.m3, Interval.m3, Interval.m3};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "7th"));
-			assert(verifyChordOnC(primaryChordStrs, "[C Eb Gb Bbb]"));
-		}
+      Document doc = dbf.newDocumentBuilder().parse(string);
 
-		// Dim 7, no 5
-		{
-      String name = "Dim 7";
-			String[] chordStr = {"dim", "d"};
-			Interval[] ival = ChordRegistry.DIM;
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "Common"));
-			assert(verifyChordOnC(primaryChordStrs, "[C Eb Bbb]"));
-		}
+      System.out.println("Read Doc From: " + string);
 
-		// 9th Chords
-		//-------------------------------
+      return doc;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
 
-		// 9th +5
-		{
-      String name = "Major 9 w/ 5";
-			String[] chordStr = {"9*"};
-			Interval[] ival = {Interval.M3, Interval.m3, Interval.m3, Interval.M3};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "9th"));
-			assert(verifyChordOnC(primaryChordStrs, "[C E G Bb D]"));
-		}
+  public void loadFromXml(String filename)
+  {
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
-		// 9th no 5th
-		{
-      String name = "Major 9";
-      String[] chordStr = {"9"};
-			Interval[] ival = {Interval.M3, Interval.Dim5, Interval.M3};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "9th"));
-			assert(verifyChordOnC(primaryChordStrs, "[C E Bb D]"));
-		}
+    Document doc = tryDoc(dbf, filename);
 
-		// Triads
-		//-------------------------------
+    if (doc == null) {
+      doc = tryDoc(dbf, "./xml/" + filename);
+    }
 
-		// Major
-		{
-      String name = "Major";
-			String[] chordStr = {"maj", "M"};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ChordRegistry.MAJOR, "Common"));
-			assert(verifyChordOnC(primaryChordStrs, "[C E G]"));
-		}
+    if (doc == null) {
+      allSets = new ChordGroupSet[1];
+      allSets[0] = new ChordGroupSet(ALL_CHORDS);
+      return;
+    }
 
-		// Minor
-		{
-      String name = "Minor";
-			String[] chordStr = {"min", "m"};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ChordRegistry.MINOR, "Common"));
-			assert(verifyChordOnC(primaryChordStrs, "[C Eb G]"));
-		}
+    Element root = doc.getDocumentElement();
 
-		// Diminished, standard
-		{
-      String name = "Dim";
-			String[] chordStr = {"dim*", "d*"};
-			Interval[] ival = {Interval.m3, Interval.m3};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "Triad"));
-			assert(verifyChordOnC(primaryChordStrs, "[C Eb Gb]"));
-		}
+    NodeList chordsets = root.getElementsByTagName("chordset");
 
-		// Augmented
-		{
-      String name = "Aug";
-			String[] chordStr = {"aug", "+"};
-			Interval[] ival = {Interval.M3, Interval.M3};
-			primaryChordStrs.add(new ChordEntry(name, chordStr, ival, "Triad"));
-			assert(verifyChordOnC(primaryChordStrs, "[C E G#]"));
-		}
-	}
+    allSets = new ChordGroupSet[chordsets.getLength()];
+
+    for (int i = 0; i < chordsets.getLength(); i++) {
+      allSets[i] = new ChordGroupSet((Element) chordsets.item(i));
+    }
+  }
+
+  public static class ChordFindResult
+  {
+
+    public int x, y;
+    ExtChordDef theDef;
+
+    ChordFindResult(int lx, int ly, ExtChordDef def)
+    {
+      x = lx;
+      y = ly;
+      theDef = def;
+    }
+  }
+
+  public ChordGroupSet findChordSet(String chordSetName)
+  {
+    for (ChordGroupSet set : allSets)
+    {
+      if (set.name.equals(chordSetName))
+      {
+        return set;
+      }
+    }
+
+    return null;
+  }
+
+
+
+  public ChordFindResult findChord(String chordSetName, StringParser parser)
+  {
+    ChordGroupSet chordSet = findChordSet(chordSetName);
+
+    if (chordSet != null)
+      return chordSet.findChord(parser);
+    else
+      return new ChordFindResult(0, 0, new ExtChordDef());
+  }
 }

@@ -189,6 +189,16 @@ public class Chord
 			notes[extraLen + i] = existing.notes[i].add(ival);
 		}
   }
+
+  public Interval[] extractInterval()
+  {
+    Interval ivals[] = new Interval[notes.length - 1];
+    for (int i = 0; i < notes.length - 1; i++)
+    {
+      ivals[i] = notes[i + 1].diff(notes[i]);
+    }
+    return ivals;
+  }
 		
 	public void transpose(Interval ival)
 	{

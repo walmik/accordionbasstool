@@ -1,5 +1,5 @@
 ﻿<root>
-	<chords>
+	<chordset name="AllChordSet">
 		<chordgroup name="Common Chords">
 			<chord name="Note" abbrev=" Note" notes="C"></chord>
 			<chord name="Major" abbrev="M" notes="C E G"></chord>
@@ -29,7 +29,6 @@
 			<chord name="Diminished 7th" notes="C Eb Gb Bbb" abbrev="dim[7]"></chord>
 		</chordgroup>
 		
-		
 		<chordgroup name="9th">
 			<chord name="Dominant 9th (no 5th)" notes="C E Bb D" abbrev="9"></chord>
 			<chord name="Dominant 9th" notes="C E G Bb D" abbrev="9*"></chord>
@@ -42,5 +41,18 @@
 			<chord name="Half-Diminished 9th" notes="C Eb Gb Bb Db" abbrev="[Ø9]"></chord>
 			<chord name="Diminished 9th" notes="C Eb Gb Bbb Db" abbrev="dim[9]"></chord>
 		</chordgroup>
-	</chords>
+	</chordset>
+	<chordset name="SimpleChordSet">
+		<chordgroup name="Common Chords">
+			<chord name="Note" abbrev=" Note" notes="C"></chord>
+			<chord name="Major" abbrev="M" notes="C E G"></chord>
+			<chord name="Minor" abbrev="m" notes="C Eb G"></chord>
+			<chord name="Dominant 7th, no 5th" abbrev="7" notes="C E Bb"></chord>
+			<chord name="Diminished 7th, no 5th" abbrev="dim[7]" notes="C Eb Bbb"></chord>
+			<chord name="Major 6th" notes="C E G A" abbrev="6"></chord>
+			<chord name="Minor 6th" notes="C Eb G A" abbrev="min[6]"></chord>
+			<chord name="Augmented" notes="C E G#" abbrev="+"></chord>
+			<chord name="Diminished" notes="C Eb Gb" abbrev="dim"></chord>			
+		</chordgroup>
+	</chordset>
 </root>

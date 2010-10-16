@@ -84,8 +84,8 @@ public class Main {
   public static JFrame _rootFrame;
 
 	public static void main(String[] args) {
-		runUnitTests();
-		ChordRegistry.initChords();
+		ChordRegistry.mainRegistry = new ChordRegistry();
+    ChordRegistry.mainRegistry.loadFromXml("chorddefs.xml");
     
     try
     {

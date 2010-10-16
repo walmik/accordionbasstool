@@ -1,17 +1,15 @@
-package render;
+package music;
 
-import music.Chord;
-
-class ChordDef
+public class ChordDef
 {
 
-  String name;
-  String abbrevHtml;
-  String abbrevPlain;
+  public String name;
+  public String abbrevHtml;
+  public String abbrevPlain;
   //private String notestr;
-  music.Chord chord;
+  public music.Chord chord;
 
-  ChordDef(String _name, String _abb, String _notes)
+  public ChordDef(String _name, String _abb, String _notes)
   {
     name = _name;
     abbrevHtml = _abb.replace("[", "<sup>");
@@ -21,7 +19,7 @@ class ChordDef
     chord = music.ChordParser.parseNoteList(new util.Main.StringParser(_notes));
   }
 
-  ChordDef()
+  public ChordDef()
   {
     chord = new Chord(new music.Note(), false);
     name = "";
@@ -29,27 +27,27 @@ class ChordDef
     abbrevPlain = "";
   }
 
-  String getName()
+  public String getName()
   {
     return name;
   }
 
-  String getAbbrevHtml()
+  public String getAbbrevHtml()
   {
     return abbrevHtml;
   }
 
-  String getAbbrevPlain()
+  public String getAbbrevPlain()
   {
     return abbrevPlain;
   }
 
-  Chord getChord()
+  public Chord getChord()
   {
     return chord;
   }
 
-  static String htmlify(String string)
+  public static String htmlify(String string)
   {
     return "<html>" + string + "</html>";
   }
