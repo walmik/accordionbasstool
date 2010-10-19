@@ -25,22 +25,37 @@ public class ChordRegistry
   final static Interval[] MINOR = {Interval.m3, Interval.M3};
   final static Interval[] DOM = {Interval.M3, Interval.Dim5};
   final static Interval[] DIM = {Interval.m3, Interval.Dim5};
-  public static ChordRegistry mainRegistry;
+  private static ChordRegistry _mainRegistry = null;
+
+  public static ChordRegistry mainRegistry()
+  {
+    if (_mainRegistry == null) {
+      _mainRegistry = new ChordRegistry();
+      _mainRegistry.loadFromXml("chorddefs.xml");
+    }
+
+    return _mainRegistry;
+  }
 
   //==============================================================
-  class ExtChordDef extends ChordDef
+  public static class ExtChordDef extends ChordDef
   {
     Interval[] ivals;
+    public int r;
+    public int c;
 
-    ExtChordDef(String _name, String _abb, String _notes)
+    ExtChordDef(String _name, String _abb, String _notes, int row, int col)
     {
       super(_name, _abb, _notes);
       ivals = this.chord.extractInterval();
+      r = row;
+      c = col;
     }
 
     ExtChordDef()
     {
       ivals = new Interval[0];
+      r = c = -1;
     }
   }
 
@@ -48,6 +63,7 @@ public class ChordRegistry
   public class ChordGroupSet
   {
     // Chord Defs (loaded from XML)
+
     final ExtChordDef groupedChordDefs[][];
     public final String groupNames[];
     public final int maxChordsInGroup;
@@ -83,7 +99,7 @@ public class ChordRegistry
           String name = chord.getAttribute("name");
           String abbrev = chord.getAttribute("abbrev");
           String notelist = chord.getAttribute("notes");
-          groupedChordDefs[i][j] = new ExtChordDef(name, abbrev, notelist);
+          groupedChordDefs[i][j] = new ExtChordDef(name, abbrev, notelist, j, i);
         }
       }
 
@@ -93,6 +109,7 @@ public class ChordRegistry
     public ChordDef getChordDef(int groupIndex, int chordIndex)
     {
       assert ((chordIndex >= 0) && (groupIndex >= 0));
+
       if (chordIndex < groupedChordDefs[groupIndex].length) {
         return groupedChordDefs[groupIndex][chordIndex];
       } else {
@@ -100,36 +117,35 @@ public class ChordRegistry
       }
     }
 
-    public ChordFindResult findChord(StringParser parser)
+    public ExtChordDef findChord(StringParser parser)
     {
       int prevMatchLength = 0;
-      ChordFindResult bestMatch = new ChordFindResult(0, 0, null);
+      ExtChordDef bestMatch = null;
       String chordToMatch = parser.input();
 
       for (int col = 0; col < groupedChordDefs.length; col++) {
         for (int row = 0; row < groupedChordDefs[col].length; row++) {
           ExtChordDef currChord = groupedChordDefs[col][row];
-          String currAbbrev = currChord.abbrevPlain;
+          String currAbbrev = currChord.abbrevPlain.trim();
           if ((currAbbrev.length() > prevMatchLength)
                   && chordToMatch.startsWith(currAbbrev)) {
-            bestMatch.x = col;
-            bestMatch.y = row;
-            bestMatch.theDef = currChord;
+
+            bestMatch = currChord;
             prevMatchLength = currAbbrev.length();
           }
         }
       }
 
       parser.incOffset(prevMatchLength);
+      if (bestMatch == null) {
+        bestMatch = new ExtChordDef();
+      }
+
       return bestMatch;
     }
   }
-
-
-  
   public final static String ALL_CHORDS = "AllChordSet";
   public final static String SIMPLE_CHORDS = "SimpleChordSet";
-
   private ChordGroupSet[] allSets;
 
   public ChordRegistry()
@@ -182,26 +198,10 @@ public class ChordRegistry
     }
   }
 
-  public static class ChordFindResult
-  {
-
-    public int x, y;
-    ExtChordDef theDef;
-
-    ChordFindResult(int lx, int ly, ExtChordDef def)
-    {
-      x = lx;
-      y = ly;
-      theDef = def;
-    }
-  }
-
   public ChordGroupSet findChordSet(String chordSetName)
   {
-    for (ChordGroupSet set : allSets)
-    {
-      if (set.name.equals(chordSetName))
-      {
+    for (ChordGroupSet set : allSets) {
+      if (set.name.equals(chordSetName)) {
         return set;
       }
     }
@@ -209,15 +209,14 @@ public class ChordRegistry
     return null;
   }
 
-
-
-  public ChordFindResult findChord(String chordSetName, StringParser parser)
+  public ExtChordDef findChord(String chordSetName, StringParser parser)
   {
     ChordGroupSet chordSet = findChordSet(chordSetName);
 
-    if (chordSet != null)
+    if (chordSet != null) {
       return chordSet.findChord(parser);
-    else
-      return new ChordFindResult(0, 0, new ExtChordDef());
+    } else {
+      return new ExtChordDef();
+    }
   }
 }

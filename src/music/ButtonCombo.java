@@ -63,6 +63,21 @@ public class ButtonCombo
 		str += ">";
 		return str;
 	}
+
+  public String toInfoString(BassBoard board)
+	{
+    String str = "";
+
+		for (int i = 0; i < pos.length; i++)
+		{
+      if (i > 0)
+        str += " + ";
+      //str += (board.isSingleBassRow(pos[i].row) ? "Bass " : "Chord ");
+			str += board.getChordName(pos[i].row, pos[i].col);
+		}
+
+    return str;
+	}
 	
 	public int evalHeur(final BassBoard.Pos boardCenter)
 	{

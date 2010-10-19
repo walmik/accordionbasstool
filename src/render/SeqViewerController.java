@@ -16,6 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -23,6 +24,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import music.ChordDef;
 
 /**
@@ -41,27 +43,28 @@ public class SeqViewerController
     seqTable = table;
     tableScrollPane = scroll;
 
-    ChordPicker chordPicker = new ChordPicker(util.Main._rootFrame, true);
-
     RenderBassBoard renderBoard = BassToolFrame.getRenderBoard();
 
-    columnModel = new SeqColumnModel(chordPicker, renderBoard, seqTable.getSelectionModel());
+    columnModel = new SeqColumnModel(renderBoard, seqTable.getSelectionModel());
 
+    seqTable.setAutoCreateColumnsFromModel(false);
     seqTable.setColumnModel(columnModel);
     seqTable.setModel(columnModel.dataModel);
+
+    seqTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
     seqTable.setDefaultRenderer(String.class, new CellRenderer());
 
     JTableHeader header = seqTable.getTableHeader();
-    header.setResizingAllowed(false);
+    header.setResizingAllowed(true);
 
     //Create row header table
     JList rowHeader = new JList(columnModel.rowHeaderDataModel);
     rowHeader.setCellRenderer(new RowHeaderRenderer(header));
     rowHeader.setSelectionModel(seqTable.getSelectionModel());
-    rowHeader.setFixedCellWidth(75);
+    rowHeader.setFixedCellWidth(96);
     rowHeader.setFixedCellHeight(seqTable.getRowHeight());
     rowHeader.setOpaque(false);
 
@@ -112,7 +115,7 @@ public class SeqViewerController
               }
             });
 
-    columnModel.addColumn(chordPicker.getDefaultChordDef(), 0);
+    //columnModel.addColumn(new ChordDef(), 0);
   }
 
   class HeaderMouseInputHandler extends MouseAdapter
@@ -127,7 +130,6 @@ public class SeqViewerController
       }
 
       seqTable.setColumnSelectionInterval(column, column);
-
     }
 
     @Override
@@ -139,17 +141,17 @@ public class SeqViewerController
     @Override
     public void mouseDragged(MouseEvent e)
     {
-      updateColumn(e);
+//      updateColumn(e);
     }
 
     @Override
     public void mouseClicked(MouseEvent e)
     {
-      if (e.getClickCount() > 1) {
-        int column = seqTable.columnAtPoint(e.getPoint());
-
-        columnModel.editColumn(column);
-      }
+//      if (e.getClickCount() > 1) {
+//        int column = seqTable.columnAtPoint(e.getPoint());
+//
+//        columnModel.editColumn(column);
+//      }
     }
   }
 
@@ -160,6 +162,7 @@ public class SeqViewerController
     Color defColor, selColor;
     Border lowered, raised;
     JTableHeader header;
+    TableCellRenderer defRenderer;
 
     RowHeaderRenderer(JTableHeader head)
     {
@@ -173,12 +176,16 @@ public class SeqViewerController
         return;
       }
 
+      defRenderer = header.getDefaultRenderer();
       defColor = header.getBackground();
       selColor = defColor.darker();
-      lowered = BorderFactory.createLoweredBevelBorder();
-      raised = BorderFactory.createRaisedBevelBorder();
+      //selColor = SystemColor.textHighlight;
+      //lowered = BorderFactory.createLoweredBevelBorder();
+      //raised = BorderFactory.createRaisedBevelBorder();
+      lowered = noFocusBorder;
+      raised = noFocusBorder;
 
-      Font font = header.getFont().deriveFont(18.f);
+      Font font = header.getFont().deriveFont(14.f);
       plain = font.deriveFont(Font.PLAIN);
       bold = font.deriveFont(Font.BOLD);
     }
@@ -186,16 +193,17 @@ public class SeqViewerController
     @Override
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
     {
+      //Component comp = defRenderer.getTableCellRendererComponent(seqTable, value, false, cellHasFocus, -1, index);
       this.setText(value.toString());
 
       if (isSelected) {
+        this.setBorder(lowered);
         this.setFont(bold);
         this.setBackground(selColor);
-        this.setBorder(lowered);
       } else {
+        this.setBorder(raised);
         this.setFont(plain);
         this.setBackground(defColor);
-        this.setBorder(raised);
       }
 
       return this;
@@ -209,6 +217,7 @@ public class SeqViewerController
     Color defColor, selColor;
     Border lowered, raised;
     JTableHeader header;
+    TableCellRenderer defaultRenderer;
 
     ColumnHeaderRenderer(JTableHeader head)
     {
@@ -222,6 +231,7 @@ public class SeqViewerController
         return;
       }
 
+      defaultRenderer = header.getDefaultRenderer();
       defColor = header.getBackground();
       selColor = defColor.darker();
       lowered = BorderFactory.createLoweredBevelBorder();
@@ -244,29 +254,36 @@ public class SeqViewerController
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
     {
+      if (!(value instanceof ChordDef))
+        return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
       ChordDef chordDef = (ChordDef) value;
 
-      //Component comp = super.getTableCellRendererComponent(table, chordDef.getAbbrevHtml(), isSelected, hasFocus, row, column);
+      isSelected = table.isColumnSelected(column);
+      hasFocus = false;
+
       //assert (comp == this);
       String info = "<html>" + chordDef.abbrevHtml + "</html>";
 
       String statusInfo = "<html><b>" + chordDef.getName() + "</b><br/>"
               + "(" + chordDef.getChord().toString("-", true) + ")</html>";
 
-      this.setText(info);
-      this.setToolTipText(statusInfo);
+      JComponent comp = (JComponent)defaultRenderer.getTableCellRendererComponent(table, info, isSelected, hasFocus, row, column);
+      //this.setText(info);
+
+      comp.setToolTipText(statusInfo);
 
       if (table.isColumnSelected(column)) {
-        this.setFont(bold);
-        this.setBackground(selColor);
-        this.setBorder(lowered);
+        comp.setFont(bold);
+ //       this.setBackground(selColor);
+ //       this.setBorder(lowered);
       } else {
-        this.setFont(plain);
-        this.setBackground(defColor);
-        this.setBorder(raised);
+        comp.setFont(plain);
+ //       this.setBackground(defColor);
+ //       this.setBorder(raised);
       }
 
-      return this;
+      return comp;
     }
   }
 
@@ -310,7 +327,6 @@ public class SeqViewerController
       Component defRendComp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       JComponent jcomp = (JComponent) defRendComp;
       assert (jcomp == this);
-
 
       if (isSelected) {
         // See if this is the anchor sell even if it doesn't have focus

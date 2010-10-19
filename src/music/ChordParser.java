@@ -62,8 +62,8 @@ public class ChordParser {
 			return new Chord(rootNote, false);
 		}
 
-    ChordRegistry.ChordFindResult result = 
-            ChordRegistry.mainRegistry.findChord(ChordRegistry.ALL_CHORDS, parser);
+    ChordRegistry.ExtChordDef result =
+            ChordRegistry.mainRegistry().findChord(ChordRegistry.ALL_CHORDS, parser);
 
     // Additional Bass, root
 		
@@ -73,7 +73,7 @@ public class ChordParser {
 			
 			Note bassNote = Note.fromString(parser);
 			
-			return new Chord(rootNote, result.theDef.ivals, bassNote, true);
+			return new Chord(rootNote, result.ivals, bassNote, true);
 		}
 
     // Additional Bass, non-root
@@ -84,11 +84,11 @@ public class ChordParser {
 
 			Note bassNote = Note.fromString(parser);
 
-			return new Chord(rootNote, result.theDef.ivals, bassNote, false);
+			return new Chord(rootNote, result.ivals, bassNote, false);
 		}
 
 		
-		return new Chord(rootNote, result.theDef.ivals);
+		return new Chord(rootNote, result.ivals);
   }
 
 }

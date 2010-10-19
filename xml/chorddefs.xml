@@ -43,12 +43,14 @@
 		</chordgroup>
 	</chordset>
 	<chordset name="SimpleChordSet">
-		<chordgroup name="Common Chords">
+		<chordgroup name="Single-Button Chords">
 			<chord name="Note" abbrev=" Note" notes="C"></chord>
 			<chord name="Major" abbrev="M" notes="C E G"></chord>
 			<chord name="Minor" abbrev="m" notes="C Eb G"></chord>
 			<chord name="Dominant 7th, no 5th" abbrev="7" notes="C E Bb"></chord>
 			<chord name="Diminished 7th, no 5th" abbrev="dim[7]" notes="C Eb Bbb"></chord>
+		</chordgroup>
+		<chordgroup name="Other Common Chords">
 			<chord name="Major 6th" notes="C E G A" abbrev="6"></chord>
 			<chord name="Minor 6th" notes="C Eb G A" abbrev="min[6]"></chord>
 			<chord name="Augmented" notes="C E G#" abbrev="+"></chord>

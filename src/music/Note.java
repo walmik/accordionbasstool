@@ -28,7 +28,8 @@ public class Note
 			scaleDist = (short)dist;			
 			halfStep = (short)hs;
 		}
-		
+
+    @Override
 		public String toString()
 		{
 
@@ -107,7 +108,7 @@ public class Note
     this(ScaleNote.C, 0);
   }
 
-	public Note(ScaleNote n, int sof)
+	Note(ScaleNote n, int sof)
 	{
 		note = n;
 		sharpsOrFlats = (short)sof;
@@ -155,14 +156,45 @@ public class Note
 		return add(ival.scale(-1));
 	}
 	
-	public static String printNote(ScaleNote note, int sharpsOrFlats, boolean html)
+	static String printNote(ScaleNote note, int sharpsOrFlats, boolean html)
 	{
+    if (sharpsOrFlats > 0)
+    {
+      switch (note)
+      {
+        case B:
+          note = ScaleNote.C;
+          sharpsOrFlats--;
+          break;
+
+        case E:
+          note = ScaleNote.F;
+          sharpsOrFlats--;
+          break;
+      }
+    }
+    else if (sharpsOrFlats < 0)
+    {
+      switch (note)
+      {
+        case C:
+          note = ScaleNote.B;
+          sharpsOrFlats++;
+          break;
+
+        case F:
+          note = ScaleNote.E;
+          sharpsOrFlats++;
+          break;
+      }
+    }
+		
 		String base = note.toString();
 
     if (html && (sharpsOrFlats != 0))
       base += "<sup>";
-		
-		if (sharpsOrFlats > 0)
+
+    if (sharpsOrFlats > 0)
 		{
 			for (int i = 0; i < sharpsOrFlats; i++)
 			{
@@ -188,6 +220,7 @@ public class Note
 		return base;		
 	}
 
+  @Override
   public String toString()
   {
     return toString(2, false);

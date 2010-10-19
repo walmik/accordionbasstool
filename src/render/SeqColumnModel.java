@@ -13,16 +13,16 @@ import music.Chord;
 
 class SeqColumnModel extends DefaultTableColumnModel
 {
+
   SelectedButtonCombo selComboModel;
   ButtonComboSequence[] allComboSeqs;
   BoardSearcher searcher;
-  ChordPicker chordPicker;
   RenderBassBoard renderBoard;
   SeqDataModel dataModel;
   SeqRowHeaderData rowHeaderDataModel;
   ListSelectionModel rowSelModel;
 
-  SeqColumnModel(ChordPicker picker, RenderBassBoard rBoard, ListSelectionModel selM)
+  SeqColumnModel(RenderBassBoard rBoard, ListSelectionModel selM)
   {
     selComboModel = new SelectedButtonCombo();
     selComboModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -32,20 +32,15 @@ class SeqColumnModel extends DefaultTableColumnModel
 
     dataModel = new SeqDataModel();
     rowHeaderDataModel = new SeqRowHeaderData();
-    
-    chordPicker = picker;
+
     renderBoard = rBoard;
     rowSelModel = selM;
 
-    renderBoard.setSelectedButtonCombo(selComboModel);
+    if (renderBoard != null) {
+      renderBoard.setSelectedButtonCombo(selComboModel);
+    }
 
     this.setSelectionModel(selComboModel);
-  }
-
-  void addColumn(int index)
-  {
-    ChordDef def = chordPicker.showChordPicker(null);
-    addColumn(def, index);
   }
 
   void addColumn(ChordDef def, int index)
@@ -72,45 +67,58 @@ class SeqColumnModel extends DefaultTableColumnModel
   {
     super.moveColumn(columnIndex, newIndex);
     if (columnIndex != newIndex) {
-      syncModelToView(Math.min(columnIndex, newIndex));
+      syncModelToView(Math.min(columnIndex, newIndex), newIndex);
+    }
+  }
+
+  int getSelectedColumn()
+  {
+    if (this.getSelectedColumnCount() > 0) {
+      return this.getSelectedColumns()[0];
+    } else {
+      return -1;
+    }
+  }
+
+  void setSelectedColumn(ChordDef newDef)
+  {
+    int index = getSelectedColumn();
+    if (index >= 0) {
+      editColumn(index, newDef);
     }
   }
 
   void removeSelectedColumn()
   {
-    if (getSelectedColumnCount() < 1) {
-      return;
-    }
     if (getColumnCount() < 2) {
       return;
     }
-    int index = getSelectedColumns()[0];
+    int index = getSelectedColumn();
+    if (index < 0) {
+      return;
+    }
     removeColumn(getColumn(index));
     if (index < getColumnCount()) {
-      syncModelToView(index);
+      syncModelToView(index, index);
     } else {
       computeSeqs(index - 1);
     }
   }
 
-  private void syncModelToView(int index)
+  private void syncModelToView(int index, int selIndex)
   {
     for (int i = index; i < getColumnCount(); i++) {
       this.getColumn(i).setModelIndex(i);
     }
-    computeSeqs(index);
+    computeSeqs(selIndex);
   }
 
-  void editColumn(int index)
+  private void editColumn(int index, ChordDef newChordDef)
   {
-    if ((index < 0) || (index > getColumnCount())) {
-      return;
-    }
     TableColumn column = this.getColumn(index);
-    ChordDef def = (ChordDef) column.getHeaderValue();
-    def = chordPicker.showChordPicker(def);
-    if (def != null) {
-      column.setHeaderValue(def);
+
+    if (newChordDef != null) {
+      column.setHeaderValue(newChordDef);
       computeSeqs(index);
     }
   }
@@ -130,7 +138,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     return vec;
   }
 
-  void computeSeqs(int colIndex)
+  void computeSeqs(int selIndex)
   {
     if (renderBoard == null) {
       return;
@@ -142,8 +150,8 @@ class SeqColumnModel extends DefaultTableColumnModel
 
     rowHeaderDataModel.fireListDataChanged();
     dataModel.fireTableStructureChanged();
-    
-    selComboModel.setSelectionInterval(colIndex, colIndex);
+
+    selComboModel.setSelectionInterval(selIndex, selIndex);
     rowSelModel.setSelectionInterval(0, 0);
   }
 
@@ -169,6 +177,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     @Override
     public int getColumnCount()
     {
+      System.out.println("Num Cols:" + SeqColumnModel.this.getColumnCount());
       return SeqColumnModel.this.getColumnCount();
     }
 
@@ -182,7 +191,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     public Object getValueAt(int rowIndex, int columnIndex)
     {
       music.ButtonCombo combo = allComboSeqs[rowIndex].getCombo(columnIndex);
-      return combo.toString();
+      return combo.toInfoString(allComboSeqs[rowIndex].getBoard());
     }
   }
 
@@ -207,8 +216,8 @@ class SeqColumnModel extends DefaultTableColumnModel
     @Override
     public Object getElementAt(int index)
     {
-      String str = "H: ";
-      str += allComboSeqs[index].getHeur();
+      String str = "Option #" + (index + 1);
+      //str += allComboSeqs[index].getHeur();
       return str;
     }
   }

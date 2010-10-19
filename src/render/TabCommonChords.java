@@ -24,8 +24,9 @@ public class TabCommonChords extends javax.swing.JPanel
   public TabCommonChords()
   {
     initComponents();
+    //ChordPickerDialog chordPicker = new ChordPickerDialog(util.Main._rootFrame, true);
     seqViewer = new SeqViewerController(seqTable, tableScrollPane);
-    columnModel = (SeqColumnModel)seqTable.getColumnModel();
+    columnModel = seqViewer.columnModel;
   }
 
   
@@ -145,17 +146,17 @@ public class TabCommonChords extends javax.swing.JPanel
 
     private void actionEditColumnChord(java.awt.event.ActionEvent evt)//GEN-FIRST:event_actionEditColumnChord
     {//GEN-HEADEREND:event_actionEditColumnChord
-      columnModel.editColumn(seqTable.getSelectedColumn());
+      //columnModel.editColumn(seqTable.getSelectedColumn());
 }//GEN-LAST:event_actionEditColumnChord
 
     private void butAddChordActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_butAddChordActionPerformed
     {//GEN-HEADEREND:event_butAddChordActionPerformed
-      columnModel.addColumn(columnModel.getColumnCount());
+      //columnModel.addColumn(columnModel.getColumnCount());
 }//GEN-LAST:event_butAddChordActionPerformed
 
     private void butInsertChordActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_butInsertChordActionPerformed
     {//GEN-HEADEREND:event_butInsertChordActionPerformed
-      columnModel.addColumn(seqTable.getSelectedColumn());
+      //columnModel.addColumn(seqTable.getSelectedColumn());
 }//GEN-LAST:event_butInsertChordActionPerformed
 
     private void butRemoveChordActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_butRemoveChordActionPerformed

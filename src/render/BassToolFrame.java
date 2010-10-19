@@ -40,7 +40,7 @@ public class BassToolFrame extends javax.swing.JFrame {
     renderBoardScrollPane = new javax.swing.JScrollPane();
     renderBassBoard = new render.RenderBassBoard();
     toolTabs = new javax.swing.JTabbedPane();
-    tabCommonChords = new render.TabCommonChords();
+    tabChordPicker1 = new render.TabSeqVisualizer();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.1");
@@ -56,7 +56,7 @@ public class BassToolFrame extends javax.swing.JFrame {
     );
     renderBassBoardLayout.setVerticalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 312, Short.MAX_VALUE)
+      .addGap(0, 298, Short.MAX_VALUE)
     );
 
     renderBoardScrollPane.setViewportView(renderBassBoard);
@@ -65,7 +65,7 @@ public class BassToolFrame extends javax.swing.JFrame {
     renderBoardScrollPane.getVerticalScrollBar().setUnitIncrement(8);
     splitPane.setRightComponent(renderBoardScrollPane);
 
-    toolTabs.addTab("Chord Sequence Visualizer", tabCommonChords);
+    toolTabs.addTab("Chord Visualizer", tabChordPicker1);
 
     splitPane.setTopComponent(toolTabs);
 
@@ -89,7 +89,7 @@ public class BassToolFrame extends javax.swing.JFrame {
   private static render.RenderBassBoard renderBassBoard;
   private javax.swing.JScrollPane renderBoardScrollPane;
   private javax.swing.JSplitPane splitPane;
-  private render.TabCommonChords tabCommonChords;
+  private render.TabSeqVisualizer tabChordPicker1;
   private javax.swing.JTabbedPane toolTabs;
   // End of variables declaration//GEN-END:variables
 

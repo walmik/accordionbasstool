@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.SystemColor;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -14,7 +15,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 
-import javax.swing.DefaultSingleSelectionModel;
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -345,7 +345,9 @@ public class RenderBassBoard extends JPanel
 			
 			if (selected)
 			{
-				lighterFill = Color.MAGENTA;
+        //TODO: System Color
+				//lighterFill = Color.MAGENTA;
+        lighterFill = SystemColor.textHighlight;
 				darkerFill = lighterFill.darker();
 			}
 			
@@ -402,9 +404,9 @@ public class RenderBassBoard extends JPanel
 			boolean pressed = (_selCombo != null && _selCombo.hasButtonPressed(row, col));
 
 			if (pressed)
-				graphics.setColor(Color.WHITE);
+				graphics.setColor(SystemColor.textHighlightText);
 			else
-				graphics.setColor(Color.BLACK);
+				graphics.setColor(SystemColor.textText);
 			
 			String chordStr = _theBoard.getChordName(row, col);
 			
