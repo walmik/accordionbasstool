@@ -10,6 +10,8 @@ import javax.swing.table.TableColumn;
 import music.BoardSearcher;
 import music.ButtonComboSequence;
 import music.Chord;
+import music.ChordParser;
+import util.Main.StringParser;
 
 class SeqColumnModel extends DefaultTableColumnModel
 {
@@ -21,6 +23,8 @@ class SeqColumnModel extends DefaultTableColumnModel
   SeqDataModel dataModel;
   SeqRowHeaderData rowHeaderDataModel;
   ListSelectionModel rowSelModel;
+
+  final static int DEFAULT_COL_WIDTH = 120;
 
   SeqColumnModel(RenderBassBoard rBoard, ListSelectionModel selM)
   {
@@ -52,7 +56,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     if (index < 0) {
       index = lastColIndex;
     }
-    TableColumn column = new TableColumn(lastColIndex, 120, null, null);
+    TableColumn column = new TableColumn(lastColIndex, DEFAULT_COL_WIDTH, null, null);
     column.setHeaderValue(def);
     addColumn(column);
     if (index < lastColIndex) {
@@ -80,7 +84,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
-  void setSelectedColumn(ChordDef newDef)
+  void editSelectedColumn(ChordDef newDef)
   {
     int index = getSelectedColumn();
     if (index >= 0) {
@@ -103,6 +107,26 @@ class SeqColumnModel extends DefaultTableColumnModel
     } else {
       computeSeqs(index - 1);
     }
+  }
+
+  boolean isPopulating = false;
+
+  public void populateFromText(String text)
+  {
+    StringParser parser = new StringParser(text);
+    Vector<ChordDef> chords = ChordParser.parseChords(parser);
+
+    this.tableColumns.clear();
+
+    isPopulating = true;
+
+    for (int i = 0; i < chords.size(); i++)
+    {
+      this.addColumn(chords.elementAt(i), i);
+    }
+
+    isPopulating = false;
+    syncModelToView(0, 0);
   }
 
   private void syncModelToView(int index, int selIndex)
@@ -141,6 +165,10 @@ class SeqColumnModel extends DefaultTableColumnModel
   void computeSeqs(int selIndex)
   {
     if (renderBoard == null) {
+      return;
+    }
+
+    if (isPopulating) {
       return;
     }
 

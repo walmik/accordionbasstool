@@ -19,6 +19,14 @@ public class ChordDef
     chord = music.ChordParser.parseNoteList(new util.Main.StringParser(_notes));
   }
 
+  public ChordDef(Chord chord)
+  {
+    this.chord = chord;
+    name = chord.toString();
+    abbrevHtml = chord.toString("-", true);
+    abbrevPlain = name;
+  }
+
   public ChordDef()
   {
     chord = new Chord(new music.Note(), false);

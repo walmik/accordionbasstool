@@ -55,7 +55,7 @@ public class ChordRegistry
     ExtChordDef()
     {
       ivals = new Interval[0];
-      r = c = -1;
+      r = c = 0;
     }
   }
 

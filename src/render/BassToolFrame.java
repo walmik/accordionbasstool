@@ -41,6 +41,8 @@ public class BassToolFrame extends javax.swing.JFrame {
     renderBassBoard = new render.RenderBassBoard();
     toolTabs = new javax.swing.JTabbedPane();
     tabChordPicker1 = new render.TabSeqVisualizer();
+    tabCustomBass1 = new render.TabCustomBass();
+    tabTester1 = new render.TabTester();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.1");
@@ -65,7 +67,21 @@ public class BassToolFrame extends javax.swing.JFrame {
     renderBoardScrollPane.getVerticalScrollBar().setUnitIncrement(8);
     splitPane.setRightComponent(renderBoardScrollPane);
 
-    toolTabs.addTab("Chord Visualizer", tabChordPicker1);
+    toolTabs.addTab("Simple Chord Visualizer", tabChordPicker1);
+    toolTabs.addTab("Advanced Chord Visualizer", tabCustomBass1);
+
+    javax.swing.GroupLayout tabTester1Layout = new javax.swing.GroupLayout(tabTester1);
+    tabTester1.setLayout(tabTester1Layout);
+    tabTester1Layout.setHorizontalGroup(
+      tabTester1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGap(0, 973, Short.MAX_VALUE)
+    );
+    tabTester1Layout.setVerticalGroup(
+      tabTester1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGap(0, 292, Short.MAX_VALUE)
+    );
+
+    toolTabs.addTab("Tester", tabTester1);
 
     splitPane.setTopComponent(toolTabs);
 
@@ -90,6 +106,8 @@ public class BassToolFrame extends javax.swing.JFrame {
   private javax.swing.JScrollPane renderBoardScrollPane;
   private javax.swing.JSplitPane splitPane;
   private render.TabSeqVisualizer tabChordPicker1;
+  private render.TabCustomBass tabCustomBass1;
+  private render.TabTester tabTester1;
   private javax.swing.JTabbedPane toolTabs;
   // End of variables declaration//GEN-END:variables
 

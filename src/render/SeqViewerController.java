@@ -2,26 +2,37 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package render;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Component.BaselineResizeBehavior;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.accessibility.Accessible;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.plaf.TableHeaderUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -59,12 +70,19 @@ public class SeqViewerController
 
     JTableHeader header = seqTable.getTableHeader();
     header.setResizingAllowed(true);
+    header.setDefaultRenderer(new ColumnHeaderRenderer(header));
+
+    //header.setUI(new SliderTableHeaderUI(header.getUI(), columnModel));
+
+    seqTable.setTableHeader(header);
+
+    final int DEFAULT_ROW_HEADER_WIDTH = 96;
 
     //Create row header table
     JList rowHeader = new JList(columnModel.rowHeaderDataModel);
     rowHeader.setCellRenderer(new RowHeaderRenderer(header));
     rowHeader.setSelectionModel(seqTable.getSelectionModel());
-    rowHeader.setFixedCellWidth(96);
+    rowHeader.setFixedCellWidth(DEFAULT_ROW_HEADER_WIDTH);
     rowHeader.setFixedCellHeight(seqTable.getRowHeight());
     rowHeader.setOpaque(false);
 
@@ -74,8 +92,6 @@ public class SeqViewerController
     header.addMouseListener(headerMouse);
     header.addMouseMotionListener(headerMouse);
     seqTable.addMouseListener(headerMouse);
-
-    header.setDefaultRenderer(new ColumnHeaderRenderer(header));
 
     // Row Selection Change
     seqTable.getSelectionModel().addListSelectionListener(
@@ -114,8 +130,228 @@ public class SeqViewerController
                 seqTable.getTableHeader().repaint();
               }
             });
+  }
 
-    //columnModel.addColumn(new ChordDef(), 0);
+  void registerPanelListener(Component top)
+  {
+    top.addComponentListener(new ComponentAdapter()
+    {
+
+      @Override
+      public void componentHidden(ComponentEvent e)
+      {
+        RenderBassBoard renderBoard = BassToolFrame.getRenderBoard();
+        if (renderBoard != null) {
+          renderBoard.setSelectedButtonCombo(null);
+        }
+      }
+
+      @Override
+      public void componentShown(ComponentEvent e)
+      {
+        RenderBassBoard renderBoard = BassToolFrame.getRenderBoard();
+        if (renderBoard != null) {
+          renderBoard.setSelectedButtonCombo(columnModel.selComboModel);
+        }
+      }
+    });
+  }
+
+  class SliderTableHeaderUI extends TableHeaderUI
+          implements TableColumnModelListener, ChangeListener
+  {
+
+    @Override
+    public boolean contains(JComponent c, int x, int y)
+    {
+      return existing.contains(c, x, y);
+    }
+
+    @Override
+    public Accessible getAccessibleChild(JComponent c, int i)
+    {
+      return existing.getAccessibleChild(c, i);
+    }
+
+    @Override
+    public int getAccessibleChildrenCount(JComponent c)
+    {
+      return existing.getAccessibleChildrenCount(c);
+    }
+
+    @Override
+    public int getBaseline(JComponent c, int width, int height)
+    {
+      return existing.getBaseline(c, width, height);
+    }
+
+    @Override
+    public BaselineResizeBehavior getBaselineResizeBehavior(JComponent c)
+    {
+      return existing.getBaselineResizeBehavior(c);
+    }
+
+    @Override
+    public Dimension getMaximumSize(JComponent c)
+    {
+      return existing.getMaximumSize(c);
+    }
+
+    @Override
+    public Dimension getMinimumSize(JComponent c)
+    {
+      return existing.getMinimumSize(c);
+    }
+
+    @Override
+    public void paint(Graphics g, JComponent c)
+    {
+      existing.paint(g, c);
+    }
+
+    @Override
+    public void uninstallUI(JComponent c)
+    {
+      existing.uninstallUI(c);
+    }
+
+    @Override
+    public void update(Graphics g, JComponent c)
+    {
+      existing.update(g, c);
+    }
+    int sliderHeight = 40;
+    TableHeaderUI existing;
+    JSlider slider;
+    boolean updateLock = false;
+    SeqColumnModel columnModel;
+    JTable table;
+
+    SliderTableHeaderUI(TableHeaderUI existing, SeqColumnModel model,
+            JTable newTable)
+    {
+      this.existing = existing;
+      this.columnModel = model;
+      this.table = newTable;
+
+      slider = new JSlider();
+      slider.setOpaque(false);
+      slider.setPaintTicks(true);
+      slider.setPaintTrack(true);
+      slider.setFocusable(false);
+      slider.setSnapToTicks(true);
+
+      slider.addMouseListener(new MouseAdapter()
+      {
+
+        @Override
+        public void mousePressed(MouseEvent e)
+        {
+          table.requestFocusInWindow();
+        }
+      });
+
+      slider.addChangeListener(this);
+      columnModel.addColumnModelListener(this);
+    }
+
+    @Override
+    public Dimension getPreferredSize(JComponent c)
+    {
+      Dimension dim = existing.getPreferredSize(c);
+      if (columnModel.getColumnCount() > 1) {
+        dim.height += sliderHeight;
+        
+      }
+      return dim;
+    }
+
+    @Override
+    public void installUI(JComponent c)
+    {
+      existing.installUI(c);
+      c.setLayout(null);
+      c.add(slider);
+    }
+
+    void resizeSlider()
+    {
+      int numCols = columnModel.getColumnCount();
+
+      if (numCols < 2) {
+        slider.setVisible(false);
+        return;
+      }
+
+      int x1 = columnModel.getColumn(0).getWidth() / 2;
+      int x2 = columnModel.getTotalColumnWidth() - columnModel.getColumn(numCols - 1).getWidth() / 2;
+      x1 -= 8;
+      x2 += 8;
+
+      slider.setBounds(x1, 0, x2 - x1, sliderHeight);
+
+      slider.setMinimum(0);
+      slider.setMaximum(numCols - 1);
+
+      updateLock = true;
+      slider.setValue(columnModel.getSelectedColumn());
+      updateLock = false;
+
+      slider.setVisible(true);
+      slider.repaint();
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e)
+    {
+      if (updateLock) {
+        return;
+      }
+
+      int index = slider.getValue();
+      updateLock = true;
+      columnModel.getSelectionModel().setSelectionInterval(index, index);
+      updateLock = false;
+    }
+
+    @Override
+    public void columnAdded(TableColumnModelEvent e)
+    {
+      resizeSlider();
+    }
+
+    @Override
+    public void columnMarginChanged(ChangeEvent e)
+    {
+      resizeSlider();
+    }
+
+    @Override
+    public void columnMoved(TableColumnModelEvent e)
+    {
+      resizeSlider();
+    }
+
+    @Override
+    public void columnRemoved(TableColumnModelEvent e)
+    {
+      resizeSlider();
+    }
+
+    @Override
+    public void columnSelectionChanged(ListSelectionEvent e)
+    {
+      if (updateLock) {
+        return;
+      }
+
+      updateLock = true;
+      int index = columnModel.getSelectedColumn();
+      if (index >= 0) {
+        slider.setValue(index);
+      }
+      updateLock = false;
+    }
   }
 
   class HeaderMouseInputHandler extends MouseAdapter
@@ -155,7 +391,7 @@ public class SeqViewerController
     }
   }
 
-  class RowHeaderRenderer extends DefaultListCellRenderer
+  static class RowHeaderRenderer extends DefaultListCellRenderer
   {
 
     Font plain, bold;
@@ -217,7 +453,7 @@ public class SeqViewerController
     Color defColor, selColor;
     Border lowered, raised;
     JTableHeader header;
-    TableCellRenderer defaultRenderer;
+    //TableCellRenderer defaultRenderer;
 
     ColumnHeaderRenderer(JTableHeader head)
     {
@@ -231,17 +467,22 @@ public class SeqViewerController
         return;
       }
 
-      defaultRenderer = header.getDefaultRenderer();
-      defColor = header.getBackground();
+      header.setUI(new SliderTableHeaderUI(header.getUI(), columnModel, header.getTable()));
+
+
+      //defaultRenderer = header.getDefaultRenderer();
+      //defColor = header.getBackground();
+      defColor = Color.gray;
       selColor = defColor.darker();
       lowered = BorderFactory.createLoweredBevelBorder();
       raised = BorderFactory.createRaisedBevelBorder();
 
-      Font font = header.getFont().deriveFont(18.f);
+      Font font = getFont().deriveFont(18.f);
       plain = font.deriveFont(Font.PLAIN);
       bold = font.deriveFont(Font.BOLD);
 
       this.setHorizontalAlignment(CENTER);
+      this.setVerticalAlignment(BOTTOM);
     }
 
     @Override
@@ -254,10 +495,15 @@ public class SeqViewerController
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
     {
-      if (!(value instanceof ChordDef))
+      if (!(value instanceof ChordDef)) {
         return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+      }
 
       ChordDef chordDef = (ChordDef) value;
+
+      if (table == null) {
+        return this;
+      }
 
       isSelected = table.isColumnSelected(column);
       hasFocus = false;
@@ -268,19 +514,20 @@ public class SeqViewerController
       String statusInfo = "<html><b>" + chordDef.getName() + "</b><br/>"
               + "(" + chordDef.getChord().toString("-", true) + ")</html>";
 
-      JComponent comp = (JComponent)defaultRenderer.getTableCellRendererComponent(table, info, isSelected, hasFocus, row, column);
-      //this.setText(info);
+      //JComponent comp = (JComponent) defaultRenderer.getTableCellRendererComponent(table, info, isSelected, hasFocus, row, column);
+      JComponent comp = this;
+      this.setText(info);
 
       comp.setToolTipText(statusInfo);
 
       if (table.isColumnSelected(column)) {
         comp.setFont(bold);
- //       this.setBackground(selColor);
- //       this.setBorder(lowered);
+        //       this.setBackground(selColor);
+        //       this.setBorder(lowered);
       } else {
         comp.setFont(plain);
- //       this.setBackground(defColor);
- //       this.setBorder(raised);
+        //       this.setBackground(defColor);
+        //       this.setBorder(raised);
       }
 
       return comp;

@@ -23,7 +23,7 @@ import music.BassBoard;
 import music.ButtonComboSequence;
 
 
-public class RenderBassBoard extends JPanel
+public class RenderBassBoard extends JPanel implements ListSelectionListener
 {
 	final static long serialVersionUID = 1;
 
@@ -62,17 +62,18 @@ public class RenderBassBoard extends JPanel
 		return _theBoard;
 	}
 
+  @Override
+  public void valueChanged(ListSelectionEvent e)
+  {
+    repaint();
+  }
+
   public void setSelectedButtonCombo(SelectedButtonCombo newSel)
   {
     _selCombo = newSel;
-    _selCombo.addListSelectionListener(new ListSelectionListener()
-    {
-      @Override
-      public void valueChanged(ListSelectionEvent e)
-      {
-        repaint();
-      }
-    });
+    if (_selCombo != null)
+      _selCombo.addListSelectionListener(this);
+    repaint();
   }
 
   public void setSelectedSeq(ButtonComboSequence seq)

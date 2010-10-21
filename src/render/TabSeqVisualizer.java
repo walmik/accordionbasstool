@@ -11,6 +11,8 @@
 package render;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Timer;
 
@@ -35,10 +37,9 @@ public class TabSeqVisualizer extends javax.swing.JPanel
 
     SeqViewerController seqViewer = new SeqViewerController(seqTable, jScrollPane2);
     columnModel = seqViewer.columnModel;
+    seqViewer.registerPanelListener(this);
 
     chordPicker1.setSeqColModel(columnModel);
-
-    columnModel.addColumn(chordPicker1.getPickedChord(), 0);
 
     chordTableAction = new ChordTableAction();
     toolAddChord.addActionListener(chordTableAction);
@@ -49,6 +50,10 @@ public class TabSeqVisualizer extends javax.swing.JPanel
 
     playTimer = new Timer(1000, chordTableAction);
     playTimer.setActionCommand("Timer");
+
+
+    columnModel.addColumn(chordPicker1.getPickedChord(), 0);
+    //columnModel.populateFromText("Am, EM, [ABC]");
   }
 
   class ChordTableAction extends AbstractAction
@@ -66,8 +71,7 @@ public class TabSeqVisualizer extends javax.swing.JPanel
         }
       } else if (e.getActionCommand().equals("RemoveChord")) {
         columnModel.removeSelectedColumn();
-      } else if (e.getActionCommand().equals("Options"))
-      {
+      } else if (e.getActionCommand().equals("Options")) {
         new OptionsDialog(null, true).setVisible(true);
       } else if (e.getActionCommand().equals("PlaySeq")) {
         if (!playTimer.isRunning()) {
@@ -77,13 +81,13 @@ public class TabSeqVisualizer extends javax.swing.JPanel
           toolPlay.setText("Play Sequence");
           playTimer.stop();
         }
-      } else if (e.getActionCommand().equals("Timer"))
-      {
+      } else if (e.getActionCommand().equals("Timer")) {
         int index = columnModel.getSelectedColumn();
 
         index++;
-        if (index >= columnModel.getColumnCount())
+        if (index >= columnModel.getColumnCount()) {
           index = 0;
+        }
 
         columnModel.selComboModel.setSelectionInterval(index, index);
       }
@@ -185,7 +189,6 @@ public class TabSeqVisualizer extends javax.swing.JPanel
     toolOptions.setAction(chordTableAction);
     toolOptions.setText("Options...");
     toolOptions.setActionCommand("Options");
-    toolOptions.setEnabled(false);
     jToolBar1.add(toolOptions);
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -197,8 +200,8 @@ public class TabSeqVisualizer extends javax.swing.JPanel
           .addGroup(layout.createSequentialGroup()
             .addGap(6, 6, 6)
             .addComponent(chordPicker1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 659, Short.MAX_VALUE))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE))
           .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addContainerGap())
     );
@@ -207,10 +210,10 @@ public class TabSeqVisualizer extends javax.swing.JPanel
       .addGroup(layout.createSequentialGroup()
         .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-          .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-          .addComponent(chordPicker1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addGap(50, 50, 50))
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, 0, 0, Short.MAX_VALUE)
+          .addComponent(chordPicker1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addContainerGap())
     );
   }// </editor-fold>//GEN-END:initComponents
 

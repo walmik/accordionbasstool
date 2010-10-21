@@ -28,12 +28,12 @@
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="addedBassCheck" min="-2" max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" pref="313" max="32767" attributes="1"/>
+                          <Component id="jScrollPane1" pref="301" max="32767" attributes="1"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="statusLabel" min="-2" pref="120" max="-2" attributes="0"/>
-                          <Component id="showAdvanced" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="showAdvanced" min="-2" max="-2" attributes="1"/>
+                          <Component id="statusLabel" min="-2" pref="132" max="-2" attributes="1"/>
                       </Group>
                   </Group>
                   <Component id="notePicker2" alignment="0" min="-2" max="-2" attributes="1"/>
@@ -47,18 +47,16 @@
           <Group type="102" alignment="0" max="-2" attributes="0">
               <Component id="notePicker1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Component id="jScrollPane1" min="-2" pref="181" max="-2" attributes="1"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="addedBassCheck" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Group type="102" alignment="0" attributes="1">
                       <Component id="showAdvanced" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
-                      <Component id="statusLabel" min="-2" pref="144" max="-2" attributes="1"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="statusLabel" max="32767" attributes="1"/>
                   </Group>
+                  <Component id="jScrollPane1" alignment="0" min="-2" pref="181" max="-2" attributes="1"/>
               </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="addedBassCheck" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="notePicker2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
@@ -89,6 +87,7 @@
                 <Column editable="true" title="Title 4" type="java.lang.Object"/>
               </Table>
             </Property>
+            <Property name="autoResizeMode" type="int" value="0"/>
             <Property name="fillsViewportHeight" type="boolean" value="true"/>
             <Property name="rowHeight" type="int" value="30"/>
           </Properties>
@@ -134,7 +133,7 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="showAdvanced">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Advanced Chords"/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;Show&lt;br/&gt; Advanced Chords&lt;/html&gt;"/>
         <Property name="opaque" type="boolean" value="false"/>
       </Properties>
       <Events>

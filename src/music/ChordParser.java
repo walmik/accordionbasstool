@@ -20,9 +20,9 @@ public class ChordParser {
 		return new Chord(notes.toArray(noteArray));
 	}
 	
-	public static Vector<Chord> parseChords(Main.StringParser parser)
+	public static Vector<ChordDef> parseChords(Main.StringParser parser)
 	{
-		Vector<Chord> chordVec = new Vector<Chord>();
+		Vector<ChordDef> chordVec = new Vector<ChordDef>();
 		
 		while (!parser.isDone())
 		{		
@@ -35,7 +35,7 @@ public class ChordParser {
 	}
 	
 	
-	public static Chord parse(Main.StringParser parser)
+	public static ChordDef parse(Main.StringParser parser)
 	{
 		// If starting with [ then we have a list of notes
 		// so parse them individually
@@ -47,7 +47,7 @@ public class ChordParser {
 			{
 				parser.incOffset(1);
 			}
-			return chord;
+			return new ChordDef(chord);
 		}
 		
 		// Otherwise, parse the chord name
@@ -59,7 +59,7 @@ public class ChordParser {
 		// Single note
 		if (input.length() == 0)
 		{
-			return new Chord(rootNote, false);
+			return new ChordDef(new Chord(rootNote, false));
 		}
 
     ChordRegistry.ExtChordDef result =
@@ -73,7 +73,8 @@ public class ChordParser {
 			
 			Note bassNote = Note.fromString(parser);
 			
-			return new Chord(rootNote, result.ivals, bassNote, true);
+			//return new Chord(rootNote, result.ivals, bassNote, true);
+      return buildChord(rootNote, bassNote, result, false);
 		}
 
     // Additional Bass, non-root
@@ -84,11 +85,49 @@ public class ChordParser {
 
 			Note bassNote = Note.fromString(parser);
 
-			return new Chord(rootNote, result.ivals, bassNote, false);
+			//return new Chord(rootNote, result.ivals, bassNote, false);
+      return buildChord(rootNote, bassNote, result, false);
 		}
+	
+		//return new Chord(rootNote, result.ivals);
+    return buildChord(rootNote, null, result, false);
+  }
 
-		
-		return new Chord(rootNote, result.ivals);
+  public static ChordDef buildChord(Note rootNote, Note addedBassNote, ChordDef currTableChord, boolean addedBassLowest)
+  {
+
+    Chord fullChord =
+            new Chord(currTableChord.chord,
+            rootNote,
+            addedBassNote, addedBassLowest);
+
+    ChordDef finalChord = new ChordDef();
+
+    finalChord.chord = fullChord;
+
+    // -- Set HTML Abbrev
+    finalChord.abbrevHtml = rootNote.toString(true) + currTableChord.abbrevHtml;
+
+    if (addedBassNote != null) {
+      finalChord.abbrevHtml += "/" + addedBassNote.toString(true);
+    }
+
+    // -- Set Plain Abbrev
+
+    finalChord.abbrevPlain = rootNote.toString() + currTableChord.abbrevPlain;
+
+    if (addedBassNote != null) {
+      finalChord.abbrevPlain += "/" + addedBassNote.toString();
+    }
+
+    // -- Set Name
+    finalChord.name = rootNote.toString(true) + " " + currTableChord.name;
+
+    if (addedBassNote != null) {
+      finalChord.name += " over " + addedBassNote.toString(true);
+    }
+
+    return finalChord;
   }
 
 }
