@@ -10,10 +10,12 @@
  */
 package render;
 
+import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.util.Enumeration;
 import javax.swing.AbstractButton;
+import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.UIManager;
 import music.Note;
@@ -37,6 +39,23 @@ public class NotePicker extends javax.swing.JPanel
     accStr = "";
     note = new Note();
   }
+
+//  @Override
+//  public void updateUI()
+//  {
+//    super.updateUI();
+//
+//
+//    //TODO: Margin hack for nimbus
+//    Component[] comps = this.getComponents();
+//
+//    for (Component comp : comps)
+//    {
+//      if (comp instanceof JButton)
+//        ((JButton)comp).setMargin(getButtonMargins());
+//    }
+//  }
+
 
   public void setNote(Note note)
   {

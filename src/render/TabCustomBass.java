@@ -25,8 +25,12 @@ public class TabCustomBass extends javax.swing.JPanel
     initComponents();
 
     SeqViewerController seqViewer = new SeqViewerController(seqTable, jScrollPane1);
-    columnModel = seqViewer.columnModel;
     seqViewer.registerPanelListener(this);
+
+    // For Debug
+    String startChords = "[C], [D], [E], [F], [G], [A], [B], [C]";
+
+    textParserPanel1.setSeqColModel(seqViewer.columnModel, startChords);
   }
 
   /** This method is called from within the constructor to
@@ -38,37 +42,9 @@ public class TabCustomBass extends javax.swing.JPanel
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    chordTextTP = new javax.swing.JPanel();
-    chordTextSP = new javax.swing.JScrollPane();
-    chordTextArea = new javax.swing.JTextArea();
-    computeButton = new javax.swing.JButton();
     jScrollPane1 = new javax.swing.JScrollPane();
     seqTable = new javax.swing.JTable();
-
-    chordTextTP.setBorder(javax.swing.BorderFactory.createTitledBorder("Enter a Chord/Bass Sequence:"));
-
-    chordTextArea.setColumns(20);
-    chordTextArea.setRows(5);
-    chordTextArea.setText("[C], [D], [E], [F], [G], [A], [B], [C]");
-    chordTextSP.setViewportView(chordTextArea);
-
-    javax.swing.GroupLayout chordTextTPLayout = new javax.swing.GroupLayout(chordTextTP);
-    chordTextTP.setLayout(chordTextTPLayout);
-    chordTextTPLayout.setHorizontalGroup(
-      chordTextTPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(chordTextSP, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
-    );
-    chordTextTPLayout.setVerticalGroup(
-      chordTextTPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(chordTextSP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-    );
-
-    computeButton.setText("Compute Optimal Bass Sequences");
-    computeButton.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        computeButtonActionPerformed(evt);
-      }
-    });
+    textParserPanel1 = new render.TextParserPanel();
 
     seqTable.setModel(new javax.swing.table.DefaultTableModel(
       new Object [][] {
@@ -81,6 +57,7 @@ public class TabCustomBass extends javax.swing.JPanel
         "Title 1", "Title 2", "Title 3", "Title 4"
       }
     ));
+    seqTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
     seqTable.setRowHeight(32);
     jScrollPane1.setViewportView(seqTable);
 
@@ -89,50 +66,27 @@ public class TabCustomBass extends javax.swing.JPanel
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(layout.createSequentialGroup()
-            .addContainerGap()
-            .addComponent(computeButton))
-          .addComponent(chordTextTP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addComponent(textParserPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)
+        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
         .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addContainerGap()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+          .addComponent(textParserPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addGroup(layout.createSequentialGroup()
-            .addComponent(chordTextTP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(computeButton)))
+            .addGap(11, 11, 11)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)))
         .addContainerGap())
     );
   }// </editor-fold>//GEN-END:initComponents
 
-    private void computeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_computeButtonActionPerformed
-      // TODO add your handling code here:
-      //TODO: err check
-      String text = chordTextArea.getText();
-      columnModel.populateFromText(text);
-      seqTable.requestFocusInWindow();
-    }//GEN-LAST:event_computeButtonActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JTextArea chordTextArea;
-  private javax.swing.JScrollPane chordTextSP;
-  private javax.swing.JPanel chordTextTP;
-  private javax.swing.JButton computeButton;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JTable seqTable;
+  private render.TextParserPanel textParserPanel1;
   // End of variables declaration//GEN-END:variables
 
-  // Custom Init
-  void customInit()
-  {
-    // For Debug
-    String t = "[C], [D], [E], [F], [G], [A], [B], [C]";
-    chordTextArea.setText(t);
-  }
 }

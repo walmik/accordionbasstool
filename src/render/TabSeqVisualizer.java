@@ -106,16 +106,14 @@ public class TabSeqVisualizer extends javax.swing.JPanel
     jScrollPane2 = new javax.swing.JScrollPane();
     seqTable = new javax.swing.JTable();
     chordPicker1 = new render.ChordPicker();
-    jToolBar1 = new javax.swing.JToolBar();
     toggleChordPicker = new javax.swing.JButton();
-    jSeparator2 = new javax.swing.JToolBar.Separator();
+    toolOptions = new javax.swing.JButton();
+    jToolBar1 = new javax.swing.JToolBar();
+    toolPlay = new javax.swing.JButton();
+    jPanel1 = new javax.swing.JPanel();
     toolAddChord = new javax.swing.JButton();
     toolInsert = new javax.swing.JButton();
     toolRemove = new javax.swing.JButton();
-    jSeparator1 = new javax.swing.JToolBar.Separator();
-    toolPlay = new javax.swing.JButton();
-    jSeparator3 = new javax.swing.JToolBar.Separator();
-    toolOptions = new javax.swing.JButton();
 
     addComponentListener(new java.awt.event.ComponentAdapter() {
       public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -139,8 +137,7 @@ public class TabSeqVisualizer extends javax.swing.JPanel
     seqTable.setRowHeight(24);
     jScrollPane2.setViewportView(seqTable);
 
-    jToolBar1.setFloatable(false);
-    jToolBar1.setRollover(true);
+    chordPicker1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Common Chord Editor", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
     toggleChordPicker.setFont(toggleChordPicker.getFont().deriveFont(toggleChordPicker.getFont().getStyle() | java.awt.Font.BOLD));
     toggleChordPicker.setText("<< Hide Editor");
@@ -149,33 +146,12 @@ public class TabSeqVisualizer extends javax.swing.JPanel
         toggleChordPickerActionPerformed(evt);
       }
     });
-    jToolBar1.add(toggleChordPicker);
-    jToolBar1.add(jSeparator2);
 
-    toolAddChord.setAction(chordTableAction);
-    toolAddChord.setText("Add Chord");
-    toolAddChord.setActionCommand("AddChord");
-    toolAddChord.setFocusable(false);
-    toolAddChord.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    toolAddChord.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-    jToolBar1.add(toolAddChord);
+    toolOptions.setAction(chordTableAction);
+    toolOptions.setText("Options...");
+    toolOptions.setActionCommand("Options");
 
-    toolInsert.setAction(chordTableAction);
-    toolInsert.setText("Insert Chord");
-    toolInsert.setActionCommand("InsertChord");
-    toolInsert.setFocusable(false);
-    toolInsert.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    toolInsert.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-    jToolBar1.add(toolInsert);
-
-    toolRemove.setAction(chordTableAction);
-    toolRemove.setText("Remove Chord");
-    toolRemove.setActionCommand("RemoveChord");
-    toolRemove.setFocusable(false);
-    toolRemove.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    toolRemove.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-    jToolBar1.add(toolRemove);
-    jToolBar1.add(jSeparator1);
+    jToolBar1.setRollover(true);
 
     toolPlay.setAction(chordTableAction);
     toolPlay.setText("Play Sequence");
@@ -184,36 +160,83 @@ public class TabSeqVisualizer extends javax.swing.JPanel
     toolPlay.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
     toolPlay.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
     jToolBar1.add(toolPlay);
-    jToolBar1.add(jSeparator3);
 
-    toolOptions.setAction(chordTableAction);
-    toolOptions.setText("Options...");
-    toolOptions.setActionCommand("Options");
-    jToolBar1.add(toolOptions);
+    jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Sequence:"));
+
+    toolAddChord.setAction(chordTableAction);
+    toolAddChord.setText("Add Chord");
+    toolAddChord.setActionCommand("AddChord");
+    toolAddChord.setFocusable(false);
+    toolAddChord.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    toolAddChord.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+
+    toolInsert.setAction(chordTableAction);
+    toolInsert.setText("Insert Chord");
+    toolInsert.setActionCommand("InsertChord");
+    toolInsert.setFocusable(false);
+    toolInsert.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    toolInsert.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+
+    toolRemove.setAction(chordTableAction);
+    toolRemove.setText("Remove Chord");
+    toolRemove.setActionCommand("RemoveChord");
+    toolRemove.setFocusable(false);
+    toolRemove.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    toolRemove.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+
+    javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+    jPanel1.setLayout(jPanel1Layout);
+    jPanel1Layout.setHorizontalGroup(
+      jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel1Layout.createSequentialGroup()
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(toolRemove)
+          .addComponent(toolInsert)
+          .addComponent(toolAddChord))
+        .addContainerGap(20, Short.MAX_VALUE))
+    );
+    jPanel1Layout.setVerticalGroup(
+      jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel1Layout.createSequentialGroup()
+        .addComponent(toolAddChord)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(toolInsert)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(toolRemove))
+    );
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
+        .addComponent(chordPicker1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(layout.createSequentialGroup()
-            .addGap(6, 6, 6)
-            .addComponent(chordPicker1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE))
-          .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addComponent(toggleChordPicker)
+          .addComponent(toolOptions)
+          .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
+          .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE))
         .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addComponent(chordPicker1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
       .addGroup(layout.createSequentialGroup()
-        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(toggleChordPicker)
+          .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, 0, 0, Short.MAX_VALUE)
-          .addComponent(chordPicker1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        .addContainerGap())
+          .addGroup(layout.createSequentialGroup()
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGap(74, 74, 74)
+            .addComponent(toolOptions)
+            .addContainerGap())
+          .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)))
     );
   }// </editor-fold>//GEN-END:initComponents
 
@@ -232,12 +255,11 @@ public class TabSeqVisualizer extends javax.swing.JPanel
       toggleChordPicker.setText("<< Hide Editor");
     }
   }//GEN-LAST:event_toggleChordPickerActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private render.ChordPicker chordPicker1;
+  private javax.swing.JPanel jPanel1;
   private javax.swing.JScrollPane jScrollPane2;
-  private javax.swing.JToolBar.Separator jSeparator1;
-  private javax.swing.JToolBar.Separator jSeparator2;
-  private javax.swing.JToolBar.Separator jSeparator3;
   private javax.swing.JToolBar jToolBar1;
   private javax.swing.JTable seqTable;
   private javax.swing.JButton toggleChordPicker;

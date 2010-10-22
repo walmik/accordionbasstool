@@ -10,6 +10,7 @@ import java.awt.Component.BaselineResizeBehavior;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -17,6 +18,7 @@ import java.awt.event.MouseEvent;
 import javax.accessibility.Accessible;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
@@ -194,18 +196,29 @@ public class SeqViewerController
     @Override
     public Dimension getMaximumSize(JComponent c)
     {
-      return existing.getMaximumSize(c);
+      Dimension dim = existing.getMaximumSize(c);
+      if (columnModel.getColumnCount() > 1) {
+        dim.height += sliderHeight;
+
+      }
+      return dim;
     }
 
     @Override
     public Dimension getMinimumSize(JComponent c)
     {
-      return existing.getMinimumSize(c);
+      Dimension dim = existing.getMinimumSize(c);
+      if (columnModel.getColumnCount() > 1) {
+        dim.height += sliderHeight;
+
+      }
+      return dim;
     }
 
     @Override
     public void paint(Graphics g, JComponent c)
     {
+      ;
       existing.paint(g, c);
     }
 
@@ -220,7 +233,7 @@ public class SeqViewerController
     {
       existing.update(g, c);
     }
-    int sliderHeight = 40;
+    int sliderHeight = 30;
     TableHeaderUI existing;
     JSlider slider;
     boolean updateLock = false;
@@ -259,10 +272,11 @@ public class SeqViewerController
     public Dimension getPreferredSize(JComponent c)
     {
       Dimension dim = existing.getPreferredSize(c);
+
       if (columnModel.getColumnCount() > 1) {
         dim.height += sliderHeight;
-        
       }
+
       return dim;
     }
 
@@ -418,8 +432,8 @@ public class SeqViewerController
       //selColor = SystemColor.textHighlight;
       //lowered = BorderFactory.createLoweredBevelBorder();
       //raised = BorderFactory.createRaisedBevelBorder();
-      lowered = noFocusBorder;
       raised = noFocusBorder;
+      lowered = noFocusBorder;
 
       Font font = header.getFont().deriveFont(14.f);
       plain = font.deriveFont(Font.PLAIN);
@@ -453,7 +467,7 @@ public class SeqViewerController
     Color defColor, selColor;
     Border lowered, raised;
     JTableHeader header;
-    //TableCellRenderer defaultRenderer;
+    ImageIcon notSelectedIcon, selectedIcon;
 
     ColumnHeaderRenderer(JTableHeader head)
     {
@@ -469,13 +483,15 @@ public class SeqViewerController
 
       header.setUI(new SliderTableHeaderUI(header.getUI(), columnModel, header.getTable()));
 
-
-      //defaultRenderer = header.getDefaultRenderer();
-      //defColor = header.getBackground();
-      defColor = Color.gray;
+      defColor = header.getBackground();
       selColor = defColor.darker();
       lowered = BorderFactory.createLoweredBevelBorder();
       raised = BorderFactory.createRaisedBevelBorder();
+
+      if (RenderBoardUI.defaultUI != null) {
+        notSelectedIcon = new ImageIcon(RenderBoardUI.defaultUI.selectedIM.getScaledInstance(32, 32, Image.SCALE_SMOOTH));
+        selectedIcon = new ImageIcon(RenderBoardUI.defaultUI.pressedIM.getScaledInstance(32, 32, Image.SCALE_SMOOTH));
+      }
 
       Font font = getFont().deriveFont(18.f);
       plain = font.deriveFont(Font.PLAIN);
@@ -483,6 +499,12 @@ public class SeqViewerController
 
       this.setHorizontalAlignment(CENTER);
       this.setVerticalAlignment(BOTTOM);
+
+      this.setHorizontalTextPosition(CENTER);
+      this.setIconTextGap(0);
+      this.setVerticalTextPosition(BOTTOM);
+
+      this.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
     }
 
     @Override
@@ -495,15 +517,12 @@ public class SeqViewerController
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
     {
-      if (!(value instanceof ChordDef)) {
-        return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-      }
+      assert (value instanceof ChordDef);
 
       ChordDef chordDef = (ChordDef) value;
 
-      if (table == null) {
-        return this;
-      }
+      assert (table != null);
+
 
       isSelected = table.isColumnSelected(column);
       hasFocus = false;
@@ -515,22 +534,23 @@ public class SeqViewerController
               + "(" + chordDef.getChord().toString("-", true) + ")</html>";
 
       //JComponent comp = (JComponent) defaultRenderer.getTableCellRendererComponent(table, info, isSelected, hasFocus, row, column);
-      JComponent comp = this;
       this.setText(info);
 
-      comp.setToolTipText(statusInfo);
+      this.setToolTipText(statusInfo);
 
       if (table.isColumnSelected(column)) {
-        comp.setFont(bold);
+        this.setIcon(selectedIcon);
+        this.setFont(bold);
         //       this.setBackground(selColor);
         //       this.setBorder(lowered);
       } else {
-        comp.setFont(plain);
+        this.setIcon(notSelectedIcon);
+        this.setFont(plain);
         //       this.setBackground(defColor);
         //       this.setBorder(raised);
       }
 
-      return comp;
+      return this;
     }
   }
 
@@ -565,7 +585,6 @@ public class SeqViewerController
     {
       super.updateUI();
       initUI();
-      seqTable.repaint();
     }
 
     @Override

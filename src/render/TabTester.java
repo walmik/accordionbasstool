@@ -10,16 +10,21 @@
  */
 package render;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
 import java.awt.Paint;
+import java.awt.RadialGradientPaint;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 
 /**
  *
@@ -32,63 +37,38 @@ public class TabTester extends javax.swing.JPanel
   public TabTester()
   {
     initComponents();
-
-    cylP = createCylPath(diamX, diamY, hei);
-    _buttonTop = new Ellipse2D.Float(0, 0, diamX, diamY);
   }
-  Path2D cylP;
-  Ellipse2D _buttonTop;
-  int diamX = 90;
-  int diamY = 60;
-  int hei = 180;
 
-  Path2D createCylPath(int X, int Y, int height)
-  {
-    Path2D cyl = new Path2D.Float();
 
-    // Right cyl line
-    cyl.append(new Line2D.Float(X, Y / 2,
-            X, Y / 2 + height), true);
 
-    Arc2D cylBottom = new Arc2D.Float();
-    cylBottom.setArc(0, height, X, Y, 0, -180, Arc2D.OPEN);
-    cyl.append(cylBottom, true);
 
-    // Left cy line
-    cyl.append(new Line2D.Float(0, Y / 2 + height,
-            0, Y / 2), true);
-
-    return cyl;
-  }
 
   @Override
   public void paint(Graphics g)
   {
     Graphics2D graphics = (Graphics2D) g;
+
     graphics.translate(50, 50);
 
-    Point2D start = new java.awt.geom.Point2D.Float(0, diamY);
-    Point2D end = new Point2D.Float(diamX, diamY);
-    float fractions[] = {0.0f, 0.3f, 1.0f};
-    Color colors[] = {Color.darkGray, Color.white.darker(), Color.black};
+    if (RenderBoardUI.defaultUI == null)
+      return;
 
-    Paint cylPaint = new LinearGradientPaint(start, end, fractions, colors);
-    
-    graphics.setPaint(cylPaint);
-    graphics.fill(cylP);
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+    int scale = 2;
+    int imWidth = RenderBoardUI.defaultUI.selectedIM.getWidth() * scale;
+    int imHeight = RenderBoardUI.defaultUI.selectedIM.getHeight() * scale;
 
-    start = new java.awt.geom.Point2D.Float(0, 0);
-    end = new Point2D.Float(diamX, diamY);
+    graphics.drawImage(RenderBoardUI.defaultUI.selectedIM, 0, 0, imWidth, imHeight, null, this);
 
-    float frac2[] = {0.0f, 0.5f, 1.0f};
-    Color col2[] = {Color.darkGray, Color.white.darker(), Color.black};
-    Paint topPaint = new LinearGradientPaint(start, end, frac2, col2);
+    graphics.translate(imWidth + 10, 0);
+    graphics.drawImage(RenderBoardUI.defaultUI.unselectedIM, 0, 0, imWidth, imHeight, null, this);
 
-    graphics.setPaint(topPaint);
-    graphics.fill(_buttonTop);
+    graphics.translate(imWidth + 10, 0);
+    graphics.drawImage(RenderBoardUI.defaultUI.pressedIM, 0, 0, imWidth, imHeight, null, this);
   }
 
+  
   /** This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
@@ -98,29 +78,17 @@ public class TabTester extends javax.swing.JPanel
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    jSlider1 = new javax.swing.JSlider();
-
-    jSlider1.setPaintLabels(true);
-    jSlider1.setPaintTicks(true);
-
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(layout.createSequentialGroup()
-        .addGap(82, 82, 82)
-        .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(118, Short.MAX_VALUE))
+      .addGap(0, 400, Short.MAX_VALUE)
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(layout.createSequentialGroup()
-        .addGap(112, 112, 112)
-        .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(157, Short.MAX_VALUE))
+      .addGap(0, 300, Short.MAX_VALUE)
     );
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JSlider jSlider1;
   // End of variables declaration//GEN-END:variables
 }

@@ -23,7 +23,6 @@ class SeqColumnModel extends DefaultTableColumnModel
   SeqDataModel dataModel;
   SeqRowHeaderData rowHeaderDataModel;
   ListSelectionModel rowSelModel;
-
   final static int DEFAULT_COL_WIDTH = 120;
 
   SeqColumnModel(RenderBassBoard rBoard, ListSelectionModel selM)
@@ -108,7 +107,6 @@ class SeqColumnModel extends DefaultTableColumnModel
       computeSeqs(index - 1);
     }
   }
-
   boolean isPopulating = false;
 
   public void populateFromText(String text)
@@ -120,8 +118,7 @@ class SeqColumnModel extends DefaultTableColumnModel
 
     isPopulating = true;
 
-    for (int i = 0; i < chords.size(); i++)
-    {
+    for (int i = 0; i < chords.size(); i++) {
       this.addColumn(chords.elementAt(i), i);
     }
 
@@ -205,19 +202,25 @@ class SeqColumnModel extends DefaultTableColumnModel
     @Override
     public int getColumnCount()
     {
-      System.out.println("Num Cols:" + SeqColumnModel.this.getColumnCount());
       return SeqColumnModel.this.getColumnCount();
     }
 
     @Override
     public int getRowCount()
     {
+      if (allComboSeqs.length == 0) {
+        return 1;
+      }
+
       return allComboSeqs.length;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex)
     {
+      if (allComboSeqs.length == 0) {
+        return "Chord not Possible";
+      }
       music.ButtonCombo combo = allComboSeqs[rowIndex].getCombo(columnIndex);
       return combo.toInfoString(allComboSeqs[rowIndex].getBoard());
     }
