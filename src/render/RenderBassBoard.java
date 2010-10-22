@@ -1,21 +1,12 @@
 package render;
 
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.SystemColor;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
 
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
@@ -92,6 +83,11 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     repaint();
   }
 
+  public SelectedButtonCombo getSelectedButtonCombo()
+  {
+    return _selCombo;
+  }
+
   public void setSelectedSeq(ButtonComboSequence seq)
   {
     _selCombo.setButtonComboSeq(seq);
@@ -153,9 +149,11 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     if (_isHoriz) {
       w = getWidth();
       h = getHeight();
+      h -= RenderBoardUI.defaultUI.buttonXMargin * 2;
     } else {
       h = getWidth();
       w = getHeight();
+      w -= RenderBoardUI.defaultUI.buttonXMargin * 2;
     }
 
     double theTan = Math.abs(Math.tan(_slantAngle));
@@ -219,6 +217,9 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     int diamX = Math.min(xW, yW) - margin;
     int diamY = (int) (diamX * ellipseRatio);
 
+    int xP = margin;
+    int yP = margin;
+
     buttonDrawer.setup(graphics2D, xW, yW, diamX, diamY);
     textDrawer.setup(graphics2D, xW, yW, diamX, diamY);
 
@@ -245,6 +246,8 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
         if (!_isHoriz) {
           realCol = _cols - c - 1;
         }
+
+        graphics2D.translate(xP, yP);
 
         boolean pressed = (_selCombo != null && _selCombo.hasButtonPressed(r, realCol));
         boolean selected = (_selCombo != null && _selCombo.hasButtonInSeq(r, realCol));
@@ -282,7 +285,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     int buttonMargin = RenderBoardUI.defaultUI.buttonXMargin;
 
     r = (int) (_theBoard.getCols() * _colToRow * prefSize);
-    c = (int) (_theBoard.getRows() * prefSize) + buttonMargin;// - _prefSize/2;
+    c = (int) (_theBoard.getRows() * prefSize);// - _prefSize/2;
 
     if (_isHoriz) {
       dim = new Dimension(r, c);

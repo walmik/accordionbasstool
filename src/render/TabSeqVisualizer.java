@@ -51,9 +51,7 @@ public class TabSeqVisualizer extends javax.swing.JPanel
     playTimer = new Timer(1000, chordTableAction);
     playTimer.setActionCommand("Timer");
 
-
     columnModel.addColumn(chordPicker1.getPickedChord(), 0);
-    //columnModel.populateFromText("Am, EM, [ABC]");
   }
 
   class ChordTableAction extends AbstractAction
@@ -218,8 +216,8 @@ public class TabSeqVisualizer extends javax.swing.JPanel
           .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-          .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
-          .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE))
+          .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
+          .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -234,9 +232,10 @@ public class TabSeqVisualizer extends javax.swing.JPanel
           .addGroup(layout.createSequentialGroup()
             .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGap(74, 74, 74)
-            .addComponent(toolOptions)
-            .addContainerGap())
-          .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)))
+            .addComponent(toolOptions))
+          .addGroup(layout.createSequentialGroup()
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE)
+            .addContainerGap())))
     );
   }// </editor-fold>//GEN-END:initComponents
 

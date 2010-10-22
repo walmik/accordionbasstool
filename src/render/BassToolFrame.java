@@ -11,9 +11,6 @@
 
 package render;
 
-import javax.swing.BorderFactory;
-import javax.swing.border.EtchedBorder;
-
 /**
  *
  * @author Ilya

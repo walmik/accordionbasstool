@@ -31,14 +31,20 @@ public class RenderBoardUI
 
   static RenderBoardUI defaultUI = new RenderBoardUI();
   private Path2D unpressedCyl, pressedCyl;
-  private Ellipse2D _buttonTop, _shadowFloor, _pressedShadowFloor;
+  private Ellipse2D _buttonTop, _shadowFloor;
+
+
   float shadowScale = 1.1f;
-  final int dimScale = 1;
+  final int dimScale = 2;
+
   int diamX = 36 * dimScale;
   int diamY = 27 * dimScale;
   int cylHeight = 16 * dimScale;
+  
   float pressedRatio = 0.25f;
-  final int buttonXMargin = 8;
+
+  final int buttonXMargin = 10;
+
   final double ellipseRatio = (3.f / 4.f);
   final double _colToRow = 4.0 / 3.0;
   boolean _isHoriz = true;
@@ -58,8 +64,8 @@ public class RenderBoardUI
     _shadowFloor = new Ellipse2D.Float(0, 0, diamX * shadowScale, diamY * shadowScale);
     //_pressedShadowFloor = new Ellipse2D.Float(0, 0, diamX * shadowScale * .5f, diamY * shadowScale * .5f);
 
-    int imWidth = (int) (diamX * shadowScale);
-    int imHeight = imWidth + cylHeight;
+    int imWidth = (int)(diamX * shadowScale);
+    int imHeight = (int)(diamY * shadowScale) + cylHeight;
 
     selectedIM = new BufferedImage(imWidth, imHeight, BufferedImage.TYPE_INT_ARGB);
     unselectedIM = new BufferedImage(imWidth, imHeight, BufferedImage.TYPE_INT_ARGB);
@@ -84,7 +90,146 @@ public class RenderBoardUI
     return new TextDrawer();
   }
 
-  static Path2D createCylPath(float X, float Y, float height)
+  abstract class ButtonDrawer
+  {
+    int _pressedCylOff;
+
+    void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
+    {
+      int pressedHeight = (int) (cylHeight * pressedRatio);
+      _pressedCylOff = cylHeight - pressedHeight;
+    }
+
+    abstract void draw(Graphics2D graphics, int col, int row, boolean pressed, boolean selected);
+  }
+
+  class IconButtonDrawer extends ButtonDrawer
+  {
+
+    int _xW, _yW;
+    int _diamX, _diamY;
+    int imWidth, imHeight;
+
+    @Override
+    void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
+    {
+      super.setup(graphics, xW, yW, diamX, diamY);
+      
+      _xW = xW;
+      _yW = yW;
+      _diamX = diamX;
+      _diamY = diamY;
+
+      imHeight = yW;
+      imWidth = imHeight * pressedIM.getWidth() / pressedIM.getHeight();
+
+      //imWidth = (int)(_diamX * shadowScale);
+      //imHeight = imWidth * pressedIM.getHeight() / pressedIM.getWidth();
+      _pressedCylOff = _pressedCylOff * imWidth / pressedIM.getWidth();
+      //System.out.println("IM: " + imWidth + ", " + imHeight);
+    }
+
+    @Override
+    void draw(Graphics2D graphics, int col, int row, boolean pressed, boolean selected)
+    {
+ 
+      //graphics.setComposite(AlphaComposite.SrcAtop);
+      //graphics.drawRect(0, 0, _xW, _yW);
+
+      if (pressed) {
+        graphics.drawImage(pressedIM, 0, 0, imWidth, imHeight, null);
+        graphics.translate(0, _pressedCylOff);
+      } else if (selected) {
+        graphics.drawImage(selectedIM, 0, 0, imWidth, imHeight, null);
+      } else {
+        graphics.drawImage(unselectedIM, 0, 0, imWidth, imHeight, null);
+      }
+    }
+  }
+
+  class FlatButtonDrawer extends ButtonDrawer
+  {
+
+    @Override
+    void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
+    {
+      super.setup(graphics, xW, yW, diamX, diamY);
+
+//      _unpressedCyl = createCylPath(diamX, diamY, cylHeight);
+//
+//      _pressedCyl = createCylPath(diamX, diamY, (int) (cylHeight * pressedRatio));
+//
+//      _buttonTop = new Ellipse2D.Float(0, 0, diamX, diamY);
+    }
+
+    @Override
+    void draw(Graphics2D graphics, int col, int row, boolean pressed, boolean selected)
+    {
+      Color lighterFill = Color.LIGHT_GRAY;
+      Color darkerFill = Color.GRAY;
+
+      if (selected) {
+        //TODO: System Color
+        //lighterFill = Color.MAGENTA;
+        lighterFill = SystemColor.textHighlight;
+        darkerFill = lighterFill.darker();
+      }
+
+      if (pressed) {
+        // Draw Pressed
+        graphics.translate(0, _pressedCylOff);
+        graphics.setColor(darkerFill);
+        graphics.fill(_pressedCyl);
+        graphics.setColor(lighterFill);
+        graphics.fill(_buttonTop);
+      } else {
+        // Draw Unpressed
+        graphics.setColor(darkerFill);
+        graphics.fill(_unpressedCyl);
+        graphics.setColor(lighterFill);
+        graphics.fill(_buttonTop);
+      }
+    }
+    Path2D _unpressedCyl;
+    Path2D _pressedCyl;
+    Ellipse2D _buttonTop;
+  }
+
+  static class TextDrawer
+  {
+
+    private FontMetrics _fm;
+    private int _tX, _tY;
+    private int _textHeight;
+    private Font _font = new Font("Default", Font.BOLD, 14);
+
+    void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
+    {
+      // Text Set up
+      graphics.setFont(_font);
+      _fm = graphics.getFontMetrics();
+      int textDescent = _fm.getDescent() + 1;
+      _textHeight = _fm.getHeight() - 4;
+
+      _tX = diamX / 2;
+      _tY = diamY / 2 + textDescent;
+    }
+
+    void draw(Graphics2D graphics, int col, int row, boolean pressed, String chordStr)
+    {
+      if (pressed) {
+        graphics.setColor(SystemColor.textText);
+      } else {
+        graphics.setColor(SystemColor.textText);
+      }
+
+      graphics.drawString(chordStr,
+              _tX - _fm.stringWidth(chordStr) / 2,
+              _tY);
+    }
+  }
+
+    static Path2D createCylPath(float X, float Y, float height)
   {
     Path2D cyl = new Path2D.Float();
 
@@ -175,147 +320,5 @@ public class RenderBoardUI
 
     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (pressed ? 0.9f : 0.5f)));
     graphics.fill(_buttonTop);
-  }
-
-  abstract class ButtonDrawer
-  {
-
-    int _xP, _yP;
-    int _pressedCylOff;
-
-    void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
-    {
-      _xP = (xW - diamX) / 2;
-      _yP = (yW - diamY) / 2;
-
-      int pressedHeight = (int) (cylHeight * pressedRatio);
-      _pressedCylOff = cylHeight - pressedHeight;
-    }
-
-    abstract void draw(Graphics2D graphics, int col, int row, boolean pressed, boolean selected);
-  }
-
-  class IconButtonDrawer extends ButtonDrawer
-  {
-
-    int _xW, _yW;
-    int _diamX, _diamY;
-    int imWidth, imHeight;
-
-    @Override
-    void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
-    {
-      _xW = xW;
-      _yW = yW;
-      _diamX = diamX;
-      _diamY = diamY;
-
-      imWidth = pressedIM.getWidth();// (_diamX * shadowScale);
-      imHeight = imWidth * pressedIM.getHeight() / pressedIM.getWidth();
-      //System.out.println("IM: " + imWidth + ", " + imHeight);
-
-      super.setup(graphics, xW, yW, diamX, diamY);
-    }
-
-    @Override
-    void draw(Graphics2D graphics, int col, int row, boolean pressed, boolean selected)
-    {
-      graphics.translate(_xP, _yP);
-
-      //graphics.setComposite(AlphaComposite.SrcAtop);
-
-      if (pressed) {
-        graphics.drawImage(pressedIM, null, null);
-        graphics.translate(0, _pressedCylOff);
-      } else if (selected) {
-        graphics.drawImage(selectedIM, null, null);
-      } else {
-        graphics.drawImage(unselectedIM, null, null);
-      }
-    }
-  }
-
-  class FlatButtonDrawer extends ButtonDrawer
-  {
-
-    @Override
-    void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
-    {
-      super.setup(graphics, xW, yW, diamX, diamY);
-
-//      _unpressedCyl = createCylPath(diamX, diamY, cylHeight);
-//
-//      _pressedCyl = createCylPath(diamX, diamY, (int) (cylHeight * pressedRatio));
-//
-//      _buttonTop = new Ellipse2D.Float(0, 0, diamX, diamY);
-    }
-
-    @Override
-    void draw(Graphics2D graphics, int col, int row, boolean pressed, boolean selected)
-    {
-      graphics.translate(_xP, _yP);
-
-      Color lighterFill = Color.LIGHT_GRAY;
-      Color darkerFill = Color.GRAY;
-
-      if (selected) {
-        //TODO: System Color
-        //lighterFill = Color.MAGENTA;
-        lighterFill = SystemColor.textHighlight;
-        darkerFill = lighterFill.darker();
-      }
-
-      if (pressed) {
-        // Draw Pressed
-        graphics.translate(0, _pressedCylOff);
-        graphics.setColor(darkerFill);
-        graphics.fill(_pressedCyl);
-        graphics.setColor(lighterFill);
-        graphics.fill(_buttonTop);
-      } else {
-        // Draw Unpressed
-        graphics.setColor(darkerFill);
-        graphics.fill(_unpressedCyl);
-        graphics.setColor(lighterFill);
-        graphics.fill(_buttonTop);
-      }
-    }
-    Path2D _unpressedCyl;
-    Path2D _pressedCyl;
-    Ellipse2D _buttonTop;
-  }
-
-  static class TextDrawer
-  {
-
-    private FontMetrics _fm;
-    private int _tX, _tY;
-    private int _textHeight;
-    private Font _font = new Font("Default", Font.BOLD, 14);
-
-    void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
-    {
-      // Text Set up
-      graphics.setFont(_font);
-      _fm = graphics.getFontMetrics();
-      int textDescent = _fm.getDescent() + 1;
-      _textHeight = _fm.getHeight() - 4;
-
-      _tX = diamX / 2;
-      _tY = diamY / 2 + textDescent;
-    }
-
-    void draw(Graphics2D graphics, int col, int row, boolean pressed, String chordStr)
-    {
-      if (pressed) {
-        graphics.setColor(SystemColor.textText);
-      } else {
-        graphics.setColor(SystemColor.textText);
-      }
-
-      graphics.drawString(chordStr,
-              _tX - _fm.stringWidth(chordStr) / 2,
-              _tY);
-    }
   }
 }

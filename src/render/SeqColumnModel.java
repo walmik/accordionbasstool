@@ -39,9 +39,9 @@ class SeqColumnModel extends DefaultTableColumnModel
     renderBoard = rBoard;
     rowSelModel = selM;
 
-    if (renderBoard != null) {
-      renderBoard.setSelectedButtonCombo(selComboModel);
-    }
+//    if (renderBoard != null) {
+//      renderBoard.setSelectedButtonCombo(selComboModel);
+//    }
 
     this.setSelectionModel(selComboModel);
   }

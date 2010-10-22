@@ -143,7 +143,8 @@ public class SeqViewerController
       public void componentHidden(ComponentEvent e)
       {
         RenderBassBoard renderBoard = BassToolFrame.getRenderBoard();
-        if (renderBoard != null) {
+        if ((renderBoard != null) && 
+            (renderBoard.getSelectedButtonCombo() == columnModel.selComboModel)) {
           renderBoard.setSelectedButtonCombo(null);
         }
       }
