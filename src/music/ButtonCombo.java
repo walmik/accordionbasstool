@@ -50,7 +50,8 @@ public class ButtonCombo
 	{
 		pos = newPos;
 	}
-	
+
+  @Override
 	public String toString()
 	{
 		String str = this.heur + ": <";
@@ -79,12 +80,12 @@ public class ButtonCombo
     return str;
 	}
 	
-	public int evalHeur(final BassBoard.Pos boardCenter)
+	int evalHeur(final BassBoard.Pos boardCenter)
 	{
 		return evalHeur(boardCenter, null, null);
 	}
 	
-	public int evalHeur(final BassBoard.Pos boardCenter,
+	int evalHeur(final BassBoard.Pos boardCenter,
 						GeoPos boundsMax,
 						GeoPos boundsMin)
 	{
@@ -142,29 +143,18 @@ public class ButtonCombo
 	boolean contains(ButtonCombo other)
 	{
 		return getHash().contains(other.getHash());
-		
-//		if (other.pos.length > pos.length)
-//			return false;
-//		
-//		for (int i = 0; i < other.pos.length; i++)
-//		{
-//			boolean found = false;
-//			
-//			for (int j = 0; j < pos.length; j++)
-//			{
-//				if (other.pos[i].equals(pos[j]))
-//				{
-//					found = true;
-//					break;
-//				}
-//			}
-//			
-//			if (!found)
-//				return false;
-//		}
-//		
-//		return true;
 	}
+
+  boolean isUsingBassOnly(BassBoard board)
+  {
+    for (int i = 0; i < pos.length; i++)
+    {
+      if (!board.isSingleBassRow(pos[i].row))
+        return false;
+    }
+
+    return true;
+  }
 	
 //	ButtonCombo expand(BassBoard.Pos newPos, Chord newChord)
 //	{

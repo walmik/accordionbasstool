@@ -53,7 +53,8 @@ public class ButtonComboSequence implements Cloneable
     else
       return heur;
   }
-	
+
+  @Override
 	public String toString()
 	{
 		String str = "Heur: " + evalHeuristic() + " Seq: ";

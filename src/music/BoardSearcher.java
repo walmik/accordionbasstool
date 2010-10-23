@@ -45,7 +45,7 @@ public class BoardSearcher
         System.out.println("Elapsed: " + (end - start));
       }
 
-			
+
 			if (combo == null)
 			{
 				//TODO handle null case?
@@ -242,6 +242,9 @@ public class BoardSearcher
     //TODO: Make this an option strict bass
     boolean unmaskBassRegister = true;
 		//boolean unmaskBassRegister = !fullChordMask.hasRootBassReq();
+    //TODO: Filter out all bass combos, if alternatives exist
+    boolean ignoreAllBassCombos = true;
+    boolean chordComboFound = false;
     // ***************************
 		
 		Vector<BassBoard.Pos> validPos = new Vector<BassBoard.Pos>();
@@ -307,11 +310,10 @@ public class BoardSearcher
 					continue;
 				}
 				
-				
-											
 				ButtonComboLink newLink = 
 					new ButtonComboLink(newPos, i, newChordMask, currLink);
-							
+
+         // See if the new link is a finished combo
 				if (newLink.chordMask.equals(fullChord.getChordMask()))
 				{
 					ListIterator<ButtonCombo> nextIter = 
@@ -334,68 +336,33 @@ public class BoardSearcher
 							containCount++;
 						}
 					}
-					
-					if (containCount == 0)
-					{
-						combos.addLast(newCombo);
-					}
-					
-//					System.out.println(newLink.indent + "MATCH " + newLink.chordMask.value);
 
-//					ButtonCombo newCombo = newLink.getCombo();
-//					int heur = newCombo.evalHeur(board.getCenter());
-//					
-//					boolean inserted = false;
-//					
-//					assert(combos.getLast().heur != 0);
-//					
-//					// Quick check, if we are at max sequences and the heuristic
-//					// is greater than the last one, skip immediately
-//					if ((combos.size() == MAX_COMBOS) && 
-//						(heur >= combos.getLast().heur))
-//					{
-//						continue;
-//					}
-//					
-//					ListIterator<ButtonCombo> nextIter = 
-//						combos.listIterator();
-//					while (nextIter.hasNext())
-//					{
-//						int index = nextIter.nextIndex();
-//						if (heur < nextIter.next().heur)
-//						{
-//							combos.add(index, newCombo);
-//							inserted = true;
-//							break;
-//						}
-//					}
-//					
-//					if (!inserted)
-//					{
-//						if (combos.size() < MAX_COMBOS)
-//						{
-//							combos.add(newCombo);	
-//						}
-//					}
-//					else if (combos.size() > MAX_COMBOS)
-//					{
-//						combos.removeLast();
-//					}
-				}
+          // If we're already contained in the existing combo, ignore
+					if (containCount != 0)
+					{
+            continue;
+          }
+
+          if (ignoreAllBassCombos)
+          {
+             boolean isBassOnly = newCombo.isUsingBassOnly(board);
+             if (chordComboFound && isBassOnly)
+               continue;
+
+             chordComboFound = (chordComboFound || !isBassOnly);
+          }
+
+          // Insert any combo-level heuristic filtering here...
+
+          combos.addLast(newCombo);
+        }
 				else
 				{
+          // Combo not matched, continue building combo
+          // Ignore combos of 4 or more in length
 					if (newLink.len >= 4)
 						continue;
-						
-//					if (combos.size() == MAX_COMBOS)
-//					{
-//						ButtonCombo newCombo = newLink.getCombo();
-//						int heur = newCombo.evalHeur(board.getCenter());
-//						
-//						if (heur >= combos.getLast().heur)
-//							continue;
-//					}
-					
+										
 					// Inc length of combo, effectively recurse to next level
 					currLink = newLink;	
 				}

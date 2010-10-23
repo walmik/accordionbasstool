@@ -79,14 +79,14 @@ public class ChordParser {
 
     // Additional Bass, non-root
 
-		if (parser.nextChar() == '&')
+		if (parser.nextChar() == '\\')
 		{
 			parser.incOffset(1);
 
 			Note bassNote = Note.fromString(parser);
 
 			//return new Chord(rootNote, result.ivals, bassNote, false);
-      return buildChord(rootNote, bassNote, result, false);
+      return buildChord(rootNote, bassNote, result, true);
 		}
 	
 		//return new Chord(rootNote, result.ivals);
