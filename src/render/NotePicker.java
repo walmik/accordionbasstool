@@ -10,12 +10,10 @@
  */
 package render;
 
-import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.util.Enumeration;
 import javax.swing.AbstractButton;
-import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.UIManager;
 import music.Note;
@@ -64,19 +62,19 @@ public class NotePicker extends javax.swing.JPanel
     while (noteButs.hasMoreElements()) {
       AbstractButton but = noteButs.nextElement();
       if (noteStr.startsWith(but.getActionCommand())) {
-        but.doClick();
+        but.setSelected(true);
         break;
       }
     }
 
     if (noteStr.length() == 1) {
-      rootNatural.doClick();
+      rootNatural.setSelected(true);
     } else if (note.getSharpOrFlat() > 0) {
-      rootSharp.doClick();
+      rootSharp.setSelected(true);
     } else if (note.getSharpOrFlat() < 0) {
-      rootFlat.doClick();
+      rootFlat.setSelected(true);
     } else {
-      rootNatural.doClick();
+      rootNatural.setSelected(true);
     }
   }
 

@@ -22,9 +22,14 @@ public class BassToolFrame extends javax.swing.JFrame {
         initComponents();
     }
 
+    private static RenderBassBoard theBoard = null;
+
     public static RenderBassBoard getRenderBoard()
     {
-      return renderBassBoard;
+      if (theBoard == null)
+        theBoard = new RenderBassBoard();
+      
+      return theBoard;
     }
 
     /** This method is called from within the constructor to
@@ -38,7 +43,7 @@ public class BassToolFrame extends javax.swing.JFrame {
 
     splitPane = new javax.swing.JSplitPane();
     renderBoardScrollPane = new javax.swing.JScrollPane();
-    renderBassBoard = new render.RenderBassBoard();
+    renderBassBoard = getRenderBoard();
     toolTabs = new javax.swing.JTabbedPane();
     tabChordPicker1 = new render.TabSeqVisualizer();
     tabCustomBass1 = new render.TabCustomBass();
@@ -58,7 +63,7 @@ public class BassToolFrame extends javax.swing.JFrame {
     );
     renderBassBoardLayout.setVerticalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 298, Short.MAX_VALUE)
+      .addGap(0, 288, Short.MAX_VALUE)
     );
 
     renderBoardScrollPane.setViewportView(renderBassBoard);
@@ -78,7 +83,7 @@ public class BassToolFrame extends javax.swing.JFrame {
     );
     tabTester1Layout.setVerticalGroup(
       tabTester1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 292, Short.MAX_VALUE)
+      .addGap(0, 317, Short.MAX_VALUE)
     );
 
     toolTabs.addTab("Tester", tabTester1);
@@ -92,7 +97,7 @@ public class BassToolFrame extends javax.swing.JFrame {
 
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private static render.RenderBassBoard renderBassBoard;
+  private render.RenderBassBoard renderBassBoard;
   private javax.swing.JScrollPane renderBoardScrollPane;
   private javax.swing.JSplitPane splitPane;
   private render.TabSeqVisualizer tabChordPicker1;

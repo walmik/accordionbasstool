@@ -4,9 +4,7 @@
  */
 package music;
 
-import java.awt.Point;
 import java.net.URL;
-import java.util.Vector;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -38,33 +36,11 @@ public class ChordRegistry
   }
 
   //==============================================================
-  public static class ExtChordDef extends ChordDef
-  {
-    Interval[] ivals;
-    public int r;
-    public int c;
-
-    ExtChordDef(String _name, String _abb, String _notes, int row, int col)
-    {
-      super(_name, _abb, _notes);
-      ivals = this.chord.extractInterval();
-      r = row;
-      c = col;
-    }
-
-    ExtChordDef()
-    {
-      ivals = new Interval[0];
-      r = c = 0;
-    }
-  }
-
-  //==============================================================
   public class ChordGroupSet
   {
     // Chord Defs (loaded from XML)
 
-    final ExtChordDef groupedChordDefs[][];
+    final RegistryChordDef groupedChordDefs[][];
     public final String groupNames[];
     public final int maxChordsInGroup;
     public final String name;
@@ -72,7 +48,7 @@ public class ChordRegistry
     ChordGroupSet(String chordSetName)
     {
       name = chordSetName;
-      groupedChordDefs = new ExtChordDef[0][];
+      groupedChordDefs = new RegistryChordDef[0][];
       groupNames = new String[0];
       maxChordsInGroup = 0;
     }
@@ -82,7 +58,7 @@ public class ChordRegistry
       name = root.getAttribute("name");
       NodeList groups = root.getElementsByTagName("chordgroup");
       groupNames = new String[groups.getLength()];
-      groupedChordDefs = new ExtChordDef[groupNames.length][];
+      groupedChordDefs = new RegistryChordDef[groupNames.length][];
       int maxChords = 0;
 
       for (int i = 0; i < groupedChordDefs.length; i++) {
@@ -91,7 +67,7 @@ public class ChordRegistry
 
         NodeList chords = group.getElementsByTagName("chord");
 
-        groupedChordDefs[i] = new ExtChordDef[chords.getLength()];
+        groupedChordDefs[i] = new RegistryChordDef[chords.getLength()];
         maxChords = Math.max(maxChords, groupedChordDefs[i].length);
 
         for (int j = 0; j < groupedChordDefs[i].length; j++) {
@@ -99,14 +75,14 @@ public class ChordRegistry
           String name = chord.getAttribute("name");
           String abbrev = chord.getAttribute("abbrev");
           String notelist = chord.getAttribute("notes");
-          groupedChordDefs[i][j] = new ExtChordDef(name, abbrev, notelist, j, i);
+          groupedChordDefs[i][j] = new RegistryChordDef(name, abbrev, notelist, j, i);
         }
       }
 
       maxChordsInGroup = maxChords;
     }
 
-    public ChordDef getChordDef(int groupIndex, int chordIndex)
+    public RegistryChordDef getChordDef(int groupIndex, int chordIndex)
     {
       assert ((chordIndex >= 0) && (groupIndex >= 0));
 
@@ -117,15 +93,15 @@ public class ChordRegistry
       }
     }
 
-    public ExtChordDef findChord(StringParser parser)
+    public RegistryChordDef findChord(StringParser parser)
     {
       int prevMatchLength = 0;
-      ExtChordDef bestMatch = null;
+      RegistryChordDef bestMatch = null;
       String chordToMatch = parser.input();
 
       for (int col = 0; col < groupedChordDefs.length; col++) {
         for (int row = 0; row < groupedChordDefs[col].length; row++) {
-          ExtChordDef currChord = groupedChordDefs[col][row];
+          RegistryChordDef currChord = groupedChordDefs[col][row];
           String currAbbrev = currChord.abbrevPlain.trim();
           if ((currAbbrev.length() > prevMatchLength)
                   && chordToMatch.startsWith(currAbbrev)) {
@@ -137,10 +113,6 @@ public class ChordRegistry
       }
 
       parser.incOffset(prevMatchLength);
-      if (bestMatch == null) {
-        bestMatch = new ExtChordDef();
-      }
-
       return bestMatch;
     }
   }
@@ -209,14 +181,14 @@ public class ChordRegistry
     return null;
   }
 
-  public ExtChordDef findChord(String chordSetName, StringParser parser)
+  public RegistryChordDef findChord(String chordSetName, StringParser parser)
   {
     ChordGroupSet chordSet = findChordSet(chordSetName);
 
     if (chordSet != null) {
       return chordSet.findChord(parser);
     } else {
-      return new ExtChordDef();
+      return null;
     }
   }
 }

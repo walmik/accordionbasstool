@@ -1,6 +1,6 @@
 package render;
 
-import music.ChordDef;
+import music.ParsedChordDef;
 import java.util.Vector;
 import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
@@ -46,7 +46,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     this.setSelectionModel(selComboModel);
   }
 
-  void addColumn(ChordDef def, int index)
+  void addColumn(ParsedChordDef def, int index)
   {
     if (def == null) {
       return;
@@ -83,7 +83,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
-  void editSelectedColumn(ChordDef newDef)
+  void editSelectedColumn(ParsedChordDef newDef)
   {
     int index = getSelectedColumn();
     if (index >= 0) {
@@ -112,7 +112,7 @@ class SeqColumnModel extends DefaultTableColumnModel
   public void populateFromText(String text)
   {
     StringParser parser = new StringParser(text);
-    Vector<ChordDef> chords = ChordParser.parseChords(parser);
+    Vector<ParsedChordDef> chords = ChordParser.parseChords(parser);
 
     this.tableColumns.clear();
 
@@ -134,7 +134,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     computeSeqs(selIndex);
   }
 
-  private void editColumn(int index, ChordDef newChordDef)
+  private void editColumn(int index, ParsedChordDef newChordDef)
   {
     TableColumn column = this.getColumn(index);
 
@@ -144,17 +144,17 @@ class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
-  ChordDef getChordDef(int index)
+  ParsedChordDef getChordDef(int index)
   {
     assert ((index >= 0) && (index < getColumnCount()));
-    return (ChordDef) getColumn(index).getHeaderValue();
+    return (ParsedChordDef) getColumn(index).getHeaderValue();
   }
 
   Vector<Chord> getAllChords()
   {
     Vector<Chord> vec = new Vector<Chord>();
     for (int i = 0; i < getColumnCount(); i++) {
-      vec.add(getChordDef(i).getChord());
+      vec.add(getChordDef(i).chord);
     }
     return vec;
   }
@@ -192,7 +192,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     @Override
     public String getColumnName(int column)
     {
-      return SeqColumnModel.this.getChordDef(column).getAbbrevHtml();
+      return SeqColumnModel.this.getChordDef(column).nameHtml;
     }
 
     public SeqDataModel()

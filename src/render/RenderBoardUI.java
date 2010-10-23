@@ -41,7 +41,7 @@ public class RenderBoardUI
   int diamY = 27 * dimScale;
   int cylHeight = 16 * dimScale;
   
-  float pressedRatio = 0.25f;
+  float pressedRatio = 0.333f;
 
   final int buttonXMargin = 10;
 

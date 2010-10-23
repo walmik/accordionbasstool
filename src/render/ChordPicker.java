@@ -17,7 +17,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
@@ -29,10 +28,10 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
-import music.ChordDef;
-import music.ChordParser;
+import music.RegistryChordDef;
 import music.ChordRegistry;
 import music.Note;
+import music.ParsedChordDef;
 import util.Main.StringParser;
 
 /**
@@ -48,7 +47,7 @@ public class ChordPicker extends javax.swing.JPanel
     initComponents();
   }
   Note rootNote = new Note();
-  ChordDef currTableChord;
+  RegistryChordDef currTableChord;
   Note addedBassNote = new Note();
   SeqColumnModel seqColumnModel = null;
 //  JTable chordTable;
@@ -56,7 +55,7 @@ public class ChordPicker extends javax.swing.JPanel
 //  NotePicker notePicker2;
 //  JCheckBox addedBassCheck;
   String chordSet = ChordRegistry.ALL_CHORDS;
-  int isUpdatingChord = 0;
+  boolean isUpdatingChord = false;
   final static int DEFAULT_TABLE_COL_WIDTH = 96;
 
   void setSeqColModel(SeqColumnModel model)
@@ -88,7 +87,7 @@ public class ChordPicker extends javax.swing.JPanel
                   return;
                 }
 
-                setupChord(index);
+                setupChord(seqColumnModel.getChordDef(index));
               }
             });
 
@@ -107,7 +106,7 @@ public class ChordPicker extends javax.swing.JPanel
       public void propertyChange(PropertyChangeEvent evt)
       {
         rootNote = (Note) evt.getNewValue();
-        updateCurrChord();
+        updateChordInModel();
         chordTable.repaint();
       }
     });
@@ -121,7 +120,7 @@ public class ChordPicker extends javax.swing.JPanel
         public void propertyChange(PropertyChangeEvent evt)
         {
           addedBassNote = (Note) evt.getNewValue();
-          updateCurrChord();
+          updateChordInModel();
           chordTable.repaint();
         }
       });
@@ -135,48 +134,47 @@ public class ChordPicker extends javax.swing.JPanel
         {
           boolean usingAddedBass = (evt.getStateChange() == ItemEvent.SELECTED);
           notePicker2.setVisible(usingAddedBass);
-          updateCurrChord();
+          updateChordInModel();
         }
       });
     }
   }
 
-  ChordDef getPickedChord()
+  private void updateChordInModel()
   {
-    ChordDef finalChord = buildChord();
-    return finalChord;
-  }
-
-  void updateCurrChord()
-  {
-    ChordDef finalChord = buildChord();
-
-    String notestr = finalChord.chord.toString("-", true);
-
-    String info = "<html><b>" + finalChord.abbrevHtml + "</b>"
-            + "<br/>" + finalChord.name + ": "
-            + "(" + notestr + ")" + "</html>";
-
-    statusLabel.setText(info);
-
-    if (isUpdatingChord > 0) {
+    if (isUpdatingChord) {
       return;
     }
 
-    isUpdatingChord++;
+    isUpdatingChord = true;
+
+    ParsedChordDef finalChord = getPickedChord();
 
     if (seqColumnModel != null) {
       seqColumnModel.editSelectedColumn(finalChord);
     }
 
-    isUpdatingChord--;
+    isUpdatingChord = false;
+
+    updateChordUI(finalChord);
   }
 
-  ChordDef buildChord()
+  private void updateChordUI(ParsedChordDef finalChord)
+  {
+    String notestr = finalChord.chord.toHtmlString();
+
+    String info = "<html><b>" + finalChord.nameHtml + "</b>"
+            + "<br/>" + finalChord.detail + ": "
+            + "(" + notestr + ")" + "</html>";
+
+    statusLabel.setText(info);
+  }
+
+  ParsedChordDef getPickedChord()
   {
     boolean usingAddedBass = addedBassCheck.isSelected();
     Note addedBass = (usingAddedBass ? addedBassNote : null);
-    return ChordParser.buildChord(rootNote, addedBass, currTableChord, false);
+    return new ParsedChordDef(rootNote, addedBass, currTableChord, false);
   }
 
   @Override
@@ -191,52 +189,55 @@ public class ChordPicker extends javax.swing.JPanel
     super.setVisible(visible);
   }
 
-  private void setupChord(int index)
+  private void setupChord(ParsedChordDef possChordDef)
   {
-    if (isUpdatingChord > 0) {
+    if (isUpdatingChord) {
       return;
     }
-    isUpdatingChord++;
-    setupChord(seqColumnModel.getChordDef(index));
-    isUpdatingChord--;
-  }
 
-  private void setupChord(ChordDef possChordDef)
-  {
-    String chordStr = possChordDef.abbrevPlain;
-    StringParser parser = new StringParser(chordStr);
-    Note newRoot = Note.fromString(parser);
+//    String chordStr = possChordDef.namePlain;
+//    StringParser parser = new StringParser(chordStr);
+//    Note newRoot = Note.fromString(parser);
+
+    Note newRoot = possChordDef.rootNote;
 
     if (newRoot == null) {
       return;
     }
 
-    notePicker1.setNote(newRoot);
-
     if ((chordTable.getRowCount() == 0) || (chordTable.getColumnCount() == 0)) {
       return;
     }
 
-    ChordRegistry.ExtChordDef extChordDef = null;
+    isUpdatingChord = true;
 
-    extChordDef = ChordRegistry.mainRegistry().findChord(this.chordSet, parser);
+    notePicker1.setNote(newRoot);
 
-    int row = extChordDef.r;
-    int col = chordTable.convertColumnIndexToView(extChordDef.c);
+    int row = 0, col = 0;
+//    if (possChordDef.registryDef == null) {
+//      RegistryChordDef regChordDef = null;
+//
+//      regChordDef = ChordRegistry.mainRegistry().findChord(this.chordSet, parser);
+//
+//      if (regChordDef != null) {
+//        row = regChordDef.row;
+//        col = chordTable.convertColumnIndexToView(regChordDef.col);
+//      }
+//      System.out.println("Null Chord Def");
+//    } else {
+    row = possChordDef.regRow;
+    col = possChordDef.regCol;
+//    }
 
     chordTable.setRowSelectionInterval(row, row);
     chordTable.setColumnSelectionInterval(col, col);
 
-    Note newAddedBass = null;
+    Note newAddedBass = possChordDef.addedBassNote;
 
-    if (notePicker2 == null || addedBassCheck == null) {
-      return;
-    }
-
-    if (parser.nextChar() == '/') {
-      parser.incOffset(1);
-      newAddedBass = Note.fromString(parser);
-    }
+//    if (parser.nextChar() == '/') {
+//      parser.incOffset(1);
+//      newAddedBass = Note.fromString(parser);
+//    }
 
     if (newAddedBass != null) {
       addedBassCheck.setSelected(true);
@@ -244,6 +245,10 @@ public class ChordPicker extends javax.swing.JPanel
     } else {
       addedBassCheck.setSelected(false);
     }
+
+    isUpdatingChord = false;
+
+    updateChordUI(possChordDef);
   }
 
   void changeChordSet(boolean simpleMode)
@@ -282,17 +287,17 @@ public class ChordPicker extends javax.swing.JPanel
     int selCol = -1;
     int invalidRow = -1, invalidCol = -1;
 
-    private ChordDef getChordAt(int row, int col)
+    private RegistryChordDef getChordAt(int row, int col)
     {
       col = chordTable.convertColumnIndexToModel(col);
-      return (ChordDef) chordTable.getModel().getValueAt(row, col);
+      return (RegistryChordDef) chordTable.getModel().getValueAt(row, col);
     }
 
     @Override
     public void valueChanged(ListSelectionEvent e)
     {
       ListSelectionModel model = (ListSelectionModel) e.getSource();
-      ChordDef chordDef;
+      RegistryChordDef chordDef;
 
       if (model == chordTable.getSelectionModel()) {
         int newRow = model.getAnchorSelectionIndex();
@@ -362,7 +367,7 @@ public class ChordPicker extends javax.swing.JPanel
       }
 
       currTableChord = chordDef;
-      updateCurrChord();
+      updateChordInModel();
     }
   }
 
@@ -384,7 +389,7 @@ public class ChordPicker extends javax.swing.JPanel
     @Override
     public Class<?> getColumnClass(int columnIndex)
     {
-      return ChordDef.class;
+      return RegistryChordDef.class;
     }
 
     @Override
@@ -419,7 +424,7 @@ public class ChordPicker extends javax.swing.JPanel
 
     ToggleButtonRenderer renderer = new ToggleButtonRenderer();
 
-    chordTable.setDefaultRenderer(ChordDef.class, renderer);
+    chordTable.setDefaultRenderer(RegistryChordDef.class, renderer);
 
     chordTable.getTableHeader().setReorderingAllowed(true);
 
@@ -486,7 +491,7 @@ public class ChordPicker extends javax.swing.JPanel
       }
 
       // Chord Cell Rendering
-      ChordDef chordDef = (ChordDef) value;
+      RegistryChordDef chordDef = (RegistryChordDef) value;
 
       String cellText = rootNote.toString(true) + chordDef.abbrevHtml;
 

@@ -273,9 +273,15 @@ public class Chord
 		return str;
 	}
 
+  @Override
   public String toString()
   {
     return toString("", false);
+  }
+
+  public String toHtmlString()
+  {
+    return toString("-", true);
   }
 }
 

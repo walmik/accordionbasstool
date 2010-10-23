@@ -38,7 +38,7 @@ import javax.swing.plaf.TableHeaderUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
-import music.ChordDef;
+import music.ParsedChordDef;
 
 /**
  *
@@ -489,6 +489,8 @@ public class SeqViewerController
       lowered = BorderFactory.createLoweredBevelBorder();
       raised = BorderFactory.createRaisedBevelBorder();
 
+      this.setOpaque(false);
+
       if (RenderBoardUI.defaultUI != null) {
         notSelectedIcon = new ImageIcon(RenderBoardUI.defaultUI.selectedIM.getScaledInstance(32, 32, Image.SCALE_SMOOTH));
         selectedIcon = new ImageIcon(RenderBoardUI.defaultUI.pressedIM.getScaledInstance(32, 32, Image.SCALE_SMOOTH));
@@ -518,9 +520,9 @@ public class SeqViewerController
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
     {
-      assert (value instanceof ChordDef);
+      assert (value instanceof ParsedChordDef);
 
-      ChordDef chordDef = (ChordDef) value;
+      ParsedChordDef chordDef = (ParsedChordDef) value;
 
       assert (table != null);
 
@@ -529,10 +531,10 @@ public class SeqViewerController
       hasFocus = false;
 
       //assert (comp == this);
-      String info = "<html>" + chordDef.abbrevHtml + "</html>";
+      String info = "<html>" + chordDef.nameHtml + "</html>";
 
-      String statusInfo = "<html><b>" + chordDef.getName() + "</b><br/>"
-              + "(" + chordDef.getChord().toString("-", true) + ")</html>";
+      String statusInfo = "<html><b>" + chordDef.detail + "</b><br/>"
+              + "(" + chordDef.chord.toHtmlString() + ")</html>";
 
       //JComponent comp = (JComponent) defaultRenderer.getTableCellRendererComponent(table, info, isSelected, hasFocus, row, column);
       this.setText(info);
