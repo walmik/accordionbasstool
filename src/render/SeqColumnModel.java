@@ -159,6 +159,22 @@ class SeqColumnModel extends DefaultTableColumnModel
     return vec;
   }
 
+  @Override
+  public String toString()
+  {
+    String str = "";
+    for (int i = 0; i < getColumnCount(); i++)
+    {
+      if (i > 0)
+        str += ", ";
+      
+      ParsedChordDef def = getChordDef(i);
+      str += def.namePlain;
+    }
+
+    return str;
+  }
+
   void computeSeqs(int selIndex)
   {
     if (renderBoard == null) {
@@ -168,6 +184,8 @@ class SeqColumnModel extends DefaultTableColumnModel
     if (isPopulating) {
       return;
     }
+
+    //System.out.println(toString());
 
     music.BassBoard currBassBoard = renderBoard.getBassBoard();
     allComboSeqs = searcher.parseSequence(currBassBoard, getAllChords());

@@ -20,9 +20,9 @@ public class ParsedChordDef
   //public final RegistryChordDef registryDef;
   public final short regRow, regCol;
 
-  public ParsedChordDef()
+  public static ParsedChordDef getDefaultChordDef()
   {
-    this(new Note());
+    return new ParsedChordDef(new Note(), null, ChordRegistry.mainRegistry().getDefaultChordDef(), false);
   }
 
   public ParsedChordDef(Note root)
@@ -54,15 +54,19 @@ public class ParsedChordDef
   {
     rootNote = root;
 
-    //Unknown Chord
+    // Use Default Chord
     if (currTableChord == null) {
-      addedBassNote = null;
+      currTableChord = ChordRegistry.mainRegistry().getDefaultChordDef();
+    }
+    
+    //Unknown Chord if default doesn't exist..
+    if (currTableChord == null) {
+      addedBassNote = addedBass;
       chord = new Chord(root, false);
       namePlain = chord.toString();
       nameHtml = chord.toHtmlString();
       detail = nameHtml;
       regRow = regCol = 0;
-      System.out.println("Null ChordDef");
       return;
     }
 
@@ -71,8 +75,7 @@ public class ParsedChordDef
 
     addedBassNote = addedBass;
 
-    chord = new Chord(currTableChord.chord,
-            rootNote,
+    chord = new Chord(rootNote, currTableChord.ivals,
             addedBassNote, addedBassLowest);
 
 

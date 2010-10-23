@@ -14,6 +14,7 @@ public class ChordParser {
 		while ((newNote = Note.fromString(parser)) != null)
 		{
 			notes.add(newNote);
+      parser.skipWhiteSpace();
 		}
 		
 		Note[] noteArray = new Note[notes.size()];

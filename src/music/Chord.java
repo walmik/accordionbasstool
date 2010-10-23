@@ -98,16 +98,22 @@ public class Chord
 		initFromIval(0, note, ivals);
 	}
 	
-	public Chord(Note note, Interval[] ivals, Note bassNote, boolean mustBeRoot)
+	public Chord(Note note, Interval[] ivals, Note extraBass, boolean mustBeBassRoot)
 	{
-    int dupCount = (mustBeRoot ? 2 : 1);
-    
-		assert(bassNote != null);
-		
-		notes = new Note[ivals.length + 1 + dupCount];
-		
-		initBassNote(bassNote, dupCount);
-		initFromIval(dupCount, note, ivals);
+    int extraLen = 0;
+    if (extraBass != null)
+    {
+      extraLen++;
+      if (mustBeBassRoot)
+        extraLen++;
+    }
+
+    this.notes = new Note[ivals.length + 1 + extraLen];
+
+    if (extraBass != null)
+      initBassNote(extraBass, extraLen);
+
+		initFromIval(extraLen, note, ivals);
 	}
 	
 	private void initBassNote(Note singleN, int count)
@@ -259,7 +265,7 @@ public class Chord
 		return mask;
 	}
 	
-	public String toString(String sep, boolean html)
+	private String toString(String sep, boolean html)
 	{
 		String str = "";
 		
@@ -281,7 +287,7 @@ public class Chord
 
   public String toHtmlString()
   {
-    return toString("-", true);
+    return toString("+", true);
   }
 }
 

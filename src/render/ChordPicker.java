@@ -501,9 +501,9 @@ public class ChordPicker extends javax.swing.JPanel
 
       button.setText("<html>" + cellText + "</html>");
 
-      String statusInfo = "<html><b>" + rootNote.toString(true) + " " + chordDef.name + "</b><br/>" + chordDef.chord.getTransposedString(rootNote) + "</html>";
+      String statusInfo = "<html><b>" + rootNote.toString(true) + " " + chordDef.name + "</b><br/>" + chordDef.getTransposedString(rootNote) + "</html>";
 
-      button.setToolTipText(statusInfo);
+      this.setToolTipText(statusInfo);
 
       button.setSelected(isSelected);
       button.setFont(isSelected ? bold : plain);

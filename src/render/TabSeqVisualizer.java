@@ -13,6 +13,7 @@ package render;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Timer;
+import music.ParsedChordDef;
 
 /**
  *
@@ -59,12 +60,14 @@ public class TabSeqVisualizer extends javax.swing.JPanel
     public void actionPerformed(ActionEvent e)
     {
       if (e.getActionCommand().equals("AddChord")) {
-        columnModel.addColumn(chordPicker1.getPickedChord(), columnModel.getColumnCount());
+        columnModel.addColumn(ParsedChordDef.getDefaultChordDef(), columnModel.getColumnCount());
+
       } else if (e.getActionCommand().equals("InsertChord")) {
         int index = columnModel.getSelectedColumn();
         if (index >= 0) {
-          columnModel.addColumn(chordPicker1.getPickedChord(), index);
+          columnModel.addColumn(ParsedChordDef.getDefaultChordDef(), index);
         }
+
       } else if (e.getActionCommand().equals("RemoveChord")) {
         columnModel.removeSelectedColumn();
       } else if (e.getActionCommand().equals("Options")) {

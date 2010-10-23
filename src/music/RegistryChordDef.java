@@ -1,12 +1,12 @@
 package music;
 
-public class RegistryChordDef
+final public class RegistryChordDef
 {
   final public String name;
   final public String abbrevHtml;
   final public String abbrevPlain;
   
-  final public music.Chord chord;
+  final private music.Chord chord;
 
   Interval[] ivals;
   final public short row;
@@ -24,44 +24,9 @@ public class RegistryChordDef
     col = (short)c;
   }
 
-//  RegistryChordDef(Chord chord)
-//  {
-//    this.chord = chord;
-//    name = chord.toString();
-//    abbrevHtml = chord.toString("-", true);
-//    abbrevPlain = name;
-//  }
-//
-//  RegistryChordDef()
-//  {
-//    chord = new Chord(new music.Note(), false);
-//    name = "";
-//    abbrevHtml = "";
-//    abbrevPlain = "";
-//  }
-
-//  public String getName()
-//  {
-//    return name;
-//  }
-//
-//  public String getAbbrevHtml()
-//  {
-//    return abbrevHtml;
-//  }
-//
-//  public String getAbbrevPlain()
-//  {
-//    return abbrevPlain;
-//  }
-//
-//  public Chord getChord()
-//  {
-//    return chord;
-//  }
-//
-//  public static String htmlify(String string)
-//  {
-//    return "<html>" + string + "</html>";
-//  }
+  public String getTransposedString(Note rootNote)
+  {
+    //return new Chord(rootNote, ivals).toString();
+    return chord.getTransposedString(rootNote);
+  }
 }

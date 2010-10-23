@@ -25,6 +25,8 @@ public class ChordRegistry
   final static Interval[] DIM = {Interval.m3, Interval.Dim5};
   private static ChordRegistry _mainRegistry = null;
 
+  static RegistryChordDef defaultChord;
+
   public static ChordRegistry mainRegistry()
   {
     if (_mainRegistry == null) {
@@ -36,7 +38,7 @@ public class ChordRegistry
   }
 
   //==============================================================
-  public class ChordGroupSet
+  static public class ChordGroupSet
   {
     // Chord Defs (loaded from XML)
 
@@ -72,10 +74,10 @@ public class ChordRegistry
 
         for (int j = 0; j < groupedChordDefs[i].length; j++) {
           Element chord = (Element) chords.item(j);
-          String name = chord.getAttribute("name");
+          String chordName = chord.getAttribute("name");
           String abbrev = chord.getAttribute("abbrev");
           String notelist = chord.getAttribute("notes");
-          groupedChordDefs[i][j] = new RegistryChordDef(name, abbrev, notelist, j, i);
+          groupedChordDefs[i][j] = new RegistryChordDef(chordName, abbrev, notelist, j, i);
         }
       }
 
@@ -190,5 +192,19 @@ public class ChordRegistry
     } else {
       return null;
     }
+  }
+
+  public RegistryChordDef getDefaultChordDef()
+  {
+    if (allSets.length == 0)
+      return null;
+
+    if (allSets[0].groupedChordDefs.length == 0)
+      return null;
+
+    if (allSets[0].groupedChordDefs[0].length == 0)
+      return null;
+
+    return allSets[0].groupedChordDefs[0][0];
   }
 }
