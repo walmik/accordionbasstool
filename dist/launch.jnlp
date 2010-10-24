@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jnlp codebase="http://accordionbasstool.googlecode.com/hg/dist/" href="launch.jnlp" spec="1.0+">
+  <!--http://accordionbasstool.googlecode.com/hg/dist/-->
     <information>
         <title>AccordionBassTool</title>
         <vendor>Ilya</vendor>
@@ -15,8 +16,7 @@
 <jar eager="true" href="AccordionBassTool.jar" main="true"/>
 
 
-    <jar href="lib/beansbinding-1.2.1.jar"/>
-</resources>
+    </resources>
     <application-desc main-class="util.Main">
 
     </application-desc>

@@ -1,4 +1,5 @@
-<jnlp spec="1.0+" codebase="http://accordionbasstool.googlecode.com/hg/dist/" href="launch.jnlp">
+<jnlp spec="1.0+" codebase="${jnlp.codebase}" href="launch.jnlp">
+  <!--http://accordionbasstool.googlecode.com/hg/dist/-->
     <information>
         <title>${APPLICATION.TITLE}</title>
         <vendor>${APPLICATION.VENDOR}</vendor>
