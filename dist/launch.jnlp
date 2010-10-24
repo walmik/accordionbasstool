@@ -9,14 +9,14 @@
         <description kind="short">AccordionBassTool</description>
 
 
-    <offline-allowed/>
-</information>
+    </information>
     <resources>
-<j2se java-vm-args="-ea" version="1.6+"/>
+<j2se version="1.6+"/>
 <jar eager="true" href="AccordionBassTool.jar" main="true"/>
 
 
     </resources>
+    <update check="always" policy="prompt-update"/>
     <application-desc main-class="util.Main">
 
     </application-desc>
