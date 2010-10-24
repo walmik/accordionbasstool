@@ -14,15 +14,20 @@ public class BassBoard
 		CB_MIN3;
 	};
 
-  static class Pos
+  public static class Pos
   {
     final int row;
     final int col;
 
-    Pos(int r, int c)
+    public Pos(int r, int c)
     {
       row = r;
       col = c;
+    }
+
+    public boolean equals(int r, int c)
+    {
+      return (row == r) && (col == c);
     }
   }
 	

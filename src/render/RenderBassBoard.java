@@ -22,7 +22,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
   public RenderBassBoard()
   {
-    this(BassBoard.bassBoard32());
+    this(BassBoard.bassBoard120());
   }
 
   public RenderBassBoard(BassBoard newBoard)
@@ -44,16 +44,36 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     this._isHoriz = RenderBoardUI.defaultUI._isHoriz;
     this._slantAngle = RenderBoardUI.defaultUI._defaultSlantAngle;
 
-    this.addMouseListener(new MouseAdapter()
-    {
+//    this.addMouseListener(new MouseHandler());
+//    this.addMouseMotionListener(new MouseHandler());
+  }
 
-      @Override
-      public void mousePressed(MouseEvent e)
-      {
-        // TODO Auto-generated method stub
-        hitTest(e.getX(), e.getY());
-      }
-    });
+  BassBoard.Pos clickPos = null;
+
+  class MouseHandler extends MouseAdapter
+  {
+
+    @Override
+    public void mousePressed(MouseEvent e)
+    {
+      // TODO Auto-generated method stub
+      clickPos = hitTest(e.getX(), e.getY());
+      repaint();
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e)
+    {
+      clickPos = hitTest(e.getX(), e.getY());
+      repaint();
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e)
+    {
+      clickPos = null;
+      repaint();
+    }
   }
 
   public void setBassBoard(BassBoard newBoard)
@@ -107,7 +127,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 //		_isHoriz = horiz;
 //		_colToRow = ctr;
 //	}
-  public void hitTest(int x, int y)
+  public BassBoard.Pos hitTest(int x, int y)
   {
     int row, col;
     int cPos, rPos;
@@ -131,9 +151,11 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     }
 
     if ((row < _rows) && (col < _cols) && (row >= 0) && (col >= 0)) {
-      System.out.println(_theBoard.getChordAt(row, col));
+      //System.out.println(_theBoard.getChordAt(row, col));
+      return new BassBoard.Pos(row, col);
     } else {
-      System.out.println("Row: " + row + " Col: " + col);
+      //System.out.println("Row: " + row + " Col: " + col);
+      return null;
     }
   }
 
@@ -251,6 +273,10 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
         boolean pressed = (_selCombo != null && _selCombo.hasButtonPressed(r, realCol));
         boolean selected = (_selCombo != null && _selCombo.hasButtonInSeq(r, realCol));
+
+        if (!pressed && (clickPos != null) && clickPos.equals(r, realCol)) {
+          pressed = true;
+        }
 
         {
           buttonDrawer.draw(graphics2D, realCol, r, pressed, selected);

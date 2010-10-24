@@ -20,7 +20,7 @@ import javax.swing.JSplitPane;
  *
  * @author Ilya
  */
-public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeListener
+public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeListener, ActionListener
 {
 
   boolean editorVis = true;
@@ -35,19 +35,13 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     this.renderBassBoard.setSelectedButtonCombo(seqTablePanel.columnModel.selComboModel);
 
-    seqTablePanel.toggleChordPicker.addActionListener(new ActionListener()
-    {
-      @Override
-      public void actionPerformed(ActionEvent e)
-      {
-        toggleEditorTabsVisible();
-      }
-    });
+    seqTablePanel.toggleChordPicker.addActionListener(this);
 
     controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
 
     this.splitPane.setDividerLocation(controlSplitPane.getMinimumDividerLocation());
     this.controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
+    
   }
 
   @Override
@@ -55,7 +49,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   {
     if (evt.getPropertyName().equals(JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
       int newLoc = ((Integer) evt.getNewValue()).intValue();
-      
+
       this.editorVis = (newLoc <= controlSplitPane.getMaximumDividerLocation() + 10);
 
       //System.out.println("newLoc: " + newLoc + "Width: " + controlSplitPane.getWidth() + " Max: " + this.controlSplitPane.getMaximumDividerLocation());
@@ -67,7 +61,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     }
   }
 
-  private void toggleEditorTabsVisible()
+  @Override
+  public void actionPerformed(ActionEvent e)
   {
     if (editorVis) {
       controlSplitPane.setDividerLocation(1.0);
@@ -139,7 +134,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     controlSplitPane.setOneTouchExpandable(true);
 
     toolTabs.addTab("Chord Editor", chordPicker1);
-    toolTabs.addTab("Custom Chord Sequence Editor", textParserPanel1);
+    toolTabs.addTab("Advanced Sequence Editor", textParserPanel1);
 
     controlSplitPane.setRightComponent(toolTabs);
     toolTabs.getAccessibleContext().setAccessibleName("Custom Chord Sequence Editor");

@@ -72,7 +72,7 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
     jPanel1 = new javax.swing.JPanel();
     chordTextField = new javax.swing.JTextField();
 
-    setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Custom Chord Sequence Editor", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 14))); // NOI18N
+    setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Chord Sequence Editor:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 14))); // NOI18N
 
     computeButton.setText("Update Chord Sequence");
     computeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -81,8 +81,8 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
       }
     });
 
-    jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11));
-    jLabel1.setText("<html>\n<li>See Chord Editor for all valid chords. (ex. M = Major, m = minor)</li><br/>\n<li>Seperate chords in sequence with commas \", \" (ex. AM, Em)</li><br/>\n<li>To specify a custom chord by notes, put the notes in [ ], (ex. [A B C], [D F# G])</li><br/>\n</html>");
+    jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    jLabel1.setText("<html>\n<li>Enter a sequence of comma seperated chords  as text below</li><br/>\n<li>See Chord Editor tab for all valid chord names. (ex. M = Major, m = minor)</li><br/>\n<li>To specify a custom chord by notes, put the notes in [ ], (ex. [ABC], [D F# G])</li><br/>\n</html>");
     jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Enter Chord Sequence Below:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
@@ -98,7 +98,7 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
     jPanel1.setLayout(jPanel1Layout);
     jPanel1Layout.setHorizontalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(chordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE)
+      .addComponent(chordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
     );
     jPanel1Layout.setVerticalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -111,23 +111,24 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
-        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addGroup(layout.createSequentialGroup()
+            .addGap(111, 111, 111)
+            .addComponent(computeButton)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 153, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         .addContainerGap())
-      .addGroup(layout.createSequentialGroup()
-        .addGap(121, 121, 121)
-        .addComponent(computeButton)
-        .addContainerGap(153, Short.MAX_VALUE))
+      .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(layout.createSequentialGroup()
-        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGap(1, 1, 1)
         .addComponent(computeButton)
         .addContainerGap())
     );

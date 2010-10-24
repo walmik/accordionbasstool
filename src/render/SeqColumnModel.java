@@ -163,13 +163,40 @@ class SeqColumnModel extends DefaultTableColumnModel
   public String toString()
   {
     String str = "";
-    for (int i = 0; i < getColumnCount(); i++)
-    {
-      if (i > 0)
+    for (int i = 0; i < getColumnCount(); i++) {
+      if (i > 0) {
         str += ", ";
-      
+      }
+
       ParsedChordDef def = getChordDef(i);
       str += def.namePlain;
+    }
+
+    return str;
+  }
+
+  public String toHtmlString(boolean hiliteSelected)
+  {
+    String str = "";
+
+    int selIndex = -1;
+    if (hiliteSelected) {
+      selIndex = this.getSelectedColumn();
+    }
+
+    for (int i = 0; i < getColumnCount(); i++) {
+      if (i > 0) {
+        str += ", ";
+      }
+
+      ParsedChordDef def = getChordDef(i);
+
+      if (i == selIndex)
+      {
+        str += "<b>" + def.nameHtml + "</b>";
+      } else {
+        str += def.nameHtml;
+      }
     }
 
     return str;
@@ -265,7 +292,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     @Override
     public Object getElementAt(int index)
     {
-      String str = "Option #" + (index + 1);
+      String str = "Combo #" + (index + 1);
       //str += allComboSeqs[index].getHeur();
       return str;
     }
