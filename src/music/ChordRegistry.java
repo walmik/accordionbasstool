@@ -174,6 +174,9 @@ public class ChordRegistry
 
   public ChordGroupSet findChordSet(String chordSetName)
   {
+    if (allSets == null)
+      return null;
+
     for (ChordGroupSet set : allSets) {
       if (set.name.equals(chordSetName)) {
         return set;

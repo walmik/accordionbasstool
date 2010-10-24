@@ -27,13 +27,7 @@ public class ParsedChordDef
 
   public ParsedChordDef(Note root)
   {
-    rootNote = root;
-    addedBassNote = null;
-    chord = new Chord(root, false);
-    namePlain = chord.toString();
-    nameHtml = chord.toHtmlString();
-    detail = nameHtml;
-    regRow = regCol = 0;
+    this(new Chord(root, false));
   }
 
   public ParsedChordDef(Chord achord)
@@ -41,8 +35,18 @@ public class ParsedChordDef
     rootNote = achord.getRootNote();
     addedBassNote = null; //assume none
     chord = achord;
-    namePlain = chord.toString();
-    nameHtml = chord.toHtmlString();
+
+    if (achord.isSingleNote())
+    {
+      namePlain = achord.toString();
+      nameHtml = chord.toHtmlString();
+    }
+    else
+    {
+      namePlain = "[" + chord.toString() + "]";
+      nameHtml = chord.toHtmlString();
+    }
+
     detail = nameHtml;
     regRow = regCol = 0;
   }
@@ -89,7 +93,12 @@ public class ParsedChordDef
 
     // -- Set Plain Abbrev
 
-    String plain = rootNote.toString() + currTableChord.abbrevPlain;
+    String plain = rootNote.toString();
+
+    if (!chord.isSingleNote())
+    {
+      plain += currTableChord.abbrevPlain;
+    }
 
     if (addedBassNote != null) {
       plain += "/" + addedBassNote.toString();

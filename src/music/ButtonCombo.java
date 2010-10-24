@@ -69,12 +69,13 @@ public class ButtonCombo
 	{
     String str = "";
 
-		for (int i = 0; i < pos.length; i++)
+    // Print in reverse as we were built depth first, so top button is last
+		for (int i = pos.length - 1; i >=0; i--)
 		{
-      if (i > 0)
-        str += " + ";
       //str += (board.isSingleBassRow(pos[i].row) ? "Bass " : "Chord ");
 			str += board.getChordName(pos[i].row, pos[i].col);
+      if (i > 0)
+        str += " + ";
 		}
 
     return str;

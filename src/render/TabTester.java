@@ -10,21 +10,9 @@
  */
 package render;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.LinearGradientPaint;
-import java.awt.Paint;
-import java.awt.RadialGradientPaint;
 import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 
 /**
  *
@@ -39,10 +27,6 @@ public class TabTester extends javax.swing.JPanel
     initComponents();
   }
 
-
-
-
-
   @Override
   public void paint(Graphics g)
   {
@@ -50,8 +34,9 @@ public class TabTester extends javax.swing.JPanel
 
     graphics.translate(50, 50);
 
-    if (RenderBoardUI.defaultUI == null)
+    if (RenderBoardUI.defaultUI == null) {
       return;
+    }
 
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -68,7 +53,6 @@ public class TabTester extends javax.swing.JPanel
     graphics.drawImage(RenderBoardUI.defaultUI.pressedIM, 0, 0, imWidth, imHeight, null, this);
   }
 
-  
   /** This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is

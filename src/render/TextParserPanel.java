@@ -11,12 +11,14 @@
 package render;
 
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  *
  * @author Ilya
  */
-public class TextParserPanel extends javax.swing.JPanel
+public class TextParserPanel extends javax.swing.JPanel implements ListSelectionListener
 {
 
   SeqColumnModel columnModel;
@@ -28,14 +30,32 @@ public class TextParserPanel extends javax.swing.JPanel
     initComponents();
   }
 
-  public void setSeqColModel(SeqColumnModel theModel, JTable theTable, String startChords)
+  void setSeqColModel(SeqColumnModel theModel, JTable theTable, String startChords)
   {
     columnModel = theModel;
     seqTable = theTable;
+    columnModel.selComboModel.addListSelectionListener(this);
     if (startChords != null) {
-      chordTextArea.setText(startChords);
+      chordTextField.setText(startChords);
       computeButton.doClick();
     }
+  }
+
+  @Override
+  public void valueChanged(ListSelectionEvent e)
+  {
+    if (isVisible() && (columnModel != null)) {
+      this.chordTextField.setText(columnModel.toString());
+    }
+  }
+
+  @Override
+  public void setVisible(boolean visible)
+  {
+    if (visible && (columnModel != null)) {
+      this.chordTextField.setText(columnModel.toString());
+    }
+    super.setVisible(visible);
   }
 
   /** This method is called from within the constructor to
@@ -50,38 +70,41 @@ public class TextParserPanel extends javax.swing.JPanel
     computeButton = new javax.swing.JButton();
     jLabel1 = new javax.swing.JLabel();
     jPanel1 = new javax.swing.JPanel();
-    chordTextSP = new javax.swing.JScrollPane();
-    chordTextArea = new javax.swing.JTextArea();
+    chordTextField = new javax.swing.JTextField();
 
     setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Custom Chord Sequence Editor", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 14))); // NOI18N
 
-    computeButton.setText("Compute Optimal Bass Sequences");
+    computeButton.setText("Update Chord Sequence");
     computeButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         computeButtonActionPerformed(evt);
       }
     });
 
-    jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11));
     jLabel1.setText("<html>\n<li>See Chord Editor for all valid chords. (ex. M = Major, m = minor)</li><br/>\n<li>Seperate chords in sequence with commas \", \" (ex. AM, Em)</li><br/>\n<li>To specify a custom chord by notes, put the notes in [ ], (ex. [A B C], [D F# G])</li><br/>\n</html>");
     jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Enter Chord Sequence Below:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
-    chordTextArea.setColumns(20);
-    chordTextArea.setRows(5);
-    chordTextArea.setText("[C], [D], [E], [F], [G], [A], [B], [C]");
-    chordTextSP.setViewportView(chordTextArea);
+    chordTextField.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
+    chordTextField.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        chordTextFieldActionPerformed(evt);
+      }
+    });
 
     javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
     jPanel1.setLayout(jPanel1Layout);
     jPanel1Layout.setHorizontalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(chordTextSP, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE)
+      .addComponent(chordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE)
     );
     jPanel1Layout.setVerticalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(chordTextSP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+      .addGroup(jPanel1Layout.createSequentialGroup()
+        .addComponent(chordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
+        .addContainerGap())
     );
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -94,9 +117,9 @@ public class TextParserPanel extends javax.swing.JPanel
         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         .addContainerGap())
       .addGroup(layout.createSequentialGroup()
-        .addGap(103, 103, 103)
+        .addGap(121, 121, 121)
         .addComponent(computeButton)
-        .addContainerGap(125, Short.MAX_VALUE))
+        .addContainerGap(153, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -105,23 +128,30 @@ public class TextParserPanel extends javax.swing.JPanel
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(computeButton))
+        .addComponent(computeButton)
+        .addContainerGap())
     );
   }// </editor-fold>//GEN-END:initComponents
 
     private void computeButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_computeButtonActionPerformed
     {//GEN-HEADEREND:event_computeButtonActionPerformed
-      // TODO add your handling code here:
-      //TODO: err check
-      String text = chordTextArea.getText();
+      String text = chordTextField.getText();
+      if (text == null || text.length() == 0)
+        text = "C";
+
       if (columnModel != null) {
         columnModel.populateFromText(text);
       }
       seqTable.requestFocusInWindow();
 }//GEN-LAST:event_computeButtonActionPerformed
+
+    private void chordTextFieldActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_chordTextFieldActionPerformed
+    {//GEN-HEADEREND:event_chordTextFieldActionPerformed
+      this.computeButton.doClick();
+    }//GEN-LAST:event_chordTextFieldActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JTextArea chordTextArea;
-  private javax.swing.JScrollPane chordTextSP;
+  private javax.swing.JTextField chordTextField;
   private javax.swing.JButton computeButton;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JPanel jPanel1;
