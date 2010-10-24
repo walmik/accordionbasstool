@@ -1,5 +1,4 @@
 <jnlp spec="1.0+" codebase="${jnlp.codebase}" href="launch.jnlp">
-  <!--http://accordionbasstool.googlecode.com/hg/dist/-->
     <information>
         <title>${APPLICATION.TITLE}</title>
         <vendor>${APPLICATION.VENDOR}</vendor>
@@ -15,7 +14,7 @@
 <!--${JNLP.RESOURCES.JARS}-->
 <!--${JNLP.RESOURCES.EXTENSIONS}-->
     </resources>
-    <update check="always" policy="prompt-update"/>
+    <update check="always" policy="always"/>
     <application-desc main-class="${jnlp.main.class}">
 <!--${JNLP.APPLICATION.ARGS}-->
     </application-desc>
