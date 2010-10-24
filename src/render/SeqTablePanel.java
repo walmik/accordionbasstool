@@ -167,13 +167,10 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     seqTable.setAutoCreateColumnsFromModel(false);
     seqTable.setModel(new javax.swing.table.DefaultTableModel(
       new Object [][] {
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null}
+
       },
       new String [] {
-        "Title 1", "Title 2", "Title 3", "Title 4"
+
       }
     ));
     seqTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
@@ -232,8 +229,8 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
             .addGap(38, 38, 38)
             .addComponent(toolOptions))
           .addGroup(layout.createSequentialGroup()
-            .addGap(18, 18, 18)
-            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(statusText, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
     );

@@ -39,7 +39,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
 
-    this.splitPane.setDividerLocation(controlSplitPane.getMinimumDividerLocation());
+    //this.splitPane.setDividerLocation(controlSplitPane.getMinimumDividerLocation());
     this.controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
     
   }
@@ -95,10 +95,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     renderBoardScrollPane = new javax.swing.JScrollPane();
     renderBassBoard = getRenderBoard();
     controlSplitPane = new javax.swing.JSplitPane();
+    seqTablePanel = new render.SeqTablePanel();
     toolTabs = new javax.swing.JTabbedPane();
     chordPicker1 = new render.ChordPicker();
     textParserPanel1 = new render.TextParserPanel();
-    seqTablePanel = new render.SeqTablePanel();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.5");
@@ -128,18 +128,15 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     renderBoardScrollPane.getVerticalScrollBar().setUnitIncrement(8);
     splitPane.setRightComponent(renderBoardScrollPane);
 
-    controlSplitPane.setDividerLocation(400);
     controlSplitPane.setDividerSize(20);
     controlSplitPane.setAutoscrolls(true);
     controlSplitPane.setOneTouchExpandable(true);
+    controlSplitPane.setLeftComponent(seqTablePanel);
 
     toolTabs.addTab("Chord Editor", chordPicker1);
     toolTabs.addTab("Advanced Sequence Editor", textParserPanel1);
 
     controlSplitPane.setRightComponent(toolTabs);
-    toolTabs.getAccessibleContext().setAccessibleName("Custom Chord Sequence Editor");
-
-    controlSplitPane.setLeftComponent(seqTablePanel);
 
     splitPane.setLeftComponent(controlSplitPane);
 

@@ -11,7 +11,7 @@
 
     </information>
     <resources>
-<j2se version="1.6+"/>
+<j2se java-vm-args="-ea" version="1.6+"/>
 <jar eager="true" href="AccordionBassTool.jar" main="true"/>
 
 

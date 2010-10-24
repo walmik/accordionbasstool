@@ -128,8 +128,8 @@ public class Main
   {
 
     try {
-//      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      setNimbus();
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//      setNimbus();
 
     } catch (Exception exc) {
     }
