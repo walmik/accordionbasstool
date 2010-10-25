@@ -17,13 +17,29 @@ public class Chord
 			
 			for (int i = 0; i < chord.notes.length; i++)
 			{
-				int bit = (1 << chord.notes[i].value());
-				if ((value & bit) != 0)
-					bit <<= Note.NUM_HALFSTEPS;
+				int bit = toUpperOctaveBit(chord.notes[i]);
+				if ((value & bit) != 0) {
+					bit = toLowerOctaveBit(bit);
+        }
 				
 				value |= bit;
 			}
 		}
+
+    final private int toUpperOctaveBit(Note note)
+    {
+      return (1 << (note.value() + Note.NUM_HALFSTEPS));
+    }
+
+    final private int toLowerOctaveBit(int upperbit)
+    {
+      return (upperbit >> Note.NUM_HALFSTEPS);
+    }
+
+    final private int toLowerOctaveBit(Note note)
+    {
+      return (1 << note.value());
+    }
 		
 		static boolean contains(int a, int b)
 		{
@@ -34,6 +50,11 @@ public class Chord
 		{
 			return contains(value, otherMask.value);
 		}
+
+    boolean contains(int bit)
+    {
+      return ((value & (1 << bit)) != 0);
+    }
 		
 //		boolean containsSingleRegister(Mask otherMask)
 //		{
@@ -56,14 +77,16 @@ public class Chord
 			return new Mask(value | otherMask.value);
 		}
 		
-		void doubleNote(Note note)
+//		void doubleNote(Note note)
+//		{
+//			value |= (1 << (note.value() + Note.NUM_HALFSTEPS));
+//		}
+
+    // Are there any bass buttons in the mask
+		boolean hasLowerOctave()
 		{
-			value |= (1 << (note.value() + Note.NUM_HALFSTEPS));
-		}
-		
-		boolean hasRootBassReq()
-		{
-			return (value >> Note.NUM_HALFSTEPS) != 0;
+			//return (value >> Note.NUM_HALFSTEPS) != 0;
+      return (value & ~((1 << Note.NUM_HALFSTEPS)-1)) != 0;
 		}
 		
 		public void unmaskRegister(Mask otherMask)
@@ -135,42 +158,42 @@ public class Chord
 
 	}
 
-	public Chord(Chord one, Chord two)
-	{
-		Mask onemask = one.getChordMask();
-		Mask twomask = two.getChordMask();
-		
-		int newMask = (~onemask.value | twomask.value);
-		
-		int numNotes = one.notes.length;
-		
-		// See which notes in two are not in one and add them
-		// to new note list
-		for (int i = 0; i < two.notes.length; i++)
-		{
-			if ((newMask & (1 << two.notes[i].value())) != 0)
-			{
-				numNotes++;
-			}
-		}
-		
-		notes = new Note[numNotes];
-		
-		System.arraycopy(one.notes, 0, notes, 0, one.notes.length);
-		
-		// Fill only the second chord's notes that don't overlap
-		int count = one.notes.length;
-		
-		for (int i = 0; i < two.notes.length; i++)
-		{
-			if ((newMask & (1 << two.notes[i].value())) != 0)
-			{
-				notes[count++] = two.notes[i];
-			}
-		}
-		
-		assert(count == numNotes);
-	}
+//	public Chord(Chord one, Chord two)
+//	{
+//		Mask onemask = one.getChordMask();
+//		Mask twomask = two.getChordMask();
+//
+//		int newMask = (~onemask.value | twomask.value);
+//
+//		int numNotes = one.notes.length;
+//
+//		// See which notes in two are not in one and add them
+//		// to new note list
+//		for (int i = 0; i < two.notes.length; i++)
+//		{
+//			if ((newMask & (1 << two.notes[i].value())) != 0)
+//			{
+//				numNotes++;
+//			}
+//		}
+//
+//		notes = new Note[numNotes];
+//
+//		System.arraycopy(one.notes, 0, notes, 0, one.notes.length);
+//
+//		// Fill only the second chord's notes that don't overlap
+//		int count = one.notes.length;
+//
+//		for (int i = 0; i < two.notes.length; i++)
+//		{
+//			if ((newMask & (1 << two.notes[i].value())) != 0)
+//			{
+//				notes[count++] = two.notes[i];
+//			}
+//		}
+//
+//		assert(count == numNotes);
+//	}
 
   // extraBass may be null
   public Chord(Chord existing, Note newRoot, Note extraBass, boolean mustBeBassRoot)

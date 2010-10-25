@@ -3,35 +3,48 @@
  */
 package music;
 
+import java.util.BitSet;
+
 public class ButtonCombo
 {
-	private BassBoard.Pos[] pos;
+	final private BassBoard.Pos[] pos;
+  //final private Chord.Mask chordMask;
 	GeoPos center;
 	int heur = 0;
 	Hash hash;
 	
 	class Hash
 	{
-		int hash;
+		BitSet bitset;
 		
-		Hash()
+		Hash(ButtonCombo combo, int numRows, int numCols)
 		{
-			hash = 0;
-		}
-		
-		Hash(ButtonCombo combo)
-		{
+      bitset = new BitSet(numRows * numCols);
+
 			for (int i = 0; i < pos.length; i++)
 			{
-				hash |= (1<<pos[i].row);
-				hash |= (1<<pos[i].col + BassBoard.RowType.values().length);
+        bitset.set((pos[i].row * numCols) + pos[i].col);
 			}
 		}
-		
+
+    // Check if other hash is contained in this hash
+    // For all bits set in other hash, bit must be set here, otherwise false
 		boolean contains(Hash other)
 		{
-			return Chord.Mask.contains(hash, other.hash);
+			for (int i = other.bitset.nextSetBit(0); i >= 0; i = other.bitset.nextSetBit(i + 1))
+      {
+        if (!bitset.get(i)) {
+          return false;
+        }
+      }
+
+      return true;
 		}
+
+    boolean contains(int row, int col, BassBoard board)
+    {
+      return bitset.get((row * board.getCols()) + col);
+    }
 	}
 	
 	ButtonCombo(BassBoard.Pos singlePos)
@@ -39,13 +52,7 @@ public class ButtonCombo
 		pos = new BassBoard.Pos[1];
 		pos[0] = singlePos;
 	}
-	
-//	ButtonCombo(Chord.Mask mask)
-//	{
-//		pos = new Vector<BassBoard.Pos>();
-//		//chordMask = new Chord.Mask();
-//	}
-	
+		
 	ButtonCombo(BassBoard.Pos[] newPos)
 	{
 		pos = newPos;
@@ -65,7 +72,7 @@ public class ButtonCombo
 		return str;
 	}
 
-  public String toInfoString(BassBoard board)
+  public String toButtonListingString(BassBoard board)
 	{
     String str = "";
 
@@ -80,6 +87,26 @@ public class ButtonCombo
 
     return str;
 	}
+
+//  public String toChordVoicingString(BassBoard board)
+//	{
+//    String str = "";
+//
+//		for (int i = 0; i < (Note.NUM_HALFSTEPS * 2); i++)
+//		{
+//      if (chordMask.contains(i)) {
+////        if (!str.isEmpty()) {
+////          str += " + ";
+////        }
+//        //str += Note.printNote(Note.ScaleNote.C, i % Note.NUM_HALFSTEPS, false);
+//        str += "1";
+//      } else {
+//        str += "0";
+//      }
+//		}
+//
+//    return str;
+//	}
 	
 	int evalHeur(final BassBoard.Pos boardCenter)
 	{
@@ -133,17 +160,17 @@ public class ButtonCombo
 		return heur;
 	}
 	
-	Hash getHash()
+	Hash getHash(BassBoard board)
 	{
 		if (hash == null)
-			hash = new Hash(this);
+			hash = new Hash(this, board.getRows(), board.getCols());
 		
 		return hash;
 	}
 	
-	boolean contains(ButtonCombo other)
+	boolean contains(ButtonCombo other, BassBoard board)
 	{
-		return getHash().contains(other.getHash());
+		return getHash(board).contains(other.getHash(board));
 	}
 
   boolean isUsingBassOnly(BassBoard board)
@@ -174,17 +201,20 @@ public class ButtonCombo
 //		//return (rowDelta * rowDelta) + (colDelta * colDelta);
 //	}
 	
-	public boolean hasButton(int row, int col)
+	public boolean hasButton(int row, int col, BassBoard board)
 	{
-		for (int i = 0; i < pos.length; i++)
-		{
-			BassBoard.Pos currPos = pos[i];
-			if ((currPos.col == col) && (currPos.row == row))
-			{
-				return true;
-			}
-		}
-		
-		return false;
+    //Using hash version
+    return getHash(board).contains(row, col, board);
+    //Compare version
+//		for (int i = 0; i < pos.length; i++)
+//		{
+//			BassBoard.Pos currPos = pos[i];
+//			if ((currPos.col == col) && (currPos.row == row))
+//			{
+//				return true;
+//			}
+//		}
+//
+//		return false;
 	}
 }

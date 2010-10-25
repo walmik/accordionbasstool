@@ -3,7 +3,7 @@ package music;
 
 public class BassBoard 
 {
-	enum RowType
+	public enum RowType
 	{
 		CB_MAJ3,
 		ROOT,
@@ -94,7 +94,7 @@ public class BassBoard
 	{
 		return cols;
 	}
-	
+
 	public Pos getCenter()
 	{
 		return centerPos;

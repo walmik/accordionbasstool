@@ -220,14 +220,14 @@ public class BoardSearcher
 				count++;
 				curr = curr.last;
 			}
-			
-			// verify len is the actual # of links
-			assert(count == len);
-			
-			theCombo = new ButtonCombo(posVec);
-			return theCombo;
-		}
-	}
+
+      // verify len is the actual # of links
+      assert (count == len);
+
+      theCombo = new ButtonCombo(posVec);
+      return theCombo;
+    }
+  }
 	
 	// All Chords
 	ButtonCombo[] findAllIter(BassBoard board, Chord fullChord)
@@ -241,7 +241,7 @@ public class BoardSearcher
     // ***************************
     //TODO: Make this an option strict bass
     boolean unmaskBassRegister = true;
-		//boolean unmaskBassRegister = !fullChordMask.hasRootBassReq();
+		//boolean unmaskBassRegister = !fullChordMask.hasLowerOctave();
     //TODO: Filter out all bass combos, if alternatives exist
     boolean ignoreAllBassCombos = true;
     boolean chordComboFound = false;
@@ -326,7 +326,7 @@ public class BoardSearcher
 					while (nextIter.hasNext())
 					{
 						ButtonCombo existingCombo = nextIter.next();
-						if (existingCombo.contains(newCombo))
+						if (existingCombo.contains(newCombo, board))
 						{
 							if (containCount == 0)
 								nextIter.set(newCombo);
