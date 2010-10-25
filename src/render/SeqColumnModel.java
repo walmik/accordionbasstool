@@ -225,6 +225,11 @@ class SeqColumnModel extends DefaultTableColumnModel
     rowSelModel.setSelectionInterval(0, 0);
   }
 
+  public void recomputeSeqs()
+  {
+    computeSeqs(getSelectedColumn());
+  }
+
   class SeqDataModel extends AbstractTableModel
   {
 
@@ -267,7 +272,7 @@ class SeqColumnModel extends DefaultTableColumnModel
         return "Chord not Possible";
       }
       music.ButtonCombo combo = allComboSeqs[rowIndex].getCombo(columnIndex);
-      return combo.toInfoString(allComboSeqs[rowIndex].getBoard());
+      return combo.toButtonListingString(allComboSeqs[rowIndex].getBoard());
     }
   }
 

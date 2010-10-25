@@ -67,7 +67,7 @@ public class SeqViewerController
     seqTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
-
+    
     seqTable.setDefaultRenderer(String.class, new CellRenderer());
 
     JTableHeader header = seqTable.getTableHeader();
@@ -219,7 +219,6 @@ public class SeqViewerController
     @Override
     public void paint(Graphics g, JComponent c)
     {
-      ;
       existing.paint(g, c);
     }
 

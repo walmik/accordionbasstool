@@ -64,6 +64,11 @@ public class RenderBoardUI
     _shadowFloor = new Ellipse2D.Float(0, 0, diamX * shadowScale, diamY * shadowScale);
     //_pressedShadowFloor = new Ellipse2D.Float(0, 0, diamX * shadowScale * .5f, diamY * shadowScale * .5f);
 
+    createButtonImages(diamX, diamY, cylHeight);
+  }
+
+  private void createButtonImages(int diamX, int diamY, int cylHeight)
+  {
     int imWidth = (int)(diamX * shadowScale);
     int imHeight = (int)(diamY * shadowScale) + cylHeight;
 
@@ -107,7 +112,7 @@ public class RenderBoardUI
   {
 
     int _xW, _yW;
-    int _diamX, _diamY;
+    //int _diamX, _diamY;
     int imWidth, imHeight;
 
     @Override
@@ -117,16 +122,18 @@ public class RenderBoardUI
       
       _xW = xW;
       _yW = yW;
-      _diamX = diamX;
-      _diamY = diamY;
+      //_diamX = diamX;
+      //_diamY = diamY;
+
+      //defaultUI.createButtonImages((int)(yW / (defaultUI.ellipseRatio * defaultUI.shadowScale)), (int)(yW / defaultUI.shadowScale), (int)(cylHeight / defaultUI.shadowScale));
 
       imHeight = yW;
       imWidth = imHeight * pressedIM.getWidth() / pressedIM.getHeight();
-
       //imWidth = (int)(_diamX * shadowScale);
       //imHeight = imWidth * pressedIM.getHeight() / pressedIM.getWidth();
       _pressedCylOff = _pressedCylOff * imWidth / pressedIM.getWidth();
       //System.out.println("IM: " + imWidth + ", " + imHeight);
+
     }
 
     @Override

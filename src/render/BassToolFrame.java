@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.BorderFactory;
 import javax.swing.JSplitPane;
 
 /**
@@ -32,6 +33,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     seqTablePanel.initChordPicker(this.chordPicker1);
     seqTablePanel.initTextParser(this.textParserPanel1);
+
+    this.renderBoardScrollPane.setBorder(BorderFactory.createEmptyBorder());
+    
+    this.renderBoardHeader1.initBoardHeader(renderBassBoard, seqTablePanel.columnModel);
 
     this.renderBassBoard.setSelectedButtonCombo(seqTablePanel.columnModel.selComboModel);
 
@@ -92,8 +97,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private void initComponents() {
 
     splitPane = new javax.swing.JSplitPane();
+    jPanel1 = new javax.swing.JPanel();
     renderBoardScrollPane = new javax.swing.JScrollPane();
     renderBassBoard = getRenderBoard();
+    renderBoardHeader1 = new render.RenderBoardHeader();
     controlSplitPane = new javax.swing.JSplitPane();
     seqTablePanel = new render.SeqTablePanel();
     toolTabs = new javax.swing.JTabbedPane();
@@ -103,13 +110,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.5");
     setLocationByPlatform(true);
-    addComponentListener(new java.awt.event.ComponentAdapter() {
-      public void componentShown(java.awt.event.ComponentEvent evt) {
-        formComponentShown(evt);
-      }
-    });
 
     splitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+    jPanel1.setLayout(new java.awt.BorderLayout());
 
     javax.swing.GroupLayout renderBassBoardLayout = new javax.swing.GroupLayout(renderBassBoard);
     renderBassBoard.setLayout(renderBassBoardLayout);
@@ -119,14 +123,17 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     );
     renderBassBoardLayout.setVerticalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 288, Short.MAX_VALUE)
+      .addGap(0, 311, Short.MAX_VALUE)
     );
 
     renderBoardScrollPane.setViewportView(renderBassBoard);
 
     renderBoardScrollPane.getVerticalScrollBar().setBlockIncrement(24);
     renderBoardScrollPane.getVerticalScrollBar().setUnitIncrement(8);
-    splitPane.setRightComponent(renderBoardScrollPane);
+    jPanel1.add(renderBoardScrollPane, java.awt.BorderLayout.CENTER);
+    jPanel1.add(renderBoardHeader1, java.awt.BorderLayout.PAGE_START);
+
+    splitPane.setRightComponent(jPanel1);
 
     controlSplitPane.setDividerSize(20);
     controlSplitPane.setAutoscrolls(true);
@@ -145,14 +152,12 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     pack();
   }// </editor-fold>//GEN-END:initComponents
 
-  private void formComponentShown(java.awt.event.ComponentEvent evt)//GEN-FIRST:event_formComponentShown
-  {//GEN-HEADEREND:event_formComponentShown
-    //adjustUI();
-}//GEN-LAST:event_formComponentShown
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private render.ChordPicker chordPicker1;
   private javax.swing.JSplitPane controlSplitPane;
+  private javax.swing.JPanel jPanel1;
   private render.RenderBassBoard renderBassBoard;
+  private render.RenderBoardHeader renderBoardHeader1;
   private javax.swing.JScrollPane renderBoardScrollPane;
   private render.SeqTablePanel seqTablePanel;
   private javax.swing.JSplitPane splitPane;

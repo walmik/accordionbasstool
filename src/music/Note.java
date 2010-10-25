@@ -20,8 +20,8 @@ public class Note
 		A(5, 9),
 		B(6, 11);
 
-		short halfStep;
-		short scaleDist;
+		final short halfStep;
+		final short scaleDist;
 
 		private ScaleNote(int dist, int hs)
 		{

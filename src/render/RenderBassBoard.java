@@ -22,7 +22,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
   public RenderBassBoard()
   {
-    this(BassBoard.bassBoard120());
+    this(BassBoard.bassBoard32());
   }
 
   public RenderBassBoard(BassBoard newBoard)

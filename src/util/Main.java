@@ -1,17 +1,14 @@
 package util;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.net.URL;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 
 import music.ChordParser;
+import org.w3c.dom.Document;
 import render.BassToolFrame;
 
 public class Main
@@ -88,24 +85,38 @@ public class Main
    */
   public static JFrame _rootFrame;
 
-  private static void printDefaults()
+  private static Document tryDoc(DocumentBuilderFactory dbf, String string)
   {
-    List<String> colorKeys = new ArrayList<String>();
-    Set<Entry<Object, Object>> entries = UIManager.getLookAndFeelDefaults().entrySet();
-    for (Entry entry : entries) {
-      if (entry.getValue() instanceof Color) {
-        colorKeys.add((String) entry.getKey());
+    try {
+      URL url = Main.class.getClassLoader().getResource(string);
+      if (url != null) {
+        string = url.toString();
       }
-    }
 
-    // sort the color keys
-    Collections.sort(colorKeys);
+      Document doc = dbf.newDocumentBuilder().parse(string);
 
-    // print the color keys
-    for (String colorKey : colorKeys) {
-      System.out.println(colorKey);
+      System.out.println("Read Doc From: " + string);
+
+      return doc;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
     }
   }
+
+  public static Document loadXmlFile(String filename, String optDir)
+  {
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+    Document doc = tryDoc(dbf, filename);
+
+    if ((doc == null) && (optDir != null)) {
+      doc = tryDoc(dbf, optDir + filename);
+    }
+
+    return doc;
+  }
+
 
   private static boolean setNimbus()
   {

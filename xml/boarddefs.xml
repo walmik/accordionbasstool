@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <boards>
+
+    <board name="8 Bass (4 x 2)" middleNote="C" numColumns="4">
+      <row name="BassRoot"/>
+      <row name="ChordMajor"/>
+    </board>
+
+    <board name="12 Bass (6 x 2)" middleNote="C" numColumns="6">
+      <row name="BassRoot"/>
+      <row name="ChordMajor"/>
+    </board>
+
+    <board name="24 Bass (8 x 3)" middleNote="C" numColumns="8">
+      <row name="BassRoot"/>
+      <row name="ChordMajor"/>
+      <row name="ChordMinor"/>
+    </board>
+
+    <board name="32 Bass (8 x 4)" middleNote="C" numColumns="8">
+      <row name="BassRoot"/>
+      <row name="ChordMajor"/>
+      <row name="ChordMinor"/>
+      <row name="Chord7th"/>
+    </board>
+
+    <board name="40 Bass (8 x 5)" middleNote="C" numColumns="8">
+      <row name="BassMaj3"/>
+      <row name="BassRoot"/>
+      <row name="ChordMajor"/>
+      <row name="ChordMinor"/>
+      <row name="Chord7th"/>
+    </board>
+
+    <board name="48 Bass (8 x 6)" middleNote="C" numColumns="8">
+      <row name="BassMaj3"/>
+      <row name="BassRoot"/>
+      <row name="ChordMajor"/>
+      <row name="ChordMinor"/>
+      <row name="Chord7th"/>
+      <row name="ChordDim"/>
+    </board>
+
+    <board name="48 Bass (12 x 4)" middleNote="C" numColumns="12">
+      <row name="BassMaj3"/>
+      <row name="BassRoot"/>
+      <row name="ChordMajor"/>
+      <row name="ChordMinor"/>
+    </board>
+
+    <board name="60 Bass (12 x 5)" middleNote="C" numColumns="12">
+      <row name="BassMaj3"/>
+      <row name="BassRoot"/>
+      <row name="ChordMajor"/>
+      <row name="ChordMinor"/>
+      <row name="Chord7th"/>
+    </board>
+
+    <board name="72 Bass (12 x 6)" middleNote="C" numColumns="12">
+      <row name="BassMaj3"/>
+      <row name="BassRoot"/>
+      <row name="ChordMajor"/>
+      <row name="ChordMinor"/>
+      <row name="Chord7th"/>
+      <row name="ChordDim"/>
+    </board>
+
+    <board name="80 Bass (16 x 5)" middleNote="C" numColumns="16">
+      <row name="BassMaj3"/>
+      <row name="BassRoot"/>
+      <row name="ChordMajor"/>
+      <row name="ChordMinor"/>
+      <row name="Chord7th"/>
+    </board>
+
+    <board name="96 Bass (16 x 6)" middleNote="C" numColumns="16">
+      <row name="BassMaj3"/>
+      <row name="BassRoot"/>
+      <row name="ChordMajor"/>
+      <row name="ChordMinor"/>
+      <row name="Chord7th"/>
+      <row name="ChordDim"/>
+    </board>
+
+    <board name="120 Bass (20 x 6)" middleNote="C" numColumns="20">
+      <row name="BassMaj3"/>
+      <row name="BassRoot"/>
+      <row name="ChordMajor"/>
+      <row name="ChordMinor"/>
+      <row name="Chord7th"/>
+      <row name="ChordDim"/>
+    </board>
+
+    <board name="140 Bass (20 x 7)" middleNote="C" numColumns="20">
+      <row name="BassMin3"/>
+      <row name="BassMaj3"/>
+      <row name="BassRoot"/>
+      <row name="ChordMajor"/>
+      <row name="ChordMinor"/>
+      <row name="Chord7th"/>
+      <row name="ChordDim"/>
+    </board>
+
+  </boards>
+
+</root>

@@ -535,17 +535,6 @@ public class ChordPicker extends javax.swing.JPanel
 
     jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
 
-    chordTable.setModel(new javax.swing.table.DefaultTableModel(
-      new Object [][] {
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null}
-      },
-      new String [] {
-        "Title 1", "Title 2", "Title 3", "Title 4"
-      }
-    ));
     chordTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
     chordTable.setFillsViewportHeight(true);
     chordTable.setRowHeight(30);

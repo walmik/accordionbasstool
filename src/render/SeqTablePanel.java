@@ -184,7 +184,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     toolPlay.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
     toolPlay.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
-    statusText.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+    statusText.setFont(new java.awt.Font("Tahoma", 0, 16));
     statusText.setText("Status");
     statusText.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 

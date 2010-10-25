@@ -4,11 +4,10 @@
  */
 package music;
 
-import java.net.URL;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import util.Main;
 import util.Main.StringParser;
 
 /**
@@ -126,34 +125,9 @@ public class ChordRegistry
   {
   }
 
-  private Document tryDoc(DocumentBuilderFactory dbf, String string)
-  {
-    try {
-      URL url = getClass().getClassLoader().getResource(string);
-      if (url != null) {
-        string = url.toString();
-      }
-
-      Document doc = dbf.newDocumentBuilder().parse(string);
-
-      System.out.println("Read Doc From: " + string);
-
-      return doc;
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
-    }
-  }
-
   public void loadFromXml(String filename)
   {
-    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-    Document doc = tryDoc(dbf, filename);
-
-    if (doc == null) {
-      doc = tryDoc(dbf, "./xml/" + filename);
-    }
+    Document doc = Main.loadXmlFile(filename, "./xml/");
 
     if (doc == null) {
       allSets = new ChordGroupSet[1];

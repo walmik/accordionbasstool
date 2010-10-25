@@ -20,7 +20,7 @@ public class SelectedButtonCombo extends DefaultListSelectionModel
       return false;
     }
     for (int i = 0; i < _comboSeq.getNumCombos(); i++) {
-      if (_comboSeq.getCombo(i).hasButton(row, col)) {
+      if (_comboSeq.getCombo(i).hasButton(row, col, _comboSeq.getBoard())) {
         return true;
       }
     }
@@ -35,7 +35,7 @@ public class SelectedButtonCombo extends DefaultListSelectionModel
     }
     if (currIndex < _comboSeq.getNumCombos()) {
       // return if button is in the currently selected combo seq
-      return _comboSeq.getCombo(currIndex).hasButton(row, col);
+      return _comboSeq.getCombo(currIndex).hasButton(row, col, _comboSeq.getBoard());
     }
     if (currIndex == _comboSeq.getNumCombos()) {
       // return true for all buttons in the all comboseqs
