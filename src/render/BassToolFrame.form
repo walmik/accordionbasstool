@@ -24,8 +24,9 @@
 
   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
   <SubComponents>
-    <Container class="javax.swing.JSplitPane" name="splitPane">
+    <Container class="javax.swing.JSplitPane" name="boardSplitPane">
       <Properties>
+        <Property name="dividerSize" type="int" value="10"/>
         <Property name="orientation" type="int" value="0"/>
       </Properties>
       <Constraints>
@@ -70,7 +71,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="211" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="206" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -88,7 +89,7 @@
         </Container>
         <Container class="javax.swing.JSplitPane" name="controlSplitPane">
           <Properties>
-            <Property name="dividerSize" type="int" value="20"/>
+            <Property name="dividerSize" type="int" value="16"/>
             <Property name="autoscrolls" type="boolean" value="true"/>
             <Property name="oneTouchExpandable" type="boolean" value="true"/>
           </Properties>
@@ -103,14 +104,14 @@
             <Component class="render.SeqTablePanel" name="seqTablePanel">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
-                  <JSplitPaneConstraints position="left"/>
+                  <JSplitPaneConstraints position="right"/>
                 </Constraint>
               </Constraints>
             </Component>
             <Container class="javax.swing.JTabbedPane" name="toolTabs">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
-                  <JSplitPaneConstraints position="right"/>
+                  <JSplitPaneConstraints position="left"/>
                 </Constraint>
               </Constraints>
 

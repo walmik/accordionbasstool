@@ -14,7 +14,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.BorderFactory;
 import javax.swing.JSplitPane;
 
 /**
@@ -25,6 +24,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 {
 
   boolean editorVis = true;
+  boolean editorLeft = true;
 
   /** Creates new form BassToolFrame */
   public BassToolFrame()
@@ -42,9 +42,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
 
-    //this.splitPane.setDividerLocation(controlSplitPane.getMinimumDividerLocation());
-    this.controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
-    
+    this.boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
+    if (!editorLeft) {
+      this.controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
+    }    
   }
 
   @Override
@@ -53,13 +54,16 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     if (evt.getPropertyName().equals(JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
       int newLoc = ((Integer) evt.getNewValue()).intValue();
 
-      this.editorVis = (newLoc <= controlSplitPane.getMaximumDividerLocation() + 10);
+      if (!editorLeft)
+        this.editorVis = (newLoc <= controlSplitPane.getMaximumDividerLocation() + 10);
+      else
+        this.editorVis = (newLoc >= 10);
 
       //System.out.println("newLoc: " + newLoc + "Width: " + controlSplitPane.getWidth() + " Max: " + this.controlSplitPane.getMaximumDividerLocation());
       if (editorVis) {
-        seqTablePanel.toggleChordPicker.setText("Hide Editor >>");
+        seqTablePanel.toggleChordPicker.setText(editorLeft ? "<< Hide Editor" : "Hide Editor >>");
       } else {
-        seqTablePanel.toggleChordPicker.setText("<< Show Editor");
+        seqTablePanel.toggleChordPicker.setText(editorLeft ? "Show Editor >>" : "<< Show Editor");
       }
     }
   }
@@ -68,9 +72,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   public void actionPerformed(ActionEvent e)
   {
     if (editorVis) {
-      controlSplitPane.setDividerLocation(1.0);
+      controlSplitPane.setDividerLocation(editorLeft ? 0.0 : 1.0);
     } else {
-      controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
+      controlSplitPane.setDividerLocation(editorLeft ? controlSplitPane.getMinimumDividerLocation() : controlSplitPane.getMaximumDividerLocation());
     }
   }
 
@@ -94,7 +98,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    splitPane = new javax.swing.JSplitPane();
+    boardSplitPane = new javax.swing.JSplitPane();
     jPanel1 = new javax.swing.JPanel();
     renderBoardScrollPane = new javax.swing.JScrollPane();
     renderBassBoard = getRenderBoard();
@@ -109,7 +113,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     setTitle("Accordion Bass Tool v0.5");
     setLocationByPlatform(true);
 
-    splitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+    boardSplitPane.setDividerSize(10);
+    boardSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
     jPanel1.setLayout(new java.awt.BorderLayout());
 
@@ -117,11 +122,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     renderBassBoard.setLayout(renderBassBoardLayout);
     renderBassBoardLayout.setHorizontalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 1280, Short.MAX_VALUE)
+      .addGap(0, 1047, Short.MAX_VALUE)
     );
     renderBassBoardLayout.setVerticalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 311, Short.MAX_VALUE)
+      .addGap(0, 206, Short.MAX_VALUE)
     );
 
     renderBoardScrollPane.setViewportView(renderBassBoard);
@@ -131,26 +136,27 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     jPanel1.add(renderBoardScrollPane, java.awt.BorderLayout.CENTER);
     jPanel1.add(renderBoardHeader1, java.awt.BorderLayout.PAGE_START);
 
-    splitPane.setRightComponent(jPanel1);
+    boardSplitPane.setRightComponent(jPanel1);
 
-    controlSplitPane.setDividerSize(20);
+    controlSplitPane.setDividerSize(16);
     controlSplitPane.setAutoscrolls(true);
     controlSplitPane.setOneTouchExpandable(true);
-    controlSplitPane.setLeftComponent(seqTablePanel);
+    controlSplitPane.setRightComponent(seqTablePanel);
 
     toolTabs.addTab("Chord Editor", chordPicker1);
     toolTabs.addTab("Advanced Sequence Editor", textParserPanel1);
 
-    controlSplitPane.setRightComponent(toolTabs);
+    controlSplitPane.setLeftComponent(toolTabs);
 
-    splitPane.setLeftComponent(controlSplitPane);
+    boardSplitPane.setLeftComponent(controlSplitPane);
 
-    getContentPane().add(splitPane, java.awt.BorderLayout.CENTER);
+    getContentPane().add(boardSplitPane, java.awt.BorderLayout.CENTER);
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JSplitPane boardSplitPane;
   private render.ChordPicker chordPicker1;
   private javax.swing.JSplitPane controlSplitPane;
   private javax.swing.JPanel jPanel1;
@@ -158,7 +164,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private render.RenderBoardHeader renderBoardHeader1;
   private javax.swing.JScrollPane renderBoardScrollPane;
   private render.SeqTablePanel seqTablePanel;
-  private javax.swing.JSplitPane splitPane;
   private render.TextParserPanel textParserPanel1;
   private javax.swing.JTabbedPane toolTabs;
   // End of variables declaration//GEN-END:variables

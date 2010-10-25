@@ -600,7 +600,7 @@ public class ChordPicker extends javax.swing.JPanel
           .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
         .addComponent(notePicker2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addGap(11, 11, 11))
+        .addContainerGap())
     );
   }// </editor-fold>//GEN-END:initComponents
 

@@ -32,19 +32,12 @@ public class RenderBoardUI
   static RenderBoardUI defaultUI = new RenderBoardUI();
   private Path2D unpressedCyl, pressedCyl;
   private Ellipse2D _buttonTop, _shadowFloor;
-
-
   float shadowScale = 1.1f;
-  final int dimScale = 2;
-
-  int diamX = 36 * dimScale;
-  int diamY = 27 * dimScale;
-  int cylHeight = 16 * dimScale;
-  
+  int defaultDiamX = 36;
+  int defaultDiamY = 27;
+  int defaultCylHeight = 16;
   float pressedRatio = 0.333f;
-
   final int buttonXMargin = 10;
-
   final double ellipseRatio = (3.f / 4.f);
   final double _colToRow = 4.0 / 3.0;
   boolean _isHoriz = true;
@@ -52,11 +45,27 @@ public class RenderBoardUI
   final static int _prefSize = 48;
   BufferedImage selectedIM, unselectedIM, pressedIM;
   boolean use3DDrawer = true;
+  int lastIMScale = 0;
 
   RenderBoardUI()
   {
     //diamX /= shadowScale;
     //diamY /= shadowScale;
+
+    createButtonImages(1);
+  }
+
+  private void createButtonImages(int scale)
+  {
+    if (scale == lastIMScale)
+      return;
+
+    createButtonImages(defaultDiamX * scale, defaultDiamY * scale, defaultCylHeight * scale);
+    lastIMScale = scale;
+  }
+
+  private void createButtonImages(int diamX, int diamY, int cylHeight)
+  {
     unpressedCyl = createCylPath(diamX, diamY, cylHeight);
     pressedCyl = createCylPath(diamX, diamY, cylHeight * pressedRatio);
 
@@ -64,21 +73,16 @@ public class RenderBoardUI
     _shadowFloor = new Ellipse2D.Float(0, 0, diamX * shadowScale, diamY * shadowScale);
     //_pressedShadowFloor = new Ellipse2D.Float(0, 0, diamX * shadowScale * .5f, diamY * shadowScale * .5f);
 
-    createButtonImages(diamX, diamY, cylHeight);
-  }
-
-  private void createButtonImages(int diamX, int diamY, int cylHeight)
-  {
-    int imWidth = (int)(diamX * shadowScale);
-    int imHeight = (int)(diamY * shadowScale) + cylHeight;
+    int imWidth = (int) (diamX * shadowScale);
+    int imHeight = (int) (diamY * shadowScale) + cylHeight;
 
     selectedIM = new BufferedImage(imWidth, imHeight, BufferedImage.TYPE_INT_ARGB);
     unselectedIM = new BufferedImage(imWidth, imHeight, BufferedImage.TYPE_INT_ARGB);
     pressedIM = new BufferedImage(imWidth, imHeight, BufferedImage.TYPE_INT_ARGB);
 
-    render3DButton(selectedIM.createGraphics(), Color.blue, true, false);
-    render3DButton(unselectedIM.createGraphics(), Color.black, false, false);
-    render3DButton(pressedIM.createGraphics(), Color.magenta, false, true);
+    render3DButton(diamX, diamY, cylHeight, selectedIM.createGraphics(), Color.blue, true, false);
+    render3DButton(diamY, diamY, cylHeight, unselectedIM.createGraphics(), Color.black, false, false);
+    render3DButton(diamX, diamY, cylHeight, pressedIM.createGraphics(), Color.magenta, false, true);
   }
 
   ButtonDrawer getButtonDrawer()
@@ -97,13 +101,8 @@ public class RenderBoardUI
 
   abstract class ButtonDrawer
   {
-    int _pressedCylOff;
 
-    void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
-    {
-      int pressedHeight = (int) (cylHeight * pressedRatio);
-      _pressedCylOff = cylHeight - pressedHeight;
-    }
+    abstract void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY);
 
     abstract void draw(Graphics2D graphics, int col, int row, boolean pressed, boolean selected);
   }
@@ -114,24 +113,30 @@ public class RenderBoardUI
     int _xW, _yW;
     //int _diamX, _diamY;
     int imWidth, imHeight;
+    int _pressedCylOff;
 
     @Override
     void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
     {
-      super.setup(graphics, xW, yW, diamX, diamY);
-      
       _xW = xW;
       _yW = yW;
       //_diamX = diamX;
       //_diamY = diamY;
 
-      //defaultUI.createButtonImages((int)(yW / (defaultUI.ellipseRatio * defaultUI.shadowScale)), (int)(yW / defaultUI.shadowScale), (int)(cylHeight / defaultUI.shadowScale));
+      int scale = (xW / defaultDiamX);
+      if (scale < 1) {
+        scale = 1;
+      }
+      //Recreate Images every time?
+      //****************
+      createButtonImages(scale);
+      //****************
 
       imHeight = yW;
       imWidth = imHeight * pressedIM.getWidth() / pressedIM.getHeight();
       //imWidth = (int)(_diamX * shadowScale);
       //imHeight = imWidth * pressedIM.getHeight() / pressedIM.getWidth();
-      _pressedCylOff = _pressedCylOff * imWidth / pressedIM.getWidth();
+      _pressedCylOff = (int) ((defaultCylHeight * scale * (1.0 - pressedRatio)) * imWidth / pressedIM.getWidth());
       //System.out.println("IM: " + imWidth + ", " + imHeight);
 
     }
@@ -139,7 +144,7 @@ public class RenderBoardUI
     @Override
     void draw(Graphics2D graphics, int col, int row, boolean pressed, boolean selected)
     {
- 
+
       //graphics.setComposite(AlphaComposite.SrcAtop);
       //graphics.drawRect(0, 0, _xW, _yW);
 
@@ -157,16 +162,13 @@ public class RenderBoardUI
   class FlatButtonDrawer extends ButtonDrawer
   {
 
+    int _pressedCylOff;
+
     @Override
     void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
     {
-      super.setup(graphics, xW, yW, diamX, diamY);
-
-//      _unpressedCyl = createCylPath(diamX, diamY, cylHeight);
-//
-//      _pressedCyl = createCylPath(diamX, diamY, (int) (cylHeight * pressedRatio));
-//
-//      _buttonTop = new Ellipse2D.Float(0, 0, diamX, diamY);
+      int pressedHeight = (int) (defaultCylHeight * pressedRatio);
+      _pressedCylOff = defaultCylHeight - pressedHeight;
     }
 
     @Override
@@ -236,7 +238,7 @@ public class RenderBoardUI
     }
   }
 
-    static Path2D createCylPath(float X, float Y, float height)
+  static Path2D createCylPath(float X, float Y, float height)
   {
     Path2D cyl = new Path2D.Float();
 
@@ -264,7 +266,12 @@ public class RenderBoardUI
     return cyl;
   }
 
-  void render3DButton(Graphics2D graphics, Color selColor, boolean selected, boolean pressed)
+  void render3DButton(int diamX,
+          int diamY,
+          int cylHeight,
+          Graphics2D graphics,
+          Color selColor,
+          boolean selected, boolean pressed)
   {
     graphics.setComposite(AlphaComposite.SrcOver);
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

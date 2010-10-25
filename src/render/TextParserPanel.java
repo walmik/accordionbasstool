@@ -81,13 +81,13 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
       }
     });
 
-    jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11));
     jLabel1.setText("<html>\n<li>Enter a sequence of comma seperated chords  as text below</li><br/>\n<li>See Chord Editor tab for all valid chord names. (ex. M = Major, m = minor)</li><br/>\n<li>To specify a custom chord by notes, put the notes in [ ], (ex. [ABC], [D F# G])</li><br/>\n</html>");
     jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Enter Chord Sequence Below:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
-    chordTextField.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
+    chordTextField.setFont(new java.awt.Font("Monospaced", 0, 18));
     chordTextField.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         chordTextFieldActionPerformed(evt);
@@ -125,7 +125,7 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
+        .addComponent(jLabel1)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addGap(1, 1, 1)

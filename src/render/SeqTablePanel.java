@@ -71,6 +71,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
   @Override
   public void valueChanged(ListSelectionEvent e)
   {
+    toolPlay.setVisible(columnModel.getColumnCount() > 1);
     statusText.setText("<html>Complete Sequence: " + columnModel.toHtmlString(true) + "</html>");
   }
 
@@ -97,10 +98,10 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
         new OptionsDialog(null, true).setVisible(true);
       } else if (e.getActionCommand().equals("PlaySeq")) {
         if (!playTimer.isRunning()) {
-          toolPlay.setText("Stop Sequence");
+          toolPlay.setText("Stop");
           playTimer.start();
         } else {
-          toolPlay.setText("Play Sequence");
+          toolPlay.setText("Play");
           playTimer.stop();
         }
       } else if (e.getActionCommand().equals("Timer")) {
@@ -126,19 +127,29 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    toolOptions = new javax.swing.JButton();
+    seqTableScrollPane = new javax.swing.JScrollPane();
+    seqTable = new javax.swing.JTable();
+    jPanel1 = new javax.swing.JPanel();
     toggleChordPicker = new javax.swing.JButton();
     toolAddChord = new javax.swing.JButton();
     toolInsert = new javax.swing.JButton();
     toolRemove = new javax.swing.JButton();
-    seqTableScrollPane = new javax.swing.JScrollPane();
-    seqTable = new javax.swing.JTable();
+    toolOptions = new javax.swing.JButton();
     toolPlay = new javax.swing.JButton();
     statusText = new javax.swing.JLabel();
 
-    toolOptions.setAction(chordTableAction);
-    toolOptions.setText("Options...");
-    toolOptions.setActionCommand("Options");
+    seqTable.setAutoCreateColumnsFromModel(false);
+    seqTable.setModel(new javax.swing.table.DefaultTableModel(
+      new Object [][] {
+
+      },
+      new String [] {
+
+      }
+    ));
+    seqTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+    seqTable.setRowHeight(24);
+    seqTableScrollPane.setViewportView(seqTable);
 
     toggleChordPicker.setFont(toggleChordPicker.getFont().deriveFont(toggleChordPicker.getFont().getStyle() | java.awt.Font.BOLD));
     toggleChordPicker.setText("Hide Editor >>");
@@ -164,27 +175,58 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     toolRemove.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
     toolRemove.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
-    seqTable.setAutoCreateColumnsFromModel(false);
-    seqTable.setModel(new javax.swing.table.DefaultTableModel(
-      new Object [][] {
-
-      },
-      new String [] {
-
-      }
-    ));
-    seqTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-    seqTable.setRowHeight(24);
-    seqTableScrollPane.setViewportView(seqTable);
+    toolOptions.setAction(chordTableAction);
+    toolOptions.setText("Options...");
+    toolOptions.setActionCommand("Options");
 
     toolPlay.setAction(chordTableAction);
-    toolPlay.setText("Play Sequence");
+    toolPlay.setText("Play");
     toolPlay.setActionCommand("PlaySeq");
     toolPlay.setFocusable(false);
     toolPlay.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
     toolPlay.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
-    statusText.setFont(new java.awt.Font("Tahoma", 0, 16));
+    javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+    jPanel1.setLayout(jPanel1Layout);
+    jPanel1Layout.setHorizontalGroup(
+      jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel1Layout.createSequentialGroup()
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(toggleChordPicker)
+          .addGroup(jPanel1Layout.createSequentialGroup()
+            .addContainerGap()
+            .addComponent(toolAddChord))
+          .addGroup(jPanel1Layout.createSequentialGroup()
+            .addContainerGap()
+            .addComponent(toolInsert))
+          .addGroup(jPanel1Layout.createSequentialGroup()
+            .addContainerGap()
+            .addComponent(toolRemove))
+          .addComponent(toolOptions))
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+        .addContainerGap(62, Short.MAX_VALUE)
+        .addComponent(toolPlay)
+        .addContainerGap())
+    );
+    jPanel1Layout.setVerticalGroup(
+      jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel1Layout.createSequentialGroup()
+        .addComponent(toggleChordPicker)
+        .addGap(18, 18, 18)
+        .addComponent(toolPlay)
+        .addGap(24, 24, 24)
+        .addComponent(toolAddChord)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(toolInsert)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(toolRemove)
+        .addGap(88, 88, 88)
+        .addComponent(toolOptions)
+        .addContainerGap(27, Short.MAX_VALUE))
+    );
+
+    statusText.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
     statusText.setText("Status");
     statusText.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -193,50 +235,28 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-        .addGap(163, 163, 163)
-        .addComponent(toolPlay)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 178, Short.MAX_VALUE)
-        .addComponent(toggleChordPicker))
-      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-        .addContainerGap()
-        .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 434, Short.MAX_VALUE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-          .addComponent(toolRemove)
-          .addComponent(toolInsert)
-          .addComponent(toolAddChord)
-          .addComponent(toolOptions))
-        .addGap(2, 2, 2))
-      .addGroup(layout.createSequentialGroup()
-        .addContainerGap()
-        .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 539, Short.MAX_VALUE)
+          .addComponent(statusText, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE)
+          .addComponent(seqTableScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE))
         .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addGap(43, 43, 43))
       .addGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(toggleChordPicker)
-          .addComponent(toolPlay))
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(layout.createSequentialGroup()
-            .addGap(49, 49, 49)
-            .addComponent(toolAddChord)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(toolInsert)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(toolRemove)
-            .addGap(38, 38, 38)
-            .addComponent(toolOptions))
-          .addGroup(layout.createSequentialGroup()
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)))
+        .addContainerGap()
+        .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(statusText, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addComponent(statusText, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
     );
   }// </editor-fold>//GEN-END:initComponents
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JPanel jPanel1;
   private javax.swing.JTable seqTable;
   private javax.swing.JScrollPane seqTableScrollPane;
   private javax.swing.JLabel statusText;
