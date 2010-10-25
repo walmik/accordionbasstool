@@ -12,7 +12,9 @@ package render;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JScrollPane;
 import music.BassBoard;
 import music.BoardRegistry;
 
@@ -24,6 +26,7 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
 {
 
   RenderBassBoard renderBoard;
+  JScrollPane boardScrollPane;
   SeqColumnModel columnModel;
 
   /** Creates new form RenderBoardHeader */
@@ -32,40 +35,44 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     initComponents();
   }
 
-  void initBoardHeader(RenderBassBoard renderBoard, SeqColumnModel model)
+  void initBoardHeader(RenderBassBoard renderBoard, JScrollPane pane, SeqColumnModel model)
   {
     this.renderBoard = renderBoard;
     this.columnModel = model;
+    this.boardScrollPane = pane;
+
+    boardScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
     boardCombo.setModel(new DefaultComboBoxModel(BoardRegistry.mainRegistry().allBoardDefs));
     boardCombo.addActionListener(this);
-    
+
     // Init to standard 120 bass board
     BoardRegistry.BoardDef initialBoardDef = BoardRegistry.mainRegistry().findByBassCount(120);
-    if (initialBoardDef != null)
+    if (initialBoardDef != null) {
       boardCombo.setSelectedItem(initialBoardDef);
+    }
   }
 
   @Override
   public void actionPerformed(ActionEvent e)
   {
-    if (e.getSource() == boardCombo)
-    {
-      if (renderBoard != null)
-      {
-        BoardRegistry.BoardDef def = (BoardRegistry.BoardDef)boardCombo.getSelectedItem();
+    if (e.getSource() == boardCombo) {
+      if (renderBoard != null) {
+        BoardRegistry.BoardDef def = (BoardRegistry.BoardDef) boardCombo.getSelectedItem();
 
         BassBoard newBoard = def.createBoard();
 
         renderBoard.setBassBoard(newBoard);
         columnModel.recomputeSeqs();
 
-        String info = "<html>(";
+        String info = "<html>Range: <b>";
         info += newBoard.getMinRootNote().toString(true);
         info += " to ";
         info += newBoard.getMaxRootNote().toString(true);
-        info += ")</html>";
+        info += "</b></html>";
         this.infoLabel.setText(info);
+
+        boardScrollPane.revalidate();
       }
     }
   }
@@ -83,6 +90,7 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     boardCombo = new javax.swing.JComboBox();
     infoLabel = new javax.swing.JLabel();
 
+    setBackground(java.awt.SystemColor.activeCaption);
     setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 20, 5));
 
     jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getSize()+5f));
@@ -93,7 +101,7 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     boardCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
     add(boardCombo);
 
-    infoLabel.setFont(infoLabel.getFont().deriveFont(infoLabel.getFont().getStyle() | java.awt.Font.BOLD, infoLabel.getFont().getSize()+5));
+    infoLabel.setFont(infoLabel.getFont().deriveFont(infoLabel.getFont().getSize()+5f));
     infoLabel.setText("info");
     add(infoLabel);
   }// </editor-fold>//GEN-END:initComponents

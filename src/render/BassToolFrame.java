@@ -33,10 +33,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     seqTablePanel.initChordPicker(this.chordPicker1);
     seqTablePanel.initTextParser(this.textParserPanel1);
-
-    this.renderBoardScrollPane.setBorder(BorderFactory.createEmptyBorder());
-    
-    this.renderBoardHeader1.initBoardHeader(renderBassBoard, seqTablePanel.columnModel);
+   
+    this.renderBoardHeader1.initBoardHeader(renderBassBoard, renderBoardScrollPane, seqTablePanel.columnModel);
 
     this.renderBassBoard.setSelectedButtonCombo(seqTablePanel.columnModel.selComboModel);
 
