@@ -100,9 +100,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     boardSplitPane = new javax.swing.JSplitPane();
     jPanel1 = new javax.swing.JPanel();
+    renderBoardHeader1 = new render.RenderBoardHeader();
     renderBoardScrollPane = new javax.swing.JScrollPane();
     renderBassBoard = getRenderBoard();
-    renderBoardHeader1 = new render.RenderBoardHeader();
     controlSplitPane = new javax.swing.JSplitPane();
     seqTablePanel = new render.SeqTablePanel();
     toolTabs = new javax.swing.JTabbedPane();
@@ -116,25 +116,25 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     boardSplitPane.setDividerSize(10);
     boardSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-    jPanel1.setLayout(new java.awt.BorderLayout());
+    jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.Y_AXIS));
+    jPanel1.add(renderBoardHeader1);
 
     javax.swing.GroupLayout renderBassBoardLayout = new javax.swing.GroupLayout(renderBassBoard);
     renderBassBoard.setLayout(renderBassBoardLayout);
     renderBassBoardLayout.setHorizontalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 1047, Short.MAX_VALUE)
+      .addGap(0, 1300, Short.MAX_VALUE)
     );
     renderBassBoardLayout.setVerticalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 206, Short.MAX_VALUE)
+      .addGap(0, 293, Short.MAX_VALUE)
     );
 
     renderBoardScrollPane.setViewportView(renderBassBoard);
 
     renderBoardScrollPane.getVerticalScrollBar().setBlockIncrement(24);
     renderBoardScrollPane.getVerticalScrollBar().setUnitIncrement(8);
-    jPanel1.add(renderBoardScrollPane, java.awt.BorderLayout.CENTER);
-    jPanel1.add(renderBoardHeader1, java.awt.BorderLayout.PAGE_START);
+    jPanel1.add(renderBoardScrollPane);
 
     boardSplitPane.setRightComponent(jPanel1);
 

@@ -10,10 +10,16 @@
  */
 package render;
 
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import music.BassBoard;
 import music.BoardRegistry;
@@ -56,6 +62,49 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   }
 
   @Override
+  public void paintComponent(Graphics g)
+  {
+    Graphics2D g2 = (Graphics2D) g;
+    Color lightCol = this.getBackground();//new Color(53,180,209);
+    g2.setPaint(new GradientPaint(0.f, getHeight() * 2 / 3, lightCol, 0.f, getHeight(), Color.black));
+    g2.fillRect(0, 0, getWidth(), getHeight());
+  }
+
+  private void autoSize()
+  {
+    Container cont = this.getTopLevelAncestor();
+
+    // Autoresize -- horizontal
+    if (cont.isVisible() && (cont instanceof JFrame)) {
+      JFrame frame = (JFrame) cont;
+
+      int diff = (renderBoard.getPreferredSize().height - boardScrollPane.getHeight());
+      //System.out.println("\n********\nOld Pane Height: " + boardScrollPane.getHeight());
+
+      if (!boardScrollPane.isValid() || !renderBoard.isValid()) {
+        return;
+      }
+
+//      if ((renderBoard.getHeight() + diff) < 100) {
+//        return;
+//      }
+//      if (diff > renderBoard.getHeight()) {
+//        return;
+//      }
+//      boardScrollPane.invalidate();
+      renderBoard.setSize(renderBoard.getWidth(), renderBoard.getHeight() + diff);
+      frame.setSize(frame.getWidth(), frame.getHeight() + diff);
+
+
+
+ //     System.out.println("New RB Height: " + (renderBoard.getHeight()));
+ //     System.out.println("New Frame Height: " + (frame.getHeight()));
+    }
+
+    //boardScrollPane.revalidate();
+  }
+
+  @Override
   public void actionPerformed(ActionEvent e)
   {
     if (e.getSource() == boardCombo) {
@@ -65,6 +114,9 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
         BassBoard newBoard = def.createBoard();
 
         renderBoard.setBassBoard(newBoard);
+
+        autoSize();
+
         columnModel.recomputeSeqs();
 
         String info = "<html>Range: <b>";
@@ -73,8 +125,6 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
         info += newBoard.getMaxRootNote().toString(true);
         info += "</b></html>";
         this.infoLabel.setText(info);
-
-        boardScrollPane.revalidate();
       }
     }
   }

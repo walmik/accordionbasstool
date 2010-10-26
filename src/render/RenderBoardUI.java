@@ -5,6 +5,7 @@
 package render;
 
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -13,6 +14,7 @@ import java.awt.LinearGradientPaint;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.SystemColor;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
@@ -57,8 +59,9 @@ public class RenderBoardUI
 
   private void createButtonImages(int scale)
   {
-    if (scale == lastIMScale)
+    if (scale == lastIMScale) {
       return;
+    }
 
     createButtonImages(defaultDiamX * scale, defaultDiamY * scale, defaultCylHeight * scale);
     lastIMScale = scale;
@@ -335,4 +338,65 @@ public class RenderBoardUI
     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (pressed ? 0.9f : 0.5f)));
     graphics.fill(_buttonTop);
   }
+
+  ///Border Stuff
+//  private void drawShearBorder(Graphics2D g)
+//  {
+//    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//    //this.drawShape(outlinePoly, g, getWidth(), getHeight());
+//
+//    RoundRectangle2D roundRect = new RoundRectangle2D.Float(margin.width, margin.height,
+//            _contentDim.width, _contentDim.height, 20, 10);
+//
+//    Color outer = Color.black;
+//    Color inner = Color.darkGray;
+//    int borderWidth = 16;
+//
+//    g.setPaint(outer);
+//    g.fillRect(0, 0, getWidth(), getHeight());
+//
+//    AffineTransform orig = g.getTransform();
+//
+//    double slope = Math.abs(Math.tan(_slantAngle));
+//    AffineTransform sheared = AffineTransform.getShearInstance(slope, 0.0f);
+//
+//    //g.transform(sheared);
+//
+//    //g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.5f));
+//    paintBorderShadow(g, roundRect, borderWidth, outer, inner);
+//
+//    //g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 1.f));
+//    g.setPaint(getBackground());
+//    g.fill(roundRect);
+//
+//    g.setTransform(orig);
+//  }
+
+  // From "Java 2D Trickery: Light and Shadow"
+  // http://weblogs.java.net/blog/2006/07/27/java-2d-trickery-light-and-shadow
+  static Color getMixedColor(Color c1, float pct1, Color c2, float pct2)
+  {
+    float[] clr1 = c1.getComponents(null);
+    float[] clr2 = c2.getComponents(null);
+    for (int i = 0; i < clr1.length; i++) {
+      clr1[i] = (clr1[i] * pct1) + (clr2[i] * pct2);
+    }
+    return new Color(clr1[0], clr1[1], clr1[2], clr1[3]);
+  }
+
+  static void paintBorderShadow(Graphics2D g2, Shape clipShape, int shadowWidth,
+          Color outer, Color inner)
+  {
+    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_ON);
+    int sw = shadowWidth * 2;
+    for (int i = sw; i >= 2; i -= 2) {
+      float pct = (float) (sw - i) / (sw - 1);
+      g2.setColor(getMixedColor(inner, pct,
+              outer, 1.0f - pct));
+      g2.setStroke(new BasicStroke(i, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+      g2.draw(clipShape);
+    }
+  }
 }
+
