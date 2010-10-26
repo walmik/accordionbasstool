@@ -38,6 +38,7 @@ import javax.swing.plaf.TableHeaderUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import music.ParsedChordDef;
 
 /**
@@ -50,6 +51,8 @@ public class SeqViewerController
   JTable seqTable;
   JScrollPane tableScrollPane;
   SeqColumnModel columnModel;
+
+  final static int DEFAULT_COL_WIDTH = 100;
 
   SeqViewerController(JTable table, JScrollPane scroll)
   {
@@ -525,7 +528,6 @@ public class SeqViewerController
 
       assert (table != null);
 
-
       isSelected = table.isColumnSelected(column);
       hasFocus = false;
 
@@ -550,6 +552,13 @@ public class SeqViewerController
         this.setFont(plain);
         //       this.setBackground(defColor);
         //       this.setBorder(raised);
+      }
+
+      TableColumn theColumn = table.getColumnModel().getColumn(column);
+      int newPref = Math.max(this.getPreferredSize().width + 24, DEFAULT_COL_WIDTH);
+
+      if (newPref != theColumn.getPreferredWidth()) {
+        theColumn.setPreferredWidth(newPref);
       }
 
       return this;

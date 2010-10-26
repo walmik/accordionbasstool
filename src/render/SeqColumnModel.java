@@ -23,7 +23,6 @@ class SeqColumnModel extends DefaultTableColumnModel
   SeqDataModel dataModel;
   SeqRowHeaderData rowHeaderDataModel;
   ListSelectionModel rowSelModel;
-  final static int DEFAULT_COL_WIDTH = 120;
 
   SeqColumnModel(RenderBassBoard rBoard, ListSelectionModel selM)
   {
@@ -55,7 +54,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     if (index < 0) {
       index = lastColIndex;
     }
-    TableColumn column = new TableColumn(lastColIndex, DEFAULT_COL_WIDTH, null, null);
+    TableColumn column = new TableColumn(lastColIndex, 0, null, null);
     column.setHeaderValue(def);
     addColumn(column);
     if (index < lastColIndex) {
