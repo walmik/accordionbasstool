@@ -160,12 +160,18 @@ public class BassBoard
   final Pos centerPos;
   final protected Note middleNote;
 
-  public int getRows()
+  public RowType getRow(int index)
+  {
+    assert(index < rowLayout.length);
+    return rowLayout[index];
+  }
+
+  public int getNumRows()
   {
     return rowLayout.length;
   }
 
-  public int getCols()
+  public int getNumCols()
   {
     return cols;
   }
@@ -225,10 +231,10 @@ public class BassBoard
 //	}
   Chord.Mask[][] buildChordMaskCache()
   {
-    Chord.Mask[][] masks = new Chord.Mask[getRows()][getCols()];
+    Chord.Mask[][] masks = new Chord.Mask[getNumRows()][getNumCols()];
 
-    for (int r = 0; r < getRows(); r++) {
-      for (int c = 0; c < getCols(); c++) {
+    for (int r = 0; r < getNumRows(); r++) {
+      for (int c = 0; c < getNumCols(); c++) {
         masks[r][c] = getChordAt(r, c).getChordMask();
       }
     }

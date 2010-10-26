@@ -43,7 +43,7 @@ public class ButtonCombo
 
     boolean contains(int row, int col, BassBoard board)
     {
-      return bitset.get((row * board.getCols()) + col);
+      return bitset.get((row * board.getNumCols()) + col);
     }
 	}
 	
@@ -163,7 +163,7 @@ public class ButtonCombo
 	Hash getHash(BassBoard board)
 	{
 		if (hash == null)
-			hash = new Hash(this, board.getRows(), board.getCols());
+			hash = new Hash(this, board.getNumRows(), board.getNumCols());
 		
 		return hash;
 	}

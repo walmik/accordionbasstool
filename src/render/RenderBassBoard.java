@@ -1,5 +1,6 @@
 package render;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -7,8 +8,10 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import javax.swing.JComponent;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -79,8 +82,8 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
   public void setBassBoard(BassBoard newBoard)
   {
     _theBoard = newBoard;
-    _rows = _theBoard.getRows();
-    _cols = _theBoard.getCols();
+    _rows = _theBoard.getNumRows();
+    _cols = _theBoard.getNumCols();
   }
 
   public BassBoard getBassBoard()
@@ -310,8 +313,8 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     int prefSize = RenderBoardUI.defaultUI._prefSize;
     int buttonMargin = RenderBoardUI.defaultUI.buttonXMargin;
 
-    r = (int) (_theBoard.getCols() * _colToRow * prefSize);
-    c = (int) (_theBoard.getRows() * prefSize);// - _prefSize/2;
+    r = (int) (_theBoard.getNumCols() * _colToRow * prefSize);
+    c = (int) (_theBoard.getNumRows() * prefSize);// - _prefSize/2;
 
     if (_isHoriz) {
       dim = new Dimension(r, c);
@@ -323,6 +326,79 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
     return dim;
   }
+
+  private void paintNoteHeader(JComponent comp, Graphics g)
+  {
+   //double cOff = _cStart + r * _slope;
+    int x = RenderBoardUI.defaultUI.buttonXMargin + (int)_slope;
+    int y = RenderBoardUI.defaultUI.buttonXMargin;
+
+    g.setColor(Color.black);
+    g.fillRect(0, 0, comp.getWidth(), comp.getHeight());
+
+    computeRenderOffsets();
+    g.setColor(Color.white);
+    g.setFont(this.getFont());
+
+    for (int c = 0; c < _cols; c++) {
+      g.drawString(_theBoard.getNoteAt(c).toString(), x, y);
+      x += _cInc;
+    }
+  }
+
+  private void paintBassRowHeader(JComponent comp, Graphics g)
+  {
+    int x = RenderBoardUI.defaultUI.buttonXMargin;
+    int y = RenderBoardUI.defaultUI.buttonXMargin + _rInc / 2 + g.getFontMetrics().getHeight() / 2;
+
+    g.setColor(Color.black);
+    g.fillRect(0, 0, comp.getWidth(), comp.getHeight());
+
+    computeRenderOffsets();
+    g.setColor(Color.white);
+    g.setFont(this.getFont());
+
+    for (int r = 0; r < _rows; r++) {
+      g.drawString(_theBoard.getRow(r).toString(), x, y);
+      y += _rInc;
+    }
+  }
+
+  public void setupHeaders(JScrollPane scrollPane)
+  {
+    JPanel noteHeader = new JPanel()
+    {
+      public void paint(Graphics g)
+      {
+        paintNoteHeader(this, g);
+      }
+
+      public Dimension getPreferredSize()
+      {
+        return new Dimension(50, 20);
+      }
+    };
+
+    JPanel bassRowHeader = new JPanel()
+    {
+      public void paint(Graphics g)
+      {
+        paintBassRowHeader(this, g);
+      }
+
+      public Dimension getPreferredSize()
+      {
+        return new Dimension(100, 20);
+      }
+    };
+
+
+    
+    scrollPane.setColumnHeaderView(noteHeader);
+    scrollPane.setRowHeaderView(bassRowHeader);
+  }
+
+
   //Member Vars
   //================================================================================
   BassBoard _theBoard;

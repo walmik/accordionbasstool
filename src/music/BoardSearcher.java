@@ -134,7 +134,7 @@ public class BoardSearcher
 	{
 		Vector<ButtonCombo> combos = new Vector<ButtonCombo>();
 		
-		for (int r = 0; r < board.getRows(); r++)
+		for (int r = 0; r < board.getNumRows(); r++)
 		{
 			// Only doing single note rows
 			if (!board.isSingleBassRow(r))
@@ -142,7 +142,7 @@ public class BoardSearcher
 				continue;
 			}
 			
-			for (int c = 0; c < board.getCols(); c++)
+			for (int c = 0; c < board.getNumCols(); c++)
 			{
 				Chord chord = board.getChordAt(r, c);
 				
@@ -253,11 +253,11 @@ public class BoardSearcher
 		// to narrow the search space
 		
 		// First, chord rows
-		for (int r = 0; r < board.getRows(); r++)
+		for (int r = 0; r < board.getNumRows(); r++)
 		{
 			if (!board.isSingleBassRow(r))
 			{
-				for (int c = 0; c < board.getCols(); c++)
+				for (int c = 0; c < board.getNumCols(); c++)
 				{
 					if (fullChordMask.contains(masks[r][c]))
 					{
@@ -268,11 +268,11 @@ public class BoardSearcher
 		}
 		
 		// Non-chord rows
-		for (int r = 0; r < board.getRows(); r++)
+		for (int r = 0; r < board.getNumRows(); r++)
 		{
 			if (board.isSingleBassRow(r))
 			{
-				for (int c = 0; c < board.getCols(); c++)
+				for (int c = 0; c < board.getNumCols(); c++)
 				{
 					if (unmaskBassRegister) {
 						masks[r][c].unmaskRegister(fullChordMask);
@@ -399,9 +399,9 @@ public class BoardSearcher
 //						  String indent)
 //	{
 //		
-//		for (int r = rStart; r < board.getRows(); r++)
+//		for (int r = rStart; r < board.getNumRows(); r++)
 //		{
-//			for (int c = cStart; c < board.getCols(); c++)
+//			for (int c = cStart; c < board.getNumCols(); c++)
 //			{
 //				Chord newChord = board.getChordAt(r, c);
 //				
@@ -460,7 +460,7 @@ public class BoardSearcher
 //						int newCStart = c + 1;
 //						int newRStart = r;
 //						
-//						if (newCStart >= board.getCols())
+//						if (newCStart >= board.getNumCols())
 //						{
 //							newCStart = 0;
 //							newRStart++;

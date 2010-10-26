@@ -43,6 +43,8 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
 
     boardScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
+    //renderBoard.setupHeaders(boardScrollPane);
+
     boardCombo.setModel(new DefaultComboBoxModel(BoardRegistry.mainRegistry().allBoardDefs));
     boardCombo.addActionListener(this);
 

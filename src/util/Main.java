@@ -117,7 +117,6 @@ public class Main
     return doc;
   }
 
-
   private static boolean setNimbus()
   {
     try {
@@ -139,8 +138,12 @@ public class Main
   {
 
     try {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//      setNimbus();
+      boolean success = false;
+      success = setNimbus();
+
+      if (!success) {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      }
 
     } catch (Exception exc) {
     }
