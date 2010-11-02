@@ -152,11 +152,14 @@ public class RenderBoardUI
       //graphics.drawRect(0, 0, _xW, _yW);
 
       if (pressed) {
+   //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         graphics.drawImage(pressedIM, 0, 0, imWidth, imHeight, null);
         graphics.translate(0, _pressedCylOff);
       } else if (selected) {
+   //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         graphics.drawImage(selectedIM, 0, 0, imWidth, imHeight, null);
       } else {
+   //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
         graphics.drawImage(unselectedIM, 0, 0, imWidth, imHeight, null);
       }
     }
@@ -371,7 +374,6 @@ public class RenderBoardUI
 //
 //    g.setTransform(orig);
 //  }
-
   // From "Java 2D Trickery: Light and Shadow"
   // http://weblogs.java.net/blog/2006/07/27/java-2d-trickery-light-and-shadow
   static Color getMixedColor(Color c1, float pct1, Color c2, float pct2)

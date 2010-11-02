@@ -1,162 +1,192 @@
 package music;
 
-public class Chord 
-{	
-	public final Note[] notes;
-	
-	static class Mask
-	{
-		private int value = 0;
-		
-		Mask()            { 	value = 0; 		}
-		Mask(int val) 		{ 	value = val; 	}
-		
-		Mask(Chord chord)
-		{
-			value = 0;
-			
-			for (int i = 0; i < chord.notes.length; i++)
-			{
-				int bit = toUpperOctaveBit(chord.notes[i]);
-				if ((value & bit) != 0) {
-					bit = toLowerOctaveBit(bit);
+public class Chord
+{
+
+  public final Note[] notes;
+
+  static class Mask
+  {
+
+    private int value = 0;
+
+    Mask()
+    {
+      value = 0;
+    }
+
+    Mask(int val)
+    {
+      value = val;
+    }
+
+    Mask(Chord chord)
+    {
+      value = 0;
+
+      for (int i = 0; i < chord.notes.length; i++) {
+        value = noteToMask(chord.notes[i], value);
+      }
+    }
+
+    static int noteToMask(Note note, int value)
+    {
+      int bit = toUpperOctaveBit(note);
+      if ((value & (1 << bit)) != 0) {
+        bit = toLowerOctaveBit(bit);
+      }
+      note.octaveBit = (short)bit;
+      value |= (1 << bit);
+      return value;
+    }
+
+    static Note lowestNoteFromMask(Chord chord, Note startNote)
+    {
+      // Highest bit in the byte is the lowest note
+      Note lowestNote = startNote;
+      int lowestBit = (startNote != null ? startNote.octaveBit : 32);
+      int value = 0;
+
+      for (int i = 0; i < chord.notes.length; i++) {
+        value = noteToMask(chord.notes[i], value);
+
+        if (chord.notes[i].octaveBit < lowestBit) {
+          lowestBit = chord.notes[i].octaveBit;
+          lowestNote = chord.notes[i];
         }
-				
-				value |= bit;
-			}
-		}
+      }
 
-    final private int toUpperOctaveBit(Note note)
-    {
-      return (1 << (note.value() + Note.NUM_HALFSTEPS));
+      chord.mask = new Mask(value);
+      return lowestNote;
     }
 
-    final private int toLowerOctaveBit(int upperbit)
+    final static private int toUpperOctaveBit(Note note)
     {
-      return (upperbit >> Note.NUM_HALFSTEPS);
+      return (note.value() + Note.NUM_HALFSTEPS);
     }
 
-    final private int toLowerOctaveBit(Note note)
+    final static private int toLowerOctaveBit(int upperbit)
     {
-      return (1 << note.value());
+      return (upperbit - Note.NUM_HALFSTEPS);
     }
-		
-		static boolean contains(int a, int b)
-		{
-			return (a | b) == a;
-		}
-		
-		boolean contains(Mask otherMask)
-		{
-			return contains(value, otherMask.value);
-		}
+
+//    final private int toLowerOctaveBit(Note note)
+//    {
+//      return (1 << note.value());
+//    }
+
+    static boolean contains(int a, int b)
+    {
+      return (a | b) == a;
+    }
+
+    boolean contains(Mask otherMask)
+    {
+      return contains(value, otherMask.value);
+    }
 
     boolean contains(int bit)
     {
       return ((value & (1 << bit)) != 0);
     }
-		
+
 //		boolean containsSingleRegister(Mask otherMask)
 //		{
 //			int stripLowRegMask = otherMask.value % (1 << Note.NUM_HALFSTEPS);
 //			return contains(value, stripLowRegMask);
 //		}
-		
-		boolean equals(Mask otherMask)
-		{
-			return (value == otherMask.value);
-		}
-		
-		boolean equals(Chord otherChord)
-		{
-			return equals(otherChord.getChordMask());
-		}
-		
-		Mask concat(Mask otherMask)
-		{
-			return new Mask(value | otherMask.value);
-		}
-		
+    boolean equals(Mask otherMask)
+    {
+      return (value == otherMask.value);
+    }
+
+    boolean equals(Chord otherChord)
+    {
+      return equals(otherChord.getChordMask());
+    }
+
+    Mask concat(Mask otherMask)
+    {
+      return new Mask(value | otherMask.value);
+    }
+
 //		void doubleNote(Note note)
 //		{
 //			value |= (1 << (note.value() + Note.NUM_HALFSTEPS));
 //		}
-
     // Are there any bass buttons in the mask
-		boolean hasLowerOctave()
-		{
-			//return (value >> Note.NUM_HALFSTEPS) != 0;
-      return (value & ~((1 << Note.NUM_HALFSTEPS)-1)) != 0;
-		}
-		
-		public void unmaskRegister(Mask otherMask)
-		{
-			int res = value & otherMask.value;
-			if (res != 0)
-				value = res;
-		}
-	}
-	
-	private Mask mask;
-	
-	public Chord(Note singleN, boolean mustRoot)
-	{
+    boolean hasLowerOctave()
+    {
+      //return (value >> Note.NUM_HALFSTEPS) != 0;
+      return (value & ~((1 << Note.NUM_HALFSTEPS) - 1)) != 0;
+    }
+
+    public void unmaskRegister(Mask otherMask)
+    {
+      int res = value & otherMask.value;
+      if (res != 0) {
+        value = res;
+      }
+    }
+  }
+
+  private Mask mask;
+
+  public Chord(Note singleN, boolean mustRoot)
+  {
     int dupCount = (mustRoot ? 2 : 1);
 
-		notes = new Note[dupCount];
-		
-		initBassNote(singleN, dupCount);
-	}
-	
+    notes = new Note[dupCount];
 
-	
-	public Chord(Note[] n)
-	{
-		notes = n;
-	}
-	
-	public Chord(Note note, Interval[] ivals)
-	{
-		notes = new Note[ivals.length + 1];
-		initFromIval(0, note, ivals);
-	}
-	
-	public Chord(Note note, Interval[] ivals, Note extraBass, boolean mustBeBassRoot)
-	{
+    initBassNote(singleN, dupCount);
+  }
+
+  public Chord(Note[] n)
+  {
+    notes = n;
+  }
+
+  public Chord(Note note, Interval[] ivals)
+  {
+    notes = new Note[ivals.length + 1];
+    initFromIval(0, note, ivals);
+  }
+
+  public Chord(Note note, Interval[] ivals, Note extraBass, boolean mustBeBassRoot)
+  {
     int extraLen = 0;
-    if (extraBass != null)
-    {
+    if (extraBass != null) {
       extraLen++;
-      if (mustBeBassRoot)
+      if (mustBeBassRoot) {
         extraLen++;
+      }
     }
 
     this.notes = new Note[ivals.length + 1 + extraLen];
 
-    if (extraBass != null)
+    if (extraBass != null) {
       initBassNote(extraBass, extraLen);
+    }
 
-		initFromIval(extraLen, note, ivals);
-	}
-	
-	private void initBassNote(Note singleN, int count)
-	{
-		for (int i = 0; i < count; i++)
-		{
-			notes[i] = singleN;
-		}	
-	}
-	
-	private void initFromIval(int offset, Note note, Interval[] ivals)
-	{
-		notes[offset] = note;
-		
-		for (int i = 0; i < ivals.length; i++)
-		{
-			notes[offset + i + 1] = notes[offset + i].add(ivals[i]);
-		}
+    initFromIval(extraLen, note, ivals);
+  }
 
-	}
+  private void initBassNote(Note singleN, int count)
+  {
+    for (int i = 0; i < count; i++) {
+      notes[i] = singleN;
+    }
+  }
+
+  private void initFromIval(int offset, Note note, Interval[] ivals)
+  {
+    notes[offset] = note;
+
+    for (int i = 0; i < ivals.length; i++) {
+      notes[offset + i + 1] = notes[offset + i].add(ivals[i]);
+    }
+
+  }
 
 //	public Chord(Chord one, Chord two)
 //	{
@@ -194,113 +224,112 @@ public class Chord
 //
 //		assert(count == numNotes);
 //	}
-
   // extraBass may be null
   public Chord(Chord existing, Note newRoot, Note extraBass, boolean mustBeBassRoot)
   {
     int extraLen = 0;
-    if (extraBass != null)
-    {
+    if (extraBass != null) {
       extraLen++;
-      if (mustBeBassRoot)
+      if (mustBeBassRoot) {
         extraLen++;
+      }
     }
 
     this.notes = new Note[existing.notes.length + extraLen];
 
-    if (extraBass != null)
+    if (extraBass != null) {
       initBassNote(extraBass, extraLen);
+    }
 
     Interval ival = newRoot.diff(existing.notes[0]);
 
-    for (int i = 0; i < existing.notes.length; i++)
-		{
-			notes[extraLen + i] = existing.notes[i].add(ival);
-		}
+    for (int i = 0; i < existing.notes.length; i++) {
+      notes[extraLen + i] = existing.notes[i].add(ival);
+    }
   }
 
   public Interval[] extractInterval()
   {
     Interval ivals[] = new Interval[notes.length - 1];
-    for (int i = 0; i < notes.length - 1; i++)
-    {
+    for (int i = 0; i < notes.length - 1; i++) {
       ivals[i] = notes[i + 1].diff(notes[i]);
     }
     return ivals;
   }
-		
-	public void transpose(Interval ival)
-	{
-		for (int i = 0; i < notes.length; i++)
-		{
-			notes[i] = notes[i].add(ival);
-		}
-		mask = null;
+
+  public void transpose(Interval ival)
+  {
+    for (int i = 0; i < notes.length; i++) {
+      notes[i] = notes[i].add(ival);
+    }
+    mask = null;
   }
 
   public String getTransposedString(Note newRoot)
   {
     Interval ival = newRoot.diff(notes[0]);
 
-		String str = "";
+    String str = "";
 
-		for (int i = 0; i < notes.length; i++)
-		{
-      if (i > 0)
+    for (int i = 0; i < notes.length; i++) {
+      if (i > 0) {
         str += "-";
-			str += notes[i].add(ival).toString();
-		}
+      }
+      str += notes[i].add(ival).toString();
+    }
 
-		return str;
+    return str;
   }
-	
-	public boolean isSingleNote()
-	{
-		return notes.length == 1;
-	}
-	
-	public Note getRootNote()
-	{
-		return notes[0];
-	}
-	
-	public boolean equals(Chord other)
-	{
-		return (getChordMask().equals(other.getChordMask()));
-	}
-	
+
+  public boolean isSingleNote()
+  {
+    return notes.length == 1;
+  }
+
+  public Note getRootNote()
+  {
+    return notes[0];
+  }
+
+  public boolean equals(Chord other)
+  {
+    return (getChordMask().equals(other.getChordMask()));
+  }
+
 //	public boolean contains(Chord other)
 //	{
 //		return getChordMask().contains(other.getChordMask());
 //	}
+  // Integer bitmask representing the chord
+  // Bits 0-11 are set if the chord has each respective semitone 0-11
+  // Compute on first use
+  Mask getChordMask()
+  {
+    if (mask == null) {
+      mask = new Mask(this);
+    }
 
-	// Integer bitmask representing the chord
-	// Bits 0-11 are set if the chord has each respective semitone 0-11
-	// Compute on first use
-	
-	public Mask getChordMask()
-	{
-		if (mask == null)
-		{
-			mask = new Mask(this);
-		}
-		
-		return mask;
-	}
-	
-	private String toString(String sep, boolean html)
-	{
-		String str = "";
-		
-		for (int i = 0; i < notes.length; i++)
-		{
-      if (i > 0)
+    return mask;
+  }
+
+  Note getLowestNote(Note startNote)
+  {
+    return Mask.lowestNoteFromMask(this, startNote);
+  }
+
+  private String toString(String sep, boolean html)
+  {
+    String str = "";
+
+    for (int i = 0; i < notes.length; i++) {
+      if (i > 0) {
         str += sep;
-			str += notes[i].toString(html);
-		}
-		
-		return str;
-	}
+      }
+      str += notes[i].toString(html);
+    }
+
+    return str;
+  }
 
   @Override
   public String toString()

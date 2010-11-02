@@ -271,8 +271,10 @@ class SeqColumnModel extends DefaultTableColumnModel
         return "Chord Not Possible";
       }
       music.ButtonCombo combo = allComboSeqs[rowIndex].getCombo(columnIndex);
-      String info = combo.toButtonListingString(allComboSeqs[rowIndex].getBoard(), true);
-      return "<html>" + info + "</html>";
+      String info = combo.toButtonListingString(allComboSeqs[rowIndex].getBoard(), false);
+      String lowest = combo.getLowestNote(allComboSeqs[rowIndex].getBoard()).toString(false);
+      //return "<html>" + info + " Low: " + lowest + "</html>";
+      return info + " (" + lowest + ")";
     }
   }
 

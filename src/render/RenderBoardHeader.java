@@ -75,7 +75,7 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     Container cont = this.getTopLevelAncestor();
 
     // Autoresize -- horizontal
-    if (cont.isVisible() && (cont instanceof JFrame)) {
+    if ((cont != null) && cont.isVisible() && (cont instanceof JFrame)) {
       JFrame frame = (JFrame) cont;
 
       int diff = (renderBoard.getPreferredSize().height - boardScrollPane.getHeight());

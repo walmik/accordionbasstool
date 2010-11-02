@@ -25,7 +25,7 @@ public class Note
 
 		private ScaleNote(int dist, int hs)
 		{
-			scaleDist = (short)dist;			
+			scaleDist = (short)dist;
 			halfStep = (short)hs;
 		}
 
@@ -101,6 +101,7 @@ public class Note
 
 	ScaleNote note;
 	short sharpsOrFlats;
+  short octaveBit = 0;
 
   //Default note is C
   public Note()
@@ -155,7 +156,7 @@ public class Note
 	{
 		return add(ival.scale(-1));
 	}
-	
+
 	static String printNote(ScaleNote note, int sharpsOrFlats, boolean html)
 	{
     if (sharpsOrFlats > 0)

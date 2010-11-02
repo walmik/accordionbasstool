@@ -161,6 +161,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
       }
     ));
     seqTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+    seqTable.setOpaque(false);
     seqTable.setRowHeight(24);
     seqTableScrollPane.setViewportView(seqTable);
 
@@ -254,7 +255,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
             .addGap(20, 20, 20))
           .addGroup(layout.createSequentialGroup()
             .addGap(11, 11, 11)
-            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
+            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
         .addComponent(statusText, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
     );

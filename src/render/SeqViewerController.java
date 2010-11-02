@@ -559,7 +559,7 @@ public class SeqViewerController
       TableColumn theColumn = table.getColumnModel().getColumn(column);
       int newPref = Math.max(this.getPreferredSize().width + 24, DEFAULT_COL_WIDTH);
 
-      if (newPref != theColumn.getPreferredWidth()) {
+      if (newPref >= theColumn.getPreferredWidth()) {
         theColumn.setPreferredWidth(newPref);
       }
 
