@@ -5,101 +5,21 @@ public class BassBoard
 
   public enum RowType
   {
-
-    BassMaj3("Counter-Bass Major", true),
-    BassRoot("Bass Root", true),
-    ChordMajor("Major Chord", false),
-    ChordMinor("Minor Chord", false),
-    Chord7th("7th Chord", false),
-    ChordDim("Diminished Chord", false),
-    BassMin3("Counter-Bass Minor", true);
-
-    
-    final String name;
-    final boolean singleNote;
-
-    RowType(String name, boolean single)
-    {
-      this.name = name;
-      this.singleNote = single;
-    }
-
-    @Override
-    public String toString()
-    {
-      return name;
-    }
-
-    public static RowType fromString(String key)
-    {
-      try {
-        return RowType.valueOf(key);
-      } catch (IllegalArgumentException il) {
-        return BassRoot;
-      }
-    }
-
-    Chord getChord(Note note)
-    {
-      switch (this) {
-        case BassMaj3:
-          return new Chord(note.add(Interval.M3), true);
-
-        case BassMin3:
-          return new Chord(note.add(Interval.m3), true);
-
-        case BassRoot:
-          return new Chord(note, true);
-
-        case ChordMajor:
-          return new Chord(note, ChordRegistry.MAJOR);
-
-        case ChordMinor:
-          return new Chord(note, ChordRegistry.MINOR);
-
-        case Chord7th:
-          return new Chord(note, ChordRegistry.DOM);
-
-        case ChordDim:
-          return new Chord(note, ChordRegistry.DIM);
-
-        default:
-          throw new RuntimeException("Invalid Row Specified: " + toString());
-      }
-    }
-
-    String getChordName(Note rootNote)
-    {
-      switch (this) {
-        case BassMaj3:
-          return rootNote.add(Interval.M3).toString();
-
-        case BassMin3:
-          return rootNote.add(Interval.m3).toString();
-
-        case ChordMajor:
-          return rootNote.toString() + "M";
-
-        case ChordMinor:
-          return rootNote.toString() + "m";
-
-        case Chord7th:
-          return rootNote.toString() + "7";
-
-        case ChordDim:
-          return rootNote.toString() + "\u00B0"; //degree sign
-
-        default:
-          return rootNote.toString();
-      }
-    }
+    BassRoot,
+    BassMaj3,
+    BassMin3,
+    ChordMajor,
+    ChordMinor,
+    Chord7th,
+    ChordDim,
   }
+  
 
   public static class Pos
   {
 
-    final int row;
-    final int col;
+    public final int row;
+    public final int col;
 
     public Pos(int r, int c)
     {
@@ -115,6 +35,8 @@ public class BassBoard
 
   public static BassBoard bassBoard120()
   {
+    BoardRegistry.mainRegistry();
+    
     RowType[] layout = {RowType.BassMaj3,
       RowType.BassRoot,
       RowType.ChordMajor,
@@ -155,12 +77,13 @@ public class BassBoard
 
     return new BassBoard(layout, 8);
   }
-  final protected RowType[] rowLayout;
+
+  final protected BoardRow[] rowLayout;
   final int cols;
   final Pos centerPos;
   final protected Note middleNote;
 
-  public RowType getRow(int index)
+  public BoardRow getRow(int index)
   {
     assert(index < rowLayout.length);
     return rowLayout[index];
@@ -184,7 +107,7 @@ public class BassBoard
   public int findRootRow()
   {
     for (int i = 0; i < rowLayout.length; i++) {
-      if (rowLayout[i] == RowType.BassRoot) {
+      if (rowLayout[i].name.equals(RowType.BassRoot.toString())) {
         return i;
       }
     }
@@ -195,19 +118,29 @@ public class BassBoard
   public boolean isSingleBassRow(int row)
   {
     if (row < rowLayout.length) {
-      return rowLayout[row].singleNote;
+      return rowLayout[row].isSingleNote;
     }
 
     return false;
   }
 
-  protected BassBoard(RowType[] layout, Note center, int numCols)
+  protected BassBoard(BoardRow[] rows, Note center, int numCols)
   {
-    rowLayout = layout;
+    rowLayout = rows;
     cols = numCols;
     middleNote = center;
 
     centerPos = new Pos(findRootRow(), (cols - 1) / 2);
+  }
+
+  protected BassBoard(String[] layout, Note center, int numCols)
+  {
+    this(BoardRow.findRows(layout), center, numCols);
+  }
+
+  protected BassBoard(RowType[] layout, Note center, int numCols)
+  {
+    this(BoardRow.findRows(layout), center, numCols);
   }
 
   protected BassBoard(RowType[] layout, int numCols)
@@ -242,6 +175,11 @@ public class BassBoard
     return masks;
   }
 
+  public Chord getChordAt(Pos pos)
+  {
+    return getChordAt(pos.row, pos.col);
+  }
+
   public Chord getChordAt(int row, int col)
   {
     verifyRowCol(row, col);
@@ -262,19 +200,24 @@ public class BassBoard
     }
   }
 
-  public Chord getChordFor(Note note, RowType row)
+  public Chord getChordFor(Note note, BoardRow row)
   {
     return row.getChord(note);
   }
 
-  public String getChordName(int row, int col)
+  public String getChordName(Pos pos, boolean html)
+  {
+    return getChordName(pos.row, pos.col, html);
+  }
+
+  public String getChordName(int row, int col, boolean html)
   {
     verifyRowCol(row, col);
-    RowType rowType = rowLayout[row];
+    BoardRow rowType = rowLayout[row];
 
     Note rootNote = getNoteAt(col);
 
-    return rowType.getChordName(rootNote);
+    return rowType.getChordName(rootNote, html);
   }
 
   public Note getMinRootNote()

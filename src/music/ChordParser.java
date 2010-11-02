@@ -28,7 +28,7 @@ public class ChordParser
     while (!parser.isDone()) {
       chordVec.add(parse(parser));
 
-      parser.skipThrough(',');
+      parser.skipThrough(", -+");
     }
 
     return chordVec;

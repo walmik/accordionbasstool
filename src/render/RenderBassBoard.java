@@ -1,25 +1,21 @@
 package render;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Path2D;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.AbstractBorder;
+import javax.swing.ToolTipManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -38,8 +34,6 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
   public RenderBassBoard(BassBoard newBoard)
   {
-//		drawers.add(new DrawBassChord());
-
     setBassBoard(newBoard);
 
     if (RenderBoardUI.defaultUI == null) {
@@ -57,11 +51,11 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
 //    this.addMouseListener(new MouseHandler());
 //    this.addMouseMotionListener(new MouseHandler());
+    ToolTipManager.sharedInstance().registerComponent(this);
 
     int borderMargin = RenderBoardUI.defaultUI.buttonXMargin + borderWidth / 2;
     this._borderInsets = new Insets(borderMargin, borderMargin, borderMargin, borderMargin);
   }
-
   Dimension margin = new Dimension();
   int borderWidth = 16;
   Dimension _contentDim = new Dimension(0, 0);
@@ -94,11 +88,28 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     }
   }
 
+  @Override
+  public String getToolTipText(MouseEvent event)
+  {
+    BassBoard.Pos mouseOverPos = hitTest(event.getX(), event.getY());
+    if (mouseOverPos != null) {
+      String string = "<html>";
+      string += "<b>" + _theBoard.getChordName(mouseOverPos, true) + "</b>";
+      string += " - (";
+      string += _theBoard.getChordAt(mouseOverPos).toHtmlString();
+      string += ")</html>";
+      return string;
+    }
+    return null;
+  }
+
   public void setBassBoard(BassBoard newBoard)
   {
     _theBoard = newBoard;
-    _rows = _theBoard.getNumRows();
-    _cols = _theBoard.getNumCols();
+    if (_theBoard != null) {
+      _rows = _theBoard.getNumRows();
+      _cols = _theBoard.getNumCols();
+    }
   }
 
   public BassBoard getBassBoard()
@@ -152,6 +163,13 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
     computeRenderOffsets();
 
+    x -= _borderInsets.left + margin.width / 2;
+    y -= _borderInsets.top + margin.height / 2;
+
+    if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
+      x -= (getWidth() - _contentDim.width - margin.width) / 2;
+    }
+
     if (_isHoriz) {
       cPos = x;
       rPos = y;
@@ -186,8 +204,8 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
     int w, h;
 
-    margin.width = 3*RenderBoardUI.defaultUI.buttonXMargin;
-    margin.height = 2*RenderBoardUI.defaultUI.buttonXMargin;
+    margin.width = 3 * RenderBoardUI.defaultUI.buttonXMargin;
+    margin.height = 2 * RenderBoardUI.defaultUI.buttonXMargin;
 
     w = getWidth() - (_borderInsets.left + _borderInsets.right) - margin.width;
     h = getHeight() - (_borderInsets.top + _borderInsets.bottom) - margin.height;
@@ -197,7 +215,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
       w = h;
       h = t;
     }
-    
+
     double theTan = Math.abs(Math.tan(_slantAngle));
 
     double ratio = ((double) _cols / (double) _rows) * _colToRow;
@@ -237,7 +255,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
   @Override
   public void paint(Graphics graphics)
   {
- 
+
     Graphics2D graphics2D = (Graphics2D) graphics;
 
     computeRenderOffsets();
@@ -251,7 +269,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     graphics2D.fillRect(0, 0, getWidth(), getHeight());
 
     if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
-      graphics2D.translate((getWidth() - _contentDim.width - margin.width)/2, 0);
+      graphics2D.translate((getWidth() - _contentDim.width - margin.width) / 2, 0);
     }
 
     // Paint Border & Background
@@ -276,7 +294,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
     double ellipseRatio = RenderBoardUI.defaultUI.ellipseRatio;
 
-    int diamX = Math.min(xW, yW) - margin.width/3;
+    int diamX = Math.min(xW, yW) - margin.width / 3;
     int diamY = (int) (diamX * ellipseRatio);
 
     int xP, yP;
@@ -287,8 +305,8 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 //      xP = _borderInsets.left + margin;
 //    }
 
-    xP = _borderInsets.left + margin.width/2;
-    yP = _borderInsets.right + margin.height/2;
+    xP = _borderInsets.left + margin.width / 2;
+    yP = _borderInsets.top + margin.height / 2;
 
     buttonDrawer.setup(graphics2D, xW, yW, diamX, diamY);
     textDrawer.setup(graphics2D, xW, yW, diamX, diamY);
@@ -328,7 +346,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
         {
           buttonDrawer.draw(graphics2D, realCol, r, pressed, selected);
-          textDrawer.draw(graphics2D, realCol, r, pressed, _theBoard.getChordName(r, realCol));
+          textDrawer.draw(graphics2D, realCol, r, pressed, _theBoard.getChordName(r, realCol, false));
         }
 
 
@@ -356,9 +374,9 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     Dimension dim;
 
     int prefSize = RenderBoardUI.defaultUI._prefSize;
- 
+
     r = (int) (_theBoard.getNumCols() * _colToRow * prefSize) + (_borderInsets.left + _borderInsets.right);// + margin.width/2;
-    c = (int) (_theBoard.getNumRows() * prefSize) + (_borderInsets.top + _borderInsets.bottom) + margin.height/2;
+    c = (int) (_theBoard.getNumRows() * prefSize) + (_borderInsets.top + _borderInsets.bottom) + margin.height / 2;
 
     if (_isHoriz) {
       dim = new Dimension(r, c);

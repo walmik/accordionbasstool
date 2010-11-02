@@ -268,10 +268,11 @@ class SeqColumnModel extends DefaultTableColumnModel
     public Object getValueAt(int rowIndex, int columnIndex)
     {
       if (allComboSeqs.length == 0) {
-        return "Chord not Possible";
+        return "Chord Not Possible";
       }
       music.ButtonCombo combo = allComboSeqs[rowIndex].getCombo(columnIndex);
-      return combo.toButtonListingString(allComboSeqs[rowIndex].getBoard());
+      String info = combo.toButtonListingString(allComboSeqs[rowIndex].getBoard(), true);
+      return "<html>" + info + "</html>";
     }
   }
 

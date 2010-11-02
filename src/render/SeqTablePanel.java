@@ -13,7 +13,6 @@ package render;
 import java.awt.event.ActionEvent;
 import javax.swing.Timer;
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
@@ -224,10 +223,10 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
         .addComponent(toolRemove)
         .addGap(88, 88, 88)
         .addComponent(toolOptions)
-        .addContainerGap(12, Short.MAX_VALUE))
+        .addContainerGap(46, Short.MAX_VALUE))
     );
 
-    statusText.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+    statusText.setFont(new java.awt.Font("Tahoma", 0, 16));
     statusText.setText("Status");
     statusText.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 

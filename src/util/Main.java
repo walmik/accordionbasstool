@@ -39,13 +39,17 @@ public class Main
       }
     }
 
-    public void skipThrough(char ch)
+    public void skipThrough(String str)
     {
-      while (!isDone()) {
+      boolean found = false;
+      while (!isDone() && !found) {
         char nextCh = fullString.charAt(offset);
         offset++;
-        if (nextCh == ch) {
-          break;
+        for (int i = 0; i < str.length(); i++) {
+          if (nextCh == str.charAt(i)) {
+            found = true;
+            break;
+          }
         }
       }
     }
@@ -139,7 +143,7 @@ public class Main
 
     try {
       boolean success = false;
-      success = setNimbus();
+//      success = setNimbus();
 
       if (!success) {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

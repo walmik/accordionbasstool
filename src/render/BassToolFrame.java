@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JSplitPane;
+import music.BoardRegistry;
 
 /**
  *
@@ -29,11 +30,21 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   /** Creates new form BassToolFrame */
   public BassToolFrame()
   {
+    BoardRegistry.mainRegistry();
+
     initComponents();
+
+    if (editorLeft) {
+      controlSplitPane.setLeftComponent(toolTabs);
+      controlSplitPane.setRightComponent(seqTablePanel);
+    } else {
+      controlSplitPane.setLeftComponent(seqTablePanel);
+      controlSplitPane.setRightComponent(toolTabs);
+    }
 
     seqTablePanel.initChordPicker(this.chordPicker1);
     seqTablePanel.initTextParser(this.textParserPanel1);
-   
+
     this.renderBoardHeader1.initBoardHeader(renderBassBoard, renderBoardScrollPane, seqTablePanel.columnModel);
 
     this.renderBassBoard.setSelectedButtonCombo(seqTablePanel.columnModel.selComboModel);
@@ -45,7 +56,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     this.boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
     if (!editorLeft) {
       this.controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
-    }    
+    }
   }
 
   @Override
@@ -54,10 +65,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     if (evt.getPropertyName().equals(JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
       int newLoc = ((Integer) evt.getNewValue()).intValue();
 
-      if (!editorLeft)
+      if (!editorLeft) {
         this.editorVis = (newLoc <= controlSplitPane.getMaximumDividerLocation() + 10);
-      else
+      } else {
         this.editorVis = (newLoc >= 10);
+      }
 
       //System.out.println("newLoc: " + newLoc + "Width: " + controlSplitPane.getWidth() + " Max: " + this.controlSplitPane.getMaximumDividerLocation());
       if (editorVis) {
@@ -77,7 +89,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       controlSplitPane.setDividerLocation(editorLeft ? controlSplitPane.getMinimumDividerLocation() : controlSplitPane.getMaximumDividerLocation());
     }
   }
-
   private static RenderBassBoard theBoard = null;
 
   public static RenderBassBoard getRenderBoard()
@@ -154,7 +165,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JSplitPane boardSplitPane;
   private render.ChordPicker chordPicker1;

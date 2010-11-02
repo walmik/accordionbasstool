@@ -72,7 +72,7 @@ public class ButtonCombo
 		return str;
 	}
 
-  public String toButtonListingString(BassBoard board)
+  public String toButtonListingString(BassBoard board, boolean html)
 	{
     String str = "";
 
@@ -80,7 +80,7 @@ public class ButtonCombo
 		for (int i = pos.length - 1; i >=0; i--)
 		{
       //str += (board.isSingleBassRow(pos[i].row) ? "Bass " : "Chord ");
-			str += board.getChordName(pos[i].row, pos[i].col);
+			str += board.getChordName(pos[i].row, pos[i].col, html);
       if (i > 0)
         str += " + ";
 		}

@@ -20,6 +20,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -112,6 +113,7 @@ public class SeqViewerController
                   seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
                 } else {
                   columnModel.selComboModel.setButtonComboSeq(null);
+                  seqTable.repaint();
                 }
               }
             });
@@ -163,7 +165,7 @@ public class SeqViewerController
     });
   }
 
-  class SliderTableHeaderUI extends TableHeaderUI
+  static class SliderTableHeaderUI extends TableHeaderUI
           implements TableColumnModelListener, ChangeListener
   {
 

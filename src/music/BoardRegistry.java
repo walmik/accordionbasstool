@@ -4,7 +4,6 @@
  */
 package music;
 
-import music.BassBoard.RowType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -24,7 +23,7 @@ public class BoardRegistry
     public final String desc;
     public final Note middleNote;
     public final int numCols;
-    public final BassBoard.RowType[] rowLayout;
+    public final String[] rowLayout;
 
     BoardDef(Element root)
     {
@@ -42,11 +41,11 @@ public class BoardRegistry
 
       NodeList rows = root.getElementsByTagName("row");
 
-      rowLayout = new RowType[rows.getLength()];
+      rowLayout = new String[rows.getLength()];
 
       for (int i = 0; i < rowLayout.length; i++) {
         Element row = (Element) rows.item(i);
-        rowLayout[i] = RowType.fromString(row.getAttribute("name"));
+        rowLayout[i] = row.getAttribute("name");
       }
     }
 
@@ -58,7 +57,11 @@ public class BoardRegistry
     @Override
     public String toString()
     {
-      String str = "" + numBasses() + " Bass (" + numCols + " X " + rowLayout.length + ")";
+      String str = name;
+      if (str.length() > 0) {
+        str += " - ";
+      }
+      str += numBasses() + " Bass (" + numCols + " X " + rowLayout.length + ")";
       return str;
     }
 
@@ -90,6 +93,9 @@ public class BoardRegistry
 
     Element root = doc.getDocumentElement();
     NodeList nodes;
+
+
+    BoardRow.loadRows(root);
 
     nodes = root.getElementsByTagName("boards");
 
