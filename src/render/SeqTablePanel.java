@@ -11,6 +11,7 @@
 package render;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import javax.swing.Timer;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -18,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import music.ButtonCombo;
 import music.ChordRegistry;
 import music.ParsedChordDef;
 
@@ -33,6 +35,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
   Timer playTimer;
   JPanel cornerPanel = new JPanel();
   JButton toolPlay;
+  SeqViewerController seqViewer;
 
   /** Creates new form SeqTablePanel */
   public SeqTablePanel()
@@ -41,7 +44,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
 
     ChordRegistry.mainRegistry();
 
-    SeqViewerController seqViewer = new SeqViewerController(seqTable, seqTableScrollPane);
+    seqViewer = new SeqViewerController(seqTable, seqTableScrollPane);
     columnModel = seqViewer.columnModel;
     columnModel.selComboModel.addListSelectionListener(this);
 
@@ -81,6 +84,51 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     textParser.setSeqColModel(columnModel, seqTable, null);
   }
 
+  music.midi.Player player;
+  javax.swing.Timer midiTimer;
+  boolean soundEnabled = false;
+
+  public void setSoundEnabled(boolean sound)
+  {
+    soundEnabled = sound;
+    if (player != null) {
+      player.stopAll();
+    }
+  }
+
+  private void playCombo(ButtonCombo combo)
+  {
+    if (!soundEnabled) {
+      if (player != null) {
+        player.stopAll();
+      }
+      return;
+    }
+
+    if (combo == null) {
+      return;
+    }
+
+    if (player == null) {
+      player = new music.midi.Player();
+      player.init();
+
+//      midiTimer = new javax.swing.Timer(500, new ActionListener()
+//      {
+//        @Override
+//        public void actionPerformed(ActionEvent e)
+//        {
+//          player.stopAll();
+//        }
+//      });
+//      midiTimer.setRepeats(false);
+    }
+
+    player.stopAll();
+    player.playChord(combo.getChordMaskValue());
+    //midiTimer.start();
+  }
+
   @Override
   public void valueChanged(ListSelectionEvent e)
   {
@@ -88,7 +136,30 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
       cornerPanel.setVisible(columnModel.getColumnCount() > 1);
     }
 
-    statusText.setText("<html>Complete Sequence: " + columnModel.toHtmlString(true) + "</html>");
+    int row = seqTable.getSelectedRow();
+    int col = columnModel.getSelectedColumn();
+
+    ButtonCombo combo = (ButtonCombo) seqTable.getModel().getValueAt(row, col);
+
+    if (playTimer.isRunning()) {
+      playCombo(combo);
+    }
+
+    String text = "<html>Selected Combo - ";
+
+    if (combo != null) {
+      text += "Bass: " + "<b>" + combo.getLowestNote().toString(true) + "</b>";
+      text += " Buttons: " + "<b>" + combo.toButtonListingString(true) + "</b>";
+      //text += " (" + combo.toSortedNoteString(true) + ") ";
+      //text += "</b>";
+    } else {
+      text += "Not Possible on this board ";
+    }
+    text += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Complete Sequence: ";
+    text += columnModel.toHtmlString(true);
+    text += "</html>";
+
+    statusText.setText(text);
   }
 
   class ChordTableAction extends AbstractAction
@@ -149,6 +220,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     toolInsert = new javax.swing.JButton();
     toolRemove = new javax.swing.JButton();
     toolOptions = new javax.swing.JButton();
+    soundCheck = new javax.swing.JCheckBox();
     statusText = new javax.swing.JLabel();
 
     seqTable.setAutoCreateColumnsFromModel(false);
@@ -193,6 +265,13 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     toolOptions.setText("Options...");
     toolOptions.setActionCommand("Options");
 
+    soundCheck.setText("Sound On");
+    soundCheck.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        soundCheckItemStateChanged(evt);
+      }
+    });
+
     javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
     jPanel1.setLayout(jPanel1Layout);
     jPanel1Layout.setHorizontalGroup(
@@ -209,14 +288,19 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
           .addGroup(jPanel1Layout.createSequentialGroup()
             .addContainerGap()
             .addComponent(toolRemove))
-          .addComponent(toolOptions))
+          .addComponent(toolOptions)
+          .addGroup(jPanel1Layout.createSequentialGroup()
+            .addContainerGap()
+            .addComponent(soundCheck)))
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
     jPanel1Layout.setVerticalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(jPanel1Layout.createSequentialGroup()
         .addComponent(toggleChordPicker)
-        .addGap(65, 65, 65)
+        .addGap(24, 24, 24)
+        .addComponent(soundCheck)
+        .addGap(18, 18, 18)
         .addComponent(toolAddChord)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(toolInsert)
@@ -260,10 +344,17 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
         .addComponent(statusText, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
     );
   }// </editor-fold>//GEN-END:initComponents
+
+  private void soundCheckItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_soundCheckItemStateChanged
+  {//GEN-HEADEREND:event_soundCheckItemStateChanged
+    setSoundEnabled(evt.getStateChange() == ItemEvent.SELECTED);
+  }//GEN-LAST:event_soundCheckItemStateChanged
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel jPanel1;
   private javax.swing.JTable seqTable;
   private javax.swing.JScrollPane seqTableScrollPane;
+  private javax.swing.JCheckBox soundCheck;
   private javax.swing.JLabel statusText;
   javax.swing.JButton toggleChordPicker;
   private javax.swing.JButton toolAddChord;

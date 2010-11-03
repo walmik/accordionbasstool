@@ -4,15 +4,18 @@
 package music;
 
 import java.util.BitSet;
+import java.util.LinkedList;
 
 public class ButtonCombo
 {
 
   final private BassBoard.Pos[] pos;
-  //final private Chord.Mask chordMask;
+  final BassBoard board;
+  private Chord.Mask chordMask = null;
   GeoPos center;
   int heur = 0;
   Hash hash;
+  private Note[] sortedNotes;
   private Note lowestNote;
 
   class Hash
@@ -42,20 +45,22 @@ public class ButtonCombo
       return true;
     }
 
-    boolean contains(int row, int col, BassBoard board)
+    boolean contains(int row, int col)
     {
       return bitset.get((row * board.getNumCols()) + col);
     }
   }
 
-  ButtonCombo(BassBoard.Pos singlePos)
+  ButtonCombo(BassBoard.Pos singlePos, BassBoard board)
   {
+    this.board = board;
     pos = new BassBoard.Pos[1];
     pos[0] = singlePos;
   }
 
-  ButtonCombo(BassBoard.Pos[] newPos)
+  ButtonCombo(BassBoard.Pos[] newPos, BassBoard board)
   {
+    this.board = board;
     pos = newPos;
   }
 
@@ -72,7 +77,7 @@ public class ButtonCombo
     return str;
   }
 
-  public String toButtonListingString(BassBoard board, boolean html)
+  public String toButtonListingString(boolean html)
   {
     String str = "";
 
@@ -155,7 +160,7 @@ public class ButtonCombo
     return heur;
   }
 
-  Hash getHash(BassBoard board)
+  Hash getHash()
   {
     if (hash == null) {
       hash = new Hash(this, board.getNumRows(), board.getNumCols());
@@ -164,12 +169,12 @@ public class ButtonCombo
     return hash;
   }
 
-  boolean contains(ButtonCombo other, BassBoard board)
+  boolean contains(ButtonCombo other)
   {
-    return getHash(board).contains(other.getHash(board));
+    return getHash().contains(other.getHash());
   }
 
-  boolean isUsingBassOnly(BassBoard board)
+  boolean isUsingBassOnly()
   {
     for (int i = 0; i < pos.length; i++) {
       if (!board.isSingleBassRow(pos[i].row)) {
@@ -195,35 +200,72 @@ public class ButtonCombo
 //		return Math.max(rowDelta, colDelta);
 //		//return (rowDelta * rowDelta) + (colDelta * colDelta);
 //	}
-  public boolean hasButton(int row, int col, BassBoard board)
+  public boolean hasButton(int row, int col)
   {
     //Using hash version
-    return getHash(board).contains(row, col, board);
+    return getHash().contains(row, col);
   }
 
-  private Note findLowest(BassBoard board)
+  private void sortNotes()
   {
-    Note lowestNote = null;
-    int lowestBit = 32;
+    chordMask = new Chord.Mask();
+    sortedNotes = new Note[Note.NUM_HALFSTEPS * 2];
 
     for (int i = 0; i < pos.length; i++) {
-      Note currNote = board.getChordAt(pos[i]).getLowestNote(lowestNote);
+      Chord theChord = board.getChordAt(pos[i]);
+      chordMask.concatMe(theChord.getChordMask());
 
-      if (currNote.octaveBit < lowestBit) {
-        lowestBit = currNote.octaveBit;
-        lowestNote = currNote;
+      Chord.Mask.sortNotesFromMask(theChord, sortedNotes);
+    }
+  }
+
+  public Note getLowestNote()
+  {
+    if (this.sortedNotes == null) {
+      sortNotes();
+    }
+
+    if (lowestNote == null) {
+      for (int i = 0; i < this.sortedNotes.length; i++) {
+        if (sortedNotes[i] != null) {
+          lowestNote = sortedNotes[i];
+          break;
+        }
       }
     }
 
     return lowestNote;
   }
 
-  public Note getLowestNote(BassBoard board)
+  public String toSortedNoteString(boolean html)
   {
-    if (this.lowestNote == null) {
-      lowestNote = findLowest(board);
+    String str = "";
+
+    if (sortedNotes == null) {
+      sortNotes();
     }
 
-    return lowestNote;
+    for (int i = 0; i < sortedNotes.length; i++) {
+      if (sortedNotes[i] == null) {
+        continue;
+      }
+
+      if (str.length() > 0) {
+        str += " + ";
+      }
+      str += sortedNotes[i].toString(html);
+
+    }
+
+    return str;
+  }
+
+  public int getChordMaskValue()
+  {
+    if (this.chordMask == null) {
+      sortNotes();
+    }
+
+    return chordMask.getValue();
   }
 }

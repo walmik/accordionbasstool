@@ -8,6 +8,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 import music.BoardSearcher;
+import music.ButtonCombo;
 import music.ButtonComboSequence;
 import music.Chord;
 import music.ChordParser;
@@ -235,7 +236,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     @Override
     public Class<?> getColumnClass(int columnIndex)
     {
-      return String.class;
+      return ButtonCombo.class;
     }
 
     @Override
@@ -267,14 +268,15 @@ class SeqColumnModel extends DefaultTableColumnModel
     @Override
     public Object getValueAt(int rowIndex, int columnIndex)
     {
-      if (allComboSeqs.length == 0) {
-        return "Chord Not Possible";
+      if ((rowIndex < 0) || (rowIndex >= allComboSeqs.length)) {
+        return null;
       }
-      music.ButtonCombo combo = allComboSeqs[rowIndex].getCombo(columnIndex);
-      String info = combo.toButtonListingString(allComboSeqs[rowIndex].getBoard(), false);
-      String lowest = combo.getLowestNote(allComboSeqs[rowIndex].getBoard()).toString(false);
-      //return "<html>" + info + " Low: " + lowest + "</html>";
-      return info + " (" + lowest + ")";
+
+      if ((columnIndex < 0) || (columnIndex >= allComboSeqs[rowIndex].getNumCombos())) {
+        return null;
+      }
+
+      return allComboSeqs[rowIndex].getCombo(columnIndex);
     }
   }
 

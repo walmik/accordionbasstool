@@ -148,7 +148,7 @@ public class BoardSearcher
 				
 				if (chord.isSingleNote() && chord.notes[0].equals(note))
 				{
-					combos.add(new ButtonCombo(new BassBoard.Pos(r, c)));
+					combos.add(new ButtonCombo(new BassBoard.Pos(r, c), board));
 				}
 			}
 		}
@@ -202,7 +202,7 @@ public class BoardSearcher
 			indent = "";
 		}
 		
-		ButtonCombo getCombo()
+		ButtonCombo getCombo(BassBoard board)
 		{
 			if (theCombo != null)
 			{
@@ -224,7 +224,7 @@ public class BoardSearcher
       // verify len is the actual # of links
       assert (count == len);
 
-      theCombo = new ButtonCombo(posVec);
+      theCombo = new ButtonCombo(posVec, board);
       return theCombo;
     }
   }
@@ -321,12 +321,12 @@ public class BoardSearcher
 					
 					int containCount = 0;
 					
-					ButtonCombo newCombo = newLink.getCombo();
+					ButtonCombo newCombo = newLink.getCombo(board);
 					
 					while (nextIter.hasNext())
 					{
 						ButtonCombo existingCombo = nextIter.next();
-						if (existingCombo.contains(newCombo, board))
+						if (existingCombo.contains(newCombo))
 						{
 							if (containCount == 0)
 								nextIter.set(newCombo);
@@ -345,7 +345,7 @@ public class BoardSearcher
 
           if (ignoreAllBassCombos)
           {
-             boolean isBassOnly = newCombo.isUsingBassOnly(board);
+             boolean isBassOnly = newCombo.isUsingBassOnly();
              if (chordComboFound && isBassOnly)
                continue;
 

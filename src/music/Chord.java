@@ -5,7 +5,7 @@ public class Chord
 
   public final Note[] notes;
 
-  static class Mask
+  public static class Mask
   {
 
     private int value = 0;
@@ -40,24 +40,18 @@ public class Chord
       return value;
     }
 
-    static Note lowestNoteFromMask(Chord chord, Note startNote)
+    public static void sortNotesFromMask(Chord chord, Note[] sortArray)
     {
       // Highest bit in the byte is the lowest note
-      Note lowestNote = startNote;
-      int lowestBit = (startNote != null ? startNote.octaveBit : 32);
       int value = 0;
 
       for (int i = 0; i < chord.notes.length; i++) {
         value = noteToMask(chord.notes[i], value);
 
-        if (chord.notes[i].octaveBit < lowestBit) {
-          lowestBit = chord.notes[i].octaveBit;
-          lowestNote = chord.notes[i];
-        }
+        sortArray[chord.notes[i].octaveBit] = chord.notes[i];
       }
 
       chord.mask = new Mask(value);
-      return lowestNote;
     }
 
     final static private int toUpperOctaveBit(Note note)
@@ -110,6 +104,11 @@ public class Chord
       return new Mask(value | otherMask.value);
     }
 
+    void concatMe(Mask otherMask)
+    {
+      value |= otherMask.value;
+    }
+
 //		void doubleNote(Note note)
 //		{
 //			value |= (1 << (note.value() + Note.NUM_HALFSTEPS));
@@ -121,16 +120,21 @@ public class Chord
       return (value & ~((1 << Note.NUM_HALFSTEPS) - 1)) != 0;
     }
 
-    public void unmaskRegister(Mask otherMask)
+    void unmaskRegister(Mask otherMask)
     {
       int res = value & otherMask.value;
       if (res != 0) {
         value = res;
       }
     }
+
+    public int getValue()
+    {
+      return value;
+    }
   }
 
-  private Mask mask;
+  protected Mask mask;
 
   public Chord(Note singleN, boolean mustRoot)
   {
@@ -310,11 +314,6 @@ public class Chord
     }
 
     return mask;
-  }
-
-  Note getLowestNote(Note startNote)
-  {
-    return Mask.lowestNoteFromMask(this, startNote);
   }
 
   private String toString(String sep, boolean html)

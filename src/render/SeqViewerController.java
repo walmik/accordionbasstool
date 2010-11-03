@@ -11,8 +11,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.accessibility.Accessible;
@@ -20,7 +18,6 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -40,6 +37,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import music.ButtonCombo;
 import music.ParsedChordDef;
 
 /**
@@ -52,7 +50,6 @@ public class SeqViewerController
   JTable seqTable;
   JScrollPane tableScrollPane;
   SeqColumnModel columnModel;
-
   final static int DEFAULT_COL_WIDTH = 100;
 
   SeqViewerController(JTable table, JScrollPane scroll)
@@ -71,8 +68,8 @@ public class SeqViewerController
     seqTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
-    
-    seqTable.setDefaultRenderer(String.class, new CellRenderer());
+
+    seqTable.setDefaultRenderer(ButtonCombo.class, new CellRenderer());
 
     JTableHeader header = seqTable.getTableHeader();
     header.setResizingAllowed(true);
@@ -104,17 +101,24 @@ public class SeqViewerController
             new javax.swing.event.ListSelectionListener()
             {
 
+              int lastIndex = -1;
+
               @Override
               public void valueChanged(ListSelectionEvent e)
               {
                 int index = seqTable.getSelectedRow();
-                if ((index >= 0) && (index < columnModel.allComboSeqs.length)) {
-                  columnModel.selComboModel.setButtonComboSeq(columnModel.allComboSeqs[index]);
-                  seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
-                } else {
-                  columnModel.selComboModel.setButtonComboSeq(null);
-                  seqTable.repaint();
+                if (index == lastIndex) {
+                  return;
                 }
+                lastIndex = index;
+
+                if ((index < 0) || (index >= columnModel.allComboSeqs.length)) {
+                  columnModel.selComboModel.setButtonComboSeq(null);
+                  return;
+                }
+                
+                columnModel.selComboModel.setButtonComboSeq(columnModel.allComboSeqs[index]);
+                seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
               }
             });
 
@@ -138,33 +142,32 @@ public class SeqViewerController
               }
             });
   }
-
-  void registerPanelListener(Component top)
-  {
-    top.addComponentListener(new ComponentAdapter()
-    {
-
-      @Override
-      public void componentHidden(ComponentEvent e)
-      {
-        RenderBassBoard renderBoard = BassToolFrame.getRenderBoard();
-        if ((renderBoard != null) && 
-            (renderBoard.getSelectedButtonCombo() == columnModel.selComboModel)) {
-          renderBoard.setSelectedButtonCombo(null);
-        }
-      }
-
-      @Override
-      public void componentShown(ComponentEvent e)
-      {
-        RenderBassBoard renderBoard = BassToolFrame.getRenderBoard();
-        if (renderBoard != null) {
-          renderBoard.setSelectedButtonCombo(columnModel.selComboModel);
-        }
-      }
-    });
-  }
-
+//  void registerPanelListener(Component top)
+//  {
+//    top.addComponentListener(new ComponentAdapter()
+//    {
+//
+//      @Override
+//      public void componentHidden(ComponentEvent e)
+//      {
+//        RenderBassBoard renderBoard = BassToolFrame.getRenderBoard();
+//        if ((renderBoard != null) &&
+//            (renderBoard.getSelectedButtonCombo() == columnModel.selComboModel)) {
+//          renderBoard.setSelectedButtonCombo(null);
+//        }
+//      }
+//
+//      @Override
+//      public void componentShown(ComponentEvent e)
+//      {
+//        RenderBassBoard renderBoard = BassToolFrame.getRenderBoard();
+//        if (renderBoard != null) {
+//          renderBoard.setSelectedButtonCombo(columnModel.selComboModel);
+//        }
+//      }
+//    });
+//  }
+  
   static class SliderTableHeaderUI extends TableHeaderUI
           implements TableColumnModelListener, ChangeListener
   {
@@ -601,9 +604,23 @@ public class SeqViewerController
     }
 
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
+    public Component getTableCellRendererComponent(JTable table, Object objValue, boolean isSelected, boolean hasFocus, int row, int column)
     {
-      Component defRendComp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+      ButtonCombo combo = (ButtonCombo) objValue;
+
+      String text;
+
+      if (combo != null) {
+        String info = combo.toButtonListingString(false);
+        String lowest = combo.getLowestNote().toString(false);
+        //return "<html>" + info + " Low: " + lowest + "</html>";
+        text = info + " (" + lowest + ")";
+        //text = combo.toSortedNoteString(false);
+      } else {
+        text = "Chord Not Possible";
+      }
+
+      Component defRendComp = super.getTableCellRendererComponent(table, text, isSelected, hasFocus, row, column);
       JComponent jcomp = (JComponent) defRendComp;
       assert (jcomp == this);
 

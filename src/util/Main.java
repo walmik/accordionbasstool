@@ -143,7 +143,7 @@ public class Main
 
     try {
       boolean success = false;
-//      success = setNimbus();
+      success = setNimbus();
 
       if (!success) {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
