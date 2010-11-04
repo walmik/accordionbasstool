@@ -92,6 +92,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
   public String getToolTipText(MouseEvent event)
   {
     BassBoard.Pos mouseOverPos = hitTest(event.getX(), event.getY());
+
     if (mouseOverPos != null) {
       String string = "<html>";
       string += "<b>" + _theBoard.getChordName(mouseOverPos, true) + "</b>";
@@ -100,6 +101,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
       string += ")</html>";
       return string;
     }
+
     return null;
   }
 
@@ -163,7 +165,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
     computeRenderOffsets();
 
-    x -= _borderInsets.left + margin.width / 2;
+    x -= _borderInsets.left;
     y -= _borderInsets.top + margin.height / 2;
 
     if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
@@ -177,7 +179,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
       cPos = y;
       rPos = x;
     }
-
+    
     row = rPos / _rInc;
     cPos -= (_cStart + row * _slope);
     col = (cPos + _cInc) / _cInc - 1;

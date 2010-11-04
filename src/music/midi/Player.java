@@ -4,7 +4,10 @@
  */
 package music.midi;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.sound.midi.*;
+import music.Note;
 
 /**
  *
@@ -14,7 +17,8 @@ public class Player
 {
 
   Synthesizer synth;
-  Instrument accordion;
+  Timer stopTimer;
+  StopPlayingTask cancelTask;
 
   public boolean init()
   {
@@ -22,18 +26,19 @@ public class Player
       synth = MidiSystem.getSynthesizer();
       synth.open();
 
-      Instrument[] ins = synth.getAvailableInstruments();
+      Instrument instru = findInstrument("Accordion");
 
-      for (int i = 0; i < ins.length; i++) {
-        if (ins[i].getName().equals("Accordion")) {
-          accordion = ins[i];
-          break;
-        }
+      if (instru != null) {
+        synth.getChannels()[chanUsed].programChange(instru.getPatch().getBank(), instru.getPatch().getProgram());
       }
 
-      if (accordion != null) {
-        synth.getChannels()[chanUsed].programChange(accordion.getPatch().getBank(), accordion.getPatch().getProgram());
+      instru = findInstrument("Tango Accordion");
+
+      if (instru != null) {
+        synth.getChannels()[chanUsed + 1].programChange(instru.getPatch().getBank(), instru.getPatch().getProgram());
       }
+
+      stopTimer = new Timer(true);
 
       return true;
     } catch (MidiUnavailableException md) {
@@ -42,28 +47,56 @@ public class Player
     }
   }
 
+  private Instrument findInstrument(String name)
+  {
+    Instrument[] ins = synth.getAvailableInstruments();
+
+    for (int i = 0; i < ins.length; i++) {
+      //System.out.println("" + i + " " + ins[i].getName());
+      if (ins[i].getName().equals(name)) {
+        return ins[i];
+      }
+    }
+
+    return null;
+  }
+
   int bitToMidi(int bit)
   {
-    return bit + 48; //60 == Middle C
+    return bit + 48;// + 24 * (bit / Note.NUM_HALFSTEPS);
   }
   int chanUsed = 0;
 
-  public void playChord(int value)
+  public boolean playChord(int value)
   {
-    MidiChannel[] chans = synth.getChannels();
-    int velocity = 50;
+    try {
+      MidiChannel[] chans = synth.getChannels();
+      int velocity = 50;
 
-    if (value == 0) {
-      return;
-    }
-
-
-    for (int i = 0; i < 32; i++) {
-      if ((value & (1 << i)) != 0) {
-        int midinote = bitToMidi(i);
-        chans[chanUsed].noteOn(midinote, velocity);
-        //System.out.println("Playing Note: " + midinote);
+      if (value == 0) {
+        return false;
       }
+
+
+      for (int i = 0; i < Note.NUM_HALFSTEPS * 2; i++) {
+        if ((value & (1 << i)) != 0) {
+          int midinote = bitToMidi(i);
+          chans[chanUsed + (i / Note.NUM_HALFSTEPS)].noteOn(midinote, velocity);
+          //System.out.println("Playing Note: " + midinote);
+        }
+      }
+
+      if (cancelTask != null) {
+        cancelTask.cancel();
+      }
+      cancelTask = new StopPlayingTask(value);
+
+      stopTimer.schedule(cancelTask, 500);
+      return true;
+
+    } catch (Exception e) {
+      System.out.println("MIDI Playback Exc: " + e);
+      return false;
     }
   }
 
@@ -71,5 +104,34 @@ public class Player
   {
     MidiChannel[] chans = synth.getChannels();
     chans[chanUsed].allNotesOff();
+    chans[chanUsed + 1].allNotesOff();
+  }
+
+  private void stopChord(int value)
+  {
+    MidiChannel[] chans = synth.getChannels();
+    
+    for (int i = 0; i < Note.NUM_HALFSTEPS * 2; i++) {
+      if ((value & (1 << i)) != 0) {
+        int midinote = bitToMidi(i);
+        chans[chanUsed + (i / Note.NUM_HALFSTEPS)].noteOff(midinote, 50);
+      }
+    }
+  }
+
+  class StopPlayingTask extends TimerTask
+  {
+    int chordMask;
+
+    StopPlayingTask(int cmask)
+    {
+      chordMask = cmask;
+    }
+
+    @Override
+    public void run()
+    {
+      stopChord(chordMask);
+    }
   }
 }

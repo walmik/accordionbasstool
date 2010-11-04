@@ -83,9 +83,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
   {
     textParser.setSeqColModel(columnModel, seqTable, null);
   }
-
   music.midi.Player player;
-  javax.swing.Timer midiTimer;
   boolean soundEnabled = false;
 
   public void setSoundEnabled(boolean sound)
@@ -96,37 +94,34 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     }
   }
 
-  private void playCombo(ButtonCombo combo)
+  private boolean playCombo(ButtonCombo combo)
   {
     if (!soundEnabled) {
       if (player != null) {
         player.stopAll();
       }
-      return;
+      return false;
     }
 
     if (combo == null) {
-      return;
+      return false;
     }
 
     if (player == null) {
       player = new music.midi.Player();
       player.init();
-
-//      midiTimer = new javax.swing.Timer(500, new ActionListener()
-//      {
-//        @Override
-//        public void actionPerformed(ActionEvent e)
-//        {
-//          player.stopAll();
-//        }
-//      });
-//      midiTimer.setRepeats(false);
     }
 
     player.stopAll();
-    player.playChord(combo.getChordMaskValue());
-    //midiTimer.start();
+    return player.playChord(combo.getChordMaskValue());
+  }
+
+  private ButtonCombo getCurrCombo()
+  {
+    int row = seqTable.getSelectedRow();
+    int col = columnModel.getSelectedColumn();
+
+    return (ButtonCombo) seqTable.getModel().getValueAt(row, col);
   }
 
   @Override
@@ -136,15 +131,12 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
       cornerPanel.setVisible(columnModel.getColumnCount() > 1);
     }
 
-    int row = seqTable.getSelectedRow();
-    int col = columnModel.getSelectedColumn();
+    ButtonCombo combo = getCurrCombo();
 
-    ButtonCombo combo = (ButtonCombo) seqTable.getModel().getValueAt(row, col);
-
-    if (playTimer.isRunning()) {
-      playCombo(combo);
-    }
-
+    //****
+    playCombo(combo);
+    //****
+    
     String text = "<html>Selected Combo - ";
 
     if (combo != null) {
@@ -184,12 +176,14 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
       } else if (e.getActionCommand().equals("PlaySeq")) {
         if (!playTimer.isRunning()) {
           toolPlay.setText("Stop");
-          playTimer.start();
+          playCombo(getCurrCombo());
+          playTimer.restart();
         } else {
           toolPlay.setText("Play");
           playTimer.stop();
         }
       } else if (e.getActionCommand().equals("Timer")) {
+
         int index = columnModel.getSelectedColumn();
 
         index++;
@@ -349,7 +343,6 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
   {//GEN-HEADEREND:event_soundCheckItemStateChanged
     setSoundEnabled(evt.getStateChange() == ItemEvent.SELECTED);
   }//GEN-LAST:event_soundCheckItemStateChanged
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel jPanel1;
   private javax.swing.JTable seqTable;

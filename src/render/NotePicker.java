@@ -55,23 +55,22 @@ public class NotePicker extends javax.swing.JPanel
 //  }
 
 
-  public void setNote(Note note)
-  {
-    noteStr = note.toString(); //normalize to 1 flat or sharp only
+  public void setNote(String newNoteStr)
+  { 
     Enumeration<AbstractButton> noteButs = rootButtonGroup.getElements();
     while (noteButs.hasMoreElements()) {
       AbstractButton but = noteButs.nextElement();
-      if (noteStr.startsWith(but.getActionCommand())) {
+      if (newNoteStr.startsWith(but.getActionCommand())) {
         but.setSelected(true);
         break;
       }
     }
 
-    if (noteStr.length() == 1) {
+    if (newNoteStr.length() == 1) {
       rootNatural.setSelected(true);
-    } else if (note.getSharpOrFlat() > 0) {
+    } else if (newNoteStr.endsWith("#")) {
       rootSharp.setSelected(true);
-    } else if (note.getSharpOrFlat() < 0) {
+    } else if (newNoteStr.endsWith("b")) {
       rootFlat.setSelected(true);
     } else {
       rootNatural.setSelected(true);
@@ -324,21 +323,6 @@ public class NotePicker extends javax.swing.JPanel
       } else if (accButtonGroup.isSelected(but.getModel())) {
         accStr = but.getActionCommand();
       }
-//      else if (but == rootSharp)
-//      {
-//        if (but.isSelected())
-//          rootFlat.setSelected(false);
-//
-//        accStr = but.getActionCommand();
-//      }
-//      else if (but == rootFlat)
-//      {
-//        if (but.isSelected())
-//          rootSharp.setSelected(false);
-//
-//        accStr = but.getActionCommand();
-//      }
-
 
       this.firePropertyChange("Note", oldNote, Note.fromString(noteStr + accStr));
     }//GEN-LAST:event_NoteItemChanged

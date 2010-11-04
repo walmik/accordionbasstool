@@ -17,7 +17,7 @@ public class ParsedChordDef
   public final Note rootNote;
   public final Note addedBassNote;
   public final Chord chord;
-  //public final RegistryChordDef registryDef;
+  private final RegistryChordDef registryDef;
   public final short regRow, regCol;
 
   public static ParsedChordDef getDefaultChordDef()
@@ -34,6 +34,7 @@ public class ParsedChordDef
   {
     rootNote = achord.getRootNote();
     addedBassNote = null; //assume none
+    registryDef = null;
     chord = achord;
 
     if (achord.isSingleNote())
@@ -62,6 +63,8 @@ public class ParsedChordDef
     if (currTableChord == null) {
       currTableChord = ChordRegistry.mainRegistry().getDefaultChordDef();
     }
+
+    registryDef = currTableChord;
     
     //Unknown Chord if default doesn't exist..
     if (currTableChord == null) {
@@ -113,5 +116,23 @@ public class ParsedChordDef
     }
     detail = det;
 
+  }
+
+  public ParsedChordDef transposeBy(Interval ival)
+  {
+    Note newAddedBass = null;
+    
+    if (addedBassNote != null) {
+      newAddedBass = addedBassNote.add(ival);
+    }
+
+    //TODO: another pass on this,
+
+    if (registryDef == null) {
+      this.chord.transpose(ival);
+      return new ParsedChordDef(this.chord);
+    } else {
+      return new ParsedChordDef(rootNote.add(ival), newAddedBass, this.registryDef, false);
+    }
   }
 }

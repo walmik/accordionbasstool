@@ -4,7 +4,6 @@
 package music;
 
 import java.util.BitSet;
-import java.util.LinkedList;
 
 public class ButtonCombo
 {
@@ -12,6 +11,7 @@ public class ButtonCombo
   final private BassBoard.Pos[] pos;
   final BassBoard board;
   private Chord.Mask chordMask = null;
+  int boardDim = 0;
   GeoPos center;
   int heur = 0;
   Hash hash;
@@ -112,6 +112,47 @@ public class ButtonCombo
 //
 //    return str;
 //	}
+
+  public boolean isAcceptable()
+  {
+    return computeComboBounds(null, null) < 6;
+    //return true;
+  }
+
+  private int computeComboBounds(GeoPos boundsMax, GeoPos boundsMin)
+  {
+    if (boardDim != 0) {
+      return boardDim;
+    }
+
+    GeoPos minP = GeoPos.maxPos();
+    GeoPos maxP = GeoPos.minPos();
+    GeoPos currPos = GeoPos.zero();
+    center = GeoPos.zero();
+
+    // Compute center and corners of the buttoncombo
+    for (int i = 0; i < pos.length; i++) {
+      currPos.set(pos[i], board.getCenter());
+      minP.min(currPos);
+      maxP.max(currPos);
+      center.add(currPos);
+    }
+
+    if (boundsMax != null && boundsMin != null) {
+      boundsMax.max(maxP);
+      boundsMin.min(minP);
+    }
+
+    if (pos.length > 0) {
+      center.divide(pos.length);
+    }
+
+    maxP.subtract(minP);
+    boardDim = maxP.absValue();
+    return boardDim;
+  }
+
+
   int evalHeur(final BassBoard.Pos boardCenter)
   {
     return evalHeur(boardCenter, null, null);
@@ -127,33 +168,33 @@ public class ButtonCombo
 
     heur = 1;
 
-    center = GeoPos.zero();
-    GeoPos minP = GeoPos.maxPos();
-    GeoPos maxP = GeoPos.minPos();
-    GeoPos currPos = GeoPos.zero();
-
-    // Compute center and corners of the buttoncombo
-    for (int i = 0; i < pos.length; i++) {
-      currPos.set(pos[i], boardCenter);
-      center.add(currPos);
-      minP.min(currPos);
-      maxP.max(currPos);
-    }
-
-    if (pos.length > 0) {
-      center.divide(pos.length);
-    }
-
-    // Update max min bounds, if provided
-    if (boundsMax != null && boundsMin != null) {
-      boundsMax.max(maxP);
-      boundsMin.min(minP);
-    }
-
-    maxP.subtract(minP);
+//    center = GeoPos.zero();
+//    GeoPos minP = GeoPos.maxPos();
+//    GeoPos maxP = GeoPos.minPos();
+//    GeoPos currPos = GeoPos.zero();
+//
+//    // Compute center and corners of the buttoncombo
+//    for (int i = 0; i < pos.length; i++) {
+//      currPos.set(pos[i], boardCenter);
+//      center.add(currPos);
+//      minP.min(currPos);
+//      maxP.max(currPos);
+//    }
+//
+//    if (pos.length > 0) {
+//      center.divide(pos.length);
+//    }
+//
+//    // Update max min bounds, if provided
+//    if (boundsMax != null && boundsMin != null) {
+//      boundsMax.max(maxP);
+//      boundsMin.min(minP);
+//    }
+//
+//    maxP.subtract(minP);
 
     // Span width + height
-    heur += maxP.absValue();
+    heur += this.computeComboBounds(boundsMax, boundsMin);
     //heur += center.absValue();
     heur += (pos.length - 1) * (50 * GeoPos.GRID_SCALE);
 

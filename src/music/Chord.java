@@ -295,6 +295,17 @@ public class Chord
     return notes[0];
   }
 
+  public int findNotePos(Note note)
+  {
+    for (int i = 0; i < notes.length; i++) {
+      if (notes[i].equals(note)) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
   public boolean equals(Chord other)
   {
     return (getChordMask().equals(other.getChordMask()));

@@ -12,6 +12,7 @@ import music.ButtonCombo;
 import music.ButtonComboSequence;
 import music.Chord;
 import music.ChordParser;
+import music.Interval;
 import util.Main.StringParser;
 
 class SeqColumnModel extends DefaultTableColumnModel
@@ -83,11 +84,11 @@ class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
-  void editSelectedColumn(ParsedChordDef newDef)
+  void editSelectedColumn(ParsedChordDef newDef, boolean transposeAll)
   {
     int index = getSelectedColumn();
     if (index >= 0) {
-      editColumn(index, newDef);
+      editColumn(index, newDef, transposeAll);
     }
   }
 
@@ -134,14 +135,33 @@ class SeqColumnModel extends DefaultTableColumnModel
     computeSeqs(selIndex);
   }
 
-  private void editColumn(int index, ParsedChordDef newChordDef)
+  private void editColumn(int index, ParsedChordDef newChordDef, boolean transposeAll)
   {
     TableColumn column = this.getColumn(index);
 
-    if (newChordDef != null) {
-      column.setHeaderValue(newChordDef);
-      computeSeqs(index);
+    if (newChordDef == null) {
+      return;
     }
+
+    if (transposeAll) {
+      // Find interval diff between new and old and apply to all
+      ParsedChordDef existingDef = (ParsedChordDef) column.getHeaderValue();
+
+      Interval transDiff = newChordDef.rootNote.diff(existingDef.rootNote);
+
+      for (int i = 0; i < getColumnCount(); i++) {
+        // Current column already at transposed value, skip
+        if (i == index) {
+          continue;
+        }
+        TableColumn currCol = this.getColumn(i);
+        existingDef = (ParsedChordDef) currCol.getHeaderValue();
+        currCol.setHeaderValue(existingDef.transposeBy(transDiff));
+      }
+    }
+
+    column.setHeaderValue(newChordDef);
+    computeSeqs(index);
   }
 
   ParsedChordDef getChordDef(int index)
@@ -191,8 +211,7 @@ class SeqColumnModel extends DefaultTableColumnModel
 
       ParsedChordDef def = getChordDef(i);
 
-      if (i == selIndex)
-      {
+      if (i == selIndex) {
         str += "<b>" + def.nameHtml + "</b>";
       } else {
         str += def.nameHtml;
@@ -301,8 +320,8 @@ class SeqColumnModel extends DefaultTableColumnModel
     @Override
     public Object getElementAt(int index)
     {
-      String str = "Combo #" + (index + 1);
-      //str += allComboSeqs[index].getHeur();
+      String str = "#" + (index + 1);
+      str += " (" + allComboSeqs[index].getHeur() + ")";
       return str;
     }
   }
