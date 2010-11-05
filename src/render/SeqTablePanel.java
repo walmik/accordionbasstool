@@ -21,6 +21,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import music.ButtonCombo;
 import music.ChordRegistry;
+import music.Note;
 import music.ParsedChordDef;
 
 /**
@@ -137,10 +138,12 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     playCombo(combo);
     //****
     
-    String text = "<html>Selected Combo - ";
+    String text = "<html>";
 
     if (combo != null) {
-      text += "Bass: " + "<b>" + combo.getLowestNote().toString(true) + "</b>";
+      Note lowest = combo.getLowestNote();
+
+      text += "Low Note: " + "<b>" + (lowest.isBassNote() ? "Bass " : "Chord ") + lowest.toString() + "</b>";
       text += " Buttons: " + "<b>" + combo.toButtonListingString(true) + "</b>";
       //text += " (" + combo.toSortedNoteString(true) + ") ";
       //text += "</b>";

@@ -64,6 +64,11 @@ public class Chord
       return (upperbit - Note.NUM_HALFSTEPS);
     }
 
+    final static boolean isLowerOctaveBit(int bit)
+    {
+      return (bit < Note.NUM_HALFSTEPS);
+    }
+
 //    final private int toLowerOctaveBit(Note note)
 //    {
 //      return (1 << note.value());

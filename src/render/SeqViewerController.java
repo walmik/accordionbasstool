@@ -38,6 +38,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import music.ButtonCombo;
+import music.Note;
 import music.ParsedChordDef;
 
 /**
@@ -611,11 +612,15 @@ public class SeqViewerController
       String text;
 
       if (combo != null) {
-        String info = combo.toButtonListingString(false);
-        String lowest = combo.getLowestNote().toString(false);
-        //return "<html>" + info + " Low: " + lowest + "</html>";
-        text = info + " (" + lowest + ")";
-        //text = combo.toSortedNoteString(false);
+        text = combo.toButtonListingString(false);
+
+        //if (combo.isSingleBass()) {
+          Note lowest = combo.getLowestNote();
+          String lowestInfo = (lowest.isBassNote() ? "Bass " : "High ") + lowest.toString(false);
+          //return "<html>" + info + " Low: " + lowest + "</html>";
+          text += " (" + lowestInfo + ")";
+          //text = combo.toSortedNoteString(false);
+        //}
       } else {
         text = "Chord Not Possible";
       }

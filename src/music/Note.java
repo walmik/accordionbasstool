@@ -154,6 +154,11 @@ public class Note
     return add(ival.scale(-1));
   }
 
+  public boolean isBassNote()
+  {
+    return Chord.Mask.isLowerOctaveBit(this.octaveBit);
+  }
+
   static String printNote(ScaleNote note, int sharpsOrFlats, boolean html)
   {
     String base = note.toString();
