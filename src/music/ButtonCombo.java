@@ -115,7 +115,7 @@ public class ButtonCombo
 
   public boolean isAcceptable()
   {
-    return computeComboBounds(null, null) < 6;
+    return computeComboBounds(null, null) < 12;
     //return true;
   }
 

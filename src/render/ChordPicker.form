@@ -21,40 +21,39 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" max="-2" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="statusLabel" min="-2" pref="144" max="-2" attributes="1"/>
+                  <Component id="statusLabel" alignment="0" min="-2" pref="145" max="-2" attributes="1"/>
                   <Component id="transCheck" min="-2" max="-2" attributes="0"/>
                   <Component id="showAdvanced" min="-2" max="-2" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" alignment="0" pref="393" max="32767" attributes="3"/>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="notePickerRoot" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="chordLabel" min="-2" pref="78" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="addedBassCheck" alignment="0" min="-2" max="-2" attributes="1"/>
                           <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
-                              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="notePickerRoot" min="-2" max="-2" attributes="0"/>
+                              <Component id="slashLabel" min="-2" pref="18" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chordLabel" min="-2" pref="52" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="addedBassCheck" alignment="0" min="-2" max="-2" attributes="1"/>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="slashLabel" min="-2" pref="14" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="notePickerAdd" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
+                              <Component id="notePickerAdd" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="mustBeLowestCheck" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="inversionCombo" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="mustBeLowestCheck" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
+                  <Component id="jScrollPane1" min="-2" pref="416" max="-2" attributes="2"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -63,35 +62,53 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Group type="102" alignment="1" attributes="0">
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="addedBassCheck" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="mustBeLowestCheck" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="notePickerRoot" alignment="1" min="-2" max="-2" attributes="1"/>
-                          <Group type="103" alignment="1" groupAlignment="3" attributes="0">
-                              <Component id="slashLabel" alignment="3" min="-2" pref="39" max="-2" attributes="1"/>
-                              <Component id="chordLabel" alignment="3" min="-2" pref="31" max="-2" attributes="1"/>
+                          <Component id="addedBassCheck" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                              <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="transCheck" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="notePickerAdd" alignment="1" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="137" max="32767" attributes="3"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="mustBeLowestCheck" alignment="1" min="-2" max="-2" attributes="0"/>
+                                  <Component id="notePickerAdd" alignment="1" min="-2" max="-2" attributes="1"/>
+                              </Group>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Component id="showAdvanced" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
                   </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="transCheck" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="7" max="32767" attributes="0"/>
-                      <Component id="showAdvanced" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="statusLabel" pref="147" max="32767" attributes="1"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="36" pref="36" max="36" attributes="0"/>
+                      <Component id="inversionCombo" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="49" max="-2" attributes="0"/>
+                      <Component id="slashLabel" min="-2" pref="40" max="-2" attributes="1"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="36" pref="36" max="36" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="chordLabel" alignment="1" max="32767" attributes="3"/>
+                          <Component id="notePickerRoot" alignment="1" max="32767" attributes="1"/>
+                      </Group>
                   </Group>
               </Group>
-              <EmptySpace min="11" pref="11" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="statusLabel" pref="200" max="32767" attributes="2"/>
+                  <Component id="jScrollPane1" alignment="0" pref="200" max="32767" attributes="2"/>
+              </Group>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -120,7 +137,7 @@
     </Container>
     <Component class="javax.swing.JCheckBox" name="addedBassCheck">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Additional Note:"/>
+        <Property name="text" type="java.lang.String" value="Additional Note"/>
         <Property name="opaque" type="boolean" value="false"/>
       </Properties>
     </Component>
@@ -142,7 +159,7 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="showAdvanced">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&lt;html&gt;Show&lt;br/&gt; Advanced Chords&lt;/html&gt;"/>
+        <Property name="text" type="java.lang.String" value="Advanced Mode"/>
         <Property name="opaque" type="boolean" value="false"/>
       </Properties>
       <Events>
@@ -173,23 +190,53 @@
           <Font name="Tahoma" size="24" style="1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="/"/>
+        <Property name="verticalAlignment" type="int" value="3"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="chordLabel">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Tahoma" size="18" style="1"/>
+          <Font name="Tahoma" size="12" style="1"/>
         </Property>
+        <Property name="horizontalAlignment" type="int" value="0"/>
         <Property name="text" type="java.lang.String" value="MMM"/>
+        <Property name="verticalAlignment" type="int" value="3"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="mustBeLowestCheck">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Must Be a Bass"/>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" value="Must be in Bass"/>
+        <Property name="actionCommand" type="java.lang.String" value="Must be Bass Note"/>
+        <Property name="opaque" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="mustBeLowestCheckItemStateChanged"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="inversionCombo">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="5">
+            <StringItem index="0" value="Any/None"/>
+            <StringItem index="1" value="Root"/>
+            <StringItem index="2" value="1st"/>
+            <StringItem index="3" value="2nd"/>
+            <StringItem index="4" value="3rd"/>
+          </StringArray>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="inversionComboItemStateChanged"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel2">
+      <Properties>
+        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="inversionCombo"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Select Inversion:"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

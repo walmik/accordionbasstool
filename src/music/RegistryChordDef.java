@@ -29,4 +29,14 @@ final public class RegistryChordDef
     //return new Chord(rootNote, ivals).toString();
     return chord.getTransposedString(rootNote);
   }
+
+  public Chord getSimpleChordAt(Note rootNote)
+  {
+    return new Chord(rootNote, ivals);
+  }
+
+  public int getChordLength()
+  {
+    return ivals.length + 1;
+  }
 }

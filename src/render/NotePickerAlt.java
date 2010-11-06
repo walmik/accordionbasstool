@@ -30,10 +30,10 @@ public class NotePickerAlt extends javax.swing.JPanel {
 
     Note currNote;
 
-    public void setNote(String note)
+    public void setNote(Note newNote)
     {
-      currNote = Note.fromString(note);
-      noteCombo.setSelectedItem(note);
+      currNote = newNote;
+      noteCombo.setSelectedItem(currNote.toString());
     }
 
     @Override
@@ -82,6 +82,7 @@ public class NotePickerAlt extends javax.swing.JPanel {
     jToolBar1.setFloatable(false);
     jToolBar1.setRollover(true);
     jToolBar1.setBorderPainted(false);
+    jToolBar1.setOpaque(false);
 
     flatBut.setFont(flatBut.getFont().deriveFont(flatBut.getFont().getStyle() | java.awt.Font.BOLD));
     flatBut.setText("b");

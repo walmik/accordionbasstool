@@ -3,7 +3,7 @@ package music;
 public class Chord
 {
 
-  public final Note[] notes;
+  final Note[] notes;
 
   public static class Mask
   {
@@ -298,6 +298,20 @@ public class Chord
   public Note getRootNote()
   {
     return notes[0];
+  }
+
+  public int getNumNotes()
+  {
+    return notes.length;
+  }
+
+  public Note getNoteAt(int pos)
+  {
+    if ((pos < 0) || (pos >= notes.length)) {
+      return null;
+    }
+
+    return notes[pos];
   }
 
   public int findNotePos(Note note)

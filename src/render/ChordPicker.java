@@ -11,6 +11,7 @@
 package render;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ItemEvent;
@@ -28,11 +29,12 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import music.Chord;
 import music.RegistryChordDef;
 import music.ChordRegistry;
+import music.Interval;
 import music.Note;
 import music.ParsedChordDef;
-import util.Main.StringParser;
 
 /**
  *
@@ -46,13 +48,11 @@ public class ChordPicker extends javax.swing.JPanel
   {
     initComponents();
   }
-
   Note rootNote = new Note();
   RegistryChordDef currTableChord;
   Note addedBassNote = new Note();
   SeqColumnModel seqColumnModel = null;
   boolean isTransposeMode = false;
-
   String chordSet = ChordRegistry.ALL_CHORDS;
   boolean isUpdatingChord = false;
   final static int DEFAULT_TABLE_COL_WIDTH = 96;
@@ -104,9 +104,21 @@ public class ChordPicker extends javax.swing.JPanel
       @Override
       public void propertyChange(PropertyChangeEvent evt)
       {
-        rootNote = (Note) evt.getNewValue();
+        Note newNote = (Note) evt.getNewValue();
+
+        // If in transpose mode, just transpose bass and not worry about inversion
+        if (isTransposeMode && (addedBassNote != null)) {
+          Interval theDiff = newNote.diff(rootNote);
+          rootNote = newNote;
+          isUpdatingChord = true;
+          notePickerAdd.setNote(addedBassNote.add(theDiff));
+          isUpdatingChord = false;
+        } else {
+          rootNote = newNote;
+          changeInversion();
+        }
+
         updateChordInModel();
-        chordTable.repaint();
       }
     });
 
@@ -117,8 +129,8 @@ public class ChordPicker extends javax.swing.JPanel
       public void propertyChange(PropertyChangeEvent evt)
       {
         addedBassNote = (Note) evt.getNewValue();
+        syncInversionCombo();
         updateChordInModel();
-        chordTable.repaint();
       }
     });
 
@@ -133,15 +145,23 @@ public class ChordPicker extends javax.swing.JPanel
       public void itemStateChanged(ItemEvent evt)
       {
         boolean usingAddedBass = (evt.getStateChange() == ItemEvent.SELECTED);
-        notePickerAdd.setVisible(usingAddedBass);
-        slashLabel.setVisible(usingAddedBass);
-        mustBeLowestCheck.setVisible(usingAddedBass);
-        chordTable.repaint();
+
+        if (showAdvanced.isSelected()) {
+          notePickerAdd.setVisible(usingAddedBass);
+          slashLabel.setVisible(usingAddedBass);
+          mustBeLowestCheck.setVisible(usingAddedBass);
+        }
+
+        if (!usingAddedBass) {
+          if (!isUpdatingChord) {
+            inversionCombo.setSelectedIndex(0);
+          }
+        }
+
         updateChordInModel();
       }
     });
   }
-  
 
   private void updateChordInModel()
   {
@@ -172,14 +192,27 @@ public class ChordPicker extends javax.swing.JPanel
 
     statusLabel.setText(info);
 
-    chordLabel.setText("<html>" + currTableChord.abbrevHtml + "</html>");
+    chordLabel.setText("<html>" + currTableChord.name + "</html>");
+
+    chordTable.repaint();
   }
 
   ParsedChordDef getPickedChord()
   {
     boolean usingAddedBass = addedBassCheck.isSelected();
     Note addedBass = (usingAddedBass ? addedBassNote : null);
-    return new ParsedChordDef(rootNote, addedBass, currTableChord, mustBeLowestCheck.isSelected());
+    return new ParsedChordDef(rootNote, addedBass, currTableChord, getLowestBool());
+  }
+
+  private boolean getLowestBool()
+  {
+    // If an inversion is set, then this value is irrelevant as the bass note
+    // is already implied. Returning false to avoid duplicating the note an extra time.
+    if (inversionCombo.getSelectedIndex() != 0) {
+      return false;
+    }
+
+    return mustBeLowestCheck.isSelected();
   }
 
   @Override
@@ -216,7 +249,7 @@ public class ChordPicker extends javax.swing.JPanel
 
     isUpdatingChord = true;
 
-    notePickerRoot.setNote(newRoot.toString());
+    notePickerRoot.setNote(newRoot);
 
     int row = 0, col = 0;
 //    if (possChordDef.registryDef == null) {
@@ -246,7 +279,7 @@ public class ChordPicker extends javax.swing.JPanel
 
     if (newAddedBass != null) {
       addedBassCheck.setSelected(true);
-      notePickerAdd.setNote(newAddedBass.toString());
+      notePickerAdd.setNote(newAddedBass);
     } else {
       addedBassCheck.setSelected(false);
     }
@@ -260,7 +293,18 @@ public class ChordPicker extends javax.swing.JPanel
   {
     this.chordSet = (simpleMode ? ChordRegistry.SIMPLE_CHORDS : ChordRegistry.ALL_CHORDS);
 
-    //this.addedBassCheck.setVisible(!simpleMode);
+    //Toggle Visibility
+    this.addedBassCheck.setVisible(!simpleMode);
+    this.mustBeLowestCheck.setVisible(!simpleMode);
+    if (simpleMode) {
+      this.notePickerAdd.setVisible(false);
+      this.slashLabel.setVisible(false);
+    } else {
+      boolean usingAddedBass = addedBassCheck.isSelected();
+      notePickerAdd.setVisible(usingAddedBass);
+      slashLabel.setVisible(usingAddedBass);
+      mustBeLowestCheck.setVisible(usingAddedBass);
+    }
 
     this.chordTable.setColumnSelectionInterval(0, 0);
 
@@ -283,6 +327,86 @@ public class ChordPicker extends javax.swing.JPanel
 
     chordTable.setRowSelectionInterval(0, 0);
     chordTable.setColumnSelectionInterval(0, 0);
+  }
+
+  void populateInversionCombo(int selectIndex)
+  {
+    int chordLen = currTableChord.getChordLength();
+
+    inversionCombo.removeAllItems();
+    inversionCombo.addItem("Any");
+    inversionCombo.addItem("Root");
+
+    if (chordLen >= 2) {
+      inversionCombo.addItem("1st");
+
+      if (chordLen >= 3) {
+        inversionCombo.addItem("2nd");
+
+        if (chordLen >= 4) {
+          inversionCombo.addItem("3rd");
+        }
+      }
+    }
+
+    if (selectIndex < inversionCombo.getItemCount()) {
+      inversionCombo.setSelectedIndex(selectIndex);
+    }
+  }
+
+  void syncInversionCombo()
+  {
+    isUpdatingChord = true;
+
+    Chord simpleChord = currTableChord.getSimpleChordAt(rootNote);
+
+    int index = simpleChord.findNotePos(addedBassNote);
+    // -1 = Any, 0-3 = root, 1st, etc... inversions so just add 1
+    inversionCombo.setSelectedIndex(index + 1);
+
+    isUpdatingChord = false;
+  }
+
+  void changeInversion()
+  {
+    if (isUpdatingChord) {
+      return;
+    }
+
+    int index = inversionCombo.getSelectedIndex();
+
+    mustBeLowestCheck.setEnabled(true);
+
+    // Index 0 is any, so removing added bass option
+    if (index == 0) {
+      if (!addedBassCheck.isVisible()) {
+        addedBassCheck.setSelected(false);
+      }
+      return;
+    }
+    //Skipping the any option and the option
+    //Root = 1, 1st = 2, 2nd = 3, 3rd = 4
+    if ((index > 4)) {
+      return;
+    }
+
+    this.isUpdatingChord = true;
+
+    if (index > currTableChord.getChordLength()) {
+      index = 1;
+    }
+
+    Chord simpleChord = currTableChord.getSimpleChordAt(rootNote);
+    Note inverseRoot = simpleChord.getNoteAt(index - 1);
+
+    if (inverseRoot != null) {
+      this.notePickerAdd.setNote(inverseRoot);
+      this.addedBassCheck.setSelected(true);
+      this.mustBeLowestCheck.setSelected(true);
+      mustBeLowestCheck.setEnabled(false);
+    }
+
+    this.isUpdatingChord = false;
   }
 
   private class ChordTableSelectListener implements ListSelectionListener
@@ -372,6 +496,7 @@ public class ChordPicker extends javax.swing.JPanel
       }
 
       currTableChord = chordDef;
+      //populateInversionCombo(inversionCombo.getSelectedIndex());
       updateChordInModel();
     }
   }
@@ -421,6 +546,7 @@ public class ChordPicker extends javax.swing.JPanel
       return getSet().getChordDef(columnIndex, rowIndex);
     }
   }
+  DefaultTableCellRenderer emptyLabel = new DefaultTableCellRenderer();
 
   void initChordTable()
   {
@@ -436,6 +562,9 @@ public class ChordPicker extends javax.swing.JPanel
     chordTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     chordTable.setCellSelectionEnabled(true);
     chordTable.setShowGrid(false);
+
+    //chordTable.setBackground(emptyLabel.getBackground());
+    //jScrollPane1.setBackground(emptyLabel.getBackground());
 
     ChordTableSelectListener tablelist = new ChordTableSelectListener();
     chordTable.getSelectionModel().addListSelectionListener(tablelist);
@@ -453,12 +582,10 @@ public class ChordPicker extends javax.swing.JPanel
     Font plain;
     Font bold;
     JToggleButton button = null;
-    DefaultTableCellRenderer emptyLabel = null;
 
     public ToggleButtonRenderer()
     {
       button = new JToggleButton();
-      emptyLabel = new DefaultTableCellRenderer();
 
       this.setLayout(new BorderLayout());
       this.add(button, BorderLayout.CENTER);
@@ -540,6 +667,8 @@ public class ChordPicker extends javax.swing.JPanel
     slashLabel = new javax.swing.JLabel();
     chordLabel = new javax.swing.JLabel();
     mustBeLowestCheck = new javax.swing.JCheckBox();
+    inversionCombo = new javax.swing.JComboBox();
+    jLabel2 = new javax.swing.JLabel();
 
     setBackground(java.awt.SystemColor.inactiveCaptionBorder);
 
@@ -550,7 +679,7 @@ public class ChordPicker extends javax.swing.JPanel
     chordTable.setRowHeight(30);
     jScrollPane1.setViewportView(chordTable);
 
-    addedBassCheck.setText("Additional Note:");
+    addedBassCheck.setText("Additional Note");
     addedBassCheck.setOpaque(false);
 
     statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getSize()+3f));
@@ -558,7 +687,7 @@ public class ChordPicker extends javax.swing.JPanel
     statusLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
     statusLabel.setBorder(javax.swing.BorderFactory.createTitledBorder("Selected Chord:"));
 
-    showAdvanced.setText("<html>Show<br/> Advanced Chords</html>");
+    showAdvanced.setText("Advanced Mode");
     showAdvanced.setOpaque(false);
     showAdvanced.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -578,16 +707,32 @@ public class ChordPicker extends javax.swing.JPanel
 
     slashLabel.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
     slashLabel.setText("/");
+    slashLabel.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
-    chordLabel.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+    chordLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+    chordLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     chordLabel.setText("MMM");
+    chordLabel.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
-    mustBeLowestCheck.setText("Must Be a Bass");
+    mustBeLowestCheck.setSelected(true);
+    mustBeLowestCheck.setText("Must be in Bass");
+    mustBeLowestCheck.setActionCommand("Must be Bass Note");
+    mustBeLowestCheck.setOpaque(false);
     mustBeLowestCheck.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
         mustBeLowestCheckItemStateChanged(evt);
       }
     });
+
+    inversionCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Any/None", "Root", "1st", "2nd", "3rd" }));
+    inversionCombo.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        inversionComboItemStateChanged(evt);
+      }
+    });
+
+    jLabel2.setLabelFor(inversionCombo);
+    jLabel2.setText("Select Inversion:");
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
@@ -596,58 +741,69 @@ public class ChordPicker extends javax.swing.JPanel
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(transCheck)
-          .addComponent(showAdvanced, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addComponent(showAdvanced))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE)
           .addGroup(layout.createSequentialGroup()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addGroup(layout.createSequentialGroup()
-                .addGap(11, 11, 11)
-                .addComponent(jLabel1))
-              .addGroup(layout.createSequentialGroup()
-                .addComponent(notePickerRoot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chordLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                  .addComponent(addedBassCheck)
-                  .addGroup(layout.createSequentialGroup()
-                    .addComponent(slashLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(notePickerAdd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+              .addComponent(notePickerRoot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+              .addComponent(jLabel1))
+            .addGap(6, 6, 6)
+            .addComponent(chordLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(mustBeLowestCheck)))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(addedBassCheck)
+              .addGroup(layout.createSequentialGroup()
+                .addComponent(slashLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(notePickerAdd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+            .addGap(18, 18, 18)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(jLabel2)
+              .addComponent(inversionCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+              .addComponent(mustBeLowestCheck)))
+          .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-        .addContainerGap()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-              .addComponent(jLabel1)
-              .addComponent(addedBassCheck)
-              .addComponent(mustBeLowestCheck))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGap(11, 11, 11)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(notePickerRoot, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-              .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(slashLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(chordLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-              .addComponent(notePickerAdd, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE))
+              .addComponent(addedBassCheck)
+              .addComponent(jLabel2)
+              .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jLabel1)
+                .addComponent(transCheck)))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addGroup(layout.createSequentialGroup()
+                .addGap(2, 2, 2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                  .addComponent(mustBeLowestCheck, javax.swing.GroupLayout.Alignment.TRAILING)
+                  .addComponent(notePickerAdd, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+              .addGroup(layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(showAdvanced))))
           .addGroup(layout.createSequentialGroup()
-            .addComponent(transCheck)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
-            .addComponent(showAdvanced, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)))
-        .addGap(11, 11, 11))
+            .addGap(36, 36, 36)
+            .addComponent(inversionCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addGroup(layout.createSequentialGroup()
+            .addGap(49, 49, 49)
+            .addComponent(slashLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addGroup(layout.createSequentialGroup()
+            .addGap(36, 36, 36)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+              .addComponent(chordLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+              .addComponent(notePickerRoot, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+          .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE))
+        .addContainerGap())
     );
   }// </editor-fold>//GEN-END:initComponents
 
@@ -660,10 +816,13 @@ public class ChordPicker extends javax.swing.JPanel
   private void transCheckItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_transCheckItemStateChanged
   {//GEN-HEADEREND:event_transCheckItemStateChanged
     isTransposeMode = (evt.getStateChange() == ItemEvent.SELECTED);
-    this.chordTable.setEnabled(!isTransposeMode);
-    this.addedBassCheck.setEnabled(!isTransposeMode);
-    this.notePickerAdd.setEnabled(!isTransposeMode);
-    this.showAdvanced.setEnabled(!isTransposeMode);
+    //this.chordTable.setVisible(!isTransposeMode);
+    this.addedBassCheck.setVisible(!isTransposeMode);
+    this.notePickerAdd.setVisible(!isTransposeMode);
+    this.showAdvanced.setVisible(!isTransposeMode);
+    this.inversionCombo.setEnabled(!isTransposeMode);
+    this.jLabel2.setVisible(!isTransposeMode);
+    this.jScrollPane1.setVisible(!isTransposeMode);
     this.updateChordInModel();
   }//GEN-LAST:event_transCheckItemStateChanged
 
@@ -672,11 +831,20 @@ public class ChordPicker extends javax.swing.JPanel
     this.updateChordInModel();
   }//GEN-LAST:event_mustBeLowestCheckItemStateChanged
 
+  private void inversionComboItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_inversionComboItemStateChanged
+  {//GEN-HEADEREND:event_inversionComboItemStateChanged
+    if (evt.getStateChange() == ItemEvent.SELECTED) {
+      this.changeInversion();
+      this.updateChordInModel();
+    }
+  }//GEN-LAST:event_inversionComboItemStateChanged
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox addedBassCheck;
   private javax.swing.JLabel chordLabel;
   private javax.swing.JTable chordTable;
+  private javax.swing.JComboBox inversionCombo;
   private javax.swing.JLabel jLabel1;
+  private javax.swing.JLabel jLabel2;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JCheckBox mustBeLowestCheck;
   private render.NotePickerAlt notePickerAdd;
