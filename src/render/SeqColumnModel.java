@@ -13,6 +13,7 @@ import music.ButtonComboSequence;
 import music.Chord;
 import music.ChordParser;
 import music.Interval;
+import music.Note;
 import util.Main.StringParser;
 
 class SeqColumnModel extends DefaultTableColumnModel
@@ -133,6 +134,24 @@ class SeqColumnModel extends DefaultTableColumnModel
       this.getColumn(i).setModelIndex(i);
     }
     computeSeqs(selIndex);
+  }
+
+  public void transposeAllFromSelectedColumn(Note newNote)
+  {
+    TableColumn column = this.getColumn(getSelectedColumn());
+
+    // Find interval diff between new and old and apply to all
+    ParsedChordDef existingDef = (ParsedChordDef) column.getHeaderValue();
+
+    Interval transDiff = newNote.diff(existingDef.rootNote);
+
+    for (int i = 0; i < getColumnCount(); i++) {
+      TableColumn currCol = this.getColumn(i);
+      existingDef = (ParsedChordDef) currCol.getHeaderValue();
+      currCol.setHeaderValue(existingDef.transposeBy(transDiff));
+    }
+
+    computeSeqs(getSelectedColumn());
   }
 
   private void editColumn(int index, ParsedChordDef newChordDef, boolean transposeAll)

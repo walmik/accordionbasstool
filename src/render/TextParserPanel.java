@@ -10,15 +10,18 @@
  */
 package render;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import music.Note;
 
 /**
  *
  * @author Ilya
  */
-public class TextParserPanel extends javax.swing.JPanel implements ListSelectionListener
+public class TextParserPanel extends javax.swing.JPanel implements ListSelectionListener, PropertyChangeListener
 {
 
   SeqColumnModel columnModel;
@@ -35,9 +38,21 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
     columnModel = theModel;
     seqTable = theTable;
     columnModel.selComboModel.addListSelectionListener(this);
+
     if (startChords != null) {
       chordTextField.setText(startChords);
       computeButton.doClick();
+    }
+
+    transNotePicker.addPropertyChangeListener(this);
+  }
+
+  @Override
+  public void propertyChange(PropertyChangeEvent evt)
+  {
+    if (evt.getSource() == transNotePicker) {
+      Note newNote = (Note) evt.getNewValue();
+      columnModel.transposeAllFromSelectedColumn(newNote);
     }
   }
 
@@ -46,6 +61,11 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
   {
     if (isVisible() && (columnModel != null)) {
       this.chordTextField.setText(columnModel.toString());
+
+      int selColumn = columnModel.getSelectedColumn();
+      if (selColumn >= 0) {
+        this.transNotePicker.setNote(columnModel.getChordDef(selColumn).rootNote);
+      }
     }
   }
 
@@ -71,8 +91,7 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
     jPanel1 = new javax.swing.JPanel();
     chordTextField = new javax.swing.JTextField();
     computeButton = new javax.swing.JButton();
-    notePickerAlt1 = new render.NotePickerAlt();
-    jLabel2 = new javax.swing.JLabel();
+    transNotePicker = new render.NotePickerAlt();
 
     setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Chord Sequence Editor:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 14))); // NOI18N
 
@@ -114,8 +133,7 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
         .addComponent(computeButton))
     );
 
-    jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-    jLabel2.setText("<html>Transpose Sequence From <br/> Selected Chord: </html>");
+    transNotePicker.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Transpose:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
@@ -125,29 +143,25 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
         .addContainerGap()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE))
           .addGroup(layout.createSequentialGroup()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-              .addComponent(notePickerAlt1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-              .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addContainerGap(255, Short.MAX_VALUE))))
+            .addComponent(transNotePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addContainerGap(317, Short.MAX_VALUE))))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE)
+            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
             .addGap(161, 161, 161))
           .addGroup(layout.createSequentialGroup()
             .addGap(21, 21, 21)
             .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addGap(9, 9, 9)
-            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(notePickerAlt1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+            .addComponent(transNotePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         .addContainerGap())
     );
   }// </editor-fold>//GEN-END:initComponents
@@ -155,8 +169,9 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
     private void computeButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_computeButtonActionPerformed
     {//GEN-HEADEREND:event_computeButtonActionPerformed
       String text = chordTextField.getText();
-      if (text == null || text.length() == 0)
+      if (text == null || text.length() == 0) {
         text = "C";
+      }
 
       if (columnModel != null) {
         columnModel.populateFromText(text);
@@ -168,13 +183,11 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
     {//GEN-HEADEREND:event_chordTextFieldActionPerformed
       this.computeButton.doClick();
     }//GEN-LAST:event_chordTextFieldActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JTextField chordTextField;
   private javax.swing.JButton computeButton;
   private javax.swing.JLabel jLabel1;
-  private javax.swing.JLabel jLabel2;
   private javax.swing.JPanel jPanel1;
-  private render.NotePickerAlt notePickerAlt1;
+  private render.NotePickerAlt transNotePicker;
   // End of variables declaration//GEN-END:variables
 }
