@@ -119,6 +119,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     toolTabs = new javax.swing.JTabbedPane();
     chordPicker1 = new render.ChordPicker();
     textParserPanel1 = new render.TextParserPanel();
+    tabOptions1 = new render.TabOptions();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.5");
@@ -134,11 +135,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     renderBassBoard.setLayout(renderBassBoardLayout);
     renderBassBoardLayout.setHorizontalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 1300, Short.MAX_VALUE)
+      .addGap(0, 1316, Short.MAX_VALUE)
     );
     renderBassBoardLayout.setVerticalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 293, Short.MAX_VALUE)
+      .addGap(0, 334, Short.MAX_VALUE)
     );
 
     renderBoardScrollPane.setViewportView(renderBassBoard);
@@ -156,6 +157,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     toolTabs.addTab("Chord Editor", chordPicker1);
     toolTabs.addTab("Advanced Sequence Editor", textParserPanel1);
+    toolTabs.addTab("Options", tabOptions1);
 
     controlSplitPane.setLeftComponent(toolTabs);
 
@@ -174,6 +176,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private render.RenderBoardHeader renderBoardHeader1;
   private javax.swing.JScrollPane renderBoardScrollPane;
   private render.SeqTablePanel seqTablePanel;
+  private render.TabOptions tabOptions1;
   private render.TextParserPanel textParserPanel1;
   private javax.swing.JTabbedPane toolTabs;
   // End of variables declaration//GEN-END:variables

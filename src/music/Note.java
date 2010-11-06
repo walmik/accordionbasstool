@@ -154,6 +154,17 @@ public class Note
     return add(ival.scale(-1));
   }
 
+  public Note eharmonic()
+  {
+    if (sharpsOrFlats > 0) {
+      return this.add(Interval.m2).sub(Interval.halfStep);
+    } else if (sharpsOrFlats < 0) {
+      return this.sub(Interval.m2).add(Interval.halfStep);
+    } else {
+      return this;
+    }
+  }
+
   public boolean isBassNote()
   {
     return Chord.Mask.isLowerOctaveBit(this.octaveBit);

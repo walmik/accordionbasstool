@@ -6,6 +6,7 @@ package music;
 public class Interval
 {
 	final static Interval P1 = new Interval(0, 0, null);
+  public final static Interval halfStep = new Interval(1, 0, null);
 	final static Interval m2 = new Interval(1, 1, "Minor 2nd");
 	final static Interval M2 = new Interval(2, 1, "Major 2nd");
 	final static Interval Dim3 = new Interval(2, 2, null);
