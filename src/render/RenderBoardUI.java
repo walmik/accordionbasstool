@@ -51,9 +51,6 @@ public class RenderBoardUI
 
   RenderBoardUI()
   {
-    //diamX /= shadowScale;
-    //diamY /= shadowScale;
-
     createButtonImages(1);
   }
 
@@ -152,14 +149,14 @@ public class RenderBoardUI
       //graphics.drawRect(0, 0, _xW, _yW);
 
       if (pressed) {
-   //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+        //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         graphics.drawImage(pressedIM, 0, 0, imWidth, imHeight, null);
         graphics.translate(0, _pressedCylOff);
       } else if (selected) {
-   //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+        //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         graphics.drawImage(selectedIM, 0, 0, imWidth, imHeight, null);
       } else {
-   //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
         graphics.drawImage(unselectedIM, 0, 0, imWidth, imHeight, null);
       }
     }
@@ -186,28 +183,30 @@ public class RenderBoardUI
       if (selected) {
         //TODO: System Color
         //lighterFill = Color.MAGENTA;
-        lighterFill = SystemColor.textHighlight;
-        darkerFill = lighterFill.darker();
+        if (pressed) {
+          lighterFill = Color.magenta;
+          darkerFill = lighterFill.darker();
+        } else {
+          lighterFill = SystemColor.textHighlight;
+          darkerFill = lighterFill.darker();
+        }
       }
 
       if (pressed) {
         // Draw Pressed
         graphics.translate(0, _pressedCylOff);
         graphics.setColor(darkerFill);
-        graphics.fill(_pressedCyl);
+        graphics.fill(pressedCyl);
         graphics.setColor(lighterFill);
         graphics.fill(_buttonTop);
       } else {
         // Draw Unpressed
         graphics.setColor(darkerFill);
-        graphics.fill(_unpressedCyl);
+        graphics.fill(unpressedCyl);
         graphics.setColor(lighterFill);
         graphics.fill(_buttonTop);
       }
     }
-    Path2D _unpressedCyl;
-    Path2D _pressedCyl;
-    Ellipse2D _buttonTop;
   }
 
   static class TextDrawer
@@ -291,9 +290,17 @@ public class RenderBoardUI
 
     if (!pressed) {
       graphics.translate(0, currCylHeight);
+
+      // Draw Shadow Gray
       graphics.setComposite(AlphaComposite.SrcOver);
       graphics.setPaint(new Color(0.f, 0.f, 0.f, 0.25f));
       graphics.fill(_shadowFloor);
+
+      // Draw Shadow Color
+      graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));
+      graphics.setPaint(selColor);
+      graphics.fill(_shadowFloor);
+
       graphics.translate(0, -currCylHeight);
     }
 
@@ -304,17 +311,19 @@ public class RenderBoardUI
 
     Paint cylPaint = new LinearGradientPaint(start, end, fractions, colors);
 
-    {
-      graphics.setComposite(AlphaComposite.SrcOver);
-      graphics.setPaint(selColor);
-      graphics.fill(pressed ? pressedCyl : unpressedCyl);
-    }
 
+    // Draw Cyl Color
+    graphics.setComposite(AlphaComposite.SrcOver);
+    graphics.setPaint(selColor);
+    graphics.fill(pressed ? pressedCyl : unpressedCyl);
+
+    // Draw Cyl Gradient Composite
     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
     graphics.setPaint(cylPaint);
     graphics.fill(pressed ? pressedCyl : unpressedCyl);
 
 
+    // Draw Button Top Color
     //graphics.setComposite(AlphaComposite.SrcOver);
     graphics.setPaint(selColor);
     graphics.fill(_buttonTop);
@@ -324,6 +333,8 @@ public class RenderBoardUI
     end = new Point2D.Float(diamX, 0);
     float frac3[] = {0.0f, 1.0f};
     Color col3[] = {Color.black, Color.white};
+
+    // Draw Button Top Linear Gradient
     graphics.setPaint(new LinearGradientPaint(start, end, frac3, col3));
     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
     graphics.fill(_buttonTop);
@@ -338,6 +349,7 @@ public class RenderBoardUI
             frac2, col2,
             RadialGradientPaint.CycleMethod.NO_CYCLE));
 
+    // Draw Button Top Radial Hightlight
     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (pressed ? 0.9f : 0.5f)));
     graphics.fill(_buttonTop);
   }

@@ -10,6 +10,8 @@
  */
 package render;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -40,11 +42,27 @@ public class TabTester extends javax.swing.JPanel
 
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-    int scale = 2;
+    int scale = 5;
     int imWidth = RenderBoardUI.defaultUI.selectedIM.getWidth() * scale;
     int imHeight = RenderBoardUI.defaultUI.selectedIM.getHeight() * scale;
 
+
+   
+
+
+    //graphics.setComposite(AlphaComposite.SrcAtop);
+//    graphics.setColor(new Color(0.f, 1.f, 0.f, 1.0f));
+//    graphics.fillRect(0, 0, imWidth, imHeight);
+//    graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_ATOP, 1.0f));
+//    graphics.drawImage(RenderBoardUI.defaultUI.selectedIM, 0, 0, imWidth, imHeight, null, this);
+
+//  graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_IN, 1.0f));
+//  graphics.setColor(new Color(1.f, 1.f, 0.f, 1.0f));
+//  graphics.fillRect(0, 0, imWidth, imHeight);
+
+    graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 1.0f));
     graphics.drawImage(RenderBoardUI.defaultUI.selectedIM, 0, 0, imWidth, imHeight, null, this);
+    
 
     graphics.translate(imWidth + 10, 0);
     graphics.drawImage(RenderBoardUI.defaultUI.unselectedIM, 0, 0, imWidth, imHeight, null, this);

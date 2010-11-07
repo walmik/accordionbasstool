@@ -4,7 +4,6 @@
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
     <Property name="title" type="java.lang.String" value="Accordion Bass Tool v0.5"/>
-    <Property name="locationByPlatform" type="boolean" value="true"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -37,23 +36,24 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout"/>
       <SubComponents>
-        <Container class="javax.swing.JPanel" name="jPanel1">
+        <Container class="javax.swing.JPanel" name="boardAndHeaderPanel">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
               <JSplitPaneConstraints position="right"/>
             </Constraint>
           </Constraints>
 
-          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout">
-            <Property name="axis" type="int" value="1"/>
-          </Layout>
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
           <SubComponents>
-            <Component class="render.RenderBoardHeader" name="renderBoardHeader1">
-            </Component>
             <Container class="javax.swing.JScrollPane" name="renderBoardScrollPane">
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="renderBoardScrollPane.getVerticalScrollBar().setBlockIncrement(24);&#xd;&#xa;renderBoardScrollPane.getVerticalScrollBar().setUnitIncrement(8);"/>
               </AuxValues>
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                  <BorderConstraints direction="Center"/>
+                </Constraint>
+              </Constraints>
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
@@ -77,6 +77,13 @@
                 </Container>
               </SubComponents>
             </Container>
+            <Component class="render.RenderBoardHeader" name="renderBoardHeader1">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                  <BorderConstraints direction="First"/>
+                </Constraint>
+              </Constraints>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JSplitPane" name="controlSplitPane">
@@ -112,8 +119,8 @@
                 <Component class="render.ChordPicker" name="chordPicker1">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="Chord Editor">
-                        <Property name="tabTitle" type="java.lang.String" value="Chord Editor"/>
+                      <JTabbedPaneConstraints tabName="Chord Picker">
+                        <Property name="tabTitle" type="java.lang.String" value="Chord Picker"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>
@@ -121,8 +128,8 @@
                 <Component class="render.TextParserPanel" name="textParserPanel1">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="Advanced Sequence Editor">
-                        <Property name="tabTitle" type="java.lang.String" value="Advanced Sequence Editor"/>
+                      <JTabbedPaneConstraints tabName="Full Sequence Editor">
+                        <Property name="tabTitle" type="java.lang.String" value="Full Sequence Editor"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>
@@ -136,6 +143,28 @@
                     </Constraint>
                   </Constraints>
                 </Component>
+                <Container class="render.TabTester" name="tabTester1">
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                      <JTabbedPaneConstraints tabName="Tester">
+                        <Property name="tabTitle" type="java.lang.String" value="Tester"/>
+                      </JTabbedPaneConstraints>
+                    </Constraint>
+                  </Constraints>
+
+                  <Layout>
+                    <DimensionLayout dim="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <EmptySpace min="0" pref="594" max="32767" attributes="0"/>
+                      </Group>
+                    </DimensionLayout>
+                    <DimensionLayout dim="1">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <EmptySpace min="0" pref="252" max="32767" attributes="0"/>
+                      </Group>
+                    </DimensionLayout>
+                  </Layout>
+                </Container>
               </SubComponents>
             </Container>
           </SubComponents>

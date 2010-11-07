@@ -92,7 +92,6 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="toolRemove" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="toolOptions" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="soundCheck" min="-2" max="-2" attributes="0"/>
@@ -114,9 +113,7 @@
                   <Component id="toolInsert" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="toolRemove" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="88" max="-2" attributes="0"/>
-                  <Component id="toolOptions" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="46" max="32767" attributes="0"/>
+                  <EmptySpace pref="157" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -169,15 +166,6 @@
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JButton" name="toolOptions">
-          <Properties>
-            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="chordTableAction" type="code"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Options..."/>
-            <Property name="actionCommand" type="java.lang.String" value="Options"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="soundCheck">

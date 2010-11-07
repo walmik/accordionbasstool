@@ -57,14 +57,13 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     toolInsert.addActionListener(chordTableAction);
     toolRemove.addActionListener(chordTableAction);
     toolPlay.addActionListener(chordTableAction);
-    toolOptions.addActionListener(chordTableAction);
 
     playTimer = new Timer(1000, chordTableAction);
     playTimer.setActionCommand("Timer");
 
     columnModel.addColumn(ParsedChordDef.getDefaultChordDef(), 0);
 
-    toolOptions.setVisible(false);
+    //toolOptions.setVisible(false);
 
     cornerPanel = new JPanel();
     cornerPanel.add(toolPlay);
@@ -174,8 +173,6 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
 
       } else if (e.getActionCommand().equals("RemoveChord")) {
         columnModel.removeSelectedColumn();
-      } else if (e.getActionCommand().equals("Options")) {
-        new OptionsDialog(null, true).setVisible(true);
       } else if (e.getActionCommand().equals("PlaySeq")) {
         if (!playTimer.isRunning()) {
           toolPlay.setText("Stop");
@@ -216,7 +213,6 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     toolAddChord = new javax.swing.JButton();
     toolInsert = new javax.swing.JButton();
     toolRemove = new javax.swing.JButton();
-    toolOptions = new javax.swing.JButton();
     soundCheck = new javax.swing.JCheckBox();
     statusText = new javax.swing.JLabel();
 
@@ -258,10 +254,6 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     toolRemove.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
     toolRemove.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
-    toolOptions.setAction(chordTableAction);
-    toolOptions.setText("Options...");
-    toolOptions.setActionCommand("Options");
-
     soundCheck.setText("Sound On");
     soundCheck.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -285,7 +277,6 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
           .addGroup(jPanel1Layout.createSequentialGroup()
             .addContainerGap()
             .addComponent(toolRemove))
-          .addComponent(toolOptions)
           .addGroup(jPanel1Layout.createSequentialGroup()
             .addContainerGap()
             .addComponent(soundCheck)))
@@ -303,9 +294,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
         .addComponent(toolInsert)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(toolRemove)
-        .addGap(88, 88, 88)
-        .addComponent(toolOptions)
-        .addContainerGap(46, Short.MAX_VALUE))
+        .addContainerGap(157, Short.MAX_VALUE))
     );
 
     statusText.setFont(new java.awt.Font("Tahoma", 0, 16));
@@ -355,7 +344,6 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
   javax.swing.JButton toggleChordPicker;
   private javax.swing.JButton toolAddChord;
   private javax.swing.JButton toolInsert;
-  private javax.swing.JButton toolOptions;
   private javax.swing.JButton toolRemove;
   // End of variables declaration//GEN-END:variables
 }

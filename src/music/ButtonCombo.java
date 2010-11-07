@@ -115,8 +115,18 @@ public class ButtonCombo
 
   public boolean isAcceptable()
   {
-    return computeComboBounds(null, null) < 12;
-    //return true;
+    if (optMaxDistThreshold == 0) {
+      return true;
+    }
+    
+    return computeComboBounds(null, null) < optMaxDistThreshold;
+  }
+  
+  public static int optMaxDistThreshold = 8;
+
+  public static void setMaxComboDistThreshold(int threshold)
+  {
+    optMaxDistThreshold = threshold;
   }
 
   private int computeComboBounds(GeoPos boundsMax, GeoPos boundsMin)

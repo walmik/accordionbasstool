@@ -100,6 +100,7 @@ public class NotePickerAlt extends javax.swing.JPanel {
 
     toggleSOF.setFont(toggleSOF.getFont().deriveFont(toggleSOF.getFont().getStyle() | java.awt.Font.BOLD));
     toggleSOF.setText("b-#");
+    toggleSOF.setBorderPainted(false);
     toggleSOF.setFocusable(false);
     toggleSOF.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
     toggleSOF.setMargin(new java.awt.Insets(2, 4, 2, 4));

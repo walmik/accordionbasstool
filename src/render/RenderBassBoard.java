@@ -49,8 +49,8 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     this._isHoriz = RenderBoardUI.defaultUI._isHoriz;
     this._slantAngle = RenderBoardUI.defaultUI._defaultSlantAngle;
 
-//    this.addMouseListener(new MouseHandler());
-//    this.addMouseMotionListener(new MouseHandler());
+    this.addMouseListener(new MouseHandler());
+    this.addMouseMotionListener(new MouseHandler());
     ToolTipManager.sharedInstance().registerComponent(this);
 
     int borderMargin = RenderBoardUI.defaultUI.buttonXMargin + borderWidth / 2;
@@ -153,11 +153,22 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 //	{
 //		drawers.add(drawer);
 //	}
-//	public void setPrefs(boolean horiz, double ctr)
-//	{
-//		_isHoriz = horiz;
-//		_colToRow = ctr;
-//	}
+  public void setIsHorizontal(boolean horiz)
+  {
+    if (horiz == _isHoriz) {
+      return;
+    }
+    _slantAngle = -_slantAngle;
+    _isHoriz = horiz;
+    repaint();
+  }
+  
+  public boolean isHorizontal()
+  {
+    return _isHoriz;
+  }
+
+
   public BassBoard.Pos hitTest(int x, int y)
   {
     int row, col;
@@ -166,7 +177,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     computeRenderOffsets();
 
     x -= _borderInsets.left;
-    y -= _borderInsets.top + margin.height / 2;
+    y -= _borderInsets.top;
 
     if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
       x -= (getWidth() - _contentDim.width - margin.width) / 2;
@@ -179,13 +190,16 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
       cPos = y;
       rPos = x;
     }
-    
+
+    rPos -=  margin.height / 2;
+
     row = rPos / _rInc;
     cPos -= (_cStart + row * _slope);
     col = (cPos + _cInc) / _cInc - 1;
 
     if (!_isHoriz) {
       col = _cols - col - 1;
+      row = _rows - row - 1;
     }
 
     if ((row < _rows) && (col < _cols) && (row >= 0) && (col >= 0)) {
@@ -244,8 +258,14 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
       _slope = -_slope;
     }
 
-    _contentDim.width = (_cInc * _cols) + (int) (_slope * _rows);
-    _contentDim.height = (_rInc * _rows) + margin.height;
+    if (_isHoriz) {
+      _contentDim.width = (_cInc * _cols) + (int) (_slope * _rows);
+      _contentDim.height = (_rInc * _rows) + margin.height;
+    } else {
+      _contentDim.width = (_rInc * _rows) + margin.height;
+      _contentDim.height = (_cInc * _cols) - (int) (_slope * _rows);
+    }
+
   }
 
   @Override
@@ -270,9 +290,16 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     graphics2D.setPaint(outer);
     graphics2D.fillRect(0, 0, getWidth(), getHeight());
 
-    if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
-      graphics2D.translate((getWidth() - _contentDim.width - margin.width) / 2, 0);
-    }
+
+    //if (_isHoriz) {
+      if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
+        graphics2D.translate((getWidth() - _contentDim.width - margin.width) / 2, 0);
+      }
+    //} else {
+      //   if (this.getAlignmentY() == JComponent.CENTER_ALIGNMENT) {
+      //     graphics2D.translate(0, (getHeight() - _contentDim.height - margin.height) / 2);
+      //   }
+   //}
 
     // Paint Border & Background
     RoundRectangle2D roundRect =
@@ -333,22 +360,24 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
         graphics2D.setTransform(offset);
 
         int realCol = c;
+        int realRow = r;
         if (!_isHoriz) {
           realCol = _cols - c - 1;
+          realRow = _rows - r - 1;
         }
 
         graphics2D.translate(xP, yP);
 
-        boolean pressed = (_selCombo != null && _selCombo.hasButtonPressed(r, realCol));
-        boolean selected = (_selCombo != null && _selCombo.hasButtonInSeq(r, realCol));
+        boolean pressed = (_selCombo != null && _selCombo.hasButtonPressed(realRow, realCol));
+        boolean selected = (_selCombo != null && _selCombo.hasButtonInSeq(realRow, realCol));
 
-        if (!pressed && (clickPos != null) && clickPos.equals(r, realCol)) {
+        if (!pressed && (clickPos != null) && clickPos.equals(realRow, realCol)) {
           pressed = true;
         }
 
         {
-          buttonDrawer.draw(graphics2D, realCol, r, pressed, selected);
-          textDrawer.draw(graphics2D, realCol, r, pressed, _theBoard.getChordName(r, realCol, false));
+          buttonDrawer.draw(graphics2D, realCol, realRow, pressed, selected);
+          textDrawer.draw(graphics2D, realCol, realRow, pressed, _theBoard.getChordName(realRow, realCol, false));
         }
 
 
@@ -368,6 +397,12 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
       rOff += _rInc;
     }
   }
+
+//  @Override
+//  public Dimension getMinimumSize()
+//  {
+//    return getPreferredSize();
+//  }
 
   @Override
   public Dimension getPreferredSize()
@@ -430,6 +465,10 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
   public void setupHeaders(JScrollPane scrollPane)
   {
+    if (true == true) {
+      return;
+    }
+    
     JPanel noteHeader = new JPanel()
     {
 
@@ -466,7 +505,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
   //Member Vars
   //================================================================================
   BassBoard _theBoard;
-  boolean _isHoriz = false;
+  private boolean _isHoriz = false;
   double _colToRow = 0;
   double _slantAngle = 0;
   int _rows = 0, _cols = 0;

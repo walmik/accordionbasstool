@@ -204,6 +204,11 @@ public class BoardSearcher
     }
   }
 
+  //Options
+  public static boolean optStrictBass = false;
+  public static boolean optIgnoreBassOnly = true;
+  public static boolean optAllowBassOnlyIfNoChords = true;
+
   // All Chords
   ButtonCombo[] findAllIter(BassBoard board, Chord fullChord)
   {
@@ -215,11 +220,10 @@ public class BoardSearcher
 
     // ***************************
     //TODO: Make this an option strict bass
-    boolean unmaskBassRegister = true;
-    //boolean unmaskBassRegister = !fullChordMask.hasLowerOctave();
+    boolean unmaskBassRegister = (optStrictBass ? !fullChordMask.hasLowerOctave() : true);
     //TODO: Filter out all bass combos, if alternatives exist
-    boolean ignoreAllBassCombos = true;
-    boolean chordComboFound = false;
+    boolean ignoreAllBassCombos = optIgnoreBassOnly;
+    boolean chordComboFound = !optAllowBassOnlyIfNoChords;
     // ***************************
 
     Vector<BassBoard.Pos> validPos = new Vector<BassBoard.Pos>();

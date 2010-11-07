@@ -1,7 +1,7 @@
 <root>
 	<chordset name="AllChordSet">
 		<chordgroup name="Common Chords">
-			<chord name="" abbrev="" notes="C"></chord>
+			<chord name="Note" abbrev="" notes="C"></chord>
 			<chord name="Major" abbrev="M" notes="C E G"></chord>
 			<chord name="Minor" abbrev="m" notes="C Eb G"></chord>
 			<chord name="Dominant 7th, no 5th" abbrev="7" notes="C E Bb"></chord>
@@ -14,18 +14,19 @@
 			<chord name="Augmented" notes="C E G#" abbrev="[aug]"></chord>
 			<chord name="Suspended 4th" notes="C F G" abbrev="sus[4]"></chord>
 			<chord name="Suspended 2nd" notes="C D G" abbrev="sus[2]"></chord>
+			<chord name="Diminished" notes="C Eb Gb" abbrev="[dim]"></chord>
 		</chordgroup>
 		
 		<chordgroup name="7th">
 			<chord name="Dominant 7th" abbrev="7*" notes="C E G Bb"></chord>
 			<chord name="Dominant 7th (flat 5th)" abbrev="[7b5]" notes="C E Gb Bb"></chord>
 			<chord name="Major 7th" abbrev="M[7]" notes="C E G B"></chord>
-			<chord name="Minor-Major 7th" abbrev="min[M7]" notes="C Eb G B"></chord>
+			<chord name="Minor- Major 7th" abbrev="min[M7]" notes="C Eb G B"></chord>
 
 			<chord name="Augmented Major 7th" abbrev="aug[M7]" notes="C E G# B"></chord>
 			<chord name="Augmented 7th" notes="C E G# Bb" abbrev="[aug7]"></chord>
 			<chord name="Minor 7th" notes="C Eb G Bb" abbrev="m[7]"></chord>
-			<chord name="Half-Diminished 7th" notes="C Eb Gb Bb" abbrev="[Ø7]"></chord>
+			<chord name="Half- Diminished 7th" notes="C Eb Gb Bb" abbrev="[Ø7]"></chord>
 			<chord name="Diminished 7th" notes="C Eb Gb Bbb" abbrev="dim[7]"></chord>
 		</chordgroup>
 		
@@ -33,18 +34,18 @@
 			<chord name="Dominant 9th (no 5th)" notes="C E Bb D" abbrev="9"></chord>
 			<chord name="Dominant 9th" notes="C E G Bb D" abbrev="9*"></chord>
 			<chord name="Major 9th" notes="C E G B D" abbrev="M[9]"></chord>
-			<chord name="Minor-Major 9th" notes="C Eb G B D" abbrev="min[M9]"></chord>
+			<chord name="Minor- Major 9th" notes="C Eb G B D" abbrev="min[M9]"></chord>
 
 			<chord name="Augmented Major 9th" notes="C E G# B D" abbrev="[augM9]"></chord>
 			<chord name="Augmented 9th" notes="C E G# Bb D" abbrev="[aug9]"></chord>
 			<chord name="Minor 9th" notes="C Eb G Bb D" abbrev="min[9]"></chord>
-			<chord name="Half-Diminished 9th" notes="C Eb Gb Bb Db" abbrev="[Ø9]"></chord>
+			<chord name="Half- Diminished 9th" notes="C Eb Gb Bb Db" abbrev="[Ø9]"></chord>
 			<chord name="Diminished 9th" notes="C Eb Gb Bbb Db" abbrev="dim[9]"></chord>
 		</chordgroup>
 	</chordset>
 	<chordset name="SimpleChordSet">
 		<chordgroup name="Single-Button Chords">
-			<chord name="Note" abbrev=" Note" notes="C"></chord>
+			<chord name="Note" abbrev="" notes="C"></chord>
 			<chord name="Major" abbrev="M" notes="C E G"></chord>
 			<chord name="Minor" abbrev="m" notes="C Eb G"></chord>
 			<chord name="Dominant 7th, no 5th" abbrev="7" notes="C E Bb"></chord>

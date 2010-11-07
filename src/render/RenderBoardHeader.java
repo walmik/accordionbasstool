@@ -11,13 +11,16 @@
 package render;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -47,8 +50,6 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     this.columnModel = model;
     this.boardScrollPane = pane;
 
-    boardScrollPane.setBorder(BorderFactory.createEmptyBorder());
-
     //renderBoard.setupHeaders(boardScrollPane);
 
     boardCombo.setModel(new DefaultComboBoxModel(BoardRegistry.mainRegistry().allBoardDefs));
@@ -60,13 +61,43 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
       boardCombo.setSelectedItem(initialBoardDef);
     }
   }
+  
+  Component hiddenBox;
+
+  public void toggleOrientation(boolean isHoriz)
+  {
+    if (isHoriz) {
+      setLayout(new FlowLayout());
+    } else {
+      this.jLabel1.setAlignmentX(CENTER_ALIGNMENT);
+      this.boardCombo.setAlignmentX(CENTER_ALIGNMENT);
+      this.infoLabel.setAlignmentX(CENTER_ALIGNMENT);
+      setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+      if (hiddenBox == null) {
+        hiddenBox = Box.createVerticalStrut(30);
+        add(hiddenBox);
+      }
+    }
+  }
+
+  boolean flipHeaderPos = false;
+
+  void flipHeader(boolean b)
+  {
+    flipHeaderPos = b;
+  }
 
   @Override
   public void paintComponent(Graphics g)
   {
     Graphics2D g2 = (Graphics2D) g;
     Color lightCol = this.getBackground();//new Color(53,180,209);
-    g2.setPaint(new GradientPaint(0.f, getHeight() * 2 / 3, lightCol, 0.f, getHeight(), Color.black));
+    if (flipHeaderPos) {
+      g2.setPaint(new GradientPaint(0.f, 0.f, Color.black, 0.f, getHeight() * 1 / 3, lightCol));
+    } else {
+      g2.setPaint(new GradientPaint(0.f, getHeight() * 2 / 3, lightCol, 0.f, getHeight(), Color.black));
+    }
     g2.fillRect(0, 0, getWidth(), getHeight());
   }
 
@@ -78,27 +109,28 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     if ((cont != null) && cont.isVisible() && (cont instanceof JFrame)) {
       JFrame frame = (JFrame) cont;
 
-      int diff = (renderBoard.getPreferredSize().height - boardScrollPane.getHeight());
-      //System.out.println("\n********\nOld Pane Height: " + boardScrollPane.getHeight());
+      int diff = 0;
+      if (renderBoard.isHorizontal()) {
+        diff = (renderBoard.getPreferredSize().height - boardScrollPane.getHeight());
+      } else {
+        diff = (renderBoard.getPreferredSize().width - boardScrollPane.getWidth());
+      }
 
       if (!boardScrollPane.isValid() || !renderBoard.isValid()) {
         return;
       }
 
-//      if ((renderBoard.getHeight() + diff) < 100) {
-//        return;
-//      }
-//      if (diff > renderBoard.getHeight()) {
-//        return;
-//      }
-//      boardScrollPane.invalidate();
-      renderBoard.setSize(renderBoard.getWidth(), renderBoard.getHeight() + diff);
-      frame.setSize(frame.getWidth(), frame.getHeight() + diff);
+      if (renderBoard.isHorizontal()) {
+        renderBoard.setSize(renderBoard.getWidth(), renderBoard.getHeight() + diff);
+        frame.setSize(frame.getWidth(), frame.getHeight() + diff);
+      } else {
+        return;
+//        renderBoard.setSize(renderBoard.getWidth() + diff, renderBoard.getHeight());
+//        frame.setSize(frame.getWidth() + diff, frame.getHeight());
+      }
 
-
-
- //     System.out.println("New RB Height: " + (renderBoard.getHeight()));
- //     System.out.println("New Frame Height: " + (frame.getHeight()));
+      //     System.out.println("New RB Height: " + (renderBoard.getHeight()));
+      //     System.out.println("New Frame Height: " + (frame.getHeight()));
     }
 
     //boardScrollPane.revalidate();
@@ -114,6 +146,8 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
         BassBoard newBoard = def.createBoard();
 
         renderBoard.setBassBoard(newBoard);
+        boardScrollPane.revalidate();
+        boardScrollPane.doLayout();
 
         autoSize();
 
@@ -143,9 +177,9 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     infoLabel = new javax.swing.JLabel();
 
     setBackground(java.awt.SystemColor.activeCaption);
-    setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 20, 5));
 
     jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getSize()+5f));
+    jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     jLabel1.setText("Current Board:");
     add(jLabel1);
 
@@ -154,6 +188,7 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     add(boardCombo);
 
     infoLabel.setFont(infoLabel.getFont().deriveFont(infoLabel.getFont().getSize()+5f));
+    infoLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     infoLabel.setText("info");
     add(infoLabel);
   }// </editor-fold>//GEN-END:initComponents

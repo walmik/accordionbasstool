@@ -26,6 +26,7 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
 
   SeqColumnModel columnModel;
   JTable seqTable;
+  boolean isUpdating = false;
 
   /** Creates new form TextParserPanel */
   public TextParserPanel()
@@ -50,7 +51,11 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
   @Override
   public void propertyChange(PropertyChangeEvent evt)
   {
-    if (evt.getSource() == transNotePicker) {
+    if (isUpdating) {
+      return;
+    }
+    
+    if ((evt.getSource() == transNotePicker) && (evt.getPropertyName().equals("Note"))) {
       Note newNote = (Note) evt.getNewValue();
       columnModel.transposeAllFromSelectedColumn(newNote);
     }
@@ -64,7 +69,9 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
 
       int selColumn = columnModel.getSelectedColumn();
       if (selColumn >= 0) {
+        isUpdating = true;
         this.transNotePicker.setNote(columnModel.getChordDef(selColumn).rootNote);
+        isUpdating = false;
       }
     }
   }
@@ -119,15 +126,19 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
     jPanel1.setLayout(jPanel1Layout);
     jPanel1Layout.setHorizontalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(chordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
       .addGroup(jPanel1Layout.createSequentialGroup()
-        .addGap(134, 134, 134)
-        .addComponent(computeButton)
-        .addContainerGap(137, Short.MAX_VALUE))
+        .addContainerGap()
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addGroup(jPanel1Layout.createSequentialGroup()
+            .addComponent(chordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)
+            .addContainerGap())
+          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addComponent(computeButton)
+            .addGap(124, 124, 124))))
     );
     jPanel1Layout.setVerticalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(jPanel1Layout.createSequentialGroup()
+      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
         .addComponent(chordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(computeButton))
@@ -145,10 +156,10 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
           .addGroup(layout.createSequentialGroup()
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE))
+            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))
           .addGroup(layout.createSequentialGroup()
-            .addComponent(transNotePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addContainerGap(317, Short.MAX_VALUE))))
+            .addComponent(transNotePicker, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addContainerGap(355, Short.MAX_VALUE))))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -158,7 +169,7 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
             .addGap(161, 161, 161))
           .addGroup(layout.createSequentialGroup()
-            .addGap(21, 21, 21)
+            .addContainerGap()
             .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(transNotePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
