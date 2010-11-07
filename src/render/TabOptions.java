@@ -212,7 +212,7 @@ public class TabOptions extends javax.swing.JPanel
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
 
-    jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Apperence:"));
+    jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Appearence:"));
 
     lnfCombo.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {

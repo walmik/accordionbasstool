@@ -1,7 +1,7 @@
 <root>
 	<chordset name="AllChordSet">
 		<chordgroup name="Common Chords">
-			<chord name="Note" abbrev="" notes="C"></chord>
+			<chord name="Note" abbrev="" notes="CC"></chord>
 			<chord name="Major" abbrev="M" notes="C E G"></chord>
 			<chord name="Minor" abbrev="m" notes="C Eb G"></chord>
 			<chord name="Dominant 7th, no 5th" abbrev="7" notes="C E Bb"></chord>
@@ -45,7 +45,7 @@
 	</chordset>
 	<chordset name="SimpleChordSet">
 		<chordgroup name="Single-Button Chords">
-			<chord name="Note" abbrev="" notes="C"></chord>
+			<chord name="Note" abbrev="" notes="CC"></chord>
 			<chord name="Major" abbrev="M" notes="C E G"></chord>
 			<chord name="Minor" abbrev="m" notes="C Eb G"></chord>
 			<chord name="Dominant 7th, no 5th" abbrev="7" notes="C E Bb"></chord>
