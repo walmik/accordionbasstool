@@ -209,6 +209,8 @@ public class BoardSearcher
   public static boolean optIgnoreBassOnly = true;
   public static boolean optAllowBassOnlyIfNoChords = true;
 
+  public static int optMaxComboLength = 4;
+
   // All Chords
   ButtonCombo[] findAllIter(BassBoard board, Chord fullChord)
   {
@@ -324,8 +326,8 @@ public class BoardSearcher
           }
         } else {
           // Combo not matched, continue building combo
-          // Ignore combos of 4 or more in length
-          if (newLink.len >= 4) {
+          // Ignore combos of optMaxComboLength or more in length
+          if (newLink.len >= optMaxComboLength) {
             continue;
           }
 

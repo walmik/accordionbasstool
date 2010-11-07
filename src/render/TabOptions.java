@@ -38,6 +38,7 @@ public class TabOptions extends javax.swing.JPanel
     initLNFCombo();
     
     this.maxComboThreshSpin.setValue(new Integer(ButtonCombo.optMaxDistThreshold));
+    this.maxComboLenSpin.setValue(new Integer(BoardSearcher.optMaxComboLength));
   }
 
   void setSeqColModel(SeqColumnModel mod)
@@ -113,6 +114,8 @@ public class TabOptions extends javax.swing.JPanel
     checkAllowAllBass = new javax.swing.JCheckBox();
     checkIgnoreMaxThres = new javax.swing.JCheckBox();
     maxComboThreshSpin = new javax.swing.JSpinner();
+    jLabel2 = new javax.swing.JLabel();
+    maxComboLenSpin = new javax.swing.JSpinner();
     jPanel2 = new javax.swing.JPanel();
     lnfCombo = new javax.swing.JComboBox();
     jLabel1 = new javax.swing.JLabel();
@@ -159,6 +162,15 @@ public class TabOptions extends javax.swing.JPanel
       }
     });
 
+    jLabel2.setText("Max Button Combo Size:");
+
+    maxComboLenSpin.setModel(new javax.swing.SpinnerNumberModel(4, 1, 4, 1));
+    maxComboLenSpin.addChangeListener(new javax.swing.event.ChangeListener() {
+      public void stateChanged(javax.swing.event.ChangeEvent evt) {
+        maxComboLenSpinStateChanged(evt);
+      }
+    });
+
     javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
     jPanel1.setLayout(jPanel1Layout);
     jPanel1Layout.setHorizontalGroup(
@@ -172,9 +184,15 @@ public class TabOptions extends javax.swing.JPanel
           .addComponent(checkIgnoreAllBass, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
           .addComponent(checkStrictBass, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(checkIgnoreMaxThres)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(maxComboThreshSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addGroup(jPanel1Layout.createSequentialGroup()
+            .addComponent(checkIgnoreMaxThres)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addComponent(maxComboThreshSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addGroup(jPanel1Layout.createSequentialGroup()
+            .addComponent(jLabel2)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addComponent(maxComboLenSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         .addContainerGap(80, Short.MAX_VALUE))
     );
     jPanel1Layout.setVerticalGroup(
@@ -185,7 +203,10 @@ public class TabOptions extends javax.swing.JPanel
           .addComponent(checkIgnoreMaxThres)
           .addComponent(maxComboThreshSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(checkIgnoreAllBass)
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(checkIgnoreAllBass)
+          .addComponent(jLabel2)
+          .addComponent(maxComboLenSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(checkAllowAllBass)
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -316,15 +337,25 @@ public class TabOptions extends javax.swing.JPanel
     ButtonCombo.setMaxComboDistThreshold(thres.intValue());
     recompute();
   }//GEN-LAST:event_maxComboThreshSpinStateChanged
+
+  private void maxComboLenSpinStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_maxComboLenSpinStateChanged
+  {//GEN-HEADEREND:event_maxComboLenSpinStateChanged
+    Integer maxInt = (Integer) this.maxComboLenSpin.getValue();
+    BoardSearcher.optMaxComboLength = maxInt.intValue();
+    recompute();
+  }//GEN-LAST:event_maxComboLenSpinStateChanged
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkAllowAllBass;
   private javax.swing.JCheckBox checkIgnoreAllBass;
   private javax.swing.JCheckBox checkIgnoreMaxThres;
   private javax.swing.JCheckBox checkStrictBass;
   private javax.swing.JLabel jLabel1;
+  private javax.swing.JLabel jLabel2;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel2;
   private javax.swing.JComboBox lnfCombo;
+  private javax.swing.JSpinner maxComboLenSpin;
   private javax.swing.JSpinner maxComboThreshSpin;
   private javax.swing.JCheckBox toggleBoardHoriz;
   private javax.swing.JCheckBox toggleBoardLeftTop;

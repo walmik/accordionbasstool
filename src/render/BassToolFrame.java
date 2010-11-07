@@ -211,7 +211,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     chordPicker1 = new render.ChordPicker();
     textParserPanel1 = new render.TextParserPanel();
     tabOptions1 = new render.TabOptions();
-    tabTester1 = new render.TabTester();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.5");
@@ -250,19 +249,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     toolTabs.addTab("Full Sequence Editor", textParserPanel1);
     toolTabs.addTab("Options", tabOptions1);
 
-    javax.swing.GroupLayout tabTester1Layout = new javax.swing.GroupLayout(tabTester1);
-    tabTester1.setLayout(tabTester1Layout);
-    tabTester1Layout.setHorizontalGroup(
-      tabTester1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 594, Short.MAX_VALUE)
-    );
-    tabTester1Layout.setVerticalGroup(
-      tabTester1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 252, Short.MAX_VALUE)
-    );
-
-    toolTabs.addTab("Tester", tabTester1);
-
     controlSplitPane.setLeftComponent(toolTabs);
 
     boardSplitPane.setLeftComponent(controlSplitPane);
@@ -281,7 +267,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private javax.swing.JScrollPane renderBoardScrollPane;
   private render.SeqTablePanel seqTablePanel;
   private render.TabOptions tabOptions1;
-  private render.TabTester tabTester1;
   private render.TextParserPanel textParserPanel1;
   private javax.swing.JTabbedPane toolTabs;
   // End of variables declaration//GEN-END:variables

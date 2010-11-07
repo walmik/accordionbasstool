@@ -134,7 +134,10 @@
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="chordLabel" min="-2" pref="78" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="chordLabel" min="-2" pref="78" max="-2" attributes="0"/>
+                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                  </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="addedBassCheck" alignment="0" min="-2" max="-2" attributes="1"/>
@@ -156,38 +159,43 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
-                  <Group type="102" alignment="1" attributes="1">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
-                              <Component id="inversionCombo" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+              <Group type="102" attributes="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel1" alignment="0" min="-2" pref="14" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <EmptySpace pref="11" max="32767" attributes="0"/>
+                          <Component id="notePickerAdd" min="-2" max="-2" attributes="1"/>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
-                      <Component id="mustBeLowestCheck" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="1">
-                      <Component id="addedBassCheck" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
-                      <Component id="notePickerAdd" min="-2" max="-2" attributes="1"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="1">
-                      <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
-                      <Component id="slashLabel" max="32767" attributes="1"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="chordLabel" alignment="1" max="32767" attributes="3"/>
+                              <Component id="notePickerRoot" alignment="1" max="32767" attributes="1"/>
+                          </Group>
+                      </Group>
                   </Group>
               </Group>
-              <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
-                  <Group type="102" alignment="1" attributes="1">
-                      <EmptySpace min="2" pref="2" max="2" attributes="0"/>
-                      <Component id="chordLabel" max="32767" attributes="3"/>
+              <Group type="102" attributes="0">
+                  <Component id="addedBassCheck" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="55" pref="55" max="55" attributes="0"/>
+              </Group>
+              <Group type="102" alignment="0" attributes="1">
+                  <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
+                  <Component id="slashLabel" pref="40" max="32767" attributes="1"/>
+              </Group>
+              <Group type="102" alignment="1" attributes="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
+                          <Component id="inversionCombo" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="jLabel1" min="-2" pref="14" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="notePickerRoot" min="-2" max="-2" attributes="1"/>
-                  </Group>
+                  <EmptySpace pref="10" max="32767" attributes="0"/>
+                  <Component id="mustBeLowestCheck" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -261,6 +269,11 @@
           </Properties>
         </Component>
         <Component class="render.NotePickerAlt" name="notePickerAdd">
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel3">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Chord:"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>
