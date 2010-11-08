@@ -163,7 +163,9 @@ public class BoardSearcher
       len = lastLink.len + 1;
       theCombo = null;
 
-      indent = lastLink.indent + "  ";
+      if (debugOut) {
+        indent = lastLink.indent + "  ";
+      }
     }
 
     ButtonComboLink()
@@ -176,7 +178,9 @@ public class BoardSearcher
       len = 0;
       theCombo = null;
 
-      indent = "";
+      if (debugOut) {
+        indent = "";
+      }
     }
 
     ButtonCombo getCombo(BassBoard board)
@@ -203,12 +207,10 @@ public class BoardSearcher
       return theCombo;
     }
   }
-
   //Options
-  public static boolean optStrictBass = false;
+  public static boolean optStrictBass = true;
   public static boolean optIgnoreBassOnly = true;
   public static boolean optAllowBassOnlyIfNoChords = true;
-
   public static int optMaxComboLength = 4;
 
   // All Chords
@@ -219,11 +221,10 @@ public class BoardSearcher
     // Build mask cache, use instead of board.getChord access
     Chord.Mask[][] masks = board.buildChordMaskCache();
     Chord.Mask fullChordMask = fullChord.getChordMask();
+    int lowestBit = Integer.numberOfTrailingZeros(fullChordMask.getValue());
 
     // ***************************
-    //TODO: Make this an option strict bass
-    boolean unmaskBassRegister = (optStrictBass ? !fullChordMask.hasLowerOctave() : true);
-    //TODO: Filter out all bass combos, if alternatives exist
+    boolean restrictLowerBasses = optStrictBass;
     boolean ignoreAllBassCombos = optIgnoreBassOnly;
     boolean chordComboFound = !optAllowBassOnlyIfNoChords;
     // ***************************
@@ -248,7 +249,9 @@ public class BoardSearcher
     for (int r = 0; r < board.getNumRows(); r++) {
       if (board.isSingleBassRow(r)) {
         for (int c = 0; c < board.getNumCols(); c++) {
-          if (unmaskBassRegister) {
+          if (restrictLowerBasses) {
+            masks[r][c].unmaskLowRegisterAndAbove(fullChordMask, lowestBit);
+          } else {
             masks[r][c].unmaskRegister(fullChordMask);
           }
 
@@ -274,7 +277,9 @@ public class BoardSearcher
 
         Chord.Mask newChordMask = masks[r][c];
 
-//					System.out.println(currLink.indent + "R: " + r + " C: " + c + " - " + currLink.chordMask.value);
+        if (debugOut) {
+          System.out.println(currLink.indent + "R: " + r + " C: " + c + " - " + currLink.chordMask.getValue());
+        }
 
         // If already contain the new chord, skip immediately
         if (currLink.chordMask.contains(newChordMask)) {

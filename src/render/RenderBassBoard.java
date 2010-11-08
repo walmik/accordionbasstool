@@ -21,6 +21,7 @@ import javax.swing.event.ListSelectionListener;
 
 import music.BassBoard;
 import music.ButtonComboSequence;
+import music.Note;
 
 public class RenderBassBoard extends JPanel implements ListSelectionListener
 {
@@ -70,6 +71,13 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     {
       // TODO Auto-generated method stub
       clickPos = hitTest(e.getX(), e.getY());
+
+      // Debug Stuff
+      //int value = _theBoard.getChordAt(clickPos).getChordMask().getValue();
+      //int lowestBit = Integer.numberOfTrailingZeros(value);
+      //int abc = ((1 << (Note.NUM_HALFSTEPS - lowestBit)) - 1) << lowestBit;
+      //System.out.println(Integer.toBinaryString(abc));
+
       repaint();
     }
 
@@ -412,8 +420,8 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
     int prefSize = RenderBoardUI.defaultUI._prefSize;
 
-    r = (int) (_theBoard.getNumCols() * _colToRow * prefSize) + (_borderInsets.left + _borderInsets.right);// + margin.width/2;
-    c = (int) (_theBoard.getNumRows() * prefSize) + (_borderInsets.top + _borderInsets.bottom) + margin.height / 2;
+    r = (int) (_theBoard.getNumCols() * _colToRow * prefSize) + (_borderInsets.left + _borderInsets.right);
+    c = (int) (_theBoard.getNumRows() * prefSize) + (_borderInsets.top + _borderInsets.bottom);
 
     if (_isHoriz) {
       dim = new Dimension(r, c);

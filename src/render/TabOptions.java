@@ -124,7 +124,8 @@ public class TabOptions extends javax.swing.JPanel
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Sequence Search Options:"));
 
-    checkStrictBass.setText("Strict Lowest Bass");
+    checkStrictBass.setSelected(true);
+    checkStrictBass.setText("Guarantee Lowest Bass");
     checkStrictBass.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         checkStrictBassActionPerformed(evt);

@@ -1,5 +1,7 @@
 package music;
 
+import music.Note.ScaleNote;
+
 public class Chord
 {
 
@@ -119,15 +121,30 @@ public class Chord
 //			value |= (1 << (note.value() + Note.NUM_HALFSTEPS));
 //		}
     // Are there any bass buttons in the mask
-    boolean hasLowerOctave()
+    public boolean hasLowerOctave()
     {
       //return (value >> Note.NUM_HALFSTEPS) != 0;
-      return (value & ~((1 << Note.NUM_HALFSTEPS) - 1)) != 0;
+      return (value & ((1 << Note.NUM_HALFSTEPS) - 1)) != 0;
     }
 
     void unmaskRegister(Mask otherMask)
     {
       int res = value & otherMask.value;
+      if (res != 0) {
+        value = res;
+      }
+    }
+
+    void unmaskLowRegisterAndAbove(Mask otherMask, int lowestBit)
+    {
+      int maskToRestrict = otherMask.value;
+
+      // Restrict bass notes lower than the lowest bit desired in the chord
+      if (lowestBit < Note.NUM_HALFSTEPS) {
+        maskToRestrict |= ((1 << lowestBit) - 1);
+      }
+
+      int res = value & maskToRestrict;
       if (res != 0) {
         value = res;
       }
@@ -337,7 +354,7 @@ public class Chord
   // Integer bitmask representing the chord
   // Bits 0-11 are set if the chord has each respective semitone 0-11
   // Compute on first use
-  Mask getChordMask()
+  public Mask getChordMask()
   {
     if (mask == null) {
       mask = new Mask(this);

@@ -19,6 +19,7 @@ public class ParsedChordDef
   public final Chord chord;
   private final RegistryChordDef registryDef;
   public final short regRow, regCol;
+  public final boolean bassLowest;
 
   public static ParsedChordDef getDefaultChordDef()
   {
@@ -50,6 +51,7 @@ public class ParsedChordDef
 
     detail = nameHtml;
     regRow = regCol = 0;
+    bassLowest = false;
   }
 
   public ParsedChordDef(Note root,
@@ -74,6 +76,7 @@ public class ParsedChordDef
       nameHtml = chord.toHtmlString();
       detail = nameHtml;
       regRow = regCol = 0;
+      bassLowest = false;
       return;
     }
 
@@ -116,6 +119,8 @@ public class ParsedChordDef
     }
     detail = det;
 
+    bassLowest = addedBassLowest;
+
   }
 
   public ParsedChordDef transposeBy(Interval ival)
@@ -126,13 +131,12 @@ public class ParsedChordDef
       newAddedBass = addedBassNote.add(ival);
     }
 
-    //TODO: another pass on this,
-
     if (registryDef == null) {
+      //Is this ok?
       this.chord.transpose(ival);
       return new ParsedChordDef(this.chord);
     } else {
-      return new ParsedChordDef(rootNote.add(ival), newAddedBass, this.registryDef, false);
+      return new ParsedChordDef(rootNote.add(ival), newAddedBass, this.registryDef, this.bassLowest);
     }
   }
 }

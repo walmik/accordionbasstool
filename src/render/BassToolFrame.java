@@ -200,11 +200,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
+    renderBoardHeader1 = new render.RenderBoardHeader();
     boardSplitPane = new javax.swing.JSplitPane();
-    boardAndHeaderPanel = new javax.swing.JPanel();
     renderBoardScrollPane = new javax.swing.JScrollPane();
     renderBassBoard = getRenderBoard();
-    renderBoardHeader1 = new render.RenderBoardHeader();
     controlSplitPane = new javax.swing.JSplitPane();
     seqTablePanel = new render.SeqTablePanel();
     toolTabs = new javax.swing.JTabbedPane();
@@ -218,8 +217,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     boardSplitPane.setDividerSize(10);
     boardSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-    boardAndHeaderPanel.setLayout(new java.awt.BorderLayout());
-
     javax.swing.GroupLayout renderBassBoardLayout = new javax.swing.GroupLayout(renderBassBoard);
     renderBassBoard.setLayout(renderBassBoardLayout);
     renderBassBoardLayout.setHorizontalGroup(
@@ -228,17 +225,14 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     );
     renderBassBoardLayout.setVerticalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 334, Short.MAX_VALUE)
+      .addGap(0, 347, Short.MAX_VALUE)
     );
 
     renderBoardScrollPane.setViewportView(renderBassBoard);
 
     renderBoardScrollPane.getVerticalScrollBar().setBlockIncrement(24);
     renderBoardScrollPane.getVerticalScrollBar().setUnitIncrement(8);
-    boardAndHeaderPanel.add(renderBoardScrollPane, java.awt.BorderLayout.CENTER);
-    boardAndHeaderPanel.add(renderBoardHeader1, java.awt.BorderLayout.PAGE_START);
-
-    boardSplitPane.setRightComponent(boardAndHeaderPanel);
+    boardSplitPane.setBottomComponent(renderBoardScrollPane);
 
     controlSplitPane.setDividerSize(16);
     controlSplitPane.setAutoscrolls(true);
@@ -258,7 +252,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     pack();
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JPanel boardAndHeaderPanel;
   private javax.swing.JSplitPane boardSplitPane;
   private render.ChordPicker chordPicker1;
   private javax.swing.JSplitPane controlSplitPane;

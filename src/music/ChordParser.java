@@ -65,9 +65,9 @@ public class ChordParser
 
     RegistryChordDef result = ChordRegistry.mainRegistry().findChord(ChordRegistry.ALL_CHORDS, parser);
 
-    // Additional Bass, root
+    // Additional Bass, non-root
 
-    if (parser.nextChar() == '/') {
+    if (parser.nextChar() == '\\') {
       parser.incOffset(1);
 
       Note bassNote = Note.fromString(parser);
@@ -76,9 +76,9 @@ public class ChordParser
       return new ParsedChordDef(rootNote, bassNote, result, false);
     }
 
-    // Additional Bass, non-root
+    // Additional Bass, root
 
-    if (parser.nextChar() == '\\') {
+    if (parser.nextChar() == '/') {
       parser.incOffset(1);
 
       Note bassNote = Note.fromString(parser);
