@@ -15,7 +15,7 @@ public class ButtonCombo
   GeoPos center;
   int heur = 0;
   Hash hash;
-  private Note[] sortedNotes;
+  //private Note[] sortedNotes;
   private Note lowestNote;
 
   class Hash
@@ -257,10 +257,11 @@ public class ButtonCombo
     return getHash().contains(row, col);
   }
 
+  static Note[] sortedNotes = new Note[Note.NUM_HALFSTEPS * 2];
+
   private void sortNotes()
   {
     chordMask = new Chord.Mask();
-    sortedNotes = new Note[Note.NUM_HALFSTEPS * 2];
 
     for (int i = 0; i < pos.length; i++) {
       Chord theChord = board.getChordAt(pos[i]);
@@ -272,12 +273,14 @@ public class ButtonCombo
 
   public Note getLowestNote()
   {
-    if (this.sortedNotes == null) {
-      sortNotes();
-    }
-
     if (lowestNote == null) {
-      for (int i = 0; i < this.sortedNotes.length; i++) {
+      for (int i = 0; i < sortedNotes.length; i++) {
+        sortedNotes[i] = null;
+      }
+
+      sortNotes();
+
+      for (int i = 0; i < sortedNotes.length; i++) {
         if (sortedNotes[i] != null) {
           lowestNote = sortedNotes[i];
           break;
@@ -288,28 +291,28 @@ public class ButtonCombo
     return lowestNote;
   }
 
-  public String toSortedNoteString(boolean html)
-  {
-    String str = "";
-
-    if (sortedNotes == null) {
-      sortNotes();
-    }
-
-    for (int i = 0; i < sortedNotes.length; i++) {
-      if (sortedNotes[i] == null) {
-        continue;
-      }
-
-      if (str.length() > 0) {
-        str += " + ";
-      }
-      str += sortedNotes[i].toString(html);
-
-    }
-
-    return str;
-  }
+//  public String toSortedNoteString(boolean html)
+//  {
+//    String str = "";
+//
+//    if (sortedNotes == null) {
+//      sortNotes();
+//    }
+//
+//    for (int i = 0; i < sortedNotes.length; i++) {
+//      if (sortedNotes[i] == null) {
+//        continue;
+//      }
+//
+//      if (str.length() > 0) {
+//        str += " + ";
+//      }
+//      str += sortedNotes[i].toString(html);
+//
+//    }
+//
+//    return str;
+//  }
 
   public int getChordMaskValue()
   {
