@@ -224,7 +224,7 @@ public class BoardSearcher
     int lowestBit = Integer.numberOfTrailingZeros(fullChordMask.getValue());
 
     // ***************************
-    boolean restrictLowerBasses = optStrictBass;
+    boolean restrictLowerBasses = optStrictBass && (lowestBit < Note.NUM_HALFSTEPS);
     boolean ignoreAllBassCombos = optIgnoreBassOnly;
     boolean chordComboFound = !optAllowBassOnlyIfNoChords;
     // ***************************
@@ -278,7 +278,7 @@ public class BoardSearcher
         Chord.Mask newChordMask = masks[r][c];
 
         if (debugOut) {
-          System.out.println(currLink.indent + "R: " + r + " C: " + c + " - " + currLink.chordMask.getValue());
+          System.out.println(currLink.indent + "R: " + r + " C: " + c + " - " + Integer.toBinaryString(currLink.chordMask.getValue()));
         }
 
         // If already contain the new chord, skip immediately

@@ -15,7 +15,7 @@ public class ButtonCombo
   GeoPos center;
   int heur = 0;
   Hash hash;
-  //private Note[] sortedNotes;
+  GeoPos boundsMin, boundsMax;
   private Note lowestNote;
 
   class Hash
@@ -119,7 +119,7 @@ public class ButtonCombo
       return true;
     }
     
-    return computeComboBounds(null, null) < optMaxDistThreshold;
+    return computeComboBounds() < optMaxDistThreshold;
   }
   
   public static int optMaxDistThreshold = 8;
@@ -129,50 +129,36 @@ public class ButtonCombo
     optMaxDistThreshold = threshold;
   }
 
-  private int computeComboBounds(GeoPos boundsMax, GeoPos boundsMin)
+  private int computeComboBounds()
   {
     if (boardDim != 0) {
       return boardDim;
     }
 
-    GeoPos minP = GeoPos.maxPos();
-    GeoPos maxP = GeoPos.minPos();
+    boundsMin = GeoPos.maxPos();
+    boundsMax = GeoPos.minPos();
     GeoPos currPos = GeoPos.zero();
     center = GeoPos.zero();
 
     // Compute center and corners of the buttoncombo
     for (int i = 0; i < pos.length; i++) {
       currPos.set(pos[i], board.getCenter());
-      minP.min(currPos);
-      maxP.max(currPos);
+      boundsMin.min(currPos);
+      boundsMax.max(currPos);
       center.add(currPos);
-    }
-
-    if (boundsMax != null && boundsMin != null) {
-      boundsMax.max(maxP);
-      boundsMin.min(minP);
     }
 
     if (pos.length > 0) {
       center.divide(pos.length);
     }
 
-    maxP.subtract(minP);
-    boardDim = maxP.absValue();
+    boardDim = boundsMax.manDistTo(boundsMin);
     return boardDim;
   }
 
-
   int evalHeur(final BassBoard.Pos boardCenter)
   {
-    return evalHeur(boardCenter, null, null);
-  }
-
-  int evalHeur(final BassBoard.Pos boardCenter,
-          GeoPos boundsMax,
-          GeoPos boundsMin)
-  {
-    if ((heur != 0) && (boundsMax == null && boundsMin == null)) {
+    if ((heur != 0)) {
       return heur;
     }
 
@@ -204,9 +190,9 @@ public class ButtonCombo
 //    maxP.subtract(minP);
 
     // Span width + height
-    heur += this.computeComboBounds(boundsMax, boundsMin);
+    heur += this.computeComboBounds() * 8;
     //heur += center.absValue();
-    heur += (pos.length - 1) * (50 * GeoPos.GRID_SCALE);
+    heur += (pos.length - 1) * (10 * GeoPos.GRID_SCALE);
 
     return heur;
   }

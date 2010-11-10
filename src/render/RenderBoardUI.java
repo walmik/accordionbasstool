@@ -23,6 +23,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -49,6 +50,9 @@ public class RenderBoardUI
   boolean use3DDrawer = true;
   int lastIMScale = 0;
 
+  BufferedImage optimalityImage;
+  ImageIcon optimalityIcons[];
+
   RenderBoardUI()
   {
     createButtonImages(1);
@@ -56,7 +60,7 @@ public class RenderBoardUI
 
   private void createButtonImages(int scale)
   {
-    if (scale == lastIMScale) {
+    if ((scale == lastIMScale)) {
       return;
     }
 
@@ -127,6 +131,7 @@ public class RenderBoardUI
       if (scale < 1) {
         scale = 1;
       }
+      
       //Recreate Images every time?
       //****************
       createButtonImages(scale);
@@ -185,10 +190,10 @@ public class RenderBoardUI
         //lighterFill = Color.MAGENTA;
         if (pressed) {
           lighterFill = Color.magenta;
-          darkerFill = lighterFill.darker();
+          darkerFill = Color.magenta.darker();
         } else {
-          lighterFill = SystemColor.textHighlight;
-          darkerFill = lighterFill.darker();
+          lighterFill = Color.blue;
+          darkerFill = Color.blue.darker();
         }
       }
 
@@ -352,6 +357,38 @@ public class RenderBoardUI
     // Draw Button Top Radial Hightlight
     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (pressed ? 0.9f : 0.5f)));
     graphics.fill(_buttonTop);
+  }
+
+  void renderOptimalityImage()
+  {
+    int imageDim = 32;
+
+    float fractions[] = {0.0f, 0.5f, 1.0f};
+    Color colors[] = {Color.green.darker(), Color.yellow, Color.red};
+    optimalityImage = new BufferedImage(imageDim, imageDim, BufferedImage.TYPE_INT_ARGB);
+    LinearGradientPaint gradient = new LinearGradientPaint(0, imageDim/2, imageDim, imageDim/2, fractions, colors);
+
+    Graphics2D graphics = (Graphics2D)optimalityImage.getGraphics();
+    graphics.setPaint(gradient);
+    graphics.fillRect(0, 0, imageDim, imageDim);
+  }
+
+  void buildOptimalityIcons(int numIcons)
+  {
+    optimalityIcons = new ImageIcon[numIcons];
+
+    // Golden Ratio
+    int iconHeight = 16;
+    int iconWidth = (int)(iconHeight * 1.61803399);
+
+    int stepWidth = optimalityImage.getWidth() / numIcons;
+    int stepHeight = optimalityImage.getHeight();
+
+    for (int i = 0; i < optimalityIcons.length; i++)
+    {
+      optimalityIcons[i] = new ImageIcon(optimalityImage.getSubimage(i*stepWidth, 0, stepWidth, stepHeight).
+              getScaledInstance(iconWidth, iconHeight, BufferedImage.SCALE_FAST));
+    }
   }
 
   ///Border Stuff

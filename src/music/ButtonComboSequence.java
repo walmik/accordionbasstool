@@ -11,6 +11,8 @@ public class ButtonComboSequence implements Cloneable
 	
 	// Cached heuristic of this combo seq
 	private int heur = 0;
+
+  public int iconIndex;
 	
 	public ButtonComboSequence(BassBoard theBoard)
 	{
@@ -105,11 +107,13 @@ public class ButtonComboSequence implements Cloneable
 		{
 			ButtonCombo combo = combosList.nextElement();
 			
-			dist += combo.evalHeur(boardCenter, maxP, minP);
+			dist += combo.evalHeur(boardCenter);
+      maxP.max(combo.boundsMax);
+      minP.min(combo.boundsMin);
 			
 			if (prevCombo != null)
 			{
-				dist += combo.center.manDistTo(prevCombo.center);
+				dist += combo.center.manDistTo(prevCombo.center) * 20;
 			}
 			else
 			{

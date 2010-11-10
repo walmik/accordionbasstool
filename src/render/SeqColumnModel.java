@@ -259,7 +259,11 @@ class SeqColumnModel extends DefaultTableColumnModel
     rowHeaderDataModel.fireListDataChanged();
     dataModel.fireTableStructureChanged();
 
-    selComboModel.setSelectionInterval(selIndex, selIndex);
+    if (selIndex < allComboSeqs.length) {
+      selComboModel.setSelectionInterval(selIndex, selIndex);
+    } else {
+      selComboModel.setSelectionInterval(0, 0);
+    }
     rowSelModel.setSelectionInterval(0, 0);
   }
 
@@ -318,6 +322,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
+
   class SeqRowHeaderData extends AbstractListModel
   {
 
@@ -325,6 +330,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     {
       fireContentsChanged(this, 0, allComboSeqs.length);
     }
+
 
     @Override
     public int getSize()
@@ -339,9 +345,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     @Override
     public Object getElementAt(int index)
     {
-      String str = "#" + (index + 1);
-      str += " (" + allComboSeqs[index].getHeur() + ")";
-      return str;
+      return allComboSeqs[index];
     }
   }
 }

@@ -21,7 +21,6 @@ import javax.swing.event.ListSelectionListener;
 
 import music.BassBoard;
 import music.ButtonComboSequence;
-import music.Note;
 
 public class RenderBassBoard extends JPanel implements ListSelectionListener
 {
@@ -170,12 +169,11 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     _isHoriz = horiz;
     repaint();
   }
-  
+
   public boolean isHorizontal()
   {
     return _isHoriz;
   }
-
 
   public BassBoard.Pos hitTest(int x, int y)
   {
@@ -199,7 +197,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
       rPos = x;
     }
 
-    rPos -=  margin.height / 2;
+    rPos -= margin.height / 2;
 
     row = rPos / _rInc;
     cPos -= (_cStart + row * _slope);
@@ -300,14 +298,14 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
 
     //if (_isHoriz) {
-      if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
-        graphics2D.translate((getWidth() - _contentDim.width - margin.width) / 2, 0);
-      }
+    if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
+      graphics2D.translate((getWidth() - _contentDim.width - margin.width) / 2, 0);
+    }
     //} else {
-      //   if (this.getAlignmentY() == JComponent.CENTER_ALIGNMENT) {
-      //     graphics2D.translate(0, (getHeight() - _contentDim.height - margin.height) / 2);
-      //   }
-   //}
+    //   if (this.getAlignmentY() == JComponent.CENTER_ALIGNMENT) {
+    //     graphics2D.translate(0, (getHeight() - _contentDim.height - margin.height) / 2);
+    //   }
+    //}
 
     // Paint Border & Background
     RoundRectangle2D roundRect =
@@ -342,8 +340,20 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 //      xP = _borderInsets.left + margin;
 //    }
 
+
     xP = _borderInsets.left + margin.width / 2;
     yP = _borderInsets.top + margin.height / 2;
+
+    //********* TEMP ************
+//    if (_selCombo._comboSeq != null) {
+//      int iconIndex = this._selCombo._comboSeq.iconIndex;
+//      if (iconIndex >= 0 && iconIndex < RenderBoardUI.defaultUI.optimalityIcons.length) {
+//        int rgb = RenderBoardUI.defaultUI.optimalityImage.getRGB(iconIndex, 0);
+//        RenderBoardUI.defaultUI.newButtonColor = new Color(rgb);
+//      }
+//    }
+//    buttonDrawer = RenderBoardUI.defaultUI.getButtonDrawer();
+    //***************************
 
     buttonDrawer.setup(graphics2D, xW, yW, diamX, diamY);
     textDrawer.setup(graphics2D, xW, yW, diamX, diamY);
@@ -411,7 +421,6 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 //  {
 //    return getPreferredSize();
 //  }
-
   @Override
   public Dimension getPreferredSize()
   {
@@ -476,7 +485,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     if (true == true) {
       return;
     }
-    
+
     JPanel noteHeader = new JPanel()
     {
 

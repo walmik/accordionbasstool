@@ -38,6 +38,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import music.ButtonCombo;
+import music.ButtonComboSequence;
 import music.Note;
 import music.ParsedChordDef;
 
@@ -143,32 +144,8 @@ public class SeqViewerController
               }
             });
   }
-//  void registerPanelListener(Component top)
-//  {
-//    top.addComponentListener(new ComponentAdapter()
-//    {
-//
-//      @Override
-//      public void componentHidden(ComponentEvent e)
-//      {
-//        RenderBassBoard renderBoard = BassToolFrame.getRenderBoard();
-//        if ((renderBoard != null) &&
-//            (renderBoard.getSelectedButtonCombo() == columnModel.selComboModel)) {
-//          renderBoard.setSelectedButtonCombo(null);
-//        }
-//      }
-//
-//      @Override
-//      public void componentShown(ComponentEvent e)
-//      {
-//        RenderBassBoard renderBoard = BassToolFrame.getRenderBoard();
-//        if (renderBoard != null) {
-//          renderBoard.setSelectedButtonCombo(columnModel.selComboModel);
-//        }
-//      }
-//    });
-//  }
-  
+
+
   static class SliderTableHeaderUI extends TableHeaderUI
           implements TableColumnModelListener, ChangeListener
   {
@@ -447,13 +424,35 @@ public class SeqViewerController
       Font font = header.getFont().deriveFont(14.f);
       plain = font.deriveFont(Font.PLAIN);
       bold = font.deriveFont(Font.BOLD);
+
+      RenderBoardUI.defaultUI.renderOptimalityImage();
+      RenderBoardUI.defaultUI.buildOptimalityIcons(32);
+
+      this.setIconTextGap(6);
+      this.setHorizontalTextPosition(LEFT);
+      this.setVerticalTextPosition(CENTER);
     }
 
     @Override
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
     {
-      //Component comp = defRenderer.getTableCellRendererComponent(seqTable, value, false, cellHasFocus, -1, index);
-      this.setText(value.toString());
+      ButtonComboSequence seq = (ButtonComboSequence)value;
+      
+      int heur = seq.getHeur();
+
+      float ratio = ((float)heur / seq.getNumCombos()) / 100.f;
+      if (ratio > 1.f) {
+        ratio = 1.f;
+      }
+
+      int iconIndex = (int)(ratio * (RenderBoardUI.defaultUI.optimalityIcons.length - 1));
+      this.setIcon(RenderBoardUI.defaultUI.optimalityIcons[iconIndex]);
+
+      seq.iconIndex = iconIndex;
+
+      String str = "#" + (index + 1);
+      str += " (" + heur/seq.getNumCombos() + ")";
+      this.setText(str);
 
       if (isSelected) {
         this.setBorder(lowered);
