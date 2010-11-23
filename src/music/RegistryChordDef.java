@@ -17,7 +17,7 @@ final public class RegistryChordDef
     name = _name;
     abbrevHtml = _abb.replace("[", "<sup>").replace("]", "</sup>");
     abbrevPlain = _abb.replace("[", "").replace("]", "");
-    chord = music.ChordParser.parseNoteList(new util.Main.StringParser(_notes));
+    chord = music.ChordParser.parseNoteList(new StringParser(_notes));
 
     ivals = this.chord.extractInterval();
     row = (short)r;

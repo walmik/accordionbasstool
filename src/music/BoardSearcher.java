@@ -1,6 +1,6 @@
 package music;
 
-import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Vector;
@@ -14,18 +14,16 @@ public class BoardSearcher
 
   public ButtonComboSequence[] parseSequence(BassBoard board, Vector<Chord> chordSeq)
   {
-    Enumeration<Chord> eChord = chordSeq.elements();
-
     LinkedList<ButtonComboSequence> currSeqs = new LinkedList<ButtonComboSequence>();
     currSeqs.add(new ButtonComboSequence(board));
 
     LinkedList<ButtonComboSequence> nextSeqs = new LinkedList<ButtonComboSequence>();
 
-    while (eChord.hasMoreElements()) {
-      Chord chord = eChord.nextElement();
-      ButtonCombo[] combo = null;
+    for (Chord chord : chordSeq) {
 
-      long start = System.currentTimeMillis();
+      LinkedList<ButtonCombo> combo = null;
+
+      long start = (debugOut ? System.currentTimeMillis() : 0);
 
       if (chord.isSingleNote()) {
         // Optimized search for notes only
@@ -47,22 +45,23 @@ public class BoardSearcher
       }
 
       if (debugOut) {
-        System.out.println("Combos " + combo.length);
+        System.out.println("Combos " + combo.size());
       }
 
       // Iterate over curr seqs
 
-      ListIterator<ButtonComboSequence> currIter =
-              currSeqs.listIterator();
-      while (currIter.hasNext()) {
-        ButtonComboSequence origSeq = currIter.next();
+      for (ButtonComboSequence origSeq : currSeqs) {
 
-        for (int i = combo.length - 1; i >= 0; i--) {
-          ButtonComboSequence seq = origSeq;
-          if (i > 0) {
-            seq = seq.clone();
+        for (ButtonCombo curr : combo) {
+          ButtonComboSequence seq;
+
+          if (curr == combo.getLast()) {
+            seq = origSeq;
+          } else {
+            seq = origSeq.clone();
           }
-          seq.add(combo[i]);
+
+          seq.add(curr);
 
           int heur = seq.evalHeuristic();
           boolean inserted = false;
@@ -102,22 +101,14 @@ public class BoardSearcher
       nextSeqs.clear();
     }
 
-//		ListIterator<ButtonComboSequence> currIter = 
-//			currSeqs.listIterator();
-//		
-//		while (currIter.hasNext())
-//		{
-//			System.out.println("#" + currIter.nextIndex() + " " + currIter.next());
-//		}
-
     ButtonComboSequence[] seqArray = new ButtonComboSequence[currSeqs.size()];
     currSeqs.toArray(seqArray);
     return seqArray;
   }
 
-  ButtonCombo[] findAllNotes(BassBoard board, Note note)
+  LinkedList<ButtonCombo> findAllNotes(BassBoard board, Note note)
   {
-    Vector<ButtonCombo> combos = new Vector<ButtonCombo>();
+    LinkedList<ButtonCombo> combos = new LinkedList<ButtonCombo>();
 
     for (int r = 0; r < board.getNumRows(); r++) {
       // Only doing single note rows
@@ -134,8 +125,7 @@ public class BoardSearcher
       }
     }
 
-    ButtonCombo[] array = new ButtonCombo[combos.size()];
-    return combos.toArray(array);
+    return combos;
   }
 
   class ButtonComboLink
@@ -214,7 +204,7 @@ public class BoardSearcher
   public static int optMaxComboLength = 4;
 
   // All Chords
-  ButtonCombo[] findAllIter(BassBoard board, Chord fullChord)
+  LinkedList<ButtonCombo> findAllIter(BassBoard board, Chord fullChord)
   {
     LinkedList<ButtonCombo> combos = new LinkedList<ButtonCombo>();
 
@@ -346,9 +336,9 @@ public class BoardSearcher
       currLink = currLink.last;
     }
 
-    ButtonCombo[] array = new ButtonCombo[combos.size()];
-    return combos.toArray(array);
+    return combos;
   }
+
   // All Chords
 //	ButtonCombo[] findAll(BassBoard board, Chord fullChord)
 //	{

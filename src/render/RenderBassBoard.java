@@ -389,13 +389,23 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
         boolean pressed = (_selCombo != null && _selCombo.hasButtonPressed(realRow, realCol));
         boolean selected = (_selCombo != null && _selCombo.hasButtonInSeq(realRow, realCol));
 
+        String textStr = null;
+        
+        if (pressed) {
+          textStr = _selCombo.getFingerAt(realRow, realCol);
+        }
+
+        if (textStr == null) {
+          textStr = _theBoard.getChordName(realRow, realCol, false);
+        }
+
         if (!pressed && (clickPos != null) && clickPos.equals(realRow, realCol)) {
           pressed = true;
         }
 
         {
           buttonDrawer.draw(graphics2D, realCol, realRow, pressed, selected);
-          textDrawer.draw(graphics2D, realCol, realRow, pressed, _theBoard.getChordName(realRow, realCol, false));
+          textDrawer.draw(graphics2D, realCol, realRow, pressed, textStr);
         }
 
 
@@ -478,46 +488,6 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
       g.drawString(_theBoard.getRow(r).toString(), x, y);
       y += _rInc;
     }
-  }
-
-  public void setupHeaders(JScrollPane scrollPane)
-  {
-    if (true == true) {
-      return;
-    }
-
-    JPanel noteHeader = new JPanel()
-    {
-
-      public void paint(Graphics g)
-      {
-        paintNoteHeader(this, g);
-      }
-
-      public Dimension getPreferredSize()
-      {
-        return new Dimension(50, 20);
-      }
-    };
-
-    JPanel bassRowHeader = new JPanel()
-    {
-
-      public void paint(Graphics g)
-      {
-        paintBassRowHeader(this, g);
-      }
-
-      public Dimension getPreferredSize()
-      {
-        return new Dimension(100, 20);
-      }
-    };
-
-
-
-    scrollPane.setColumnHeaderView(noteHeader);
-    scrollPane.setRowHeaderView(bassRowHeader);
   }
   //Member Vars
   //================================================================================

@@ -4,7 +4,7 @@
  */
 
 /*
- * TextParserPanel.java
+ * TabSeqEditor.java
  *
  * Created on Oct 21, 2010, 8:29:48 PM
  */
@@ -21,15 +21,15 @@ import music.Note;
  *
  * @author Ilya
  */
-public class TextParserPanel extends javax.swing.JPanel implements ListSelectionListener, PropertyChangeListener
+public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionListener, PropertyChangeListener
 {
 
   SeqColumnModel columnModel;
   JTable seqTable;
   boolean isUpdating = false;
 
-  /** Creates new form TextParserPanel */
-  public TextParserPanel()
+  /** Creates new form TabSeqEditor */
+  public TabSeqEditor()
   {
     initComponents();
   }
@@ -54,7 +54,7 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
     if (isUpdating) {
       return;
     }
-    
+
     if ((evt.getSource() == transNotePicker) && (evt.getPropertyName().equals("Note"))) {
       Note newNote = (Note) evt.getNewValue();
       columnModel.transposeAllFromSelectedColumn(newNote);
@@ -65,14 +65,7 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
   public void valueChanged(ListSelectionEvent e)
   {
     if (isVisible() && (columnModel != null)) {
-      this.chordTextField.setText(columnModel.toString());
-
-      int selColumn = columnModel.getSelectedColumn();
-      if (selColumn >= 0) {
-        isUpdating = true;
-        this.transNotePicker.setNote(columnModel.getChordDef(selColumn).rootNote);
-        isUpdating = false;
-      }
+      updateFromSequence();
     }
   }
 
@@ -80,9 +73,21 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
   public void setVisible(boolean visible)
   {
     if (visible && (columnModel != null)) {
-      this.chordTextField.setText(columnModel.toString());
+      updateFromSequence();
     }
     super.setVisible(visible);
+  }
+
+  private void updateFromSequence()
+  {
+    this.chordTextField.setText(columnModel.toString());
+
+    int selColumn = columnModel.getSelectedColumn();
+    if (selColumn >= 0) {
+      isUpdating = true;
+      this.transNotePicker.setNote(columnModel.getChordDef(selColumn).rootNote);
+      isUpdating = false;
+    }
   }
 
   /** This method is called from within the constructor to
@@ -102,12 +107,12 @@ public class TextParserPanel extends javax.swing.JPanel implements ListSelection
 
     setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Chord Sequence Editor:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 14))); // NOI18N
 
-    jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+    jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11));
     jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Current Sequence:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
-    chordTextField.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
+    chordTextField.setFont(new java.awt.Font("Monospaced", 0, 18));
     chordTextField.setToolTipText("<html> <li>Enter a sequence of comma seperated chords  as text below</li><br/> <li>See Chord Editor tab for all valid chord names. (ex. M = Major, m = minor)</li><br/> <li>To specify a custom chord by notes, put the notes in [ ], (ex. [ABC], [D F# G])</li><br/> </html>");
     chordTextField.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {

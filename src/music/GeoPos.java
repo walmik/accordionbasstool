@@ -17,12 +17,25 @@ public class GeoPos
   {
     return new GeoPos(0, 0);
   }
+
   public int x;
   public int y;
 
   public GeoPos(BassBoard.Pos pos, BassBoard.Pos center)
   {
     set(pos, center);
+  }
+
+  public GeoPos(BassBoard.Pos pos, BassBoard.Pos center, int grid, int skewAngle)
+  {
+    set(pos, center, grid, skewAngle);
+  }
+
+  public GeoPos(int nx, int ny, int grid, int skewAngle)
+  {
+    x = nx;
+    y = ny;
+    skewTrans(grid, skewAngle);
   }
 
   private GeoPos(int nx, int ny)
@@ -36,32 +49,39 @@ public class GeoPos
     return y;
   }
 
-  final static int GRID_SCALE = 1;
+  //final static int GRID_SCALE = 1;
   //final static int SKEW_SCALE = (int)(Math.tan(20) * GRID_SCALE);
 
   void set(BassBoard.Pos boardPos, BassBoard.Pos center)
   {
     x = boardPos.col - center.col;
     y = boardPos.row - center.row;
-    //skewTrans(GRID_SCALE, SKEW_SCALE);
   }
 
-  void add(GeoPos pos)
+  void set(BassBoard.Pos boardPos, BassBoard.Pos center, int grid, int skewAngle)
   {
-    x += pos.x;
-    y += pos.y;
+    set(boardPos, center);
+    skewTrans(grid, skewAngle);
   }
 
-  void subtract(GeoPos pos)
+  GeoPos add(GeoPos pos)
   {
-    x -= pos.x;
-    y -= pos.y;
+    return new GeoPos(x + pos.x, y + pos.y);
   }
 
-  void divide(int scale)
+  GeoPos subtract(GeoPos pos)
   {
-    x /= scale;
-    y /= scale;
+    return new GeoPos(x - pos.x, y - pos.y);
+  }
+
+  GeoPos scale(int scale)
+  {
+    return new GeoPos(x * scale, y * scale);
+  }
+  
+  GeoPos divide(int scale)
+  {
+    return new GeoPos(x / scale, y / scale);
   }
 
   void max(GeoPos pos)
@@ -76,6 +96,12 @@ public class GeoPos
     y = Math.min(y, pos.y);
   }
 
+  double dot(GeoPos pos)
+  {
+    double mag = Math.sqrt((pos.x * pos.x) + (pos.y + pos.y));
+    return (x + pos.x/mag) + (y + pos.y/mag);
+  }
+
   int absValue()
   {
     return Math.abs(x) + Math.abs(y);
@@ -88,8 +114,9 @@ public class GeoPos
     return Math.max(xD, yD);
   }
 
-  private void skewTrans(int scale, int skew)
+  private void skewTrans(int scale, int skewAngle)
   {
+    int skew = (int)(Math.tan(skewAngle) * scale);
     x = (x * scale) + (skew * y);
     y = y * scale;
   }

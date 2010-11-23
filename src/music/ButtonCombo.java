@@ -8,8 +8,9 @@ import java.util.BitSet;
 public class ButtonCombo
 {
 
-  final private BassBoard.Pos[] pos;
+  final BassBoard.Pos[] pos;
   final BassBoard board;
+
   private Chord.Mask chordMask = null;
   int boardDim = 0;
   GeoPos center;
@@ -23,7 +24,7 @@ public class ButtonCombo
 
     BitSet bitset;
 
-    Hash(ButtonCombo combo, int numRows, int numCols)
+    Hash(int numRows, int numCols)
     {
       bitset = new BitSet(numRows * numCols);
 
@@ -77,6 +78,11 @@ public class ButtonCombo
     return str;
   }
 
+  public String getButtonNameAt(int index, boolean html)
+  {
+    return board.getChordName(pos[index], html);
+  }
+
   public String toButtonListingString(boolean html)
   {
     String str = "";
@@ -84,7 +90,7 @@ public class ButtonCombo
     // Print in reverse as we were built depth first, so top button is last
     for (int i = pos.length - 1; i >= 0; i--) {
       //str += (board.isSingleBassRow(pos[i].row) ? "Bass " : "Chord ");
-      str += board.getChordName(pos[i].row, pos[i].col, html);
+      str += getButtonNameAt(i, html);
       if (i > 0) {
         str += " + ";
       }
@@ -145,11 +151,11 @@ public class ButtonCombo
       currPos.set(pos[i], board.getCenter());
       boundsMin.min(currPos);
       boundsMax.max(currPos);
-      center.add(currPos);
+      center = center.add(currPos);
     }
 
     if (pos.length > 0) {
-      center.divide(pos.length);
+      center = center.divide(pos.length);
     }
 
     boardDim = boundsMax.manDistTo(boundsMin);
@@ -192,7 +198,7 @@ public class ButtonCombo
     // Span width + height
     heur += this.computeComboBounds() * 8;
     //heur += center.absValue();
-    heur += (pos.length - 1) * (10 * GeoPos.GRID_SCALE);
+    heur += (pos.length - 1) * 10;
 
     return heur;
   }
@@ -200,7 +206,7 @@ public class ButtonCombo
   Hash getHash()
   {
     if (hash == null) {
-      hash = new Hash(this, board.getNumRows(), board.getNumCols());
+      hash = new Hash(board.getNumRows(), board.getNumCols());
     }
 
     return hash;

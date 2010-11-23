@@ -25,7 +25,6 @@ public class NotePickerAlt extends javax.swing.JPanel {
         initComponents();
 
         currNote = Note.fromString(noteCombo.getSelectedItem().toString());
-        
     }
 
     Note currNote;

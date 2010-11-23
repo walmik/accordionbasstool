@@ -21,6 +21,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import music.ButtonCombo;
 import music.ChordRegistry;
+import music.FingerCombo;
 import music.Note;
 import music.ParsedChordDef;
 
@@ -69,6 +70,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     cornerPanel.add(toolPlay);
     //cornerPanel.setBorder(BorderFactory.createTitledBorder((String)null));
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, cornerPanel);
+    this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER, new JPanel());
   }
 
   void initChordPicker(ChordPicker picker)
@@ -79,7 +81,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     //columnModel.addColumn(picker.getPickedChord(), 0);
   }
 
-  void initTextParser(TextParserPanel textParser)
+  void initTextParser(TabSeqEditor textParser)
   {
     textParser.setSeqColModel(columnModel, seqTable, null);
   }
@@ -121,7 +123,15 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     int row = seqTable.getSelectedRow();
     int col = columnModel.getSelectedColumn();
 
-    return (ButtonCombo) seqTable.getModel().getValueAt(row, col);
+    Object obj = seqTable.getModel().getValueAt(row, col);
+    if (obj instanceof FingerCombo) {
+      FingerCombo fingerCombo = (FingerCombo)obj;
+          return ((fingerCombo != null) ? (fingerCombo.getButtonCombo()) : null);
+    } else if (obj instanceof ButtonCombo) {
+      return (ButtonCombo)obj;
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -297,7 +307,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
         .addContainerGap(157, Short.MAX_VALUE))
     );
 
-    statusText.setFont(new java.awt.Font("Tahoma", 0, 16));
+    statusText.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
     statusText.setText("Status");
     statusText.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -335,6 +345,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
   {//GEN-HEADEREND:event_soundCheckItemStateChanged
     setSoundEnabled(evt.getStateChange() == ItemEvent.SELECTED);
   }//GEN-LAST:event_soundCheckItemStateChanged
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel jPanel1;
   private javax.swing.JTable seqTable;

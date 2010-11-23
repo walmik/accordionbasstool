@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -39,6 +40,9 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import music.ButtonCombo;
 import music.ButtonComboSequence;
+import music.CollSequence;
+import music.FingerCombo;
+import music.FingerComboSequence;
 import music.Note;
 import music.ParsedChordDef;
 
@@ -52,7 +56,6 @@ public class SeqViewerController
   JTable seqTable;
   JScrollPane tableScrollPane;
   SeqColumnModel columnModel;
-  final static int DEFAULT_COL_WIDTH = 100;
 
   SeqViewerController(JTable table, JScrollPane scroll)
   {
@@ -65,13 +68,13 @@ public class SeqViewerController
 
     seqTable.setAutoCreateColumnsFromModel(false);
     seqTable.setColumnModel(columnModel);
-    seqTable.setModel(columnModel.dataModel);
+    seqTable.setModel(columnModel.getDataModel());
 
     seqTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-    seqTable.setDefaultRenderer(ButtonCombo.class, new CellRenderer());
+    seqTable.setDefaultRenderer(CollSequence.class, new CellRenderer());
 
     JTableHeader header = seqTable.getTableHeader();
     header.setResizingAllowed(true);
@@ -84,12 +87,13 @@ public class SeqViewerController
     final int DEFAULT_ROW_HEADER_WIDTH = 96;
 
     //Create row header table
-    JList rowHeader = new JList(columnModel.rowHeaderDataModel);
+    JList rowHeader = new JList(columnModel.getRowHeaderDataModel());
     rowHeader.setCellRenderer(new RowHeaderRenderer(header));
     rowHeader.setSelectionModel(seqTable.getSelectionModel());
-    rowHeader.setFixedCellWidth(DEFAULT_ROW_HEADER_WIDTH);
+    //rowHeader.setFixedCellWidth(DEFAULT_ROW_HEADER_WIDTH);
     rowHeader.setFixedCellHeight(seqTable.getRowHeight());
     rowHeader.setOpaque(false);
+    rowHeader.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
 
     tableScrollPane.setRowHeaderView(rowHeader);
 
@@ -114,13 +118,9 @@ public class SeqViewerController
                 }
                 lastIndex = index;
 
-                if ((index < 0) || (index >= columnModel.allComboSeqs.length)) {
-                  columnModel.selComboModel.setButtonComboSeq(null);
-                  return;
+                if (columnModel.setSelectedSeq(index)) {
+                  seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
                 }
-                
-                columnModel.selComboModel.setButtonComboSeq(columnModel.allComboSeqs[index]);
-                seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
               }
             });
 
@@ -144,7 +144,6 @@ public class SeqViewerController
               }
             });
   }
-
 
   static class SliderTableHeaderUI extends TableHeaderUI
           implements TableColumnModelListener, ChangeListener
@@ -323,6 +322,7 @@ public class SeqViewerController
     @Override
     public void columnMarginChanged(ChangeEvent e)
     {
+      
       resizeSlider();
     }
 
@@ -428,7 +428,8 @@ public class SeqViewerController
       RenderBoardUI.defaultUI.renderOptimalityImage();
       RenderBoardUI.defaultUI.buildOptimalityIcons(32);
 
-      this.setIconTextGap(6);
+      this.setIconTextGap(8);
+      //this.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 24));
       this.setHorizontalTextPosition(LEFT);
       this.setVerticalTextPosition(CENTER);
     }
@@ -436,22 +437,31 @@ public class SeqViewerController
     @Override
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
     {
-      ButtonComboSequence seq = (ButtonComboSequence)value;
-      
-      int heur = seq.getHeur();
+      FingerComboSequence fingerSeq = null;
+      ButtonComboSequence seq = null;
+      int heur;
+            
+      if (value instanceof FingerComboSequence) {
+        fingerSeq = (FingerComboSequence)value;
+        seq = fingerSeq.getButtonComboSeq();
+        heur = fingerSeq.getHeur();
+      } else {
+        seq = (ButtonComboSequence)value;
+        heur = seq.getHeur();
+      }
 
-      float ratio = ((float)heur / seq.getNumCombos()) / 100.f;
+      float ratio = ((float) heur / seq.getNumCombos()) / 100.f;
       if (ratio > 1.f) {
         ratio = 1.f;
       }
 
-      int iconIndex = (int)(ratio * (RenderBoardUI.defaultUI.optimalityIcons.length - 1));
+      int iconIndex = (int) (ratio * (RenderBoardUI.defaultUI.optimalityIcons.length - 1));
       this.setIcon(RenderBoardUI.defaultUI.optimalityIcons[iconIndex]);
 
       seq.iconIndex = iconIndex;
 
       String str = "#" + (index + 1);
-      str += " (" + heur/seq.getNumCombos() + ")";
+      str += " (" + heur + ")";
       this.setText(str);
 
       if (isSelected) {
@@ -462,6 +472,12 @@ public class SeqViewerController
         this.setBorder(raised);
         this.setFont(plain);
         this.setBackground(defColor);
+      }
+
+      int newPrefWidth = this.getPreferredSize().width + 24;
+
+      if (newPrefWidth >= list.getFixedCellWidth()) {
+        //list.setFixedCellWidth(newPrefWidth);
       }
 
       return this;
@@ -560,7 +576,7 @@ public class SeqViewerController
       }
 
       TableColumn theColumn = table.getColumnModel().getColumn(column);
-      int newPref = Math.max(this.getPreferredSize().width + 24, DEFAULT_COL_WIDTH);
+      int newPref = Math.max(this.getPreferredSize().width + 24, SeqColumnModel.DEFAULT_COL_WIDTH);
 
       if (newPref >= theColumn.getPreferredWidth()) {
         theColumn.setPreferredWidth(newPref);
@@ -574,7 +590,7 @@ public class SeqViewerController
   {
 
     Color defSelColor;
-    Color defPlainColor;
+    Color defPlainColor1, defPlainColor2;
     Border highliteBorder;
     Border stdBorder;
 
@@ -593,7 +609,10 @@ public class SeqViewerController
       //stdBorder = BorderFactory.createMatteBorder(1, 1, 0, 0, Color.black);
 
       defSelColor = super.getTableCellRendererComponent(seqTable, "", true, false, 0, 0).getBackground();
-      defPlainColor = super.getTableCellRendererComponent(seqTable, "", false, false, 0, 0).getBackground();
+      
+      defPlainColor1 = Color.white;//super.getTableCellRendererComponent(seqTable, "", false, false, 0, 0).getBackground();
+      //defPlainColor2 = super.getTableCellRendererComponent(seqTable, "", false, false, 1, 0).getBackground();
+      defPlainColor2 = UIManager.getColor("Table.alternateRowColor");
     }
 
     @Override
@@ -606,19 +625,31 @@ public class SeqViewerController
     @Override
     public Component getTableCellRendererComponent(JTable table, Object objValue, boolean isSelected, boolean hasFocus, int row, int column)
     {
-      ButtonCombo combo = (ButtonCombo) objValue;
+      FingerCombo fingerCombo = null;
+      ButtonCombo buttonCombo = null;
 
-      String text;
+      if (objValue instanceof FingerCombo) {
+        fingerCombo = (FingerCombo)objValue;
+        buttonCombo = ((fingerCombo != null) ? fingerCombo.getButtonCombo() : null);
+      } else {
+        buttonCombo = (ButtonCombo)objValue;
+      }
 
-      if (combo != null) {
-        text = combo.toButtonListingString(false);
+      String text = "";
+      
+      if (fingerCombo != null) {
+        text = fingerCombo.toString();
+      } else if (buttonCombo != null) {
+        text = buttonCombo.toButtonListingString(false);
+      }
 
+      if (buttonCombo != null) {
         //if (combo.isSingleBass()) {
-          Note lowest = combo.getLowestNote();
-          String lowestInfo = (lowest.isBassNote() ? "Bass " : "High ") + lowest.toString(false);
-          //return "<html>" + info + " Low: " + lowest + "</html>";
-          text += " (" + lowestInfo + ")";
-          //text = combo.toSortedNoteString(false);
+        Note lowest = buttonCombo.getLowestNote();
+        String lowestInfo = (lowest.isBassNote() ? "Bass " : "High ") + lowest.toString(false);
+        //return "<html>" + info + " Low: " + lowest + "</html>";
+        text += " (" + lowestInfo + ")";
+        //text = combo.toSortedNoteString(false);
         //}
       } else {
         text = "Chord Not Possible";
@@ -644,7 +675,7 @@ public class SeqViewerController
           jcomp.setBorder(stdBorder);
         }
       } else {
-        jcomp.setBackground(defPlainColor);
+        jcomp.setBackground((row % 2) == 0 ? defPlainColor1 : defPlainColor2);
         jcomp.setBorder(stdBorder);
       }
 

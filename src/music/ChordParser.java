@@ -2,12 +2,11 @@ package music;
 
 import java.util.Vector;
 
-import util.Main;
 
 public class ChordParser
 {
 
-  public static Chord parseNoteList(Main.StringParser parser)
+  public static Chord parseNoteList(StringParser parser)
   {
     Vector<Note> notes = new Vector<Note>();
     Note newNote;
@@ -21,7 +20,7 @@ public class ChordParser
     return new Chord(notes.toArray(noteArray));
   }
 
-  public static Vector<ParsedChordDef> parseChords(Main.StringParser parser)
+  public static Vector<ParsedChordDef> parseChords(StringParser parser)
   {
     Vector<ParsedChordDef> chordVec = new Vector<ParsedChordDef>();
 
@@ -34,7 +33,7 @@ public class ChordParser
     return chordVec;
   }
 
-  public static ParsedChordDef parse(Main.StringParser parser)
+  public static ParsedChordDef parse(StringParser parser)
   {
     // If starting with [ then we have a list of notes
     // so parse them individually

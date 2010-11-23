@@ -29,6 +29,7 @@ public class BoardRegistry
     {
       name = root.getAttribute("name");
       desc = root.getAttribute("desc");
+      
       middleNote = Note.fromString(root.getAttribute("middleNote"));
 
       int cols = 1;

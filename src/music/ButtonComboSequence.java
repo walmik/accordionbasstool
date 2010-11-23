@@ -4,7 +4,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 
-public class ButtonComboSequence implements Cloneable
+public class ButtonComboSequence implements Cloneable, CollSequence<ButtonCombo>
 {
 	private final Vector<ButtonCombo> combos;
 	private final BassBoard board;
@@ -27,11 +27,13 @@ public class ButtonComboSequence implements Cloneable
 		board = theBoard;
 	}
 	
+  @Override
 	public ButtonCombo getCombo(int num)
 	{
 		return combos.elementAt(num);
 	}
 	
+  @Override
 	public int getNumCombos()
 	{
 		return combos.size();
@@ -124,7 +126,7 @@ public class ButtonComboSequence implements Cloneable
 		}
 		
 		// Total row and col range
-		maxP.subtract(minP);
+		maxP = maxP.subtract(minP);
 		dist += maxP.absValue();
 		
 		// Last to first button distance

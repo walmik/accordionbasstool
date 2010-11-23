@@ -22,7 +22,9 @@ import java.awt.event.ActionListener;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import music.BassBoard;
 import music.BoardRegistry;
@@ -81,24 +83,33 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     }
   }
 
-  boolean flipHeaderPos = false;
-
-  void flipHeader(boolean b)
-  {
-    flipHeaderPos = b;
-  }
-
   @Override
   public void paintComponent(Graphics g)
   {
+    paintGradientBack(this, g);
+  }
+  
+  private static void paintGradientBack(JComponent comp, Graphics g)
+  {
+    int height = comp.getHeight();
     Graphics2D g2 = (Graphics2D) g;
-    Color lightCol = this.getBackground();//new Color(53,180,209);
-    if (flipHeaderPos) {
-      g2.setPaint(new GradientPaint(0.f, 0.f, Color.black, 0.f, getHeight() * 1 / 3, lightCol));
-    } else {
-      g2.setPaint(new GradientPaint(0.f, getHeight() * 2 / 3, lightCol, 0.f, getHeight(), Color.black));
-    }
-    g2.fillRect(0, 0, getWidth(), getHeight());
+    Color lightCol = comp.getBackground();//new Color(53,180,209);
+    g2.setPaint(new GradientPaint(0.f, height * 2 / 3, lightCol, 0.f, height, Color.black));
+    g2.fillRect(0, 0, comp.getWidth(), comp.getHeight());
+  }
+
+  public Component getCornerComp()
+  {
+    JPanel corner = new JPanel()
+    {
+      @Override
+      public void paintComponent(Graphics g)
+      {
+        paintGradientBack(this, g);
+      }
+    };
+    corner.setBackground(this.getBackground());
+    return corner;
   }
 
   private void autoSize()

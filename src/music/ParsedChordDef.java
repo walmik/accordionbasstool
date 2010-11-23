@@ -132,9 +132,7 @@ public class ParsedChordDef
     }
 
     if (registryDef == null) {
-      //Is this ok?
-      this.chord.transpose(ival);
-      return new ParsedChordDef(this.chord);
+      return new ParsedChordDef(chord.transposeBy(ival));
     } else {
       return new ParsedChordDef(rootNote.add(ival), newAddedBass, this.registryDef, this.bassLowest);
     }

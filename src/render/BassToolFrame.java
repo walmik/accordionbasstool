@@ -17,6 +17,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import music.BoardRegistry;
 
@@ -50,10 +51,13 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     tabOptions1.setSeqColModel(seqTablePanel.columnModel);
 
-    renderBoardHeader1.initBoardHeader(renderBassBoard, renderBoardScrollPane, seqTablePanel.columnModel);
-    renderBoardScrollPane.setColumnHeaderView(renderBoardHeader1);
+    renderBoardHeader.initBoardHeader(renderBassBoard, renderBoardScrollPane, seqTablePanel.columnModel);
+
+    renderBoardScrollPane.setColumnHeaderView(renderBoardHeader);
+    renderBoardScrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, renderBoardHeader.getCornerComp());
     renderBoardScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
     renderBoardScrollPane.setBorder(BorderFactory.createEmptyBorder());
+
     renderBassBoard.setSelectedButtonCombo(seqTablePanel.columnModel.selComboModel);
 
     setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
@@ -169,15 +173,15 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       }
     }
 
-    renderBoardHeader1.toggleOrientation(isHoriz);
+    renderBoardHeader.toggleOrientation(isHoriz);
 
-//    boardAndHeaderPanel.remove(renderBoardHeader1);
+//    boardAndHeaderPanel.remove(renderBoardHeader);
 //    if (isHoriz && isTopLeft) {
-//      boardAndHeaderPanel.add(BorderLayout.SOUTH, renderBoardHeader1);
-//      renderBoardHeader1.flipHeader(true);
+//      boardAndHeaderPanel.add(BorderLayout.SOUTH, renderBoardHeader);
+//      renderBoardHeader.flipHeader(true);
 //    } else {
-//      boardAndHeaderPanel.add(BorderLayout.NORTH, renderBoardHeader1);
-//      renderBoardHeader1.flipHeader(false);
+//      boardAndHeaderPanel.add(BorderLayout.NORTH, renderBoardHeader);
+//      renderBoardHeader.flipHeader(false);
 //    }
   }
   private static RenderBassBoard theBoard = null;
@@ -200,7 +204,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    renderBoardHeader1 = new render.RenderBoardHeader();
+    renderBoardHeader = new render.RenderBoardHeader();
     boardSplitPane = new javax.swing.JSplitPane();
     renderBoardScrollPane = new javax.swing.JScrollPane();
     renderBassBoard = getRenderBoard();
@@ -208,11 +212,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     seqTablePanel = new render.SeqTablePanel();
     toolTabs = new javax.swing.JTabbedPane();
     chordPicker1 = new render.ChordPicker();
-    textParserPanel1 = new render.TextParserPanel();
+    textParserPanel1 = new render.TabSeqEditor();
     tabOptions1 = new render.TabOptions();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-    setTitle("Accordion Bass Tool v0.5");
+    setTitle("Accordion Bass Tool v0.7");
 
     boardSplitPane.setDividerSize(10);
     boardSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -225,7 +229,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     );
     renderBassBoardLayout.setVerticalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 347, Short.MAX_VALUE)
+      .addGap(0, 324, Short.MAX_VALUE)
     );
 
     renderBoardScrollPane.setViewportView(renderBassBoard);
@@ -256,11 +260,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private render.ChordPicker chordPicker1;
   private javax.swing.JSplitPane controlSplitPane;
   private render.RenderBassBoard renderBassBoard;
-  private render.RenderBoardHeader renderBoardHeader1;
+  private render.RenderBoardHeader renderBoardHeader;
   private javax.swing.JScrollPane renderBoardScrollPane;
   private render.SeqTablePanel seqTablePanel;
   private render.TabOptions tabOptions1;
-  private render.TextParserPanel textParserPanel1;
+  private render.TabSeqEditor textParserPanel1;
   private javax.swing.JTabbedPane toolTabs;
   // End of variables declaration//GEN-END:variables
 }

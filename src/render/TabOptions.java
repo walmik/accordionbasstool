@@ -109,7 +109,7 @@ public class TabOptions extends javax.swing.JPanel
   private void initComponents() {
 
     jPanel1 = new javax.swing.JPanel();
-    checkStrictBass = new javax.swing.JCheckBox();
+    checkFingerSearch = new javax.swing.JCheckBox();
     checkIgnoreAllBass = new javax.swing.JCheckBox();
     checkAllowAllBass = new javax.swing.JCheckBox();
     checkIgnoreMaxThres = new javax.swing.JCheckBox();
@@ -124,11 +124,11 @@ public class TabOptions extends javax.swing.JPanel
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Sequence Search Options:"));
 
-    checkStrictBass.setSelected(true);
-    checkStrictBass.setText("Guarantee Lowest Bass");
-    checkStrictBass.addActionListener(new java.awt.event.ActionListener() {
+    checkFingerSearch.setSelected(true);
+    checkFingerSearch.setText("Finger Search Enabled");
+    checkFingerSearch.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
-        checkStrictBassActionPerformed(evt);
+        checkFingerSearchActionPerformed(evt);
       }
     });
 
@@ -183,7 +183,7 @@ public class TabOptions extends javax.swing.JPanel
             .addGap(21, 21, 21)
             .addComponent(checkAllowAllBass, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
           .addComponent(checkIgnoreAllBass, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-          .addComponent(checkStrictBass, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+          .addComponent(checkFingerSearch, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(jPanel1Layout.createSequentialGroup()
@@ -200,7 +200,7 @@ public class TabOptions extends javax.swing.JPanel
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(jPanel1Layout.createSequentialGroup()
         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(checkStrictBass)
+          .addComponent(checkFingerSearch)
           .addComponent(checkIgnoreMaxThres)
           .addComponent(maxComboThreshSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -301,11 +301,14 @@ public class TabOptions extends javax.swing.JPanel
     ((BassToolFrame) Main._rootFrame).toggleOrientation();
   }//GEN-LAST:event_toggleBoardHorizActionPerformed
 
-  private void checkStrictBassActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkStrictBassActionPerformed
-  {//GEN-HEADEREND:event_checkStrictBassActionPerformed
-    BoardSearcher.optStrictBass = (checkStrictBass.isSelected());
-    recompute();
-  }//GEN-LAST:event_checkStrictBassActionPerformed
+  private void checkFingerSearchActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkFingerSearchActionPerformed
+  {//GEN-HEADEREND:event_checkFingerSearchActionPerformed
+    
+    if (columnModel != null) {
+      columnModel.optFingerSearch = (checkFingerSearch.isSelected());
+      recompute();
+    }
+  }//GEN-LAST:event_checkFingerSearchActionPerformed
 
   private void checkIgnoreAllBassActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkIgnoreAllBassActionPerformed
   {//GEN-HEADEREND:event_checkIgnoreAllBassActionPerformed
@@ -348,9 +351,9 @@ public class TabOptions extends javax.swing.JPanel
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkAllowAllBass;
+  private javax.swing.JCheckBox checkFingerSearch;
   private javax.swing.JCheckBox checkIgnoreAllBass;
   private javax.swing.JCheckBox checkIgnoreMaxThres;
-  private javax.swing.JCheckBox checkStrictBass;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel2;
   private javax.swing.JPanel jPanel1;

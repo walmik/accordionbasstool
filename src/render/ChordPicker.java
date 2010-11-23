@@ -12,7 +12,6 @@ package render;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -34,7 +33,7 @@ import music.RegistryChordDef;
 import music.ChordRegistry;
 import music.Note;
 import music.ParsedChordDef;
-import util.Main.StringParser;
+import music.StringParser;
 
 /**
  *
@@ -161,7 +160,7 @@ public class ChordPicker extends javax.swing.JPanel
     ParsedChordDef finalChord = getPickedChord();
 
     if (seqColumnModel != null) {
-      seqColumnModel.editSelectedColumn(finalChord, false);
+      seqColumnModel.editSelectedColumn(finalChord);
     }
 
     isUpdatingChord--;

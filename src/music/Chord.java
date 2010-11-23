@@ -1,7 +1,5 @@
 package music;
 
-import music.Note.ScaleNote;
-
 public class Chord
 {
 
@@ -37,7 +35,7 @@ public class Chord
       if ((value & (1 << bit)) != 0) {
         bit = toLowerOctaveBit(bit);
       }
-      note.octaveBit = (short)bit;
+      note.octaveBit = (short) bit;
       value |= (1 << bit);
       return value;
     }
@@ -75,7 +73,6 @@ public class Chord
 //    {
 //      return (1 << note.value());
 //    }
-
     static boolean contains(int a, int b)
     {
       return (a | b) == a;
@@ -155,7 +152,6 @@ public class Chord
       return value;
     }
   }
-
   protected Mask mask;
 
   public Chord(Note singleN, boolean mustRoot)
@@ -283,12 +279,15 @@ public class Chord
     return ivals;
   }
 
-  public void transpose(Interval ival)
+  public Chord transposeBy(Interval ival)
   {
+    Note[] newNotes = new Note[notes.length];
+
     for (int i = 0; i < notes.length; i++) {
-      notes[i] = notes[i].add(ival);
+      newNotes[i] = notes[i].add(ival);
     }
-    mask = null;
+
+    return new Chord(newNotes);
   }
 
   public String getTransposedString(Note newRoot)

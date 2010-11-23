@@ -4,7 +4,6 @@
  */
 package music;
 
-import music.BoardRegistry.BoardDef;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -29,7 +28,7 @@ public class BoardRow
     shortname = root.getAttribute("shortname");
 
     String chordName = root.getAttribute("chord");
-    Chord chord = music.ChordParser.parseNoteList(new util.Main.StringParser(chordName));
+    Chord chord = ChordParser.parseNoteList(new StringParser(chordName));
 
     isSingleNote = chord.isSingleNote();
     ivals = chord.extractInterval();

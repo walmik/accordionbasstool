@@ -1,7 +1,5 @@
 package music;
 
-import util.Main;
-
 /**
  * 
  */
@@ -256,7 +254,7 @@ public class Note
   }
   static int lastParserOffset = 0;
 
-  public static Note fromString(Main.StringParser parser)
+  public static Note fromString(StringParser parser)
   {
     Note note = fromString(parser.input());
 
