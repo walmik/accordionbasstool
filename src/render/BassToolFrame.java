@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.sound.sampled.AudioPermission;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -43,6 +44,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     seqTablePanel.initTextParser(tabSeqEditor);
     tabOptions.setSeqColModel(seqTablePanel.columnModel);
     tabPitchDetect.setSeqColModel(seqTablePanel.columnModel);
+    checkPitchDetectPermissions();
 
     renderBoardHeader.initBoardHeader(renderBassBoard, renderBoardScrollPane, seqTablePanel.columnModel);
 
@@ -62,6 +64,23 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     this.boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
 
     //this.toggleEditorLeft();
+  }
+
+  private void checkPitchDetectPermissions()
+  {
+    SecurityManager manager = System.getSecurityManager();
+    if (manager == null) {
+      return;
+    }
+
+    try {
+      manager.checkPermission(new AudioPermission("record"));
+    } catch (SecurityException sec) {
+      int index = toolTabs.indexOfComponent(tabPitchDetect);
+      if (index >= 0) {
+        toolTabs.setEnabledAt(index, false);
+      }
+    }
   }
 
   @Override
