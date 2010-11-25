@@ -10,6 +10,7 @@
  */
 package render;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import javax.swing.Timer;
@@ -71,6 +72,14 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     //cornerPanel.setBorder(BorderFactory.createTitledBorder((String)null));
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, cornerPanel);
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER, new JPanel());
+  }
+
+  void toggleLeftRight(boolean left)
+  {
+    this.setLayout(new BorderLayout());
+    this.add(left ? BorderLayout.WEST : BorderLayout.EAST, this.jPanel1);
+    this.add(BorderLayout.CENTER, this.seqTableScrollPane);
+    this.add(BorderLayout.SOUTH, this.statusText);
   }
 
   void initChordPicker(ChordPicker picker)
@@ -304,10 +313,10 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
         .addComponent(toolInsert)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(toolRemove)
-        .addContainerGap(157, Short.MAX_VALUE))
+        .addContainerGap(171, Short.MAX_VALUE))
     );
 
-    statusText.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+    statusText.setFont(new java.awt.Font("Tahoma", 0, 16));
     statusText.setText("Status");
     statusText.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -331,12 +340,10 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
       .addGroup(layout.createSequentialGroup()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGap(20, 20, 20))
-          .addGroup(layout.createSequentialGroup()
             .addGap(11, 11, 11)
-            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE))
+          .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(statusText, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
     );
   }// </editor-fold>//GEN-END:initComponents

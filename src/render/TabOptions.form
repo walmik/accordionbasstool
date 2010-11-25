@@ -183,9 +183,13 @@
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="toggleBoardLeftTop" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="toggleBoardHoriz" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="toggleBoardHoriz" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="18" pref="18" max="-2" attributes="0"/>
+                          <Component id="toggleEditorPos" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
-                  <EmptySpace pref="148" max="32767" attributes="0"/>
+                  <EmptySpace pref="31" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -196,6 +200,7 @@
                       <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="lnfCombo" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="toggleBoardHoriz" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="toggleEditorPos" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="toggleBoardLeftTop" min="-2" max="-2" attributes="0"/>
@@ -229,6 +234,14 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="toggleBoardHorizActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="toggleEditorPos">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Editor Left/Right"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="toggleEditorPosActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

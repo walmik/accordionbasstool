@@ -121,6 +121,7 @@ public class TabOptions extends javax.swing.JPanel
     jLabel1 = new javax.swing.JLabel();
     toggleBoardLeftTop = new javax.swing.JCheckBox();
     toggleBoardHoriz = new javax.swing.JCheckBox();
+    toggleEditorPos = new javax.swing.JCheckBox();
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Sequence Search Options:"));
 
@@ -237,6 +238,13 @@ public class TabOptions extends javax.swing.JPanel
       }
     });
 
+    toggleEditorPos.setText("Editor Left/Right");
+    toggleEditorPos.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        toggleEditorPosActionPerformed(evt);
+      }
+    });
+
     javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
     jPanel2.setLayout(jPanel2Layout);
     jPanel2Layout.setHorizontalGroup(
@@ -249,8 +257,11 @@ public class TabOptions extends javax.swing.JPanel
         .addGap(18, 18, 18)
         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addComponent(toggleBoardLeftTop)
-          .addComponent(toggleBoardHoriz))
-        .addContainerGap(148, Short.MAX_VALUE))
+          .addGroup(jPanel2Layout.createSequentialGroup()
+            .addComponent(toggleBoardHoriz)
+            .addGap(18, 18, 18)
+            .addComponent(toggleEditorPos)))
+        .addContainerGap(31, Short.MAX_VALUE))
     );
     jPanel2Layout.setVerticalGroup(
       jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -258,7 +269,8 @@ public class TabOptions extends javax.swing.JPanel
         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(jLabel1)
           .addComponent(lnfCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(toggleBoardHoriz))
+          .addComponent(toggleBoardHoriz)
+          .addComponent(toggleEditorPos))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
         .addComponent(toggleBoardLeftTop)
         .addContainerGap(16, Short.MAX_VALUE))
@@ -349,6 +361,11 @@ public class TabOptions extends javax.swing.JPanel
     recompute();
   }//GEN-LAST:event_maxComboLenSpinStateChanged
 
+  private void toggleEditorPosActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_toggleEditorPosActionPerformed
+  {//GEN-HEADEREND:event_toggleEditorPosActionPerformed
+    ((BassToolFrame) Main._rootFrame).toggleEditorLeft();
+  }//GEN-LAST:event_toggleEditorPosActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkAllowAllBass;
   private javax.swing.JCheckBox checkFingerSearch;
@@ -363,5 +380,6 @@ public class TabOptions extends javax.swing.JPanel
   private javax.swing.JSpinner maxComboThreshSpin;
   private javax.swing.JCheckBox toggleBoardHoriz;
   private javax.swing.JCheckBox toggleBoardLeftTop;
+  private javax.swing.JCheckBox toggleEditorPos;
   // End of variables declaration//GEN-END:variables
 }

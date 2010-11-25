@@ -37,15 +37,12 @@
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="jPanel1" max="32767" attributes="1"/>
-                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
                       <EmptySpace min="11" pref="11" max="11" attributes="0"/>
                       <Component id="seqTableScrollPane" pref="329" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
+                  <Component id="jPanel1" max="32767" attributes="1"/>
               </Group>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="statusText" min="-2" pref="38" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -113,7 +110,7 @@
                   <Component id="toolInsert" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="toolRemove" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="157" max="32767" attributes="0"/>
+                  <EmptySpace pref="171" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

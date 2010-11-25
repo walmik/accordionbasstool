@@ -38,18 +38,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     initComponents();
 
-    if (editorLeft) {
-      controlSplitPane.setLeftComponent(toolTabs);
-      controlSplitPane.setRightComponent(seqTablePanel);
-    } else {
-      controlSplitPane.setLeftComponent(seqTablePanel);
-      controlSplitPane.setRightComponent(toolTabs);
-    }
-
-    seqTablePanel.initChordPicker(this.chordPicker1);
-    seqTablePanel.initTextParser(this.textParserPanel1);
-
-    tabOptions1.setSeqColModel(seqTablePanel.columnModel);
+    // Init Tabs
+    seqTablePanel.initChordPicker(tabChordPicker);
+    seqTablePanel.initTextParser(tabSeqEditor);
+    tabOptions.setSeqColModel(seqTablePanel.columnModel);
+    tabPitchDetect.setSeqColModel(seqTablePanel.columnModel);
 
     renderBoardHeader.initBoardHeader(renderBassBoard, renderBoardScrollPane, seqTablePanel.columnModel);
 
@@ -68,9 +61,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     this.boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
 
-    if (!editorLeft) {
-      this.controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
-    }
+    //this.toggleEditorLeft();
   }
 
   @Override
@@ -137,6 +128,22 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     }
 
     renderBassBoard.setIsHorizontal(!isHoriz);
+
+    this.computeDividerLocation();
+  }
+
+  public void toggleEditorLeft()
+  {
+    editorLeft = !editorLeft;
+
+    Component left = controlSplitPane.getLeftComponent();
+    Component right = controlSplitPane.getRightComponent();
+    controlSplitPane.setLeftComponent(null);
+    controlSplitPane.setRightComponent(null);
+    controlSplitPane.setLeftComponent(right);
+    controlSplitPane.setRightComponent(left);
+
+    seqTablePanel.toggleLeftRight(editorLeft);
 
     this.computeDividerLocation();
   }
@@ -211,9 +218,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     controlSplitPane = new javax.swing.JSplitPane();
     seqTablePanel = new render.SeqTablePanel();
     toolTabs = new javax.swing.JTabbedPane();
-    chordPicker1 = new render.ChordPicker();
-    textParserPanel1 = new render.TabSeqEditor();
-    tabOptions1 = new render.TabOptions();
+    tabChordPicker = new render.ChordPicker();
+    tabSeqEditor = new render.TabSeqEditor();
+    tabOptions = new render.TabOptions();
+    tabPitchDetect = new render.TabPitchDetect();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.7");
@@ -243,9 +251,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     controlSplitPane.setOneTouchExpandable(true);
     controlSplitPane.setRightComponent(seqTablePanel);
 
-    toolTabs.addTab("Chord Picker", chordPicker1);
-    toolTabs.addTab("Full Sequence Editor", textParserPanel1);
-    toolTabs.addTab("Options", tabOptions1);
+    toolTabs.addTab("Chord Picker", tabChordPicker);
+    toolTabs.addTab("Full Sequence Editor", tabSeqEditor);
+    toolTabs.addTab("Options", tabOptions);
+    toolTabs.addTab("Pitch Detector", tabPitchDetect);
 
     controlSplitPane.setLeftComponent(toolTabs);
 
@@ -257,14 +266,15 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JSplitPane boardSplitPane;
-  private render.ChordPicker chordPicker1;
   private javax.swing.JSplitPane controlSplitPane;
   private render.RenderBassBoard renderBassBoard;
   private render.RenderBoardHeader renderBoardHeader;
   private javax.swing.JScrollPane renderBoardScrollPane;
   private render.SeqTablePanel seqTablePanel;
-  private render.TabOptions tabOptions1;
-  private render.TabSeqEditor textParserPanel1;
+  private render.ChordPicker tabChordPicker;
+  private render.TabOptions tabOptions;
+  private render.TabPitchDetect tabPitchDetect;
+  private render.TabSeqEditor tabSeqEditor;
   private javax.swing.JTabbedPane toolTabs;
   // End of variables declaration//GEN-END:variables
 }

@@ -127,6 +127,9 @@ public class Note
 
   public boolean equals(Note other)
   {
+    if (other == null) {
+      return false;
+    }
     return (value() == other.value());
   }
 
