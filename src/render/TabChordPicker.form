@@ -206,7 +206,7 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="render.NotePickerAlt" name="notePickerRoot">
+        <Component class="render.NotePicker" name="notePickerRoot">
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
@@ -278,7 +278,7 @@
             <Property name="opaque" type="boolean" value="false"/>
           </Properties>
         </Component>
-        <Component class="render.NotePickerAlt" name="notePickerAdd">
+        <Component class="render.NotePicker" name="notePickerAdd">
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>

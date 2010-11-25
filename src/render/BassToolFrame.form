@@ -29,7 +29,6 @@
   <SubComponents>
     <Container class="javax.swing.JSplitPane" name="boardSplitPane">
       <Properties>
-        <Property name="dividerSize" type="int" value="10"/>
         <Property name="orientation" type="int" value="0"/>
       </Properties>
       <Constraints>
@@ -102,7 +101,7 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
               <SubComponents>
-                <Component class="render.ChordPicker" name="tabChordPicker">
+                <Component class="render.TabChordPicker" name="tabChordPicker">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                       <JTabbedPaneConstraints tabName="Chord Picker">

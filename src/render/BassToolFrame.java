@@ -218,7 +218,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     controlSplitPane = new javax.swing.JSplitPane();
     seqTablePanel = new render.SeqTablePanel();
     toolTabs = new javax.swing.JTabbedPane();
-    tabChordPicker = new render.ChordPicker();
+    tabChordPicker = new render.TabChordPicker();
     tabSeqEditor = new render.TabSeqEditor();
     tabOptions = new render.TabOptions();
     tabPitchDetect = new render.TabPitchDetect();
@@ -271,7 +271,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private render.RenderBoardHeader renderBoardHeader;
   private javax.swing.JScrollPane renderBoardScrollPane;
   private render.SeqTablePanel seqTablePanel;
-  private render.ChordPicker tabChordPicker;
+  private render.TabChordPicker tabChordPicker;
   private render.TabOptions tabOptions;
   private render.TabPitchDetect tabPitchDetect;
   private render.TabSeqEditor tabSeqEditor;

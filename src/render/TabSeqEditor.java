@@ -103,7 +103,7 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
     jPanel1 = new javax.swing.JPanel();
     chordTextField = new javax.swing.JTextField();
     computeButton = new javax.swing.JButton();
-    transNotePicker = new render.NotePickerAlt();
+    transNotePicker = new render.NotePicker();
 
     setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Chord Sequence Editor:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 14))); // NOI18N
 
@@ -204,6 +204,6 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
   private javax.swing.JButton computeButton;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JPanel jPanel1;
-  private render.NotePickerAlt transNotePicker;
+  private render.NotePicker transNotePicker;
   // End of variables declaration//GEN-END:variables
 }

@@ -4,7 +4,7 @@
  */
 
 /*
- * ChordPicker.java
+ * TabChordPicker.java
  *
  * Created on Oct 18, 2010, 4:17:22 PM
  */
@@ -39,11 +39,11 @@ import music.StringParser;
  *
  * @author Ilya
  */
-public class ChordPicker extends javax.swing.JPanel
+public class TabChordPicker extends javax.swing.JPanel
 {
 
-  /** Creates new form ChordPicker */
-  public ChordPicker()
+  /** Creates new form TabChordPicker */
+  public TabChordPicker()
   {
     initComponents();
   }
@@ -659,7 +659,7 @@ public class ChordPicker extends javax.swing.JPanel
     showAdvanced = new javax.swing.JCheckBox();
     hugeChordLabel = new javax.swing.JLabel();
     jPanel1 = new javax.swing.JPanel();
-    notePickerRoot = new render.NotePickerAlt();
+    notePickerRoot = new render.NotePicker();
     jLabel1 = new javax.swing.JLabel();
     slashLabel = new javax.swing.JLabel();
     chordLabel = new javax.swing.JLabel();
@@ -667,7 +667,7 @@ public class ChordPicker extends javax.swing.JPanel
     inversionCombo = new javax.swing.JComboBox();
     mustBeLowestCheck = new javax.swing.JCheckBox();
     addedBassCheck = new javax.swing.JCheckBox();
-    notePickerAdd = new render.NotePickerAlt();
+    notePickerAdd = new render.NotePicker();
     jLabel3 = new javax.swing.JLabel();
 
     jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
@@ -698,11 +698,11 @@ public class ChordPicker extends javax.swing.JPanel
 
     jLabel1.setText("Root Note:");
 
-    slashLabel.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+    slashLabel.setFont(new java.awt.Font("Tahoma", 1, 24));
     slashLabel.setText("/");
     slashLabel.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
-    chordLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+    chordLabel.setFont(new java.awt.Font("Tahoma", 1, 12));
     chordLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     chordLabel.setText("MMM");
     chordLabel.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
@@ -862,8 +862,8 @@ public class ChordPicker extends javax.swing.JPanel
   private javax.swing.JPanel jPanel1;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JCheckBox mustBeLowestCheck;
-  private render.NotePickerAlt notePickerAdd;
-  private render.NotePickerAlt notePickerRoot;
+  private render.NotePicker notePickerAdd;
+  private render.NotePicker notePickerRoot;
   private javax.swing.JCheckBox showAdvanced;
   private javax.swing.JLabel slashLabel;
   private javax.swing.JLabel statusLabel;
