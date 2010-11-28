@@ -75,7 +75,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     try {
       manager.checkPermission(new AudioPermission("record"));
-    } catch (SecurityException sec) {
+    } catch (SecurityException sx) {
       int index = toolTabs.indexOfComponent(tabPitchDetect);
       if (index >= 0) {
         toolTabs.setEnabledAt(index, false);
@@ -164,7 +164,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     seqTablePanel.toggleLeftRight(editorLeft);
 
-    this.computeDividerLocation();
+    if (!editorLeft) {
+      controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
+    } else {
+      controlSplitPane.setDividerLocation(controlSplitPane.getMinimumDividerLocation());
+    }
   }
 
   private void computeDividerLocation()
@@ -245,7 +249,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.7");
 
-    boardSplitPane.setDividerSize(10);
     boardSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
     javax.swing.GroupLayout renderBassBoardLayout = new javax.swing.GroupLayout(renderBassBoard);

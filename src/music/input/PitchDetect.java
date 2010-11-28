@@ -3,16 +3,39 @@ package music.input;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import javax.sound.sampled.*;
-import javax.swing.JPanel;
 import music.Interval;
 import music.Note;
 
 public class PitchDetect
 {
 
-  final static float SAMPLING_RATE = 44100 * 2;
-  final static int BUFF_WINDOW = 4096;
-  final static int READ_WINDOW = BUFF_WINDOW * 2;
+  float samplingRate = 44100 / 4;
+  int buffWindowSize = 4096;
+  
+  public synchronized int getSamplingRate()
+  {
+    return (int) samplingRate;
+  }
+
+  public synchronized void setSamplingRate(int rate)
+  {
+    samplingRate = rate;
+  }
+
+  public synchronized void setSamplingSize(int size)
+  {
+    buffWindowSize = size;
+  }
+
+  public synchronized int getSampleSize()
+  {
+    return buffWindowSize;
+  }
+
+  private int readWindowSize()
+  {
+    return buffWindowSize * 2;
+  }
 
   static class PitchMin
   {
@@ -36,19 +59,18 @@ public class PitchDetect
 
   public static interface PitchUpdater
   {
+
     public void newNote(Note note, double freq);
   }
-  
   PitchMin pitchMin;
   final GraphPanel graphPanel;
   Thread samplingThread;
   boolean running = false;
-  double standardAFreq = SAMPLING_RATE / (SAMPLING_RATE / 440);
+  double standardAFreq = samplingRate / (samplingRate / 440);
   boolean debugOut = true;
-
   double minFreq = 200;
   double maxFreq = 1000;
-  int ampNoiseThresh = 25;
+  int ampNoiseThresh = 5;
 
   public PitchDetect()
   {
@@ -77,7 +99,7 @@ public class PitchDetect
     return running;
   }
 
-  public JPanel getGraphPanel()
+  public GraphPanel getGraphPanel()
   {
     return graphPanel;
   }
@@ -100,10 +122,10 @@ public class PitchDetect
     {
       this.updater = updater;
 
-      format = new AudioFormat(SAMPLING_RATE, 8, 1, true, true);
+      format = new AudioFormat(samplingRate, 8, 1, true, true);
 
       info = new DataLine.Info(TargetDataLine.class, format);
-      
+
       if (!AudioSystem.isLineSupported(info)) {
         throw new RuntimeException("Can't Open Audio System");
       }
@@ -119,21 +141,19 @@ public class PitchDetect
         line.open(format);
         line.start();
 
-        byte buffer[] = new byte[READ_WINDOW];
-        byte buffCopy[] = new byte[READ_WINDOW];
-
-        int lastOffset = 0;
+        byte buffer[] = new byte[readWindowSize()];
+        byte buffCopy[] = new byte[readWindowSize()];
 
         double freq = 0;
         // double freqSum = 0;
         boolean lastNoise = false;
 
         while (running) {
-          //int count = line.read(buffer, 0, READ_WINDOW);
-          System.arraycopy(buffer, BUFF_WINDOW, buffer, 0, BUFF_WINDOW);
-          int count = line.read(buffer, BUFF_WINDOW, BUFF_WINDOW);
-          //int totalSound = noiseFilter(buffer, BUFF_WINDOW, BUFF_WINDOW, 8);
-          assert (count == BUFF_WINDOW);
+          //int count = line.read(buffer, 0, readWindowSize());
+          System.arraycopy(buffer, buffWindowSize, buffer, 0, buffWindowSize);
+          int count = line.read(buffer, buffWindowSize, buffWindowSize);
+          //int totalSound = noiseFilter(buffer, buffWindowSize, buffWindowSize, 8);
+          assert (count == buffWindowSize);
 
           int offset = 0;
 
@@ -146,7 +166,7 @@ public class PitchDetect
             graphPanel.setPlot(buffCopy);
           }
 
-          if ((offset <= 2) || (BUFF_WINDOW - offset) <= 2) {
+          if ((offset <= 2) || (buffWindowSize - offset) <= 2) {
             if (!lastNoise) {
               if (debugOut) {
                 System.out.println("Too Noisy");
@@ -161,7 +181,7 @@ public class PitchDetect
 
           lastNoise = false;
 
-          double newFreq = SAMPLING_RATE / offset;
+          double newFreq = samplingRate / offset;
 
 //          if (lastOffset > 0) {
 //            freq = (freq * .5) + (newFreq * .5);
@@ -189,7 +209,7 @@ public class PitchDetect
 //            if (i > 0) {
 //              System.out.print(", ");
 //            }
-//            System.out.print(freqToNote(SAMPLING_RATE / min.offset, 441) + " " + SAMPLING_RATE / min.offset);
+//            System.out.print(freqToNote(samplingRate / min.offset, 441) + " " + samplingRate / min.offset);
 //          }
 //          System.out.println();
 
@@ -293,15 +313,15 @@ public class PitchDetect
     int minSum = Integer.MAX_VALUE;
     int lastSum = -Integer.MAX_VALUE;
 
-    int start = Math.max(1, (int) (SAMPLING_RATE / maxFreq));
-    int end = Math.min((int) (SAMPLING_RATE / minFreq), BUFF_WINDOW);
+    int start = Math.max(1, (int) (samplingRate / maxFreq));
+    int end = Math.min((int) (samplingRate / minFreq), buffWindowSize);
 
     //queue.clear();
     int totalSum = 0;
 
     for (int offset = start; offset <= end; offset++) {
       //int span = size - offset;
-      int sum = computeAMDF(window, BUFF_WINDOW, offset);
+      int sum = computeAMDF(window, buffWindowSize, offset);
       totalSum += sum;
 
       if (lookForMax) {
@@ -317,7 +337,7 @@ public class PitchDetect
       lastSum = sum;
     }
 
-    int avgAmp = (totalSum / (BUFF_WINDOW * 128));
+    int avgAmp = (totalSum / (buffWindowSize * 128));
 
     if (debugOut) {
       //System.out.println ("Sum: " + avgAmp);
@@ -332,15 +352,15 @@ public class PitchDetect
 
     return minOffset;
   }
-  int[] newWindow = new int[READ_WINDOW];
-  byte[] graphArray = new byte[READ_WINDOW];
+  int[] newWindow = new int[readWindowSize()];
+  byte[] graphArray = new byte[readWindowSize()];
 
   int runAutoCorrE(
           byte[] window,
           PitchMin pitchMax)
   {
-    for (int offset = 0; offset < READ_WINDOW; offset++) {
-      int span = READ_WINDOW - offset;
+    for (int offset = 0; offset < readWindowSize(); offset++) {
+      int span = readWindowSize() - offset;
       int sum = computeAutoCorrProd(window, span, offset);
       if (sum < 0) {
         sum = 0;
@@ -360,7 +380,7 @@ public class PitchDetect
     pitchMax.offset = 0;
     pitchMax.sum = 0;
 
-    for (int offset = 0; offset < READ_WINDOW; offset++) {
+    for (int offset = 0; offset < readWindowSize(); offset++) {
       if (newWindow[offset] > pitchMax.sum) {
         pitchMax.sum = newWindow[offset];
         pitchMax.offset = offset;
@@ -376,7 +396,7 @@ public class PitchDetect
 //    int lastSign = 0;
 //    int zeroOffset = 0;
 //
-//    for (int i = 0; i < BUFF_WINDOW; i++)
+//    for (int i = 0; i < buffWindowSize; i++)
 //    {
 //      int sign = (window[i] < 0) ? -1 : 1;
 //      if (lastSign != 0 && sign != lastSign) {
@@ -386,7 +406,7 @@ public class PitchDetect
 //      lastSign = sign;
 //    }
 //
-//    for (int i = 0; i < READ_WINDOW; i++)
+//    for (int i = 0; i < readWindowSize(); i++)
 //    {
 //      window[i] -= Math.sin((zeroOffset - i) * (period / Math.PI));
 //    }

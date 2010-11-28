@@ -4,6 +4,7 @@
  */
 package music.midi;
 
+import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.sound.midi.*;
@@ -17,12 +18,13 @@ public class Player
 {
 
   Synthesizer synth;
-  Timer stopTimer;
-  StopPlayingTask cancelTask;
+  Timer audioTimer;
+  LinkedList<AudioTask> cancelTasks;
 
   public boolean init()
   {
     try {
+      cancelTasks = new LinkedList<AudioTask>();
       synth = MidiSystem.getSynthesizer();
       synth.open();
 
@@ -38,7 +40,7 @@ public class Player
         synth.getChannels()[chanUsed + 1].programChange(instru.getPatch().getBank(), instru.getPatch().getProgram());
       }
 
-      stopTimer = new Timer(true);
+      audioTimer = new Timer(true);
 
       return true;
     } catch (MidiUnavailableException md) {
@@ -67,31 +69,40 @@ public class Player
   }
   int chanUsed = 0;
 
-  public boolean playChord(int value)
+  public boolean playChords(int[] chordMasks)
+  {
+    long delay = 0;
+
+    for (int i = 0; i < chordMasks.length; i++)
+    {
+      AudioTask playTask = new AudioTask(chordMasks[i], true);
+      audioTimer.schedule(playTask, delay);
+      delay += 50;
+    }
+    return true;
+  }
+
+  public boolean playChord(int chordMask)
   {
     try {
       MidiChannel[] chans = synth.getChannels();
       int velocity = 50;
 
-      if (value == 0) {
+      if (chordMask == 0) {
         return false;
       }
 
-
       for (int i = 0; i < Note.NUM_HALFSTEPS * 2; i++) {
-        if ((value & (1 << i)) != 0) {
+        if ((chordMask & (1 << i)) != 0) {
           int midinote = bitToMidi(i);
           chans[chanUsed + (i / Note.NUM_HALFSTEPS)].noteOn(midinote, velocity);
           //System.out.println("Playing Note: " + midinote);
         }
       }
 
-      if (cancelTask != null) {
-        cancelTask.cancel();
-      }
-      cancelTask = new StopPlayingTask(value);
-
-      stopTimer.schedule(cancelTask, 500);
+      AudioTask cancelTask = new AudioTask(chordMask, false);
+      audioTimer.schedule(cancelTask, 500);
+      cancelTasks.add(cancelTask);
       return true;
 
     } catch (Exception e) {
@@ -105,33 +116,51 @@ public class Player
     MidiChannel[] chans = synth.getChannels();
     chans[chanUsed].allNotesOff();
     chans[chanUsed + 1].allNotesOff();
+    cancelAllTasks();
   }
 
-  private void stopChord(int value)
+  public void cancelAllTasks()
+  {
+    if (!cancelTasks.isEmpty()) {
+      for (AudioTask task : cancelTasks) {
+        task.cancel();
+      }
+      cancelTasks.clear();
+    }
+  }
+
+  private void stopChord(int chordMask)
   {
     MidiChannel[] chans = synth.getChannels();
-    
+
     for (int i = 0; i < Note.NUM_HALFSTEPS * 2; i++) {
-      if ((value & (1 << i)) != 0) {
+      if ((chordMask & (1 << i)) != 0) {
         int midinote = bitToMidi(i);
         chans[chanUsed + (i / Note.NUM_HALFSTEPS)].noteOff(midinote, 50);
       }
     }
   }
 
-  class StopPlayingTask extends TimerTask
+  class AudioTask extends TimerTask
   {
-    int chordMask;
 
-    StopPlayingTask(int cmask)
+    int chordMask;
+    boolean toPlay;
+
+    AudioTask(int cmask, boolean play)
     {
       chordMask = cmask;
+      toPlay = play;
     }
 
     @Override
     public void run()
     {
-      stopChord(chordMask);
+      if (toPlay) {
+        playChord(chordMask);
+      } else {
+        stopChord(chordMask);
+      }
     }
   }
 }

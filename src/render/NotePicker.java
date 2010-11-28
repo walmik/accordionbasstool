@@ -150,7 +150,7 @@ public class NotePicker extends javax.swing.JPanel {
     private void toggleSOFActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_toggleSOFActionPerformed
     {//GEN-HEADEREND:event_toggleSOFActionPerformed
       Note newNote = currNote.eharmonic();
-      if (newNote.toString() != currNote.toString()) {
+      if (!newNote.toString().equals(currNote.toString())) {
         noteCombo.setSelectedItem(newNote.toString());
       }
     }//GEN-LAST:event_toggleSOFActionPerformed
