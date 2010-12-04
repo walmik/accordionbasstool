@@ -17,7 +17,8 @@ public class FingerSearcher
   final static int SKEW_GRID = 8;
   final static int SKEW_ANGLE = 20;
   final static int MAX_DIST_BTWN_FINGER = SKEW_GRID * 4;
-  final static int MAX_SEQS = 50;
+  final static int MAX_FINGER_SEQS = 50;
+  final static int MAX_FINGER_SEQS_PER_BUTTONSEQ = 40;
   static boolean debugOut = false;
   final static int FINGER_2 = 0;
   final static int FINGER_3 = 1;
@@ -29,33 +30,10 @@ public class FingerSearcher
     LinkedList<FingerComboSequence> allFingerComboSeqs = new LinkedList<FingerComboSequence>();
 
     for (ButtonComboSequence butseq : allseqs) {
-      LinkedList<FingerComboSequence> newFingerSeqs = this.findAllFingers(butseq);
+      LinkedList<FingerComboSequence> newFingerSeqs = this.findAllFingers(butseq, MAX_FINGER_SEQS_PER_BUTTONSEQ);
 
       for (FingerComboSequence newSeq : newFingerSeqs) {
-        ListIterator<FingerComboSequence> iter = allFingerComboSeqs.listIterator();
-        boolean inserted = false;
-
-        if ((allFingerComboSeqs.size() == MAX_SEQS)
-                && (newSeq.getHeur() >= allFingerComboSeqs.getLast().getHeur())) {
-          continue;
-        }
-
-        while (iter.hasNext()) {
-          int index = iter.nextIndex();
-          if (newSeq.getHeur() < iter.next().getHeur()) {
-            allFingerComboSeqs.add(index, newSeq);
-            inserted = true;
-            break;
-          }
-        }
-
-        if (!inserted) {
-          if (allFingerComboSeqs.size() < MAX_SEQS) {
-            allFingerComboSeqs.add(newSeq);
-          }
-        } else if (allFingerComboSeqs.size() > MAX_SEQS) {
-          allFingerComboSeqs.removeLast();
-        }
+        BoardSearcher.sortedInsert(allFingerComboSeqs, newSeq, MAX_FINGER_SEQS);
       }
     }
 
@@ -64,14 +42,14 @@ public class FingerSearcher
     return seqArray;
   }
 
-  public LinkedList<FingerComboSequence> findAllFingers(ButtonComboSequence buttonseq)
+  public LinkedList<FingerComboSequence> findAllFingers(ButtonComboSequence buttonseq, int maxSeqs)
   {
     LinkedList<FingerComboSequence> currSeqs = new LinkedList<FingerComboSequence>();
     currSeqs.add(new FingerComboSequence(buttonseq));
 
     LinkedList<FingerComboSequence> nextSeqs = new LinkedList<FingerComboSequence>();
 
-    ButtonCombo prevButtonCombo = null;
+    //ButtonCombo prevButtonCombo = null;
 
     for (int j = 0; j < buttonseq.getNumCombos(); j++) {
       ButtonCombo buttonCombo = buttonseq.getCombo(j);
@@ -87,53 +65,25 @@ public class FingerSearcher
 
           FingerCombo lastFingerCombo = origSeq.getLastCombo();
 
+          GeoPos newPos[] = new GeoPos[NUM_FINGERS];
           int transHeur = 0;
 
-          if (lastFingerCombo != null) {
-            transHeur = evalFingerTransition(finger, lastFingerCombo);
-            if (transHeur < 0) {
-              continue;
-            }
-          }
-
-          FingerComboSequence seq;
-          if (finger == fingerCombos.getLast()) {
-            seq = origSeq;
-          } else {
-            seq = origSeq.clone();
-          }
-
-          seq.add(finger, transHeur);
-
-          int heur = seq.getHeur();
-
-          boolean inserted = false;
-
-          // Quick check, if we are at max sequences and the heuristic
-          // is greater than the last one, skip immediately
-          if ((nextSeqs.size() == MAX_SEQS)
-                  && (heur >= nextSeqs.getLast().getHeur())) {
+          transHeur = evalFingerTransition(newPos, finger, origSeq.currFingerPos, lastFingerCombo);
+          if (transHeur < 0) {
             continue;
           }
 
-          ListIterator<FingerComboSequence> nextIter =
-                  nextSeqs.listIterator();
-          while (nextIter.hasNext()) {
-            int index = nextIter.nextIndex();
-            if (heur < nextIter.next().getHeur()) {
-              nextSeqs.add(index, seq);
-              inserted = true;
-              break;
-            }
+          FingerComboSequence newSeq;
+
+          if (finger == fingerCombos.getLast()) {
+            newSeq = origSeq;
+          } else {
+            newSeq = origSeq.clone();
           }
 
-          if (!inserted) {
-            if (nextSeqs.size() < MAX_SEQS) {
-              nextSeqs.add(seq);
-            }
-          } else if (nextSeqs.size() > MAX_SEQS) {
-            nextSeqs.removeLast();
-          }
+          newSeq.add(finger, transHeur, newPos);
+
+          BoardSearcher.sortedInsert(nextSeqs, newSeq, maxSeqs);
         }
       }
 
@@ -143,7 +93,7 @@ public class FingerSearcher
       nextSeqs = temp;
       nextSeqs.clear();
 
-      prevButtonCombo = buttonCombo;
+      //prevButtonCombo = buttonCombo;
     }
 
     return currSeqs;
@@ -203,30 +153,51 @@ public class FingerSearcher
   {
     int heur = 0;
 
-    GeoPos naturalFingerDir = new GeoPos(0, 1, SKEW_GRID, SKEW_ANGLE);
+    // Per Finger
 
     for (int i = 0; i < reverseFingerMap.length; i++) {
-
-      if (i < (reverseFingerMap.length - 1)) {
-        GeoPos dirVec = pos[i + 1].subtract(pos[i]);
-
-        //heur += (int)((1 - dirVec.dot(naturalFingerDir)) * 10);
-
-        int dist = dirVec.absValue();
-        //int dist = pos[i + 1].manDistTo(pos[i]);
-
-        // Filter out max finger dist
-//        if (dist > ((reverseFingerMap[i + 1] - reverseFingerMap[i]) * MAX_DIST_BTWN_FINGER)) {
-//          return -1;
-//        }
-      }
-
-      heur += pos[i].absValue() / 2;
+      heur += pos[i].absValue();
     }
 
-//    if (true == true) {
-//      return heur;
-//    }
+    // Per Two Fingers
+
+    GeoPos xAxis = new GeoPos(1, 0, SKEW_GRID, SKEW_ANGLE);
+    GeoPos yAxis = new GeoPos(0, 1, SKEW_GRID, SKEW_ANGLE);
+
+    for (int i = 0; i < reverseFingerMap.length - 1; i++) {
+      int f1 = reverseFingerMap[i + 1];
+      int f0 = reverseFingerMap[i];
+
+      int fingerDist = Math.abs(f1 - f0);
+      if (pos[i + 1].manDistTo(pos[i]) > fingerDist * MAX_DIST_BTWN_FINGER) {
+        heur += fingerDist * 1000;
+        return -1;
+      }
+
+      GeoPos d1 = pos[i + 1].subtract(pos[i]);
+      if (f1 > f0) {
+        d1 = d1.scale(-1);
+      }
+      double xdot = xAxis.dot(d1);
+      double ydot = yAxis.dot(d1);
+
+      if ((ydot < 0.0)) {
+        return -1;
+      }
+//      System.out.println(Math.acos(theDot) * (180 / Math.PI) + " "
+//              + String.valueOf(reverseFingerMap[i + 1] + 2) + ": " + pos[i + 1] + "-"
+//              + String.valueOf(reverseFingerMap[i] + 2) + ": " + pos[i]);
+    }
+
+    // Per 3 Fingers
+
+    for (int i = 0; i < reverseFingerMap.length - 2; i++) {
+      GeoPos d1 = pos[i + 1].subtract(pos[i]);
+      GeoPos d2 = pos[i + 1].subtract(pos[i + 2]);
+      if (d1.dot(d2) <= 0) {
+        return -1;
+      }
+    }
 
     byte finger2 = fingerMap[FINGER_2];
     byte finger3 = fingerMap[FINGER_3];
@@ -236,14 +207,14 @@ public class FingerSearcher
     // Finger 2 -- penalty if not on a chord row
     if (finger2 != -1) {
       if (combo.board.isSingleBassRow(combo.pos[finger2].row)) {
-        heur += 10;
+        //heur += 10;
       }
     }
 
     // Finger 3 -- penalty if not on a bass row
     if (finger3 != -1) {
       if (!combo.board.isSingleBassRow(combo.pos[finger3].row)) {
-        heur += 10;
+        //heur += 10;
       }
     }
 
@@ -256,14 +227,87 @@ public class FingerSearcher
 
     // Finger 5 -- rarely used, penalty for any use
     if (finger5 != -1) {
-      heur += 20;
-    }
-
-    if (reverseFingerMap.length == 3) {
-      //TODO:
+      heur += 30;
     }
 
     return heur;
+  }
+
+  public int evalFingerTransition(GeoPos[] toPos, FingerCombo toCombo, GeoPos[] fromPos, FingerCombo fromCombo)
+  {
+    int heur = 0;
+
+    fillFingerPos(toPos, toCombo);
+
+    if (fromPos == null) {
+      return heur;
+    }
+
+    for (int i = 0; i < NUM_FINGERS; i++) {
+      if (fromPos[i] == null) {
+        continue;
+      }
+
+      int dist = fromPos[i].manDistTo(toPos[i]);
+
+      if ((fromCombo != null) && (toCombo.fingerMap[i] != -1) && (fromCombo.fingerMap[i] != -1)) {
+        heur += 100;
+        dist *= 2;
+      }
+
+      heur += dist;
+    }
+
+    return heur;
+  }
+
+  private void fillFingerPos(GeoPos[] pos, FingerCombo combo)
+  {
+    assert(combo.pos.length == combo.reverseFingerMap.length);
+    for (int i = 0; i < combo.pos.length; i++) {
+      int finger = combo.reverseFingerMap[i];
+      pos[finger] = combo.pos[i];
+    }
+
+    fillDefaultFingerPos(pos);
+  }
+
+  private void fillDefaultFingerPos(GeoPos[] currFingerPos)
+  {
+    GeoPos naturalFingerDir = new GeoPos(0, 1, SKEW_GRID, SKEW_ANGLE);
+
+    for (int i = 0; i < currFingerPos.length; i++) {
+      if (currFingerPos[i] != null) {
+        continue;
+      }
+
+      int min = -1;
+      int max = -1;
+
+      for (int j = i - 1; j >= 0; j--) {
+        if (currFingerPos[j] != null) {
+          min = j;
+          break;
+        }
+      }
+
+      for (int j = i + 1; j < currFingerPos.length; j++) {
+        if (currFingerPos[j] != null) {
+          max = j;
+          break;
+        }
+      }
+
+      if ((min >= 0) && (max >= 0)) {
+        currFingerPos[i] = currFingerPos[min].add(currFingerPos[max]).divide(2);
+      } else if (min >= 0) {
+        currFingerPos[i] = currFingerPos[min].subtract(naturalFingerDir.scale(i - min));
+      } else if (max >= 0) {
+        currFingerPos[i] = currFingerPos[max].add(naturalFingerDir.scale(max - i));
+      } else {
+        currFingerPos[i] = GeoPos.zero();
+      }
+    }
   }
 
   public int evalFingerTransition(FingerCombo toCombo, FingerCombo fromCombo)
@@ -273,7 +317,7 @@ public class FingerSearcher
     GeoPos naturalFingerDir = new GeoPos(0, 1, SKEW_GRID, SKEW_ANGLE);
 
     for (int i = 0; i < NUM_FINGERS; i++) {
-      
+
       if (toCombo.fingerMap[i] == -1) {
         continue;
       }
@@ -326,7 +370,6 @@ public class FingerSearcher
 
     return heur;
   }
-
   static byte[][] fingerPerms = null;
   final static int NUM_FINGERS = 4;
 

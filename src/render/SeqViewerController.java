@@ -93,7 +93,7 @@ public class SeqViewerController
     //rowHeader.setFixedCellWidth(DEFAULT_ROW_HEADER_WIDTH);
     rowHeader.setFixedCellHeight(seqTable.getRowHeight());
     rowHeader.setOpaque(false);
-    rowHeader.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
+    //rowHeader.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
 
     tableScrollPane.setRowHeaderView(rowHeader);
 
@@ -322,7 +322,7 @@ public class SeqViewerController
     @Override
     public void columnMarginChanged(ChangeEvent e)
     {
-      
+
       resizeSlider();
     }
 
@@ -437,32 +437,36 @@ public class SeqViewerController
     @Override
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
     {
-      FingerComboSequence fingerSeq = null;
       ButtonComboSequence seq = null;
-      int heur;
-            
+      int heur = 0;
+
       if (value instanceof FingerComboSequence) {
-        fingerSeq = (FingerComboSequence)value;
+        FingerComboSequence fingerSeq = (FingerComboSequence) value;
         seq = fingerSeq.getButtonComboSeq();
         heur = fingerSeq.getHeur();
-      } else {
-        seq = (ButtonComboSequence)value;
+      } else if (value != null) {
+        seq = (ButtonComboSequence) value;
         heur = seq.getHeur();
       }
 
-      float ratio = ((float) heur / seq.getNumCombos()) / 100.f;
-      if (ratio > 1.f) {
-        ratio = 1.f;
+      if (seq != null) {
+        float ratio = ((float) heur / seq.getNumCombos()) / 100.f;
+        if (ratio > 1.f) {
+          ratio = 1.f;
+        }
+
+        int iconIndex = (int) (ratio * (RenderBoardUI.defaultUI.optimalityIcons.length - 1));
+        this.setIcon(RenderBoardUI.defaultUI.optimalityIcons[iconIndex]);
+
+        seq.iconIndex = iconIndex;
+
+        String str = "#" + (index + 1);
+        str += " (" + heur + ")";
+        this.setText(str);
+      } else {
+        this.setIcon(RenderBoardUI.defaultUI.optimalityIcons[RenderBoardUI.defaultUI.optimalityIcons.length - 1]);
+        this.setText("None");
       }
-
-      int iconIndex = (int) (ratio * (RenderBoardUI.defaultUI.optimalityIcons.length - 1));
-      this.setIcon(RenderBoardUI.defaultUI.optimalityIcons[iconIndex]);
-
-      seq.iconIndex = iconIndex;
-
-      String str = "#" + (index + 1);
-      str += " (" + heur + ")";
-      this.setText(str);
 
       if (isSelected) {
         this.setBorder(lowered);
@@ -475,9 +479,8 @@ public class SeqViewerController
       }
 
       int newPrefWidth = this.getPreferredSize().width + 24;
-
       if (newPrefWidth >= list.getFixedCellWidth()) {
-        //list.setFixedCellWidth(newPrefWidth);
+        list.setFixedCellWidth(newPrefWidth);
       }
 
       return this;
@@ -515,8 +518,8 @@ public class SeqViewerController
       this.setOpaque(false);
 
       if (RenderBoardUI.defaultUI != null) {
-        notSelectedIcon = new ImageIcon(RenderBoardUI.defaultUI.selectedIM.getScaledInstance(32, 32, Image.SCALE_SMOOTH));
-        selectedIcon = new ImageIcon(RenderBoardUI.defaultUI.pressedIM.getScaledInstance(32, 32, Image.SCALE_SMOOTH));
+        notSelectedIcon = new ImageIcon(RenderBoardUI.BoardButtonImage.SELECTED.image.getScaledInstance(32, 32, Image.SCALE_SMOOTH));
+        selectedIcon = new ImageIcon(RenderBoardUI.BoardButtonImage.PRESSED_ANY.image.getScaledInstance(32, 32, Image.SCALE_SMOOTH));
       }
 
       Font font = getFont().deriveFont(18.f);
@@ -609,7 +612,7 @@ public class SeqViewerController
       //stdBorder = BorderFactory.createMatteBorder(1, 1, 0, 0, Color.black);
 
       defSelColor = super.getTableCellRendererComponent(seqTable, "", true, false, 0, 0).getBackground();
-      
+
       defPlainColor1 = Color.white;//super.getTableCellRendererComponent(seqTable, "", false, false, 0, 0).getBackground();
       //defPlainColor2 = super.getTableCellRendererComponent(seqTable, "", false, false, 1, 0).getBackground();
       defPlainColor2 = UIManager.getColor("Table.alternateRowColor");
@@ -629,14 +632,14 @@ public class SeqViewerController
       ButtonCombo buttonCombo = null;
 
       if (objValue instanceof FingerCombo) {
-        fingerCombo = (FingerCombo)objValue;
+        fingerCombo = (FingerCombo) objValue;
         buttonCombo = ((fingerCombo != null) ? fingerCombo.getButtonCombo() : null);
       } else {
-        buttonCombo = (ButtonCombo)objValue;
+        buttonCombo = (ButtonCombo) objValue;
       }
 
       String text = "";
-      
+
       if (fingerCombo != null) {
         text = fingerCombo.toString();
       } else if (buttonCombo != null) {

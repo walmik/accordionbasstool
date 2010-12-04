@@ -17,7 +17,6 @@ public class GeoPos
   {
     return new GeoPos(0, 0);
   }
-
   public int x;
   public int y;
 
@@ -51,7 +50,6 @@ public class GeoPos
 
   //final static int GRID_SCALE = 1;
   //final static int SKEW_SCALE = (int)(Math.tan(20) * GRID_SCALE);
-
   void set(BassBoard.Pos boardPos, BassBoard.Pos center)
   {
     x = boardPos.col - center.col;
@@ -78,7 +76,7 @@ public class GeoPos
   {
     return new GeoPos(x * scale, y * scale);
   }
-  
+
   GeoPos divide(int scale)
   {
     return new GeoPos(x / scale, y / scale);
@@ -98,8 +96,9 @@ public class GeoPos
 
   double dot(GeoPos pos)
   {
-    double mag = Math.sqrt((pos.x * pos.x) + (pos.y + pos.y));
-    return (x + pos.x/mag) + (y + pos.y/mag);
+    double magme = Math.hypot(x, y);
+    double mag = Math.hypot(pos.x, pos.y);
+    return ((x * pos.x) + (y * pos.y)) / (mag * magme);
   }
 
   int absValue()
@@ -114,9 +113,15 @@ public class GeoPos
     return Math.max(xD, yD);
   }
 
+  @Override
+  public String toString()
+  {
+    return "(" + x + ", " + y + ")";
+  }
+
   private void skewTrans(int scale, int skewAngle)
   {
-    int skew = (int)(Math.tan(skewAngle) * scale);
+    int skew = (int) (Math.tan(skewAngle) * scale);
     x = (x * scale) + (skew * y);
     y = y * scale;
   }

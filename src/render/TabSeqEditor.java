@@ -83,7 +83,7 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
     this.chordTextField.setText(columnModel.toString());
 
     int selColumn = columnModel.getSelectedColumn();
-    if (selColumn >= 0) {
+    if ((selColumn >= 0) && (selColumn < columnModel.getColumnCount())) {
       isUpdating = true;
       this.transNotePicker.setNote(columnModel.getChordDef(selColumn).rootNote);
       isUpdating = false;

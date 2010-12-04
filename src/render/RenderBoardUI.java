@@ -46,17 +46,54 @@ public class RenderBoardUI
   boolean _isHoriz = true;
   double _defaultSlantAngle = (20.0) * Math.PI / 180;
   final static int _prefSize = 48;
-  BufferedImage selectedIM, unselectedIM, pressedIM;
+  //BufferedImage selectedIM, unselectedIM, pressedIM;
   boolean use3DDrawer = true;
   int lastIMScale = 0;
 
   BufferedImage optimalityImage;
   ImageIcon optimalityIcons[];
 
+
+  public static enum BoardButtonImage
+  {
+    
+    UNSELECTED( Color.black, 0.5f,    false),
+    SELECTED(   Color.blue,           false),
+    PRESSED_2(  Color.green, 0.75f,   true),
+    PRESSED_3(  Color.cyan, 0.75f,    true),
+    PRESSED_4(  Color.orange, 0.75f,  true),
+    PRESSED_5(  Color.red, 0.75f,     true),
+    PRESSED_ANY(Color.magenta,        true);
+
+
+    BoardButtonImage(Color bcol, boolean press)
+    {
+      color = bcol;
+      alpha = 1.0f;
+      pressed = press;
+    }
+
+    BoardButtonImage(Color bcol, float alph, boolean press)
+    {
+      color = bcol;
+      alpha = alph;
+      pressed = press;
+    }
+
+    Color color;
+    BufferedImage image;
+    float alpha;
+    boolean pressed;
+  }
+
+  int currImageWidth = 1;
+  int currImageHeight = 1;
+
   RenderBoardUI()
   {
     createButtonImages(1);
   }
+  //
 
   private void createButtonImages(int scale)
   {
@@ -77,17 +114,48 @@ public class RenderBoardUI
     _shadowFloor = new Ellipse2D.Float(0, 0, diamX * shadowScale, diamY * shadowScale);
     //_pressedShadowFloor = new Ellipse2D.Float(0, 0, diamX * shadowScale * .5f, diamY * shadowScale * .5f);
 
-    int imWidth = (int) (diamX * shadowScale);
-    int imHeight = (int) (diamY * shadowScale) + cylHeight;
+    currImageWidth = (int) (diamX * shadowScale);
+    currImageHeight = (int) (diamY * shadowScale) + cylHeight;
+    
+    for (BoardButtonImage boardButton : BoardButtonImage.values())
+    {
+      boardButton.image = new BufferedImage(currImageWidth, currImageHeight, BufferedImage.TYPE_INT_ARGB);
+      render3DButton(diamX, diamY, cylHeight, boardButton.image.createGraphics(), boardButton.color, boardButton.pressed);
+    }
 
-    selectedIM = new BufferedImage(imWidth, imHeight, BufferedImage.TYPE_INT_ARGB);
-    unselectedIM = new BufferedImage(imWidth, imHeight, BufferedImage.TYPE_INT_ARGB);
-    pressedIM = new BufferedImage(imWidth, imHeight, BufferedImage.TYPE_INT_ARGB);
 
-    render3DButton(diamX, diamY, cylHeight, selectedIM.createGraphics(), Color.blue, true, false);
-    render3DButton(diamY, diamY, cylHeight, unselectedIM.createGraphics(), Color.black, false, false);
-    render3DButton(diamX, diamY, cylHeight, pressedIM.createGraphics(), Color.magenta, false, true);
+//    selectedIM = new BufferedImage(imWidth, imHeight, BufferedImage.TYPE_INT_ARGB);
+//    unselectedIM = new BufferedImage(imWidth, imHeight, BufferedImage.TYPE_INT_ARGB);
+//    pressedIM = new BufferedImage(imWidth, imHeight, BufferedImage.TYPE_INT_ARGB);
+//
+//    render3DButton(diamX, diamY, cylHeight, selectedIM.createGraphics(), Color.blue, true, false);
+//    render3DButton(diamY, diamY, cylHeight, unselectedIM.createGraphics(), Color.black, false, false);
+//    render3DButton(diamX, diamY, cylHeight, pressedIM.createGraphics(), Color.magenta, false, true);
   }
+
+  BoardButtonImage getBoardButtonImage(boolean pressed, boolean selected,
+          int finger)
+  {
+    if (!selected && !pressed) {
+      return BoardButtonImage.UNSELECTED;
+    }
+
+    if (!pressed) {
+      return BoardButtonImage.SELECTED;
+    }
+
+    if (finger < 2) {
+      return BoardButtonImage.PRESSED_ANY;
+    }
+
+    if (finger <= 5) {
+      return BoardButtonImage.values()[finger];
+    }
+
+    return BoardButtonImage.PRESSED_ANY;
+  }
+
+
 
   ButtonDrawer getButtonDrawer()
   {
@@ -108,7 +176,8 @@ public class RenderBoardUI
 
     abstract void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY);
 
-    abstract void draw(Graphics2D graphics, int col, int row, boolean pressed, boolean selected);
+    abstract void draw(Graphics2D graphics, int col, int row, 
+            boolean pressed, boolean selected, BoardButtonImage boardButton);
   }
 
   class IconButtonDrawer extends ButtonDrawer
@@ -138,31 +207,40 @@ public class RenderBoardUI
       //****************
 
       imHeight = yW;
-      imWidth = imHeight * pressedIM.getWidth() / pressedIM.getHeight();
+      imWidth = imHeight * currImageWidth / currImageHeight;
       //imWidth = (int)(_diamX * shadowScale);
       //imHeight = imWidth * pressedIM.getHeight() / pressedIM.getWidth();
-      _pressedCylOff = (int) ((defaultCylHeight * scale * (1.0 - pressedRatio)) * imWidth / pressedIM.getWidth());
+      _pressedCylOff = (int) ((defaultCylHeight * scale * (1.0 - pressedRatio)) * imWidth / currImageWidth);
       //System.out.println("IM: " + imWidth + ", " + imHeight);
 
     }
 
     @Override
-    void draw(Graphics2D graphics, int col, int row, boolean pressed, boolean selected)
+    void draw(Graphics2D graphics, int col, int row, 
+              boolean pressed, boolean selected, BoardButtonImage boardButton)
     {
+      if (boardButton == null) {
+        return;
+      }
 
       //graphics.setComposite(AlphaComposite.SrcAtop);
       //graphics.drawRect(0, 0, _xW, _yW);
 
+      graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, boardButton.alpha));
+      graphics.drawImage(boardButton.image, 0, 0, imWidth, imHeight, null);
+
+      //graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.f));
+      
       if (pressed) {
         //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
-        graphics.drawImage(pressedIM, 0, 0, imWidth, imHeight, null);
+        //graphics.drawImage(pressedIM, 0, 0, imWidth, imHeight, null);
         graphics.translate(0, _pressedCylOff);
       } else if (selected) {
         //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
-        graphics.drawImage(selectedIM, 0, 0, imWidth, imHeight, null);
+        //graphics.drawImage(selectedIM, 0, 0, imWidth, imHeight, null);
       } else {
         //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-        graphics.drawImage(unselectedIM, 0, 0, imWidth, imHeight, null);
+        //graphics.drawImage(unselectedIM, 0, 0, imWidth, imHeight, null);
       }
     }
   }
@@ -180,7 +258,8 @@ public class RenderBoardUI
     }
 
     @Override
-    void draw(Graphics2D graphics, int col, int row, boolean pressed, boolean selected)
+    void draw(Graphics2D graphics, int col, int row,
+            boolean pressed, boolean selected, BoardButtonImage boardButton)
     {
       Color lighterFill = Color.LIGHT_GRAY;
       Color darkerFill = Color.GRAY;
@@ -281,7 +360,7 @@ public class RenderBoardUI
           int cylHeight,
           Graphics2D graphics,
           Color selColor,
-          boolean selected, boolean pressed)
+          boolean pressed)
   {
     graphics.setComposite(AlphaComposite.SrcOver);
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -379,7 +458,7 @@ public class RenderBoardUI
 
     // Golden Ratio
     int iconHeight = 16;
-    int iconWidth = (int)(iconHeight * 1.61803399);
+    int iconWidth = (int)(iconHeight);// * 1.61803399);
 
     int stepWidth = optimalityImage.getWidth() / numIcons;
     int stepHeight = optimalityImage.getHeight();

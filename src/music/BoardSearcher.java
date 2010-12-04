@@ -1,6 +1,5 @@
 package music;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Vector;
@@ -15,7 +14,9 @@ public class BoardSearcher
   public ButtonComboSequence[] parseSequence(BassBoard board, Vector<Chord> chordSeq)
   {
     LinkedList<ButtonComboSequence> currSeqs = new LinkedList<ButtonComboSequence>();
-    currSeqs.add(new ButtonComboSequence(board));
+    if (!chordSeq.isEmpty()) {
+      currSeqs.add(new ButtonComboSequence(board));
+    }
 
     LinkedList<ButtonComboSequence> nextSeqs = new LinkedList<ButtonComboSequence>();
 
@@ -63,34 +64,7 @@ public class BoardSearcher
 
           seq.add(curr);
 
-          int heur = seq.evalHeuristic();
-          boolean inserted = false;
-
-          // Quick check, if we are at max sequences and the heuristic
-          // is greater than the last one, skip immediately
-          if ((nextSeqs.size() == MAX_SEQS)
-                  && (heur >= nextSeqs.getLast().evalHeuristic())) {
-            continue;
-          }
-
-          ListIterator<ButtonComboSequence> nextIter =
-                  nextSeqs.listIterator();
-          while (nextIter.hasNext()) {
-            int index = nextIter.nextIndex();
-            if (heur < nextIter.next().evalHeuristic()) {
-              nextSeqs.add(index, seq);
-              inserted = true;
-              break;
-            }
-          }
-
-          if (!inserted) {
-            if (nextSeqs.size() < MAX_SEQS) {
-              nextSeqs.add(seq);
-            }
-          } else if (nextSeqs.size() > MAX_SEQS) {
-            nextSeqs.removeLast();
-          }
+          sortedInsert(nextSeqs, seq, MAX_SEQS);
         }
       }
 
@@ -339,104 +313,39 @@ public class BoardSearcher
     return combos;
   }
 
-  // All Chords
-//	ButtonCombo[] findAll(BassBoard board, Chord fullChord)
-//	{
-//		LinkedList<ButtonCombo> combos = new LinkedList<ButtonCombo>();
-//		
-//		ButtonCombo emptyCombo = new ButtonCombo();
-//		
-//		//findSingleCombo(board, fullChord, emptyCombo, combos, 0, 0, "  ");
-//				
-//		ButtonCombo[] array = new ButtonCombo[combos.size()];
-//		return combos.toArray(array);
-//	}
-//	
-//	void  findSingleCombo(BassBoard board, 
-//						  Chord fullChord,
-//						  ButtonCombo currCombo,
-//						  LinkedList<ButtonCombo> combos,
-//						  int rStart, int cStart,
-//						  String indent)
-//	{
-//		
-//		for (int r = rStart; r < board.getNumRows(); r++)
-//		{
-//			for (int c = cStart; c < board.getNumCols(); c++)
-//			{
-//				Chord newChord = board.getChordAt(r, c);
-//				
-//				System.out.println(indent + "R: " + r + " C: " + c + " - " + currCombo.chordMask.value);
-//				
-//				if (fullChord.contains(newChord) && 
-//				    !currCombo.chordMask.contains(newChord))
-//				{
-//					BassBoard.Pos newPos = new BassBoard.Pos(r, c);
-//					
-//					int maxHeur = 0;
-//					if (combos.size() > 0)
-//						maxHeur = combos.getLast().evalHeur(board.getCenter());
-//					
-//					int heur = 0;
-////					heur = currCombo.incHeur(board.getCenter());
-////					
-////					// If at max seqs and heuristic is above the last max,
-////					// skip this combo immediately
-////					if ((combos.size() == MAX_SEQS) && 
-////						(heur >= maxHeur))
-////					{
-////						skipCount++;
-////						continue;
-////					}
-//					
-//					ButtonCombo newCombo = currCombo.expand(newPos, newChord);
-//					heur = newCombo.evalHeur(board.getCenter());
-//					
-//					// If at max seqs and heuristic is above the last max,
-//					// skip this combo immediately
-//					if ((combos.size() == MAX_SEQS) && 
-//						(heur >= maxHeur))
-//					{
-//						//skipCount++;
-//						continue;
-//					}
-//					
-//					if (newCombo.chordMask.equals(fullChord))
-//					{
-//						if (heur < maxHeur)
-//							combos.addFirst(newCombo);
-//						else
-//							combos.addLast(newCombo);
-//						
-//						if (combos.size() > MAX_SEQS)
-//							combos.removeLast();
-//						
-//						return;
-//					}
-//					else
-//					{
-//						// Increment next search position
-//						// Inc by col, unless at end, then inc row
-//						// If at last row, recursion will stop here
-//						int newCStart = c + 1;
-//						int newRStart = r;
-//						
-//						if (newCStart >= board.getNumCols())
-//						{
-//							newCStart = 0;
-//							newRStart++;
-//						}
-//
-//						findSingleCombo(board, fullChord, newCombo, combos, newRStart, newCStart, indent + "  ");
-//					}
-//				}				
-//			}
-//			
-//			//Reset to 0 to start fully on next row			
-//			cStart = 0;
-//		}
-//		
-//		
-//	}
-//	
+  public static <T extends CollSequence>
+          boolean sortedInsert(LinkedList<T> nextSeqs, T newSeq, int maxSeqs)
+  {
+    boolean inserted = false;
+
+    int heur = newSeq.getHeur();
+
+    // Quick check, if we are at max sequences and the heuristic
+    // is greater than the last one, skip immediately
+    if ((nextSeqs.size() == maxSeqs)
+            && (heur >= nextSeqs.getLast().getHeur())) {
+      return inserted;
+    }
+
+    ListIterator<T> nextIter =
+            nextSeqs.listIterator();
+    while (nextIter.hasNext()) {
+      int index = nextIter.nextIndex();
+      if (heur < nextIter.next().getHeur()) {
+        nextSeqs.add(index, newSeq);
+        inserted = true;
+        break;
+      }
+    }
+
+    if (!inserted) {
+      if (nextSeqs.size() < maxSeqs) {
+        nextSeqs.add(newSeq);
+      }
+    } else if (nextSeqs.size() > maxSeqs) {
+      nextSeqs.removeLast();
+    }
+
+    return inserted;
+  }
 }

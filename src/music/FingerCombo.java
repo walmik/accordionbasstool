@@ -25,7 +25,7 @@ public class FingerCombo
     pos = geopos;
   }
 
-  public String getFingerAt(int row, int col)
+  public int getFingerAt(int row, int col)
   {
     for (int i = 0; i < buttoncombo.pos.length; i++)
     {
@@ -34,7 +34,7 @@ public class FingerCombo
       }
     }
     
-    return "";
+    return -1;
   }
 
   public GeoPos getPosAtFinger(int finger)
@@ -43,9 +43,9 @@ public class FingerCombo
     return pos[fingerMap[finger]];
   }
 
-  private String toFinger(int index)
+  private int toFinger(int index)
   {
-    return String.valueOf(reverseFingerMap[index] + 2);
+    return (reverseFingerMap[index] + 2);
   }
 
   @Override

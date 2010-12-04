@@ -14,7 +14,6 @@ import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.ToolTipManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -27,9 +26,11 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
   final static long serialVersionUID = 1;
 
+
+
   public RenderBassBoard()
   {
-    this(BassBoard.bassBoard120());
+    this(BassBoard.bassBoard32());
   }
 
   public RenderBassBoard(BassBoard newBoard)
@@ -56,6 +57,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     int borderMargin = RenderBoardUI.defaultUI.buttonXMargin + borderWidth / 2;
     this._borderInsets = new Insets(borderMargin, borderMargin, borderMargin, borderMargin);
   }
+
   Dimension margin = new Dimension();
   int borderWidth = 16;
   Dimension _contentDim = new Dimension(0, 0);
@@ -390,9 +392,13 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
         boolean selected = (_selCombo != null && _selCombo.hasButtonInSeq(realRow, realCol));
 
         String textStr = null;
+        int finger = -1;
         
         if (pressed) {
-          textStr = _selCombo.getFingerAt(realRow, realCol);
+          finger = _selCombo.getFingerAt(realRow, realCol);
+          if (finger >= 0) {
+            textStr = String.valueOf(finger);
+          }
         }
 
         if (textStr == null) {
@@ -403,22 +409,12 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
           pressed = true;
         }
 
+        RenderBoardUI.BoardButtonImage boardButton = RenderBoardUI.defaultUI.getBoardButtonImage(pressed, selected, finger);
+
         {
-          buttonDrawer.draw(graphics2D, realCol, realRow, pressed, selected);
+          buttonDrawer.draw(graphics2D, realCol, realRow, pressed, selected, boardButton);
           textDrawer.draw(graphics2D, realCol, realRow, pressed, textStr);
         }
-
-
-//				it = drawers.iterator();
-//				while (it.hasNext())
-//				{
-//					if (_isHoriz)
-//						it.next().drawButton(graphics, (int)_cOff, _rOff, _cInc, _rInc,
-//								c, r);
-//					else
-//						it.next().drawButton(graphics, _rOff, (int)_cOff, _rInc, _cInc,
-//								_cols - c - 1, r);
-//				}
 
         cOff += _cInc;
       }
@@ -426,11 +422,6 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     }
   }
 
-//  @Override
-//  public Dimension getMinimumSize()
-//  {
-//    return getPreferredSize();
-//  }
   @Override
   public Dimension getPreferredSize()
   {

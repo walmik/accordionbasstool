@@ -53,22 +53,22 @@ public class SelectedButtonCombo extends DefaultListSelectionModel
     return false;
   }
 
-  public String getFingerAt(int row, int col)
+  public int getFingerAt(int row, int col)
   {
     if (_fingerSeq == null) {
-      return null;
+      return -1;
     }
 
     int currIndex = this.getAnchorSelectionIndex();
 
     if ((currIndex < 0) || (_comboSeq == null)) {
-      return null; //none selected
+      return -1; //none selected
     }
 
     if (currIndex < _fingerSeq.getNumCombos()) {
       return _fingerSeq.getCombo(currIndex).getFingerAt(row, col);
     }
 
-    return null;
+    return -1;
   }
 }

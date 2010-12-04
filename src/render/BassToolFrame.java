@@ -55,15 +55,17 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     renderBassBoard.setSelectedButtonCombo(seqTablePanel.columnModel.selComboModel);
 
-    setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-
     seqTablePanel.toggleChordPicker.addActionListener(this);
 
     controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
 
     this.boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
 
-    //this.toggleEditorLeft();
+    // Add Default Chord!
+    seqTablePanel.columnModel.addColumn(0);
+
+    pack();
+    setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
   }
 
   private void checkPitchDetectPermissions()
@@ -283,8 +285,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     boardSplitPane.setLeftComponent(controlSplitPane);
 
     getContentPane().add(boardSplitPane, java.awt.BorderLayout.CENTER);
-
-    pack();
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JSplitPane boardSplitPane;

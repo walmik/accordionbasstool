@@ -52,6 +52,8 @@ class SeqColumnModel extends DefaultTableColumnModel
     fingerComboSeqs = new FingerComboSequence[0];
     fingerSearcher = new FingerSearcher();
 
+    currSeqArray = (optFingerSearch ? fingerComboSeqs : allComboSeqs);
+
     renderBoard = rBoard;
     rowSelModel = selM;
 
@@ -63,6 +65,11 @@ class SeqColumnModel extends DefaultTableColumnModel
 //    }
 
     this.setSelectionModel(selComboModel);
+  }
+
+  void addColumn(int index)
+  {
+    addColumn(ParsedChordDef.getDefaultChordDef(), index);
   }
 
   void addColumn(ParsedChordDef def, int index)
@@ -309,7 +316,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     }
 
     rowHeaderDataModel.fireListDataChanged();
-    dataModel.fireTableStructureChanged();
+    dataModel.fireTableDataChanged();
 
     if (selIndex < currSeqArray.length) {
       selComboModel.setSelectionInterval(selIndex, selIndex);
@@ -439,8 +446,8 @@ class SeqColumnModel extends DefaultTableColumnModel
     @Override
     public int getSize()
     {
-      if (currSeqArray == null) {
-        return 0;
+      if (currSeqArray.length == 0) {
+        return 1;
       }
 
       return currSeqArray.length;
@@ -449,6 +456,10 @@ class SeqColumnModel extends DefaultTableColumnModel
     @Override
     public Object getElementAt(int index)
     {
+      if (currSeqArray.length == 0) {
+        return null;
+      }
+      
       return currSeqArray[index];
     }
   }

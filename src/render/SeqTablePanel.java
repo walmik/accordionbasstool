@@ -24,7 +24,6 @@ import music.ButtonCombo;
 import music.ChordRegistry;
 import music.FingerCombo;
 import music.Note;
-import music.ParsedChordDef;
 
 /**
  *
@@ -63,9 +62,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     playTimer = new Timer(1000, chordTableAction);
     playTimer.setActionCommand("Timer");
 
-    columnModel.addColumn(ParsedChordDef.getDefaultChordDef(), 0);
-
-    //toolOptions.setVisible(false);
+    //columnModel.addColumn(0);
 
     cornerPanel = new JPanel();
     cornerPanel.add(toolPlay);
@@ -182,12 +179,12 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     public void actionPerformed(ActionEvent e)
     {
       if (e.getActionCommand().equals("AddChord")) {
-        columnModel.addColumn(ParsedChordDef.getDefaultChordDef(), columnModel.getColumnCount());
+        columnModel.addColumn(columnModel.getColumnCount());
 
       } else if (e.getActionCommand().equals("InsertChord")) {
         int index = columnModel.getSelectedColumn();
         if (index >= 0) {
-          columnModel.addColumn(ParsedChordDef.getDefaultChordDef(), index);
+          columnModel.addColumn(index);
         }
 
       } else if (e.getActionCommand().equals("RemoveChord")) {

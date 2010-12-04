@@ -14,4 +14,6 @@ public interface CollSequence<T> {
   public int getNumCombos();
 
   public T getCombo(int index);
+
+  int getHeur();
 }

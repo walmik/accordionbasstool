@@ -49,6 +49,8 @@ public class BassBoard
 
   public static BassBoard bassBoardNoteRowOnly()
   {
+    BoardRegistry.mainRegistry();
+
     RowType[] layout = {RowType.BassMaj3,
       RowType.BassRoot,
       RowType.ChordMajor};
@@ -58,6 +60,8 @@ public class BassBoard
 
   public static BassBoard bassBoardDebug()
   {
+    BoardRegistry.mainRegistry();
+
     RowType[] layout = {RowType.BassMaj3,
       RowType.BassRoot,
       RowType.ChordMajor,
@@ -70,6 +74,8 @@ public class BassBoard
 
   public static BassBoard bassBoard32()
   {
+    BoardRegistry.mainRegistry();
+    
     RowType[] layout = {RowType.BassMaj3,
       RowType.BassRoot,
       RowType.ChordMajor,
