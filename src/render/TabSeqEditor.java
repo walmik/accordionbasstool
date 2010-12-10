@@ -112,7 +112,7 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Current Sequence:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
-    chordTextField.setFont(new java.awt.Font("Monospaced", 0, 18));
+    chordTextField.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
     chordTextField.setToolTipText("<html> <li>Enter a sequence of comma seperated chords  as text below</li><br/> <li>See Chord Editor tab for all valid chord names. (ex. M = Major, m = minor)</li><br/> <li>To specify a custom chord by notes, put the notes in [ ], (ex. [ABC], [D F# G])</li><br/> </html>");
     chordTextField.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {

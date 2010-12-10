@@ -237,7 +237,7 @@ public class FingerSearcher
   {
     int heur = 0;
 
-    fillFingerPos(toPos, toCombo);
+    fillFingerPos(toPos, toCombo, fromCombo);
 
     if (fromPos == null) {
       return heur;
@@ -261,7 +261,7 @@ public class FingerSearcher
     return heur;
   }
 
-  private void fillFingerPos(GeoPos[] pos, FingerCombo combo)
+  private void fillFingerPos(GeoPos[] pos, FingerCombo combo, FingerCombo fromCombo)
   {
     assert(combo.pos.length == combo.reverseFingerMap.length);
     for (int i = 0; i < combo.pos.length; i++) {
@@ -270,6 +270,17 @@ public class FingerSearcher
     }
 
     fillDefaultFingerPos(pos);
+    
+    if (fromCombo == null) {
+      return;
+    }
+
+    for (int i = 0; i < NUM_FINGERS; i++) {
+      int finger = fromCombo.fingerMap[i];
+      if (finger != -1) {
+        pos[i] = pos[i].add(fromCombo.pos[finger]).divide(2);
+      }
+    }
   }
 
   private void fillDefaultFingerPos(GeoPos[] currFingerPos)

@@ -50,6 +50,8 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     columnModel = seqViewer.columnModel;
     columnModel.selComboModel.addListSelectionListener(this);
 
+    transposePanel1.setSeqColModel(columnModel);
+
     toolPlay = new JButton("Play");
     toolPlay.setActionCommand("PlaySeq");
 
@@ -62,11 +64,9 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     playTimer = new Timer(1000, chordTableAction);
     playTimer.setActionCommand("Timer");
 
-    //columnModel.addColumn(0);
 
     cornerPanel = new JPanel();
     cornerPanel.add(toolPlay);
-    //cornerPanel.setBorder(BorderFactory.createTitledBorder((String)null));
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, cornerPanel);
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER, new JPanel());
   }
@@ -74,7 +74,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
   void toggleLeftRight(boolean left)
   {
     this.setLayout(new BorderLayout());
-    this.add(left ? BorderLayout.WEST : BorderLayout.EAST, this.jPanel1);
+    this.add(left ? BorderLayout.WEST : BorderLayout.EAST, sidebar);
     this.add(BorderLayout.CENTER, this.seqTableScrollPane);
     this.add(BorderLayout.SOUTH, this.statusText);
   }
@@ -172,6 +172,20 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     statusText.setText(text);
   }
 
+  void toggleSeqControls(boolean allowed)
+  {
+    //sidebar.setVisible(allowed);
+    toolAddChord.setVisible(allowed);
+    toolInsert.setVisible(allowed);
+    toolRemove.setVisible(allowed);
+    transposePanel1.setVisible(allowed);
+    statusText.setVisible(allowed);
+
+    if (!allowed && (columnModel.getColumnCount() > 1)) {
+      columnModel.resetToSingleColumn();
+    }
+  }
+
   class ChordTableAction extends AbstractAction
   {
 
@@ -224,12 +238,13 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
 
     seqTableScrollPane = new javax.swing.JScrollPane();
     seqTable = new javax.swing.JTable();
-    jPanel1 = new javax.swing.JPanel();
+    sidebar = new javax.swing.JPanel();
     toggleChordPicker = new javax.swing.JButton();
     toolAddChord = new javax.swing.JButton();
     toolInsert = new javax.swing.JButton();
     toolRemove = new javax.swing.JButton();
     soundCheck = new javax.swing.JCheckBox();
+    transposePanel1 = new render.TransposePanel();
     statusText = new javax.swing.JLabel();
 
     seqTable.setAutoCreateColumnsFromModel(false);
@@ -277,30 +292,31 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
       }
     });
 
-    javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-    jPanel1.setLayout(jPanel1Layout);
-    jPanel1Layout.setHorizontalGroup(
-      jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(jPanel1Layout.createSequentialGroup()
-        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+    javax.swing.GroupLayout sidebarLayout = new javax.swing.GroupLayout(sidebar);
+    sidebar.setLayout(sidebarLayout);
+    sidebarLayout.setHorizontalGroup(
+      sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(sidebarLayout.createSequentialGroup()
+        .addGroup(sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addComponent(toggleChordPicker)
-          .addGroup(jPanel1Layout.createSequentialGroup()
+          .addGroup(sidebarLayout.createSequentialGroup()
             .addContainerGap()
             .addComponent(toolAddChord))
-          .addGroup(jPanel1Layout.createSequentialGroup()
+          .addGroup(sidebarLayout.createSequentialGroup()
             .addContainerGap()
             .addComponent(toolInsert))
-          .addGroup(jPanel1Layout.createSequentialGroup()
+          .addGroup(sidebarLayout.createSequentialGroup()
             .addContainerGap()
             .addComponent(toolRemove))
-          .addGroup(jPanel1Layout.createSequentialGroup()
+          .addGroup(sidebarLayout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(soundCheck)))
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(soundCheck))
+          .addComponent(transposePanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 125, Short.MAX_VALUE))
+        .addContainerGap())
     );
-    jPanel1Layout.setVerticalGroup(
-      jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(jPanel1Layout.createSequentialGroup()
+    sidebarLayout.setVerticalGroup(
+      sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(sidebarLayout.createSequentialGroup()
         .addComponent(toggleChordPicker)
         .addGap(24, 24, 24)
         .addComponent(soundCheck)
@@ -310,7 +326,9 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
         .addComponent(toolInsert)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(toolRemove)
-        .addContainerGap(171, Short.MAX_VALUE))
+        .addGap(18, 18, 18)
+        .addComponent(transposePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap(72, Short.MAX_VALUE))
     );
 
     statusText.setFont(new java.awt.Font("Tahoma", 0, 16));
@@ -327,9 +345,9 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
             .addGap(10, 10, 10)
             .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE))
           .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(sidebar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE)))
+            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -339,7 +357,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
           .addGroup(layout.createSequentialGroup()
             .addGap(11, 11, 11)
             .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE))
-          .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+          .addComponent(sidebar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(statusText, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
     );
@@ -351,14 +369,15 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
   }//GEN-LAST:event_soundCheckItemStateChanged
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JPanel jPanel1;
   private javax.swing.JTable seqTable;
   private javax.swing.JScrollPane seqTableScrollPane;
+  private javax.swing.JPanel sidebar;
   private javax.swing.JCheckBox soundCheck;
   private javax.swing.JLabel statusText;
   javax.swing.JButton toggleChordPicker;
   private javax.swing.JButton toolAddChord;
   private javax.swing.JButton toolInsert;
   private javax.swing.JButton toolRemove;
+  private render.TransposePanel transposePanel1;
   // End of variables declaration//GEN-END:variables
 }

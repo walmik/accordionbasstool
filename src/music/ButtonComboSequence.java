@@ -50,6 +50,7 @@ public class ButtonComboSequence implements Cloneable, CollSequence<ButtonCombo>
 		heur = 0;
 	}
 
+  @Override
   public int getHeur()
   {
     if (heur == 0)

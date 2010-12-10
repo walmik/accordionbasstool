@@ -17,10 +17,10 @@ public class ChordRegistry
 {
   // Stradella Chords
 
-  final static Interval[] MAJOR = {Interval.M3, Interval.m3};
-  final static Interval[] MINOR = {Interval.m3, Interval.M3};
-  final static Interval[] DOM = {Interval.M3, Interval.Dim5};
-  final static Interval[] DIM = {Interval.m3, Interval.Dim5};
+//  final static Interval[] MAJOR = {Interval.M3, Interval.m3};
+//  final static Interval[] MINOR = {Interval.m3, Interval.M3};
+//  final static Interval[] DOM = {Interval.M3, Interval.Dim5};
+//  final static Interval[] DIM = {Interval.m3, Interval.Dim5};
   private static ChordRegistry _mainRegistry = null;
 
   static RegistryChordDef defaultChord;

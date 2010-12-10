@@ -35,53 +35,6 @@ public class FingerComboSequence implements Cloneable, CollSequence<FingerCombo>
 
   }
 
-//  private void initPos(FingerCombo firstCombo)
-//  {
-//    currFingerPos = new GeoPos[FingerSearcher.NUM_FINGERS];
-//
-//    GeoPos naturalFingerDir = new GeoPos(0, 1, FingerSearcher.SKEW_GRID, FingerSearcher.SKEW_ANGLE);
-//
-//    for (int i = 0; i < firstCombo.reverseFingerMap.length; i++) {
-//      currFingerPos[firstCombo.reverseFingerMap[i]] = firstCombo.pos[i];
-//    }
-//
-//    // Fill in the missing fingers with default positions
-//
-//    for (int i = 0; i < firstCombo.fingerMap.length; i++) {
-//      if (currFingerPos[i] != null) {
-//        continue;
-//      }
-//
-//      int min = -1;
-//      int max = -1;
-//
-//      for (int j = i - 1; j >= 0; j--) {
-//        if (firstCombo.fingerMap[j] >= 0) {
-//          min = j;
-//          break;
-//        }
-//      }
-//
-//      for (int j = i + 1; j < firstCombo.fingerMap.length; j++) {
-//        if (firstCombo.fingerMap[j] >= 0) {
-//          max = j;
-//          break;
-//        }
-//      }
-//
-//      if ((min >= 0) && (max >= 0)) {
-//        currFingerPos[i] = firstCombo.getPosAtFinger(min).add(firstCombo.getPosAtFinger(max)).divide(2);
-//      } else if (min >= 0) {
-//        currFingerPos[i] = firstCombo.getPosAtFinger(min).subtract(naturalFingerDir.scale(i - min));
-//      } else if (max >= 0) {
-//        currFingerPos[i] = firstCombo.getPosAtFinger(max).add(naturalFingerDir.scale(max - i));
-//      } else {
-//        currFingerPos[i] = GeoPos.zero();
-//      }
-//
-//    }
-//  }
-
   public ButtonComboSequence getButtonComboSeq()
   {
     return buttonSeq;
@@ -115,6 +68,7 @@ public class FingerComboSequence implements Cloneable, CollSequence<FingerCombo>
     return ((combos.size() > 0) ? combos.lastElement() : null);
   }
 
+  @Override
   public int getHeur()
   {
     return heur;

@@ -23,9 +23,9 @@
                       <Component id="statusText" pref="532" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+                      <Component id="sidebar" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="seqTableScrollPane" pref="411" max="32767" attributes="0"/>
+                      <Component id="seqTableScrollPane" pref="401" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -40,7 +40,7 @@
                       <EmptySpace min="11" pref="11" max="11" attributes="0"/>
                       <Component id="seqTableScrollPane" pref="329" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="jPanel1" max="32767" attributes="1"/>
+                  <Component id="sidebar" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="statusText" min="-2" pref="38" max="-2" attributes="0"/>
@@ -69,7 +69,7 @@
         </Component>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPanel" name="jPanel1">
+    <Container class="javax.swing.JPanel" name="sidebar">
 
       <Layout>
         <DimensionLayout dim="0">
@@ -93,8 +93,9 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="soundCheck" min="-2" max="-2" attributes="0"/>
                       </Group>
+                      <Component id="transposePanel1" alignment="1" pref="125" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -110,7 +111,9 @@
                   <Component id="toolInsert" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="toolRemove" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="171" max="32767" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Component id="transposePanel1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="72" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -172,6 +175,8 @@
           <Events>
             <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="soundCheckItemStateChanged"/>
           </Events>
+        </Component>
+        <Component class="render.TransposePanel" name="transposePanel1">
         </Component>
       </SubComponents>
     </Container>

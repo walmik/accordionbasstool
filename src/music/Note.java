@@ -136,7 +136,7 @@ public class Note
   public Interval diff(Note other)
   {
     return new Interval(halfStepValue() - other.halfStepValue(),
-            note.scaleDist - other.note.scaleDist, null);
+                        note.scaleDist - other.note.scaleDist);
   }
 
   public Note add(Interval ival)

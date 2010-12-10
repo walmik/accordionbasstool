@@ -17,6 +17,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.sound.sampled.AudioPermission;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -31,6 +32,16 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
   boolean editorVis = true;
   boolean editorLeft = true;
+  ModeSelector modeSelector;
+
+  enum ToolMode
+  {
+
+    BUTTON_FOR_CHORD,
+    CHORD_SEQ,
+    CHORD_FOR_BUTTON,
+    ALL,
+  }
 
   /** Creates new form BassToolFrame */
   public BassToolFrame()
@@ -45,6 +56,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     tabOptions.setSeqColModel(seqTablePanel.columnModel);
     tabPitchDetect.setSeqColModel(seqTablePanel.columnModel);
     checkPitchDetectPermissions();
+
+    //initModeSelector();
 
     renderBoardHeader.initBoardHeader(renderBassBoard, renderBoardScrollPane, seqTablePanel.columnModel);
 
@@ -117,10 +130,16 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   @Override
   public void actionPerformed(ActionEvent e)
   {
-    if (editorVis) {
-      controlSplitPane.setDividerLocation(editorLeft ? 0.0 : 1.0);
-    } else {
-      controlSplitPane.setDividerLocation(editorLeft ? controlSplitPane.getMinimumDividerLocation() : controlSplitPane.getMaximumDividerLocation());
+    if (e.getSource() == seqTablePanel.toggleChordPicker) {
+      if (editorVis) {
+        controlSplitPane.setDividerLocation(editorLeft ? 0.0 : 1.0);
+      } else {
+        controlSplitPane.setDividerLocation(editorLeft ? controlSplitPane.getMinimumDividerLocation() : controlSplitPane.getMaximumDividerLocation());
+      }
+    }
+
+    if (e.getSource() == modeSelector.modeCombo) {
+      switchMode((ToolMode) modeSelector.modeCombo.getSelectedItem());
     }
   }
 
@@ -227,6 +246,34 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     return theBoard;
   }
 
+  void initModeSelector()
+  {
+    modeSelector = new ModeSelector();
+    getContentPane().add(modeSelector, java.awt.BorderLayout.NORTH);
+    modeSelector.modeCombo.setModel(new DefaultComboBoxModel(ToolMode.values()));
+    modeSelector.modeCombo.addActionListener(this);
+  }
+
+  void switchMode(ToolMode mode)
+  {
+    switch (mode) {
+      case BUTTON_FOR_CHORD:
+        seqTablePanel.toggleSeqControls(false);
+        toolTabs.removeAll();
+        toolTabs.addTab("Chord Picker", tabChordPicker);
+        toolTabs.addTab("Options", tabOptions);
+        break;
+
+      case ALL:
+        seqTablePanel.toggleSeqControls(true);
+        toolTabs.removeAll();
+        toolTabs.addTab("Chord Picker", tabChordPicker);
+        toolTabs.addTab("Sequence Editor", tabSeqEditor);
+        toolTabs.addTab("Options", tabOptions);
+        break;
+    }
+  }
+
   /** This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
@@ -257,11 +304,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     renderBassBoard.setLayout(renderBassBoardLayout);
     renderBassBoardLayout.setHorizontalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 1316, Short.MAX_VALUE)
+      .addGap(0, 1091, Short.MAX_VALUE)
     );
     renderBassBoardLayout.setVerticalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 324, Short.MAX_VALUE)
+      .addGap(0, 284, Short.MAX_VALUE)
     );
 
     renderBoardScrollPane.setViewportView(renderBassBoard);

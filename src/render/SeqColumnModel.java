@@ -22,23 +22,16 @@ class SeqColumnModel extends DefaultTableColumnModel
 {
 
   SelectedButtonCombo selComboModel;
-
   private ButtonComboSequence[] allComboSeqs;
   private BoardSearcher searcher;
-
   private FingerComboSequence[] fingerComboSeqs;
   private FingerSearcher fingerSearcher;
-
   private RenderBassBoard renderBoard;
   private CollSequence[] currSeqArray;
-
   private SeqRowHeaderData rowHeaderDataModel;
   private SeqDataModel dataModel;
-
   private ListSelectionModel rowSelModel;
-
   public boolean optFingerSearch = true;
-
   final static int DEFAULT_COL_WIDTH = 100;
 
   SeqColumnModel(RenderBassBoard rBoard, ListSelectionModel selM)
@@ -48,7 +41,7 @@ class SeqColumnModel extends DefaultTableColumnModel
 
     allComboSeqs = new ButtonComboSequence[0];
     searcher = new BoardSearcher();
-    
+
     fingerComboSeqs = new FingerComboSequence[0];
     fingerSearcher = new FingerSearcher();
 
@@ -115,6 +108,12 @@ class SeqColumnModel extends DefaultTableColumnModel
     if (index >= 0) {
       editColumn(index, newDef);
     }
+  }
+
+  void resetToSingleColumn()
+  {
+    this.tableColumns.clear();
+    this.addColumn(0);
   }
 
   void removeSelectedColumn()
@@ -249,7 +248,6 @@ class SeqColumnModel extends DefaultTableColumnModel
     return false;
   }
 
-
   @Override
   public String toString()
   {
@@ -333,7 +331,8 @@ class SeqColumnModel extends DefaultTableColumnModel
 
   class SeqDataModel extends AbstractTableModel
   {
-     @Override
+
+    @Override
     public Class<?> getColumnClass(int columnIndex)
     {
       return CollSequence.class;
@@ -429,19 +428,17 @@ class SeqColumnModel extends DefaultTableColumnModel
 //      return allComboSeqs[rowIndex].getCombo(columnIndex);
 //    }
 //  }
-
   class SeqRowHeaderData extends AbstractListModel
   {
+
     SeqRowHeaderData()
     {
-
     }
 
     void fireListDataChanged()
     {
       fireContentsChanged(this, 0, currSeqArray.length);
     }
-
 
     @Override
     public int getSize()
@@ -459,8 +456,8 @@ class SeqColumnModel extends DefaultTableColumnModel
       if (currSeqArray.length == 0) {
         return null;
       }
-      
+
       return currSeqArray[index];
     }
   }
-  }
+}

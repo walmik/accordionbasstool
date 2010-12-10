@@ -57,12 +57,12 @@ public class RenderBoardUI
   public static enum BoardButtonImage
   {
     
-    UNSELECTED( Color.black, 0.5f,    false),
+    UNSELECTED( Color.black, 1.f,     false),
     SELECTED(   Color.blue,           false),
-    PRESSED_2(  Color.green, 0.75f,   true),
-    PRESSED_3(  Color.cyan, 0.75f,    true),
-    PRESSED_4(  Color.orange, 0.75f,  true),
-    PRESSED_5(  Color.red, 0.75f,     true),
+    PRESSED_2(  Color.green, 1.f,     true),
+    PRESSED_3(  Color.cyan,  1.f,     true),
+    PRESSED_4(  Color.orange, 1.f,    true),
+    PRESSED_5(  Color.red, 1.f,       true),
     PRESSED_ANY(Color.magenta,        true);
 
 

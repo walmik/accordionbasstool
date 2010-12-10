@@ -26,6 +26,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.PanelUI;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import music.Chord;
@@ -301,7 +302,7 @@ public class TabChordPicker extends javax.swing.JPanel
       chordTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
     } else {
 
-      chordTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+      chordTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
       for (int i = 0; i < chordTable.getColumnCount(); i++) {
         chordTable.getColumnModel().getColumn(i).setPreferredWidth(DEFAULT_TABLE_COL_WIDTH);
@@ -551,15 +552,17 @@ public class TabChordPicker extends javax.swing.JPanel
     TableColumnModel colModel = chordTable.getColumnModel();
     colModel.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-    ToggleButtonRenderer renderer = new ToggleButtonRenderer();
-
+    TableCellRenderer renderer = new ToggleButtonRenderer();
+    //TableCellRenderer renderer = new ChordCellRenderer();
     chordTable.setDefaultRenderer(RegistryChordDef.class, renderer);
 
-    chordTable.getTableHeader().setReorderingAllowed(true);
+    JTableHeader header = chordTable.getTableHeader();
+    header.setReorderingAllowed(true);
+    header.setFont(header.getFont().deriveFont(Font.ITALIC | Font.BOLD, 14));
 
     chordTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     chordTable.setCellSelectionEnabled(true);
-    chordTable.setShowGrid(false);
+    chordTable.setShowGrid(true);
 
     //chordTable.setBackground(emptyLabel.getBackground());
     //jScrollPane1.setBackground(emptyLabel.getBackground());
@@ -571,6 +574,61 @@ public class TabChordPicker extends javax.swing.JPanel
     if ((chordTable.getRowCount() > 0) && (chordTable.getColumnCount() > 0)) {
       chordTable.setRowSelectionInterval(0, 0);
       chordTable.setColumnSelectionInterval(0, 0);
+    }
+  }
+
+  class ChordCellRenderer extends DefaultTableCellRenderer
+  {
+
+    Font plain, bold;
+
+    ChordCellRenderer()
+    {
+      initUI();
+    }
+
+    private void initUI()
+    {
+      plain = getFont().deriveFont(Font.PLAIN, 18);
+      bold = plain.deriveFont(Font.BOLD);
+      this.setHorizontalAlignment(CENTER);
+    }
+
+    @Override
+    public Component getTableCellRendererComponent(JTable table,
+            Object value,
+            boolean isSelected,
+            boolean hasFocus,
+            int row, int column)
+    {
+      if (value == null) {
+        return emptyLabel;
+      }
+
+      super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+      // Chord Cell Rendering
+      RegistryChordDef chordDef = (RegistryChordDef) value;
+
+      String cellText = rootNote.toString(true) + chordDef.abbrevHtml;
+
+//      if (addedBassCheck.isSelected()) {
+//        cellText += "/" + addedBassNote.toString(true);
+//      }
+
+      setText("<html>" + cellText + "</html>");
+
+      String statusInfo =
+              "<html><b>" + rootNote.toString(true) + " " + chordDef.name + "</b><br/>" + chordDef.getTransposedString(rootNote) + "</html>";
+
+      this.setToolTipText(statusInfo);
+
+      //setSelected(isSelected);
+      setFont(isSelected ? bold : plain);
+      //button.setVisible(true);
+      //button.setEnabled(table.isEnabled());
+
+      return this;
     }
   }
 
@@ -597,7 +655,7 @@ public class TabChordPicker extends javax.swing.JPanel
         return;
       }
 
-      plain = getFont().deriveFont(Font.PLAIN);
+      plain = getFont().deriveFont(Font.PLAIN, 18);
       bold = plain.deriveFont(Font.BOLD);
       button.setFont(plain);
     }
@@ -623,7 +681,11 @@ public class TabChordPicker extends javax.swing.JPanel
       // Chord Cell Rendering
       RegistryChordDef chordDef = (RegistryChordDef) value;
 
-      String cellText = rootNote.toString(true) + chordDef.abbrevHtml;
+      String cellText = chordDef.abbrevHtml;
+
+      if (cellText.length() == 0) {
+        cellText = "(note)";
+      }
 
 //      if (addedBassCheck.isSelected()) {
 //        cellText += "/" + addedBassNote.toString(true);
@@ -672,9 +734,17 @@ public class TabChordPicker extends javax.swing.JPanel
 
     jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
 
+    chordTable.setModel(new javax.swing.table.DefaultTableModel(
+      new Object [][] {
+
+      },
+      new String [] {
+
+      }
+    ));
     chordTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
     chordTable.setFillsViewportHeight(true);
-    chordTable.setRowHeight(30);
+    chordTable.setRowHeight(48);
     jScrollPane1.setViewportView(chordTable);
 
     statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getSize()+3f));
