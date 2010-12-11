@@ -138,7 +138,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       }
     }
 
-    if (e.getSource() == modeSelector.modeCombo) {
+    if ((modeSelector!= null) && (e.getSource() == modeSelector.modeCombo)) {
       switchMode((ToolMode) modeSelector.modeCombo.getSelectedItem());
     }
   }

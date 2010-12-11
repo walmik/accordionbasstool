@@ -127,6 +127,15 @@ public class ButtonCombo
     
     return computeComboBounds() < optMaxDistThreshold;
   }
+
+  public boolean isSingleBass()
+  {
+    if (pos.length != 1) {
+      return false;
+    }
+
+    return board.isSingleBassRow(pos[0].row);
+  }
   
   public static int optMaxDistThreshold = 8;
 

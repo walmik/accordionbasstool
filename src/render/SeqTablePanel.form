@@ -64,7 +64,7 @@
             </Property>
             <Property name="autoResizeMode" type="int" value="0"/>
             <Property name="opaque" type="boolean" value="false"/>
-            <Property name="rowHeight" type="int" value="24"/>
+            <Property name="rowHeight" type="int" value="64"/>
           </Properties>
         </Component>
       </SubComponents>

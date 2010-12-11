@@ -596,6 +596,7 @@ public class SeqViewerController
     Color defPlainColor1, defPlainColor2;
     Border highliteBorder;
     Border stdBorder;
+    Font font;
 
     CellRenderer()
     {
@@ -614,8 +615,11 @@ public class SeqViewerController
       defSelColor = super.getTableCellRendererComponent(seqTable, "", true, false, 0, 0).getBackground();
 
       defPlainColor1 = Color.white;//super.getTableCellRendererComponent(seqTable, "", false, false, 0, 0).getBackground();
-      //defPlainColor2 = super.getTableCellRendererComponent(seqTable, "", false, false, 1, 0).getBackground();
       defPlainColor2 = UIManager.getColor("Table.alternateRowColor");
+
+      this.setVerticalAlignment(CENTER);
+      this.setHorizontalAlignment(CENTER);
+      font = getFont().deriveFont(16.f);
     }
 
     @Override
@@ -638,24 +642,38 @@ public class SeqViewerController
         buttonCombo = (ButtonCombo) objValue;
       }
 
-      String text = "";
+      boolean html = true;
+      String text = (html ? "<html>" : "");
+      String space = (html ? "&nbsp;" : " ");
 
       if (fingerCombo != null) {
-        text = fingerCombo.toString();
-      } else if (buttonCombo != null) {
-        text = buttonCombo.toButtonListingString(false);
+        text += fingerCombo.toString(html);
+        if (html) {
+          text += space + space + space + "on" + space + space + space;
+        }
       }
 
       if (buttonCombo != null) {
-        //if (combo.isSingleBass()) {
-        Note lowest = buttonCombo.getLowestNote();
-        String lowestInfo = (lowest.isBassNote() ? "Bass " : "High ") + lowest.toString(false);
-        //return "<html>" + info + " Low: " + lowest + "</html>";
-        text += " (" + lowestInfo + ")";
-        //text = combo.toSortedNoteString(false);
-        //}
+        text += buttonCombo.toButtonListingString(html);
+      }
+
+      if (buttonCombo != null) {
+        if (!buttonCombo.isSingleBass()) {
+          Note lowest = buttonCombo.getLowestNote();
+          String lowestInfo = (lowest.isBassNote() ? "Bass" : "Chord") + space + lowest.toString(html);
+          //return "<html>" + info + " Low: " + lowest + "</html>";
+          if (html) {
+            text += " (<i>" + lowestInfo + "</i>)";
+          } else {
+            text += " (" + lowestInfo + ")";
+          }
+          //text = combo.toSortedNoteString(false);
+        }
       } else {
-        text = "Chord Not Possible";
+        text += "Chord Not Possible";
+      }
+      if (html) {
+        text += "</html>";
       }
 
       Component defRendComp = super.getTableCellRendererComponent(table, text, isSelected, hasFocus, row, column);
@@ -681,6 +699,7 @@ public class SeqViewerController
         jcomp.setBackground((row % 2) == 0 ? defPlainColor1 : defPlainColor2);
         jcomp.setBorder(stdBorder);
       }
+      jcomp.setFont(font);
 
       return jcomp;
     }

@@ -258,7 +258,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     ));
     seqTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
     seqTable.setOpaque(false);
-    seqTable.setRowHeight(24);
+    seqTable.setRowHeight(64);
     seqTableScrollPane.setViewportView(seqTable);
 
     toggleChordPicker.setFont(toggleChordPicker.getFont().deriveFont(toggleChordPicker.getFont().getStyle() | java.awt.Font.BOLD));

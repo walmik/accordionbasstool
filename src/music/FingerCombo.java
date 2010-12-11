@@ -10,6 +10,7 @@ package music;
  */
 public class FingerCombo
 {
+
   ButtonCombo buttoncombo;
   final GeoPos[] pos;
   byte[] reverseFingerMap;
@@ -27,19 +28,18 @@ public class FingerCombo
 
   public int getFingerAt(int row, int col)
   {
-    for (int i = 0; i < buttoncombo.pos.length; i++)
-    {
+    for (int i = 0; i < buttoncombo.pos.length; i++) {
       if (buttoncombo.pos[i].equals(row, col)) {
         return toFinger(i);
       }
     }
-    
+
     return -1;
   }
 
   public GeoPos getPosAtFinger(int finger)
   {
-    assert(finger >= 0 && fingerMap[finger] >= 0);
+    assert (finger >= 0 && fingerMap[finger] >= 0);
     return pos[fingerMap[finger]];
   }
 
@@ -51,14 +51,24 @@ public class FingerCombo
   @Override
   public String toString()
   {
+    return toString(false);
+  }
+
+  public String toString(boolean html)
+  {
     String str = "";
     for (int i = 0; i < reverseFingerMap.length; i++) {
       if (i > 0) {
-        str += ", ";
+        str += " + ";
       }
-      str += toFinger(i) + " on ";
-      str += buttoncombo.getButtonNameAt(i, false);
+      if (html) {
+        str += "<b>" + toFinger(i) + "</b>";
+      } else {
+        str += toFinger(i);
+      }
+      //str += buttoncombo.getButtonNameAt(i, html);
     }
+
     return str;
   }
 
@@ -66,7 +76,6 @@ public class FingerCombo
   {
     return buttoncombo;
   }
-
 //  void acceptFingerCombo()
 //  {
 //    byte[] fingers = new byte[4];
@@ -99,6 +108,4 @@ public class FingerCombo
 //      }
 //    }
 //  }
-
-
 }

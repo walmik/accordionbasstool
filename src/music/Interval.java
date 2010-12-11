@@ -12,7 +12,7 @@ public class Interval
   static public enum NamedInterval
   {
     m2(1, 1, "Min 2nd"),
-    M2(1, 1, "Maj 2nd"),
+    M2(2, 1, "Maj 2nd"),
     m3(3, 2, "Min 3rd"),
     M4(4, 2, "Maj 3rd"),
     P4(5, 3, "Perfect 4th"),
@@ -66,13 +66,13 @@ public class Interval
 //	final static Interval M7 = new Interval(11, 6, "Major 7th");
 //  final static Interval P8 = new Interval(12, 7, "Perfect Octave");
 	
-	public final int interval;
-	public final int scaleDist;
+	public final short interval;
+	public final short scaleDist;
 	
 	public Interval(int val, int dist)
 	{
-		interval = val;
-		scaleDist = dist;
+		interval = (short)val;
+		scaleDist = (short)dist;
 	}
 	
 	public Interval scale(int scaler)
