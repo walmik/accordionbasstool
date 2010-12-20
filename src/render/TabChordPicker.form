@@ -81,7 +81,7 @@
             </Property>
             <Property name="autoResizeMode" type="int" value="0"/>
             <Property name="fillsViewportHeight" type="boolean" value="true"/>
-            <Property name="rowHeight" type="int" value="48"/>
+            <Property name="rowHeight" type="int" value="24"/>
           </Properties>
         </Component>
       </SubComponents>

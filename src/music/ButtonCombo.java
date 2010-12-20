@@ -86,13 +86,14 @@ public class ButtonCombo
   public String toButtonListingString(boolean html)
   {
     String str = "";
+    String space = (html ? "&nbsp;" : " ");
 
     // Print in reverse as we were built depth first, so top button is last
     for (int i = pos.length - 1; i >= 0; i--) {
       //str += (board.isSingleBassRow(pos[i].row) ? "Bass " : "Chord ");
       str += getButtonNameAt(i, html);
       if (i > 0) {
-        str += " + ";
+        str += space + "+" + space;
       }
     }
 
@@ -137,7 +138,7 @@ public class ButtonCombo
     return board.isSingleBassRow(pos[0].row);
   }
   
-  public static int optMaxDistThreshold = 8;
+  public static int optMaxDistThreshold = 5;
 
   public static void setMaxComboDistThreshold(int threshold)
   {

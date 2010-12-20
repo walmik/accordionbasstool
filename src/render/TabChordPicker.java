@@ -552,8 +552,8 @@ public class TabChordPicker extends javax.swing.JPanel
     TableColumnModel colModel = chordTable.getColumnModel();
     colModel.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-    TableCellRenderer renderer = new ToggleButtonRenderer();
-    //TableCellRenderer renderer = new ChordCellRenderer();
+    //TableCellRenderer renderer = new ToggleButtonRenderer();
+    TableCellRenderer renderer = new ChordCellRenderer();
     chordTable.setDefaultRenderer(RegistryChordDef.class, renderer);
 
     JTableHeader header = chordTable.getTableHeader();
@@ -575,6 +575,21 @@ public class TabChordPicker extends javax.swing.JPanel
       chordTable.setRowSelectionInterval(0, 0);
       chordTable.setColumnSelectionInterval(0, 0);
     }
+  }
+
+  private String getCellText(RegistryChordDef chordDef)
+  {
+    String cellText = chordDef.name;
+
+    if (cellText.length() == 0) {
+      cellText = "(note)";
+    }
+
+//      if (addedBassCheck.isSelected()) {
+//        cellText += "/" + addedBassNote.toString(true);
+//      }
+
+    return cellText;//("<html>" + cellText + "</html>");
   }
 
   class ChordCellRenderer extends DefaultTableCellRenderer
@@ -610,13 +625,7 @@ public class TabChordPicker extends javax.swing.JPanel
       // Chord Cell Rendering
       RegistryChordDef chordDef = (RegistryChordDef) value;
 
-      String cellText = rootNote.toString(true) + chordDef.abbrevHtml;
-
-//      if (addedBassCheck.isSelected()) {
-//        cellText += "/" + addedBassNote.toString(true);
-//      }
-
-      setText("<html>" + cellText + "</html>");
+      setText(getCellText(chordDef));
 
       String statusInfo =
               "<html><b>" + rootNote.toString(true) + " " + chordDef.name + "</b><br/>" + chordDef.getTransposedString(rootNote) + "</html>";
@@ -681,17 +690,7 @@ public class TabChordPicker extends javax.swing.JPanel
       // Chord Cell Rendering
       RegistryChordDef chordDef = (RegistryChordDef) value;
 
-      String cellText = chordDef.abbrevHtml;
-
-      if (cellText.length() == 0) {
-        cellText = "(note)";
-      }
-
-//      if (addedBassCheck.isSelected()) {
-//        cellText += "/" + addedBassNote.toString(true);
-//      }
-
-      button.setText("<html>" + cellText + "</html>");
+      button.setText(getCellText(chordDef));
 
       String statusInfo = "<html><b>" + rootNote.toString(true) + " " + chordDef.name + "</b><br/>" + chordDef.getTransposedString(rootNote) + "</html>";
 
@@ -744,7 +743,7 @@ public class TabChordPicker extends javax.swing.JPanel
     ));
     chordTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
     chordTable.setFillsViewportHeight(true);
-    chordTable.setRowHeight(48);
+    chordTable.setRowHeight(24);
     jScrollPane1.setViewportView(chordTable);
 
     statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getSize()+3f));

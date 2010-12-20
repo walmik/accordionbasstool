@@ -57,9 +57,11 @@ public class FingerCombo
   public String toString(boolean html)
   {
     String str = "";
+    String space = (html ? "&nbsp;" : " ");
+    
     for (int i = 0; i < reverseFingerMap.length; i++) {
       if (i > 0) {
-        str += " + ";
+        str += space + "+" + space;
       }
       if (html) {
         str += "<b>" + toFinger(i) + "</b>";

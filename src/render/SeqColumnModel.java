@@ -31,8 +31,10 @@ class SeqColumnModel extends DefaultTableColumnModel
   private SeqRowHeaderData rowHeaderDataModel;
   private SeqDataModel dataModel;
   private ListSelectionModel rowSelModel;
-  public boolean optFingerSearch = true;
-  final static int DEFAULT_COL_WIDTH = 100;
+
+  public boolean optFingerSearch = false;
+
+  final static int DEFAULT_COL_WIDTH = 120;
 
   SeqColumnModel(RenderBassBoard rBoard, ListSelectionModel selM)
   {

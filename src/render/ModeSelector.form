@@ -23,7 +23,9 @@
               <Component id="modeCombo" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="infoLabel" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="203" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
+              <Component id="checkFingerSearch" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -33,6 +35,7 @@
               <Component id="namelabel" alignment="3" min="-2" max="-2" attributes="0"/>
               <Component id="modeCombo" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
               <Component id="infoLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="checkFingerSearch" alignment="3" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -63,7 +66,7 @@
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="modeCombo"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Accordion Tool Options:"/>
+        <Property name="text" type="java.lang.String" value="Show:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="infoLabel">
@@ -72,6 +75,14 @@
           <Font name="Tahoma" size="11" style="1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="info"/>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="checkFingerSearch">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Include Fingering"/>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>

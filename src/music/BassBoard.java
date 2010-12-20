@@ -159,7 +159,7 @@ public class BassBoard
     int diffCol = col - ((cols - 1) / 2);
 
     //NoteValue rootNote = new NoteValue(NoteValue.Note.C, 0).add(Interval.P5.scale(diffCol));
-    Note rootNote = middleNote.add(Interval.P5.scale(diffCol));
+    Note rootNote = middleNote.add(NamedInterval.P5.interval.scale(diffCol));
 
     return rootNote;
   }

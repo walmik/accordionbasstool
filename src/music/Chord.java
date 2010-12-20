@@ -1,5 +1,7 @@
 package music;
 
+import java.util.Vector;
+
 public class Chord
 {
 
@@ -163,6 +165,12 @@ public class Chord
     initBassNote(singleN, dupCount);
   }
 
+  public Chord(Vector<Note> n)
+  {
+    notes = new Note[n.size()];
+    n.toArray(notes);
+  }
+
   public Chord(Note[] n)
   {
     notes = n;
@@ -207,45 +215,8 @@ public class Chord
     for (int i = 0; i < ivals.length; i++) {
       notes[offset + i + 1] = notes[offset + i].add(ivals[i]);
     }
-
   }
 
-//	public Chord(Chord one, Chord two)
-//	{
-//		Mask onemask = one.getChordMask();
-//		Mask twomask = two.getChordMask();
-//
-//		int newMask = (~onemask.value | twomask.value);
-//
-//		int numNotes = one.notes.length;
-//
-//		// See which notes in two are not in one and add them
-//		// to new note list
-//		for (int i = 0; i < two.notes.length; i++)
-//		{
-//			if ((newMask & (1 << two.notes[i].value())) != 0)
-//			{
-//				numNotes++;
-//			}
-//		}
-//
-//		notes = new Note[numNotes];
-//
-//		System.arraycopy(one.notes, 0, notes, 0, one.notes.length);
-//
-//		// Fill only the second chord's notes that don't overlap
-//		int count = one.notes.length;
-//
-//		for (int i = 0; i < two.notes.length; i++)
-//		{
-//			if ((newMask & (1 << two.notes[i].value())) != 0)
-//			{
-//				notes[count++] = two.notes[i];
-//			}
-//		}
-//
-//		assert(count == numNotes);
-//	}
   // extraBass may be null
   public Chord(Chord existing, Note newRoot, Note extraBass, boolean mustBeBassRoot)
   {
@@ -287,6 +258,18 @@ public class Chord
       newNotes[i] = notes[i].add(ival);
     }
 
+    return new Chord(newNotes);
+  }
+
+  public Chord getUndupedChord()
+  {
+    Vector<Note> newNotes = new Vector<Note>();
+    for (int i = 0; i < notes.length; i++)
+    {
+      if (!newNotes.contains(notes[i])) {
+        newNotes.add(notes[i]);
+      }
+    }
     return new Chord(newNotes);
   }
 

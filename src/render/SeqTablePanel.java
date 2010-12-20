@@ -17,6 +17,7 @@ import javax.swing.Timer;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -183,6 +184,12 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
 
     if (!allowed && (columnModel.getColumnCount() > 1)) {
       columnModel.resetToSingleColumn();
+    }
+
+    if (allowed) {
+      seqTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    } else {
+      seqTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
     }
   }
 

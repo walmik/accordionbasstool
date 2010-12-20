@@ -12,37 +12,36 @@
   </rows>
 
   <boards>
-<!--Note Onlys)-->
+<!--Notes Only)-->
     <board name="Notes Only" middleNote="C" numColumns="12">
       <row name="BassMaj3"/>
       <row name="BassRoot"/>
-      <row name="BassMin3"/>
     </board>
 <!--8 Bass (4 x 2)-->
-    <board name="" middleNote="C" numColumns="4">
+    <board numColumns="4">
       <row name="BassRoot"/>
       <row name="ChordMajor"/>
     </board>
 <!--12 Bass (6 x 2)-->
-    <board name="" middleNote="C" numColumns="6">
+    <board numColumns="6">
       <row name="BassRoot"/>
       <row name="ChordMajor"/>
     </board>
 <!--24 Bass (8 x 3)-->
-    <board name="" middleNote="C" numColumns="8">
+    <board numColumns="8">
       <row name="BassRoot"/>
       <row name="ChordMajor"/>
       <row name="ChordMinor"/>
     </board>
 <!--32 Bass (8 x 4)-->
-    <board name="" middleNote="C" numColumns="8">
+    <board numColumns="8">
       <row name="BassRoot"/>
       <row name="ChordMajor"/>
       <row name="ChordMinor"/>
       <row name="Chord7th"/>
     </board>
 <!--40 Bass (8 x 5)-->
-    <board name="" middleNote="C" numColumns="8">
+    <board numColumns="8">
       <row name="BassMaj3"/>
       <row name="BassRoot"/>
       <row name="ChordMajor"/>
@@ -50,7 +49,7 @@
       <row name="Chord7th"/>
     </board>
 <!--48 Bass (8 x 6)-->
-    <board name="" middleNote="C" numColumns="8">
+    <board numColumns="8">
       <row name="BassMaj3"/>
       <row name="BassRoot"/>
       <row name="ChordMajor"/>
@@ -59,14 +58,14 @@
       <row name="ChordDim"/>
     </board>
 <!--48 Bass (12 x 4)-->
-    <board name="" middleNote="C" numColumns="12">
+    <board numColumns="12">
       <row name="BassMaj3"/>
       <row name="BassRoot"/>
       <row name="ChordMajor"/>
       <row name="ChordMinor"/>
     </board>
 <!--60 Bass (12 x 5)-->
-    <board name="" middleNote="C" numColumns="12">
+    <board numColumns="12">
       <row name="BassMaj3"/>
       <row name="BassRoot"/>
       <row name="ChordMajor"/>
@@ -74,7 +73,7 @@
       <row name="Chord7th"/>
     </board>
 <!--72 Bass (12 x 6)-->
-    <board name="" middleNote="C" numColumns="12">
+    <board numColumns="12">
       <row name="BassMaj3"/>
       <row name="BassRoot"/>
       <row name="ChordMajor"/>
@@ -83,7 +82,7 @@
       <row name="ChordDim"/>
     </board>
 <!--80 Bass (16 x 5)-->
-    <board name="" middleNote="C" numColumns="16">
+    <board numColumns="16">
       <row name="BassMaj3"/>
       <row name="BassRoot"/>
       <row name="ChordMajor"/>
@@ -91,7 +90,7 @@
       <row name="Chord7th"/>
     </board>
 <!--96 Bass (16 x 6)-->
-    <board name="" middleNote="C" numColumns="16">
+    <board numColumns="16">
       <row name="BassMaj3"/>
       <row name="BassRoot"/>
       <row name="ChordMajor"/>
@@ -100,7 +99,7 @@
       <row name="ChordDim"/>
     </board>
 <!--120 Bass (20 x 6)-->
-    <board name="" middleNote="C" numColumns="20">
+    <board numColumns="20">
       <row name="BassMaj3"/>
       <row name="BassRoot"/>
       <row name="ChordMajor"/>
@@ -109,7 +108,7 @@
       <row name="ChordDim"/>
     </board>
 <!--140 Bass (20 x 7)-->
-    <board name="" middleNote="C" numColumns="20">
+    <board numColumns="20">
       <row name="BassMin3"/>
       <row name="BassMaj3"/>
       <row name="BassRoot"/>
@@ -118,8 +117,8 @@
       <row name="Chord7th"/>
       <row name="ChordDim"/>
     </board>
-
-    <board name="Aug 140" middleNote="C" numColumns="12">
+<!--Aug 140-->
+    <board name="Aug 140" numColumns="12">
       <row name="ChordAug"/>
       <row name="BassMaj3"/>
       <row name="BassRoot"/>

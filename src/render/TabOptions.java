@@ -36,14 +36,31 @@ public class TabOptions extends javax.swing.JPanel
     initComponents();
 
     initLNFCombo();
-    
-    this.maxComboThreshSpin.setValue(new Integer(ButtonCombo.optMaxDistThreshold));
-    this.maxComboLenSpin.setValue(new Integer(BoardSearcher.optMaxComboLength));
+    syncOptions();
   }
 
   void setSeqColModel(SeqColumnModel mod)
   {
     columnModel = mod;
+    this.checkFingerSearch.setSelected(columnModel.optFingerSearch);
+  }
+
+  @Override
+  public void setVisible(boolean vis)
+  {
+    super.setVisible(vis);
+    if (vis) {
+      syncOptions();
+    }
+  }
+
+  private void syncOptions()
+  {
+    this.maxComboThreshSpin.setValue(new Integer(ButtonCombo.optMaxDistThreshold));
+    this.maxComboLenSpin.setValue(new Integer(BoardSearcher.optMaxComboLength));
+    if (columnModel != null) {
+      this.checkFingerSearch.setSelected(columnModel.optFingerSearch);
+    }
   }
 
   private void recompute()
@@ -125,7 +142,6 @@ public class TabOptions extends javax.swing.JPanel
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Sequence Search Options:"));
 
-    checkFingerSearch.setSelected(true);
     checkFingerSearch.setText("Finger Search Enabled");
     checkFingerSearch.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -315,7 +331,7 @@ public class TabOptions extends javax.swing.JPanel
 
   private void checkFingerSearchActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkFingerSearchActionPerformed
   {//GEN-HEADEREND:event_checkFingerSearchActionPerformed
-    
+
     if (columnModel != null) {
       columnModel.optFingerSearch = (checkFingerSearch.isSelected());
       recompute();
@@ -365,7 +381,6 @@ public class TabOptions extends javax.swing.JPanel
   {//GEN-HEADEREND:event_toggleEditorPosActionPerformed
     ((BassToolFrame) Main._rootFrame).toggleEditorLeft();
   }//GEN-LAST:event_toggleEditorPosActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkAllowAllBass;
   private javax.swing.JCheckBox checkFingerSearch;

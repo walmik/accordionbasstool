@@ -102,7 +102,6 @@
       <SubComponents>
         <Component class="javax.swing.JCheckBox" name="checkFingerSearch">
           <Properties>
-            <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Finger Search Enabled"/>
           </Properties>
           <Events>

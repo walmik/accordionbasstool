@@ -12,6 +12,7 @@ package render;
 
 import javax.swing.DefaultComboBoxModel;
 import music.Interval;
+import music.NamedInterval;
 
 /**
  *
@@ -28,8 +29,8 @@ public class TransposePanel extends javax.swing.JPanel
   {
     initComponents();
 
-    ivalCombo.setModel(new DefaultComboBoxModel(Interval.NamedInterval.values()));
-    ivalCombo.setSelectedItem(Interval.NamedInterval.P5);
+    ivalCombo.setModel(new DefaultComboBoxModel(NamedInterval.values()));
+    ivalCombo.setSelectedItem(NamedInterval.P5);
   }
   
   void setSeqColModel(SeqColumnModel model)
@@ -39,8 +40,8 @@ public class TransposePanel extends javax.swing.JPanel
 
   Interval getCurrInterval()
   {
-    Interval.NamedInterval entry = (Interval.NamedInterval)ivalCombo.getSelectedItem();
-    return entry.getInterval();
+    NamedInterval entry = (NamedInterval)ivalCombo.getSelectedItem();
+    return entry.interval;
   }
 
   /** This method is called from within the constructor to

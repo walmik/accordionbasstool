@@ -20,6 +20,7 @@ public class ModeSelector extends javax.swing.JPanel {
     /** Creates new form ModeSelector */
     public ModeSelector() {
         initComponents();
+        infoLabel.setVisible(false);
     }
 
     /** This method is called from within the constructor to
@@ -34,15 +35,18 @@ public class ModeSelector extends javax.swing.JPanel {
     modeCombo = new javax.swing.JComboBox();
     namelabel = new javax.swing.JLabel();
     infoLabel = new javax.swing.JLabel();
+    checkFingerSearch = new javax.swing.JCheckBox();
 
     modeCombo.setFont(modeCombo.getFont().deriveFont(modeCombo.getFont().getSize()+7f));
     modeCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Show Buttons for Chord", "Chord/Bass Progression", "Show Chord for Buttons", " " }));
 
     namelabel.setLabelFor(modeCombo);
-    namelabel.setText("Accordion Tool Options:");
+    namelabel.setText("Show:");
 
     infoLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
     infoLabel.setText("info");
+
+    checkFingerSearch.setText("Include Fingering");
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
@@ -55,19 +59,23 @@ public class ModeSelector extends javax.swing.JPanel {
         .addComponent(modeCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(infoLabel)
-        .addContainerGap(203, Short.MAX_VALUE))
+        .addGap(27, 27, 27)
+        .addComponent(checkFingerSearch)
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
         .addComponent(namelabel)
         .addComponent(modeCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addComponent(infoLabel))
+        .addComponent(infoLabel)
+        .addComponent(checkFingerSearch))
     );
   }// </editor-fold>//GEN-END:initComponents
 
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  javax.swing.JCheckBox checkFingerSearch;
   javax.swing.JLabel infoLabel;
   javax.swing.JComboBox modeCombo;
   private javax.swing.JLabel namelabel;

@@ -11,7 +11,6 @@ public class Note
 
   enum ScaleNote
   {
-
     C(0, 0),
     D(1, 2),
     E(2, 4),
@@ -19,6 +18,7 @@ public class Note
     G(4, 7),
     A(5, 9),
     B(6, 11);
+
     final short halfStep;
     final short scaleDist;
 
@@ -28,72 +28,26 @@ public class Note
       halfStep = (short) hs;
     }
 
-    @Override
-    public String toString()
-    {
-
-      switch (this) {
-        case A:
-          return "A";
-        case B:
-          return "B";
-        case C:
-          return "C";
-        case D:
-          return "D";
-        case E:
-          return "E";
-        case F:
-          return "F";
-        case G:
-          return "G";
-        default:
-          return "A";
-      }
-    }
-
     public static ScaleNote fromString(String input)
     {
       if (input.length() < 1) {
         return null;
       }
 
-      int theChar = input.charAt(0);
+      char theChar = Character.toUpperCase(input.charAt(0));
 
-      switch (theChar) {
-        case 'A':
-        case 'a':
-          return A;
-
-        case 'B':
-        case 'b':
-          return B;
-
-        case 'C':
-        case 'c':
-          return C;
-
-        case 'D':
-        case 'd':
-          return D;
-
-        case 'E':
-        case 'e':
-          return E;
-
-        case 'F':
-        case 'f':
-          return F;
-
-        case 'G':
-        case 'g':
-          return G;
-
-        default:
-          return null;
+      for (ScaleNote scale : values())
+      {
+        if (scale.toString().charAt(0) == theChar)
+        {
+          return scale;
+        }
       }
+
+      return null;
     }
   }
+
   final ScaleNote note;
   final short sharpsOrFlats;
   short octaveBit = 0;
@@ -158,9 +112,9 @@ public class Note
   public Note eharmonic()
   {
     if (sharpsOrFlats > 0) {
-      return this.add(Interval.m2).sub(Interval.halfStep);
+      return this.add(NamedInterval.m2.interval).sub(Interval.halfStep);
     } else if (sharpsOrFlats < 0) {
-      return this.sub(Interval.m2).add(Interval.halfStep);
+      return this.sub(NamedInterval.m2.interval).add(Interval.halfStep);
     } else {
       return this;
     }

@@ -93,6 +93,12 @@ public class ChordRegistry
       }
     }
 
+    public RegistryChordDef[] getChordDefs(int groupIndex)
+    {
+      assert(groupIndex >= 0);
+      return groupedChordDefs[groupIndex];
+    }
+
     public RegistryChordDef findChord(StringParser parser)
     {
       int prevMatchLength = 0;

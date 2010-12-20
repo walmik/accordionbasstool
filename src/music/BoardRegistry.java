@@ -30,7 +30,11 @@ public class BoardRegistry
       name = root.getAttribute("name");
       desc = root.getAttribute("desc");
       
-      middleNote = Note.fromString(root.getAttribute("middleNote"));
+      Note note = Note.fromString(root.getAttribute("middleNote"));
+      if (note == null) {
+        note = new Note();
+      }
+      middleNote = note;
 
       int cols = 1;
       try {

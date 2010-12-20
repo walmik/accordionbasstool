@@ -94,6 +94,7 @@ public class SeqViewerController
     rowHeader.setFixedCellHeight(seqTable.getRowHeight());
     rowHeader.setOpaque(false);
     //rowHeader.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
+    rowHeader.setToolTipText("Button Combinations, Best to Worse");
 
     tableScrollPane.setRowHeaderView(rowHeader);
 
@@ -430,6 +431,7 @@ public class SeqViewerController
 
       this.setIconTextGap(8);
       //this.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 24));
+      this.setHorizontalAlignment(CENTER);
       this.setHorizontalTextPosition(LEFT);
       this.setVerticalTextPosition(CENTER);
     }
@@ -461,7 +463,7 @@ public class SeqViewerController
         seq.iconIndex = iconIndex;
 
         String str = "#" + (index + 1);
-        str += " (" + heur + ")";
+        //str += " (" + heur + ")";
         this.setText(str);
       } else {
         this.setIcon(RenderBoardUI.defaultUI.optimalityIcons[RenderBoardUI.defaultUI.optimalityIcons.length - 1]);
@@ -619,7 +621,7 @@ public class SeqViewerController
 
       this.setVerticalAlignment(CENTER);
       this.setHorizontalAlignment(CENTER);
-      font = getFont().deriveFont(16.f);
+      font = getFont().deriveFont(14.f);
     }
 
     @Override
@@ -654,7 +656,7 @@ public class SeqViewerController
       }
 
       if (buttonCombo != null) {
-        text += buttonCombo.toButtonListingString(html);
+        text += "<span>" + buttonCombo.toButtonListingString(html) + "</span>";
       }
 
       if (buttonCombo != null) {

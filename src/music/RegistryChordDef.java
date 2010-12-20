@@ -7,8 +7,9 @@ final public class RegistryChordDef
   final public String abbrevPlain;
   
   final private music.Chord chord;
+  final Interval[] ivals;
+  final public RelChord relChord;
 
-  Interval[] ivals;
   final public short row;
   final public short col;
 
@@ -18,6 +19,8 @@ final public class RegistryChordDef
     abbrevHtml = _abb.replace("[", "<sup>").replace("]", "</sup>");
     abbrevPlain = _abb.replace("[", "").replace("]", "");
     chord = music.ChordParser.parseNoteList(new StringParser(_notes));
+
+    relChord = new RelChord(chord);
 
     ivals = this.chord.extractInterval();
     row = (short)r;
@@ -38,5 +41,16 @@ final public class RegistryChordDef
   public int getChordLength()
   {
     return ivals.length + 1;
+  }
+
+  public static RegistryChordDef getCustomDef()
+  {
+    return new RegistryChordDef("Custom", "Custom", "C", 0, 0);
+  }
+
+  @Override
+  public String toString()
+  {
+    return name;
   }
 }

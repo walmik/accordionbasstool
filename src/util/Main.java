@@ -9,7 +9,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 
 import music.ChordParser;
-import music.FingerCombo;
 import org.w3c.dom.Document;
 import render.BassToolFrame;
 
@@ -71,11 +70,15 @@ public class Main
 
   static void miscTest()
   {
+//    String notes = "C Eb Gb Bbb Db";
+//    Chord chord = music.ChordParser.parseNoteList(new StringParser(notes));
+//    System.out.println(new RelChord(chord));
   }
 
 
   public static void main(String[] args)
   {
+    miscTest();
     try {
       boolean success = false;
       success = setNimbus();

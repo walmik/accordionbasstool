@@ -11,6 +11,7 @@
 package render;
 
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -19,6 +20,7 @@ import javax.sound.sampled.AudioPermission;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import music.BoardRegistry;
@@ -37,10 +39,23 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   enum ToolMode
   {
 
-    BUTTON_FOR_CHORD,
-    CHORD_SEQ,
-    CHORD_FOR_BUTTON,
-    ALL,
+    BUTTON_FOR_CHORD("Single Chord Buttons"),
+    CHORD_SEQ("Chord Sequence Buttons"),
+    //CHORD_FOR_BUTTON,
+    ALL("All");
+
+    ToolMode(String str)
+    {
+      title = str;
+    }
+    
+    String title;
+
+    @Override
+    public String toString()
+    {
+      return title;
+    }
   }
 
   /** Creates new form BassToolFrame */
@@ -57,7 +72,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     tabPitchDetect.setSeqColModel(seqTablePanel.columnModel);
     checkPitchDetectPermissions();
 
-    //initModeSelector();
+    initModeSelector();
 
     renderBoardHeader.initBoardHeader(renderBassBoard, renderBoardScrollPane, seqTablePanel.columnModel);
 
@@ -138,7 +153,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       }
     }
 
-    if ((modeSelector!= null) && (e.getSource() == modeSelector.modeCombo)) {
+    if ((modeSelector != null) && (e.getSource() == modeSelector.modeCombo)) {
       switchMode((ToolMode) modeSelector.modeCombo.getSelectedItem());
     }
   }
@@ -249,9 +264,28 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   void initModeSelector()
   {
     modeSelector = new ModeSelector();
-    getContentPane().add(modeSelector, java.awt.BorderLayout.NORTH);
+    JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+    flowPanel.add(modeSelector);
+    getContentPane().add(flowPanel, java.awt.BorderLayout.NORTH);
     modeSelector.modeCombo.setModel(new DefaultComboBoxModel(ToolMode.values()));
     modeSelector.modeCombo.addActionListener(this);
+
+    modeSelector.checkFingerSearch.setSelected(seqTablePanel.columnModel.optFingerSearch);
+
+    modeSelector.checkFingerSearch.addActionListener(new ActionListener()
+    {
+
+      @Override
+      public void actionPerformed(ActionEvent e)
+      {
+        if (seqTablePanel.columnModel != null) {
+          seqTablePanel.columnModel.optFingerSearch = (modeSelector.checkFingerSearch.isSelected());
+          seqTablePanel.columnModel.recomputeSeqs();
+        }
+      }
+    });
+
+    modeSelector.modeCombo.setSelectedItem(ToolMode.BUTTON_FOR_CHORD);
   }
 
   void switchMode(ToolMode mode)
@@ -264,12 +298,22 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
         toolTabs.addTab("Options", tabOptions);
         break;
 
+      case CHORD_SEQ:
+        seqTablePanel.toggleSeqControls(true);
+        toolTabs.removeAll();
+        toolTabs.addTab("Chord Picker", tabChordPicker);
+        toolTabs.addTab("Sequence Editor", tabSeqEditor);
+        toolTabs.addTab("Options", tabOptions);
+        break;
+
       case ALL:
         seqTablePanel.toggleSeqControls(true);
         toolTabs.removeAll();
         toolTabs.addTab("Chord Picker", tabChordPicker);
         toolTabs.addTab("Sequence Editor", tabSeqEditor);
         toolTabs.addTab("Options", tabOptions);
+        //toolTabs.addTab("Pitch Detect", tabPitchDetect);
+        toolTabs.addTab("Tester", tabTester);
         break;
     }
   }
@@ -294,6 +338,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     tabSeqEditor = new render.TabSeqEditor();
     tabOptions = new render.TabOptions();
     tabPitchDetect = new render.TabPitchDetect();
+    tabTester = new render.TabTester();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.7");
@@ -326,6 +371,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     toolTabs.addTab("Full Sequence Editor", tabSeqEditor);
     toolTabs.addTab("Options", tabOptions);
     toolTabs.addTab("Pitch Detector", tabPitchDetect);
+    toolTabs.addTab("tab5", tabTester);
 
     controlSplitPane.setLeftComponent(toolTabs);
 
@@ -344,6 +390,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private render.TabOptions tabOptions;
   private render.TabPitchDetect tabPitchDetect;
   private render.TabSeqEditor tabSeqEditor;
+  private render.TabTester tabTester;
   private javax.swing.JTabbedPane toolTabs;
   // End of variables declaration//GEN-END:variables
 }
