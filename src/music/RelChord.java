@@ -13,25 +13,25 @@ import java.util.Vector;
 public class RelChord implements Cloneable
 {
 
-  public static enum BaseChordQual
-  {
-    Root,
-    Major,
-    Minor,
-    Sus4,
-    Sus2,
-  };
+//  public static enum BaseChordQual
+//  {
+//    Root,
+//    Major,
+//    Minor,
+//    Sus4,
+//    Sus2,
+//  };
 
   public static enum NoteDegreeType
   {
-    None,
+ //   None("-"),
     DoubleFlat("bb"),
     Flat("b"),
-    Normal,
+    Normal("N"),
     Sharp("#"),
     DoubleSharp("##");
 
-    String label;
+    public final String label;
 
     NoteDegreeType()
     {
@@ -46,10 +46,10 @@ public class RelChord implements Cloneable
     @Override
     public String toString()
     {
-      if (this == None) {
-        return "-";
-      }
-      
+//      if (this == None) {
+//        return "-";
+//      }
+//
       if (!label.isEmpty()) {
         return label + " - " + super.toString();
       } else {
@@ -58,7 +58,7 @@ public class RelChord implements Cloneable
     }
   }
 
-  private BaseChordQual base = BaseChordQual.Major;
+  //private BaseChordQual base = BaseChordQual.Major;
 
   public final static Interval standardIval[] =
    {NamedInterval.M3.interval, NamedInterval.P5.interval, NamedInterval.M7.interval,
@@ -93,44 +93,44 @@ public class RelChord implements Cloneable
     
     // Find if Major, Minor or Sus2 or Sus4
 
-    if (steps[0] == null) {
-      if (steps[3] != null) {
-        base = BaseChordQual.Sus2;
-        steps[3] = null;
-      } else if (steps[4] != null) {
-        base = BaseChordQual.Sus4;
-        steps[4] = null;
-      } else {
-        base = BaseChordQual.Root;
-      }
-    } else if (steps[0] == NoteDegreeType.Flat) {
-      base = BaseChordQual.Minor;
-    } else {
-      base = BaseChordQual.Major;
-    }
+//    if (steps[0] == null) {
+//      if (steps[3] != null) {
+//        base = BaseChordQual.Sus2;
+//        steps[3] = null;
+//      } else if (steps[4] != null) {
+//        base = BaseChordQual.Sus4;
+//        steps[4] = null;
+//      } else {
+//        base = BaseChordQual.Root;
+//      }
+//    } else if (steps[0] == NoteDegreeType.Flat) {
+//      base = BaseChordQual.Minor;
+//    } else {
+//      base = BaseChordQual.Major;
+//    }
 
-    for (int i = 1; i < steps.length; i++) {
-      if (steps[i] == null) {
-        steps[i] = NoteDegreeType.None;
-      }
-    }
+//    for (int i = 0; i < steps.length; i++) {
+//      if (steps[i] == null) {
+//        steps[i] = NoteDegreeType.None;
+//      }
+//    }
   }
 
   public RelChord(String string)
   {
     int offset = 0;
 
-    if (string.startsWith("13")) {
-      base = BaseChordQual.Major;
-    } else if (string.startsWith("1b3")) {
-      base = BaseChordQual.Minor;
-    } else if (string.startsWith("14")) {
-      base = BaseChordQual.Sus4;
-    } else if (string.startsWith("12")) {
-      base = BaseChordQual.Sus2;
-    }
+//    if (string.startsWith("13")) {
+//      base = BaseChordQual.Major;
+//    } else if (string.startsWith("1b3")) {
+//      base = BaseChordQual.Minor;
+//    } else if (string.startsWith("14")) {
+//      base = BaseChordQual.Sus4;
+//    } else if (string.startsWith("12")) {
+//      base = BaseChordQual.Sus2;
+//    }
 
-    offset = 2;
+    offset = 0;
 
     NoteDegreeType nextType;
 
@@ -160,56 +160,57 @@ public class RelChord implements Cloneable
       offset++;
     }
 
-    for (int i = 1; i < steps.length; i++)
-    {
-      if (steps[i] == null)
-        steps[i] = NoteDegreeType.None;
-    }
+//    for (int i = 0; i < steps.length; i++)
+//    {
+//      if (steps[i] == null)
+//        steps[i] = NoteDegreeType.None;
+//    }
   }
 
-  private RelChord(BaseChordQual base, NoteDegreeType[] steps)
+  private RelChord(NoteDegreeType[] steps)
   {
-    this.base = base;
+//    this.base = base;
     this.steps = steps;
   }
 
   @Override
   public RelChord clone()
   {
-    return new RelChord(base, (NoteDegreeType[])steps.clone());
+    return new RelChord((NoteDegreeType[])steps.clone());
   }
 
   public Chord buildChord(Note root)
   {
     Vector<Note> notes = new Vector<Note>();
 
-    switch (base) {
-      case Root:
-        notes.add(root);
-        break;
+//    switch (base) {
+//      case Root:
+//        notes.add(root);
+//        break;
+//
+//      case Major:
+//        notes.add(root);
+//        notes.add(root.add(NamedInterval.M3.interval));
+//        break;
+//
+//      case Minor:
+//        notes.add(root);
+//        notes.add(root.add(NamedInterval.m3.interval));
+//        break;
+//
+//      case Sus4:
+//        notes.add(root);
+//        notes.add(root.add(NamedInterval.P4.interval));
+//        break;
+//
+//      case Sus2:
+//        notes.add(root);
+//        notes.add(root.add(NamedInterval.M2.interval));
+//        break;
+//    }
+    notes.add(root);
 
-      case Major:
-        notes.add(root);
-        notes.add(root.add(NamedInterval.M3.interval));
-        break;
-
-      case Minor:
-        notes.add(root);
-        notes.add(root.add(NamedInterval.m3.interval));
-        break;
-
-      case Sus4:
-        notes.add(root);
-        notes.add(root.add(NamedInterval.P4.interval));
-        break;
-
-      case Sus2:
-        notes.add(root);
-        notes.add(root.add(NamedInterval.M2.interval));
-        break;
-    }
-
-    for (int i = 1; i < standardIval.length; i++)
+    for (int i = 0; i < standardIval.length; i++)
     {
       addNoteDegree(notes, steps[i], root, standardIval[i]);
     }
@@ -219,38 +220,42 @@ public class RelChord implements Cloneable
 
   public int getNumEditableSteps()
   {
-    return steps.length - 1;
+    return steps.length;
   }
 
   public void setStep(int index, NoteDegreeType stepVal)
   {
     assert(index < getNumEditableSteps());
-    steps[index + 1] = stepVal;
+    steps[index] = stepVal;
   }
 
   public NoteDegreeType getStep(int index)
   {
-    return steps[index + 1];
+    return steps[index];
   }
 
-  public BaseChordQual getBaseQual()
-  {
-    return base;
-  }
-
-  public void setBaseQual(BaseChordQual qual)
-  {
-    base = qual;
-  }
+//  public BaseChordQual getBaseQual()
+//  {
+//    return base;
+//  }
+//
+//  public void setBaseQual(BaseChordQual qual)
+//  {
+//    base = qual;
+//  }
 
   private void addNoteDegree(Vector<Note> notes,
           NoteDegreeType type,
           Note root,
           Interval ival)
   {
+    if (type == null) {
+      return;
+    }
+
     switch (type) {
-      case None:
-        return;
+//      case None:
+//        return;
 
       case Flat:
         notes.add(root.add(ival.flatten()));
@@ -281,13 +286,14 @@ public class RelChord implements Cloneable
   @Override
   public String toString()
   {
-    String str = base.toString() + " ";
+    //String str = base.toString() + " ";
+    String str = "";
 
-    for (int i = 1; i < steps.length; i++)
+    for (int i = 0; i < steps.length; i++)
     {
       int qual = indexToStep(i - 1);
       
-      if (steps[i] == NoteDegreeType.None) {
+      if (steps[i] == null) {
         continue;
       }
 
@@ -303,11 +309,11 @@ public class RelChord implements Cloneable
       return false;
     }
 
-    if (base != relChord.base) {
-      return false;
-    }
+//    if (base != relChord.base) {
+//      return false;
+//    }
 
-    for (int i = 1; i < standardIval.length; i++) {
+    for (int i = 0; i < standardIval.length; i++) {
       if (steps[i] != relChord.steps[i]) {
         return false;
       }

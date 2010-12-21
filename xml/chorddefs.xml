@@ -10,8 +10,8 @@
 			<chord name="Major 6th" notes="C E G A" abbrev="6"></chord>
 			<chord name="Minor 6th" notes="C Eb G A" abbrev="min[6]"></chord>
 			<chord name="Augmented" notes="C E G#" abbrev="[aug]"></chord>
-			<chord name="Suspended 4th" notes="C F G" abbrev="sus[4]"></chord>
-			<chord name="Suspended 2nd" notes="C D G" abbrev="sus[2]"></chord>
+			<chord name="Suspended 4th" notes="C E# G" abbrev="sus[4]"></chord>
+			<chord name="Suspended 2nd" notes="C Ebb G" abbrev="sus[2]"></chord>
 			<chord name="Diminished" notes="C Eb Gb" abbrev="[dim]"></chord>
 
 			<chord name="Dominant 7th" abbrev="7*" notes="C E G Bb"></chord>
