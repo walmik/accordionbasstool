@@ -17,22 +17,14 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="10" pref="10" max="10" attributes="0"/>
-                      <Component id="showAdvanced" min="-2" max="-2" attributes="1"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="statusLabel" alignment="1" pref="191" max="32767" attributes="1"/>
-                          <Component id="hugeChordLabel" alignment="0" min="-2" pref="191" max="-2" attributes="1"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
-              </Group>
               <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="statusLabel" alignment="1" pref="191" max="32767" attributes="1"/>
+                  <Component id="hugeChordLabel" alignment="0" min="-2" pref="191" max="-2" attributes="1"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jPanel1" max="32767" attributes="1"/>
-                  <Component id="jScrollPane1" alignment="1" pref="450" max="32767" attributes="2"/>
+                  <Component id="chordPicker1" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -45,47 +37,23 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jPanel1" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="10" pref="10" max="10" attributes="0"/>
-                      <Component id="showAdvanced" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
                       <Component id="hugeChordLabel" min="-2" pref="54" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="statusLabel" pref="211" max="32767" attributes="3"/>
-                  <Component id="jScrollPane1" alignment="1" pref="211" max="32767" attributes="2"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="statusLabel" pref="215" max="32767" attributes="3"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+                  <Component id="chordPicker1" pref="226" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="javax.swing.JScrollPane" name="jScrollPane1">
-      <Properties>
-        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="ff" green="ff" red="ff" type="rgb"/>
-        </Property>
-      </Properties>
-      <AuxValues>
-        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-      </AuxValues>
-
-      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
-      <SubComponents>
-        <Component class="javax.swing.JTable" name="chordTable">
-          <Properties>
-            <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="0" rowCount="0"/>
-            </Property>
-            <Property name="autoResizeMode" type="int" value="0"/>
-            <Property name="fillsViewportHeight" type="boolean" value="true"/>
-            <Property name="rowHeight" type="int" value="24"/>
-          </Properties>
-        </Component>
-      </SubComponents>
-    </Container>
     <Component class="javax.swing.JLabel" name="statusLabel">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
@@ -101,15 +69,6 @@
           </Border>
         </Property>
       </Properties>
-    </Component>
-    <Component class="javax.swing.JCheckBox" name="showAdvanced">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Advanced Mode"/>
-        <Property name="opaque" type="boolean" value="false"/>
-      </Properties>
-      <Events>
-        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="showAdvancedItemStateChanged"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="hugeChordLabel">
       <Properties>
@@ -153,7 +112,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="inversionCombo" alignment="0" min="-2" pref="98" max="-2" attributes="0"/>
-                      <Component id="mustBeLowestCheck" alignment="0" pref="144" max="32767" attributes="0"/>
+                      <Component id="mustBeLowestCheck" alignment="0" pref="161" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -284,5 +243,7 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="render.ChordPicker" name="chordPicker1">
+    </Component>
   </SubComponents>
 </Form>

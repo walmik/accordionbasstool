@@ -66,6 +66,7 @@ public class RelChord implements Cloneable
 
   private NoteDegreeType steps[] = new NoteDegreeType[standardIval.length];
 
+  public RegistryChordDef origDef = null;
 
   public RelChord(Chord chord)
   {
@@ -167,47 +168,27 @@ public class RelChord implements Cloneable
 //    }
   }
 
-  private RelChord(NoteDegreeType[] steps)
+  private RelChord(NoteDegreeType[] steps, RegistryChordDef orig)
   {
-//    this.base = base;
     this.steps = steps;
+    this.origDef = orig;
+  }
+
+  public RelChord()
+  {
+    this.steps = new NoteDegreeType[standardIval.length];
   }
 
   @Override
   public RelChord clone()
   {
-    return new RelChord((NoteDegreeType[])steps.clone());
+    return new RelChord((NoteDegreeType[])steps.clone(), origDef);
   }
 
   public Chord buildChord(Note root)
   {
     Vector<Note> notes = new Vector<Note>();
 
-//    switch (base) {
-//      case Root:
-//        notes.add(root);
-//        break;
-//
-//      case Major:
-//        notes.add(root);
-//        notes.add(root.add(NamedInterval.M3.interval));
-//        break;
-//
-//      case Minor:
-//        notes.add(root);
-//        notes.add(root.add(NamedInterval.m3.interval));
-//        break;
-//
-//      case Sus4:
-//        notes.add(root);
-//        notes.add(root.add(NamedInterval.P4.interval));
-//        break;
-//
-//      case Sus2:
-//        notes.add(root);
-//        notes.add(root.add(NamedInterval.M2.interval));
-//        break;
-//    }
     notes.add(root);
 
     for (int i = 0; i < standardIval.length; i++)
@@ -216,6 +197,20 @@ public class RelChord implements Cloneable
     }
 
     return new Chord(notes);
+  }
+
+  public int getChordLength()
+  {
+    int count = 1;
+
+    for (int i = 0; i < steps.length; i++)
+    {
+      if (steps[i] != null) {
+        count++;
+      }
+    }
+
+    return count;
   }
 
   public int getNumEditableSteps()

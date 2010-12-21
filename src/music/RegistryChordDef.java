@@ -10,9 +10,6 @@ final public class RegistryChordDef
   final Interval[] ivals;
   final public RelChord relChord;
 
-  final public short row;
-  final public short col;
-
   RegistryChordDef(String _name, String _abb, String _notes, int r, int c)
   {
     name = _name;
@@ -21,10 +18,9 @@ final public class RegistryChordDef
     chord = music.ChordParser.parseNoteList(new StringParser(_notes));
 
     relChord = new RelChord(chord);
+    relChord.origDef = this;
 
     ivals = this.chord.extractInterval();
-    row = (short)r;
-    col = (short)c;
   }
 
   public String getTransposedString(Note rootNote)

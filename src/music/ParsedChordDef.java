@@ -17,13 +17,14 @@ public class ParsedChordDef
   public final Note rootNote;
   public final Note addedBassNote;
   public final Chord chord;
-  private final RegistryChordDef registryDef;
-  public final short regRow, regCol;
+  //private final RegistryChordDef registryDef;
+  public final RelChord relChord;
+  //public final short regRow, regCol;
   public final boolean bassLowest;
 
   public static ParsedChordDef getDefaultChordDef()
   {
-    return new ParsedChordDef(new Note(), null, ChordRegistry.mainRegistry().getDefaultChordDef(), false);
+    return new ParsedChordDef(new Note(), null, new RelChord(), false);
   }
 
   public ParsedChordDef(Note root)
@@ -35,62 +36,69 @@ public class ParsedChordDef
   {
     rootNote = achord.getRootNote();
     addedBassNote = null; //assume none
-    registryDef = null;
     chord = achord;
 
-    if (achord.isSingleNote())
-    {
+    if (achord.isSingleNote()) {
       namePlain = achord.toString();
       nameHtml = chord.toHtmlString();
-    }
-    else
-    {
+    } else {
       namePlain = "[" + chord.toString() + "]";
       nameHtml = chord.toHtmlString();
     }
 
+    relChord = null;
     detail = nameHtml;
-    regRow = regCol = 0;
     bassLowest = false;
   }
 
   public ParsedChordDef(Note root,
           Note addedBass,
-          RegistryChordDef currTableChord,
+          RelChord pickedChord,
           boolean addedBassLowest)
   {
     rootNote = root;
 
-    // Use Default Chord
-    if (currTableChord == null) {
-      currTableChord = ChordRegistry.mainRegistry().getDefaultChordDef();
-    }
+    relChord = (pickedChord != null ? pickedChord : new RelChord());
 
-    registryDef = currTableChord;
-    
-    //Unknown Chord if default doesn't exist..
-    if (currTableChord == null) {
-      addedBassNote = addedBass;
-      chord = new Chord(root, false);
-      namePlain = chord.toString();
-      nameHtml = chord.toHtmlString();
-      detail = nameHtml;
-      regRow = regCol = 0;
-      bassLowest = false;
-      return;
-    }
+    Interval[] ivals;
 
-    regRow = currTableChord.row;
-    regCol = currTableChord.col;
+    String tempAbbrevHtml;
+    String tempAbbrevPlain;
+    String tempDet;
+
+    {
+      RegistryChordDef origDef = relChord.origDef;
+
+      // If custom chord
+      if (origDef == null) {
+        Chord simpleChord = relChord.buildChord(root);
+        ivals = simpleChord.extractInterval();
+        tempAbbrevHtml = simpleChord.toHtmlString();
+        tempAbbrevPlain = simpleChord.toString();
+        tempDet = tempAbbrevPlain;
+      } else {
+        ivals = origDef.ivals;
+
+        tempAbbrevHtml = rootNote.toString(true) + origDef.abbrevHtml;
+        
+        tempAbbrevPlain = rootNote.toString();
+
+        if (ivals.length > 0) {
+          tempAbbrevPlain += origDef.abbrevPlain;
+        }
+
+        tempDet = rootNote.toString(true) + " " + origDef.name;
+      }
+    }
 
     addedBassNote = addedBass;
 
-    chord = new Chord(rootNote, currTableChord.ivals,
+    chord = new Chord(rootNote, ivals,
             addedBassNote, addedBassLowest);
 
 
     // -- Set HTML Abbrev
-    String html = rootNote.toString(true) + currTableChord.abbrevHtml;
+    String html = tempAbbrevHtml;
 
     if (addedBassNote != null) {
       html += "/" + addedBassNote.toString(true);
@@ -99,12 +107,7 @@ public class ParsedChordDef
 
     // -- Set Plain Abbrev
 
-    String plain = rootNote.toString();
-
-    if (!chord.isSingleNote())
-    {
-      plain += currTableChord.abbrevPlain;
-    }
+    String plain = tempAbbrevPlain;
 
     if (addedBassNote != null) {
       plain += "/" + addedBassNote.toString();
@@ -112,7 +115,7 @@ public class ParsedChordDef
     namePlain = plain;
 
     // -- Set Name
-    String det = rootNote.toString(true) + " " + currTableChord.name;
+    String det = tempDet;
 
     if (addedBassNote != null) {
       det += " over " + addedBassNote.toString(true);
@@ -126,15 +129,15 @@ public class ParsedChordDef
   public ParsedChordDef transposeBy(Interval ival)
   {
     Note newAddedBass = null;
-    
+
     if (addedBassNote != null) {
       newAddedBass = addedBassNote.add(ival);
     }
 
-    if (registryDef == null) {
+    if (relChord == null) {
       return new ParsedChordDef(chord.transposeBy(ival));
     } else {
-      return new ParsedChordDef(rootNote.add(ival), newAddedBass, this.registryDef, this.bassLowest);
+      return new ParsedChordDef(rootNote.add(ival), newAddedBass, this.relChord, this.bassLowest);
     }
   }
 }

@@ -83,7 +83,6 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
   void initChordPicker(TabChordPicker picker)
   {
     picker.init();
-    picker.changeChordSet(true);
     picker.setSeqColModel(columnModel);
     //columnModel.addColumn(picker.getPickedChord(), 0);
   }
