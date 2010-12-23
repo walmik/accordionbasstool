@@ -96,20 +96,18 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
   }
 
-  private void checkPitchDetectPermissions()
+  private boolean checkPitchDetectPermissions()
   {
     SecurityManager manager = System.getSecurityManager();
     if (manager == null) {
-      return;
+      return true;
     }
 
     try {
       manager.checkPermission(new AudioPermission("record"));
+      return true;
     } catch (SecurityException sx) {
-      int index = toolTabs.indexOfComponent(tabPitchDetect);
-      if (index >= 0) {
-        toolTabs.setEnabledAt(index, false);
-      }
+      return false;
     }
   }
 
@@ -312,8 +310,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
         toolTabs.addTab("Chord Picker", tabChordPicker);
         toolTabs.addTab("Sequence Editor", tabSeqEditor);
         toolTabs.addTab("Options", tabOptions);
-        //toolTabs.addTab("Pitch Detect", tabPitchDetect);
-        toolTabs.addTab("Tester", tabTester);
+        if (checkPitchDetectPermissions()) {
+          toolTabs.addTab("Pitch Detect", tabPitchDetect);
+        }
+        //toolTabs.addTab("Tester", tabTester);
         break;
     }
   }
