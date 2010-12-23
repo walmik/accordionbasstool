@@ -17,50 +17,31 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" max="-2" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jComboBox1" max="32767" attributes="0"/>
-                      </Group>
-                      <Component id="jScrollPane2" alignment="0" min="-2" pref="206" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="filterCombo" pref="127" max="32767" attributes="0"/>
                   </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                      <Component id="jTextField2" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="jScrollPane2" pref="208" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-              <Component id="chordGridPanel" pref="231" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="jPanel2" pref="194" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="chordGridPanel" alignment="1" pref="219" max="32767" attributes="1"/>
-                  <Group type="102" alignment="1" attributes="0">
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jComboBox1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jTextField2" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane2" pref="167" max="32767" attributes="1"/>
-                  </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="filterCombo" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="jScrollPane2" pref="145" max="32767" attributes="2"/>
           </Group>
+          <Component id="jPanel2" alignment="0" max="32767" attributes="2"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -87,14 +68,28 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JComboBox" name="jComboBox1">
+    <Component class="javax.swing.JComboBox" name="filterCombo">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="5">
+            <StringItem index="0" value="Show All Chords"/>
+            <StringItem index="1" value="Show Simple Chords"/>
+            <StringItem index="2" value="Show 7th Chords"/>
+            <StringItem index="3" value="Show 9th Chords"/>
+            <StringItem index="4" value="Show Other Chords"/>
+          </StringArray>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filterComboActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Show Chords:"/>
+        <Property name="text" type="java.lang.String" value="Select Chord"/>
       </Properties>
     </Component>
-    <Container class="javax.swing.JPanel" name="chordGridPanel">
+    <Container class="javax.swing.JPanel" name="jPanel2">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
@@ -103,68 +98,81 @@
         </Property>
       </Properties>
 
-      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-        <Property name="columns" type="int" value="2"/>
-        <Property name="rows" type="int" value="6"/>
-        <Property name="verticalGap" type="int" value="8"/>
-      </Layout>
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JCheckBox" name="check3">
-          <Properties>
-            <Property name="label" type="java.lang.String" value="3rd:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="combo3">
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="check5">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="5th:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="combo5">
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="check7">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="7th:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="combo7">
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="check9">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="9th (2nd):"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="combo9">
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="check11">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="11th (4th):"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="check11ActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="combo11">
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="check13">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="13th (6th):"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="combo13">
-        </Component>
+        <Container class="javax.swing.JPanel" name="chordGridPanel">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+              <BorderConstraints direction="Center"/>
+            </Constraint>
+          </Constraints>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+            <Property name="columns" type="int" value="1"/>
+            <Property name="rows" type="int" value="6"/>
+            <Property name="verticalGap" type="int" value="4"/>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JComboBox" name="combo3">
+            </Component>
+            <Component class="javax.swing.JComboBox" name="combo5">
+            </Component>
+            <Component class="javax.swing.JComboBox" name="combo7">
+            </Component>
+            <Component class="javax.swing.JComboBox" name="combo9">
+            </Component>
+            <Component class="javax.swing.JComboBox" name="combo11">
+            </Component>
+            <Component class="javax.swing.JComboBox" name="combo13">
+            </Component>
+          </SubComponents>
+        </Container>
+        <Container class="javax.swing.JPanel" name="jPanel1">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+              <BorderConstraints direction="West"/>
+            </Constraint>
+          </Constraints>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+            <Property name="columns" type="int" value="1"/>
+            <Property name="rows" type="int" value="6"/>
+            <Property name="verticalGap" type="int" value="4"/>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JCheckBox" name="check3">
+              <Properties>
+                <Property name="label" type="java.lang.String" value="3rd:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="check5">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="5th:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="check7">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="7th:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="check9">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="9th (2nd):"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="check11">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="11th (4th):"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="check13">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="13th (6th):"/>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JLabel" name="jLabel3">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="jLabel2"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="jTextField2">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="jTextField1"/>
-      </Properties>
-    </Component>
   </SubComponents>
 </Form>

@@ -11,6 +11,13 @@ package music;
 public class ParsedChordDef
 {
 
+  public enum BassSetting
+  {
+    NoLowestAllowed,
+    NotLowestBass,
+    LowestBass,
+  }
+
   public final String namePlain;
   public final String nameHtml;
   public final String detail;
@@ -20,11 +27,11 @@ public class ParsedChordDef
   //private final RegistryChordDef registryDef;
   public final RelChord relChord;
   //public final short regRow, regCol;
-  public final boolean bassLowest;
+  public final BassSetting bassSetting;
 
   public static ParsedChordDef getDefaultChordDef()
   {
-    return new ParsedChordDef(new Note(), null, new RelChord(), false);
+    return new ParsedChordDef(new Note(), null, new RelChord(), BassSetting.NotLowestBass);
   }
 
   public ParsedChordDef(Note root)
@@ -48,13 +55,13 @@ public class ParsedChordDef
 
     relChord = null;
     detail = nameHtml;
-    bassLowest = false;
+    bassSetting = BassSetting.NotLowestBass;
   }
 
   public ParsedChordDef(Note root,
           Note addedBass,
           RelChord pickedChord,
-          boolean addedBassLowest)
+          BassSetting addedBassLowest)
   {
     rootNote = root;
 
@@ -67,7 +74,7 @@ public class ParsedChordDef
     String tempDet;
 
     {
-      RegistryChordDef origDef = relChord.origDef;
+      RegistryChordDef origDef = relChord.getOrigDef();
 
       // If custom chord
       if (origDef == null) {
@@ -75,7 +82,7 @@ public class ParsedChordDef
         ivals = simpleChord.extractInterval();
         tempAbbrevHtml = simpleChord.toHtmlString();
         tempAbbrevPlain = simpleChord.toString();
-        tempDet = tempAbbrevPlain;
+        tempDet = "";
       } else {
         ivals = origDef.ivals;
 
@@ -87,15 +94,20 @@ public class ParsedChordDef
           tempAbbrevPlain += origDef.abbrevPlain;
         }
 
-        tempDet = rootNote.toString(true) + " " + origDef.name;
+        tempDet = origDef.name;
       }
     }
 
     addedBassNote = addedBass;
 
-    chord = new Chord(rootNote, ivals,
-            addedBassNote, addedBassLowest);
+    Chord aChord = new Chord(rootNote, ivals,
+            addedBassNote, (addedBassLowest == BassSetting.LowestBass));
 
+    if (addedBassLowest == BassSetting.NoLowestAllowed) {
+      chord = aChord.getUndupedChord();
+    } else {
+      chord = aChord;
+    }
 
     // -- Set HTML Abbrev
     String html = tempAbbrevHtml;
@@ -117,12 +129,12 @@ public class ParsedChordDef
     // -- Set Name
     String det = tempDet;
 
-    if (addedBassNote != null) {
+    if ((addedBassNote != null) && !det.isEmpty()) {
       det += " over " + addedBassNote.toString(true);
     }
     detail = det;
 
-    bassLowest = addedBassLowest;
+    bassSetting = addedBassLowest;
 
   }
 
@@ -137,7 +149,7 @@ public class ParsedChordDef
     if (relChord == null) {
       return new ParsedChordDef(chord.transposeBy(ival));
     } else {
-      return new ParsedChordDef(rootNote.add(ival), newAddedBass, this.relChord, this.bassLowest);
+      return new ParsedChordDef(rootNote.add(ival), newAddedBass, this.relChord, this.bassSetting);
     }
   }
 }

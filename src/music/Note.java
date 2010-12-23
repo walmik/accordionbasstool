@@ -79,6 +79,15 @@ public class Note
     return sharpsOrFlats;
   }
 
+  @Override
+  public boolean equals(Object o)
+  {
+    if (o instanceof Note)
+      return equals((Note)o);
+
+    return false;
+  }
+
   public boolean equals(Note other)
   {
     if (other == null) {

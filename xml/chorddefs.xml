@@ -1,55 +1,41 @@
 <root>
-	<chordset name="AllChordSet">
-		<chordgroup name="All">
-			<chord name="Note" abbrev="" notes="CC"></chord>
-			<chord name="Major" abbrev="M" notes="C E G"></chord>
-			<chord name="Minor" abbrev="m" notes="C Eb G"></chord>
-			<chord name="Dominant 7th, no 5th" abbrev="7" notes="C E Bb"></chord>
-			<chord name="Diminished 7th, no 5th" abbrev="[dim7]" notes="C Eb Bbb"></chord>
-		
-			<chord name="Major 6th" notes="C E G A" abbrev="6"></chord>
-			<chord name="Minor 6th" notes="C Eb G A" abbrev="min[6]"></chord>
-			<chord name="Augmented" notes="C E G#" abbrev="[aug]"></chord>
-			<chord name="Suspended 4th" notes="C E# G" abbrev="sus[4]"></chord>
-			<chord name="Suspended 2nd" notes="C Ebb G" abbrev="sus[2]"></chord>
-			<chord name="Diminished" notes="C Eb Gb" abbrev="[dim]"></chord>
+  <chords>
+    <chord name="Single Note" abbrev="" notes="C" group="std"></chord>
+    <chord name="Major" abbrev="M" notes="C E G" group="std"></chord>
+    <chord name="Minor" abbrev="m" notes="C Eb G" group="std"></chord>
+    <chord name="Dominant 7th, no 5th" abbrev="7" notes="C E Bb" group="std"></chord>
+    <chord name="Diminished 7th, no 5th" abbrev="[dim7]" notes="C Eb Bbb" group="std"></chord>
 
-			<chord name="Dominant 7th" abbrev="7*" notes="C E G Bb"></chord>
-			<chord name="Dominant 7th (flat 5th)" abbrev="[7b5]" notes="C E Gb Bb"></chord>
-			<chord name="Major 7th" abbrev="M[7]" notes="C E G B"></chord>
-			<chord name="Minor- Major 7th" abbrev="min[M7]" notes="C Eb G B"></chord>
+    <chord name="Major 6th" notes="C E G A" abbrev="6"></chord>
+    <chord name="Minor 6th" notes="C Eb G A" abbrev="min[6]"></chord>
+    <chord name="Augmented" notes="C E G#" abbrev="[aug]" group="misc"></chord>
+    <chord name="Suspended 4th" notes="C E# G" abbrev="sus[4]" group="misc"></chord>
+    <chord name="Suspended 2nd" notes="C Ebb G" abbrev="sus[2]" group="misc"></chord>
+    <chord name="Diminished" notes="C Eb Gb" abbrev="[dim]" group="misc"></chord>
 
-			<chord name="Augmented Major 7th" abbrev="aug[M7]" notes="C E G# B"></chord>
-			<chord name="Augmented 7th" notes="C E G# Bb" abbrev="[aug7]"></chord>
-			<chord name="Minor 7th" notes="C Eb G Bb" abbrev="m[7]"></chord>
-			<chord name="Half- Diminished 7th" notes="C Eb Gb Bb" abbrev="[Ø7]"></chord>
-			<chord name="Diminished 7th" notes="C Eb Gb Bbb" abbrev="[dim7]*"></chord>
+    <chord name="Dominant 7th" abbrev="7*" notes="C E G Bb"></chord>
+    <chord name="Dominant 7th (flat 5th)" abbrev="[7b5]" notes="C E Gb Bb"></chord>
+    <chord name="Major 7th" abbrev="M[7]" notes="C E G B"></chord>
+    <chord name="Minor- Major 7th" abbrev="min[M7]" notes="C Eb G B"></chord>
 
-			<chord name="Dominant 9th (no 5th)" notes="C E Bb D" abbrev="9"></chord>
-			<chord name="Dominant 9th" notes="C E G Bb D" abbrev="9*"></chord>
-			<chord name="Major 9th" notes="C E G B D" abbrev="M[9]"></chord>
-			<chord name="Minor- Major 9th" notes="C Eb G B D" abbrev="min[M9]"></chord>
+    <chord name="Augmented Major 7th" abbrev="aug[M7]" notes="C E G# B"></chord>
+    <chord name="Augmented 7th" notes="C E G# Bb" abbrev="[aug7]"></chord>
+    <chord name="Minor 7th" notes="C Eb G Bb" abbrev="m[7]"></chord>
+    <chord name="Half- Diminished 7th" notes="C Eb Gb Bb" abbrev="[Ø7]"></chord>
+    <chord name="Diminished 7th" notes="C Eb Gb Bbb" abbrev="[dim7]*"></chord>
 
-			<chord name="Augmented Major 9th" notes="C E G# B D" abbrev="[augM9]"></chord>
-			<chord name="Augmented 9th" notes="C E G# Bb D" abbrev="[aug9]"></chord>
-			<chord name="Minor 9th" notes="C Eb G Bb D" abbrev="min[9]"></chord>
-			<chord name="Half- Diminished 9th" notes="C Eb Gb Bb Db" abbrev="[Ø9]"></chord>
-			<chord name="Diminished 9th" notes="C Eb Gb Bbb Db" abbrev="dim[9]"></chord>
-		</chordgroup>
-	</chordset>
-	<chordset name="SimpleChordSet">
-		<chordgroup name="Single-Button Chords">
-			<chord name="Note" abbrev="" notes="CC"></chord>
-			<chord name="Major" abbrev="M" notes="C E G"></chord>
-			<chord name="Minor" abbrev="m" notes="C Eb G"></chord>
-			<chord name="Dominant 7th, no 5th" abbrev="7" notes="C E Bb"></chord>
-			<chord name="Diminished 7th, no 5th" abbrev="[dim7]" notes="C Eb Bbb"></chord>
-		</chordgroup>
-		<chordgroup name="Other Common Chords">
-			<chord name="Major 6th" notes="C E G A" abbrev="6"></chord>
-			<chord name="Minor 6th" notes="C Eb G A" abbrev="min[6]"></chord>
-			<chord name="Augmented" notes="C E G#" abbrev="[aug]"></chord>
-			<chord name="Diminished" notes="C Eb Gb" abbrev="[dim]"></chord>
-		</chordgroup>
-	</chordset>
+    <chord name="Dominant 9th (no 5th)" notes="C E Bb D" abbrev="9"></chord>
+    <chord name="Dominant 9th" notes="C E G Bb D" abbrev="9*"></chord>
+    <chord name="Major 9th" notes="C E G B D" abbrev="M[9]"></chord>
+    <chord name="Minor- Major 9th" notes="C Eb G B D" abbrev="min[M9]"></chord>
+
+    <chord name="Augmented Major 9th" notes="C E G# B D" abbrev="[augM9]"></chord>
+    <chord name="Augmented 9th" notes="C E G# Bb D" abbrev="[aug9]"></chord>
+    <chord name="Minor 9th" notes="C Eb G Bb D" abbrev="min[9]"></chord>
+    <chord name="Half- Diminished 9th" notes="C Eb Gb Bb Db" abbrev="[Ø9]"></chord>
+    <chord name="Diminished 9th" notes="C Eb Gb Bbb Db" abbrev="dim[9]"></chord>
+  </chords>
+  <filters>
+    <filter name="*b9*"/>
+  </filters>
 </root>

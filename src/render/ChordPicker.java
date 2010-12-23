@@ -10,26 +10,16 @@
  */
 package render;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
 import javax.swing.ListModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import music.ChordRegistry;
-import music.ChordRegistry.ChordGroupSet;
 import music.RegistryChordDef;
 import music.RelChord;
 import music.RelChord.NoteDegreeType;
@@ -44,7 +34,62 @@ public class ChordPicker extends javax.swing.JPanel
   RelChord relChord;
   StepChangeListener[] stepChangers;
   RegistryChordDef customDef;
-  //Note rootNote = new Note();
+
+  enum ChordFilter
+  {
+
+    ShowAll("All"),
+    ShowStandard("Standard"),
+    Show6th("6th"),
+    Show7th("7th"),
+    Show9th("9th"),
+    ShowMisc("Misc"),
+    ShowCustomOnly("Only Custom");
+
+    
+    String desc;
+
+    ChordFilter(String str)
+    {
+      desc = str;
+    }
+
+    boolean accepts(RegistryChordDef def)
+    {
+      String relChordString = def.relChord.toString();
+
+      switch (this) {
+        case ShowAll:
+          return true;
+
+        case ShowStandard:
+          return (def.group.equals("std"));
+
+        case Show6th:
+          return (relChordString.contains("13"));
+
+        case Show7th:
+          return (relChordString.contains("7") && !relChordString.contains("9"));
+
+        case Show9th:
+          return (relChordString.contains("9"));
+
+        case ShowMisc:
+          return (def.group.equals("misc"));
+
+        case ShowCustomOnly:
+          return false;
+      }
+
+      return false;
+    }
+
+    @Override
+    public String toString()
+    {
+      return "Show " + desc + " Chords";
+    }
+  };
 
   /** Creates new form ChordPicker */
   public ChordPicker()
@@ -53,34 +98,20 @@ public class ChordPicker extends javax.swing.JPanel
 
     initComponents();
 
-    //Chord Combo
-
-    ChordGroupSet set = ChordRegistry.mainRegistry().findChordSet(ChordRegistry.ALL_CHORDS);
-
-//    comboChords.setModel(new DefaultComboBoxModel(set.getChordDefs(0)));
-//    comboChords.addActionListener(new ActionListener()
-//    {
-//
-//      @Override
-//      public void actionPerformed(ActionEvent e)
-//      {
-//        RegistryChordDef chordDef = (RegistryChordDef) comboChords.getSelectedItem();
-//        selectChord(chordDef);
-//      }
-//    });
-//
-//    comboChords.setSelectedIndex(0);
-
     customDef = RegistryChordDef.getCustomDef();
     //relChord = customDef.relChord;
 
-    Vector<RegistryChordDef> vec = new Vector<RegistryChordDef>();
-    vec.add(customDef);
-    for (RegistryChordDef def : set.getChordDefs(0)) {
-      vec.add(def);
-    }
+//    Vector<RegistryChordDef> vec = new Vector<RegistryChordDef>();
+//    vec.add(customDef);
+//    for (RegistryChordDef def : ChordRegistry.mainRegistry().getAllChords()) {
+//      vec.add(def);
+//    }
+//
+//    listChords.setListData(vec);
 
-    listChords.setListData(vec);
+    filterCombo.setModel(new DefaultComboBoxModel(ChordFilter.values()));
+
+    populateFilteredList();
 
     listChords.addListSelectionListener(new ListSelectionListener()
     {
@@ -91,11 +122,17 @@ public class ChordPicker extends javax.swing.JPanel
       public void valueChanged(ListSelectionEvent e)
       {
         int index = listChords.getSelectedIndex();
-        if (index != lastIndex) {
-          RegistryChordDef chordDef = (RegistryChordDef) listChords.getSelectedValue();
-          selectChord(chordDef);
-          lastIndex = index;
+        if (index == lastIndex) {
+          return;
         }
+
+        if (index == -1) {
+          return;
+        }
+
+        RegistryChordDef chordDef = (RegistryChordDef) listChords.getSelectedValue();
+        selectChord(chordDef);
+        lastIndex = index;
       }
     });
 
@@ -103,26 +140,25 @@ public class ChordPicker extends javax.swing.JPanel
     //initTable();
     initStepControls();
 
-    listChords.setSelectedIndex(1);
+    //listChords.setSelectedIndex(1);
   }
 
-//  private void initBaseCombo()
-//  {
-//
-//    comboBase.setModel(new DefaultComboBoxModel(BaseChordQual.values()));
-//    comboBase.setSelectedItem(relChord.getBaseQual());
-//    comboBase.addActionListener(new ActionListener()
-//    {
-//
-//      @Override
-//      public void actionPerformed(ActionEvent e)
-//      {
-//        relChord.setBaseQual((BaseChordQual) comboBase.getSelectedItem());
-//        chordChanged();
-//        matchListToSelection();
-//      }
-//    });
-//  }
+  void populateFilteredList()
+  {
+    ChordFilter filter = (ChordFilter) filterCombo.getSelectedItem();
+
+    Vector<RegistryChordDef> vec = new Vector<RegistryChordDef>();
+    vec.add(customDef);
+    for (RegistryChordDef def : ChordRegistry.mainRegistry().getAllChords()) {
+      if (filter.accepts(def)) {
+        vec.add(def);
+      }
+    }
+    listChords.setListData(vec);
+
+    matchListToSelection();
+  }
+
   class StepChangeListener implements ActionListener
   {
 
@@ -184,15 +220,6 @@ public class ChordPicker extends javax.swing.JPanel
 
       isUpdating = false;
     }
-//    @Override
-//    public void propertyChange(PropertyChangeEvent evt)
-//    {
-//      //ChordStepToolPanel stepTool = (ChordStepToolPanel)evt.getSource();
-//      if (evt.getPropertyName().equals("Step")) {
-//        relChord.setStep(stepIndex, (NoteDegreeType) evt.getNewValue());
-//        matchListToSelection();
-//      }
-//    }
   }
 
   private void initStepControls()
@@ -230,7 +257,7 @@ public class ChordPicker extends javax.swing.JPanel
 
   private void selectChord(RegistryChordDef chordDef)
   {
-    if (chordDef == customDef) {
+    if ((chordDef == customDef) || (chordDef == null)) {
       return;
     }
 
@@ -246,7 +273,7 @@ public class ChordPicker extends javax.swing.JPanel
 
   public void setRelChord(RelChord newRelChord)
   {
-    relChord = newRelChord.clone();
+    relChord = newRelChord;
 
     for (int i = 0; i < stepChangers.length; i++) {
       NoteDegreeType step = relChord.getStep(i);
@@ -274,13 +301,17 @@ public class ChordPicker extends javax.swing.JPanel
     ListModel model = listChords.getModel();
 
     int index = 0;
-    relChord.origDef = null;
+    if (relChord != null) {
+      relChord.setOrigDef(null);
+    }
 
     for (int i = 1; i < model.getSize(); i++) {
       RegistryChordDef def = (RegistryChordDef) model.getElementAt(i);
       if (def.relChord.equals(relChord)) {
         index = i;
-        relChord.origDef = def;
+        if (relChord != null) {
+          relChord.setOrigDef(def);
+        }
         break;
       }
     }
@@ -289,227 +320,6 @@ public class ChordPicker extends javax.swing.JPanel
     listChords.setSelectedIndex(index);
     listChords.scrollRectToVisible(listChords.getCellBounds(index, index));
     isUpdating = false;
-  }
-
-  abstract static class ChordStepToolPanelBase extends JPanel
-  {
-
-    public abstract void setStep(NoteDegreeType type);
-
-    public abstract NoteDegreeType getStep();
-  }
-
-  static class ChordStepToolPanel extends ChordStepToolPanelBase implements ActionListener
-  {
-
-    private JToolBar toolbar;
-    private NoteDegreeType currStep;
-    private JToggleButton buttons[];
-    private ButtonGroup group;
-    private boolean isUpdating = false;
-
-    ChordStepToolPanel()
-    {
-      currStep = null;
-      toolbar = new JToolBar();
-      toolbar.setFloatable(false);
-      toolbar.setBorderPainted(false);
-
-      final NoteDegreeType[] stepEnums = NoteDegreeType.values();
-
-      buttons = new JToggleButton[stepEnums.length];
-      group = new ButtonGroup();
-
-      for (int i = 0; i < buttons.length; i++) {
-        JToggleButton toggle = new JToggleButton(stepEnums[i].label);
-        toggle.addActionListener(this);
-        toggle.setActionCommand(stepEnums[i].label);
-        toggle.setToolTipText(stepEnums[i].toString());
-        group.add(toggle);
-        buttons[i] = toggle;
-        this.add(toggle);
-        //toolbar.add(toggle);
-      }
-
-      //this.setLayout(new BorderLayout());
-      //this.add(BorderLayout.CENTER, toolbar);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e)
-    {
-      if (isUpdating) {
-        return;
-      }
-      for (int i = 0; i < buttons.length; i++) {
-        if (buttons[i] == e.getSource()) {
-          NoteDegreeType oldStep = currStep;
-          currStep = NoteDegreeType.values()[i];
-          this.firePropertyChange("Step", oldStep, currStep);
-          return;
-        }
-      }
-    }
-
-    @Override
-    public void setEnabled(boolean b)
-    {
-//      if (b) {
-//        setStep(currStep);
-//      } else {
-//        group.clearSelection();
-//      }
-
-      for (JToggleButton button : buttons) {
-        button.setEnabled(b);
-      }
-
-      toolbar.setEnabled(b);
-      super.setEnabled(b);
-    }
-
-    public void setStep(NoteDegreeType type)
-    {
-      final NoteDegreeType[] stepEnums = NoteDegreeType.values();
-
-      currStep = type;
-
-      for (int i = 0; i < buttons.length; i++) {
-        if (currStep == stepEnums[i]) {
-          isUpdating = true;
-          buttons[i].setSelected(true);
-          isUpdating = false;
-          return;
-        }
-      }
-    }
-
-    public NoteDegreeType getStep()
-    {
-      return (isEnabled() ? currStep : null);
-    }
-  }
-
-  static class ChordStepToolPanel2 extends ChordStepToolPanelBase implements ChangeListener
-  {
-
-    private NoteDegreeType currStep;
-    private boolean isUpdating = false;
-    private JSlider slider;
-
-    ChordStepToolPanel2()
-    {
-      currStep = null;
-      slider = new JSlider();
-
-      final NoteDegreeType[] stepEnums = NoteDegreeType.values();
-
-      slider.setSnapToTicks(true);
-      //slider.setPaintTicks(true);
-      slider.setMinimum(0);
-      slider.setMaximum(stepEnums.length - 1);
-      slider.setMajorTickSpacing(1);
-      slider.addChangeListener(this);
-
-      slider.setMinimumSize(new Dimension(50, 50));
-
-      //this.add(slider);
-
-      this.setLayout(new BorderLayout());
-      this.add(BorderLayout.CENTER, slider);
-    }
-
-    @Override
-    public void stateChanged(ChangeEvent e)
-    {
-      if (isUpdating) {
-        return;
-      }
-
-      if (e.getSource() == slider) {
-        NoteDegreeType oldStep = currStep;
-        currStep = NoteDegreeType.values()[slider.getValue()];
-        this.firePropertyChange("Step", oldStep, currStep);
-      }
-    }
-
-    @Override
-    public void setEnabled(boolean b)
-    {
-      slider.setEnabled(b);
-      super.setEnabled(b);
-    }
-
-    public void setStep(NoteDegreeType type)
-    {
-      final NoteDegreeType[] stepEnums = NoteDegreeType.values();
-
-      for (int i = 0; i < stepEnums.length; i++) {
-        if (type == stepEnums[i]) {
-          isUpdating = true;
-          slider.setValue(i);
-          isUpdating = false;
-          return;
-        }
-      }
-    }
-
-    public NoteDegreeType getStep()
-    {
-      return (isEnabled() ? currStep : null);
-    }
-  }
-
-  static class ChordStepToolPanel3 extends ChordStepToolPanelBase implements ActionListener
-  {
-
-    private NoteDegreeType currStep;
-    private boolean isUpdating = false;
-    private JComboBox combo;
-
-    ChordStepToolPanel3()
-    {
-      currStep = null;
-      combo = new JComboBox(NoteDegreeType.values());
-      combo.addActionListener(this);
-      //this.add(combo);
-      this.setLayout(new BorderLayout());
-      this.add(BorderLayout.CENTER, combo);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e)
-    {
-      if (isUpdating) {
-        return;
-      }
-
-      if (e.getSource() == combo) {
-        NoteDegreeType oldStep = currStep;
-        currStep = (NoteDegreeType) combo.getSelectedItem();
-        this.firePropertyChange("Step", oldStep, currStep);
-      }
-    }
-
-    @Override
-    public void setEnabled(boolean b)
-    {
-      combo.setEnabled(b);
-      super.setEnabled(b);
-    }
-
-    public void setStep(NoteDegreeType type)
-    {
-      isUpdating = true;
-      currStep = type;
-      combo.setSelectedItem(currStep);
-      isUpdating = false;
-    }
-
-    public NoteDegreeType getStep()
-    {
-      return (isEnabled() ? currStep : null);
-    }
   }
 
   /** This method is called from within the constructor to
@@ -523,23 +333,23 @@ public class ChordPicker extends javax.swing.JPanel
 
     jScrollPane2 = new javax.swing.JScrollPane();
     listChords = new javax.swing.JList();
-    jComboBox1 = new javax.swing.JComboBox();
+    filterCombo = new javax.swing.JComboBox();
     jLabel1 = new javax.swing.JLabel();
+    jPanel2 = new javax.swing.JPanel();
     chordGridPanel = new javax.swing.JPanel();
-    check3 = new javax.swing.JCheckBox();
     combo3 = new javax.swing.JComboBox();
-    check5 = new javax.swing.JCheckBox();
     combo5 = new javax.swing.JComboBox();
-    check7 = new javax.swing.JCheckBox();
     combo7 = new javax.swing.JComboBox();
-    check9 = new javax.swing.JCheckBox();
     combo9 = new javax.swing.JComboBox();
-    check11 = new javax.swing.JCheckBox();
     combo11 = new javax.swing.JComboBox();
-    check13 = new javax.swing.JCheckBox();
     combo13 = new javax.swing.JComboBox();
-    jLabel3 = new javax.swing.JLabel();
-    jTextField2 = new javax.swing.JTextField();
+    jPanel1 = new javax.swing.JPanel();
+    check3 = new javax.swing.JCheckBox();
+    check5 = new javax.swing.JCheckBox();
+    check7 = new javax.swing.JCheckBox();
+    check9 = new javax.swing.JCheckBox();
+    check11 = new javax.swing.JCheckBox();
+    check13 = new javax.swing.JCheckBox();
 
     listChords.setModel(new javax.swing.AbstractListModel() {
       String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -548,89 +358,81 @@ public class ChordPicker extends javax.swing.JPanel
     });
     jScrollPane2.setViewportView(listChords);
 
-    jLabel1.setText("Show Chords:");
-
-    chordGridPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
-    chordGridPanel.setLayout(new java.awt.GridLayout(6, 2, 0, 8));
-
-    check3.setLabel("3rd:");
-    chordGridPanel.add(check3);
-    chordGridPanel.add(combo3);
-
-    check5.setText("5th:");
-    chordGridPanel.add(check5);
-    chordGridPanel.add(combo5);
-
-    check7.setText("7th:");
-    chordGridPanel.add(check7);
-    chordGridPanel.add(combo7);
-
-    check9.setText("9th (2nd):");
-    chordGridPanel.add(check9);
-    chordGridPanel.add(combo9);
-
-    check11.setText("11th (4th):");
-    check11.addActionListener(new java.awt.event.ActionListener() {
+    filterCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Show All Chords", "Show Simple Chords", "Show 7th Chords", "Show 9th Chords", "Show Other Chords" }));
+    filterCombo.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
-        check11ActionPerformed(evt);
+        filterComboActionPerformed(evt);
       }
     });
-    chordGridPanel.add(check11);
-    chordGridPanel.add(combo11);
 
-    check13.setText("13th (6th):");
-    chordGridPanel.add(check13);
+    jLabel1.setText("Select Chord");
+
+    jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+    jPanel2.setLayout(new java.awt.BorderLayout());
+
+    chordGridPanel.setLayout(new java.awt.GridLayout(6, 1, 0, 4));
+    chordGridPanel.add(combo3);
+    chordGridPanel.add(combo5);
+    chordGridPanel.add(combo7);
+    chordGridPanel.add(combo9);
+    chordGridPanel.add(combo11);
     chordGridPanel.add(combo13);
 
-    jLabel3.setText("jLabel2");
+    jPanel2.add(chordGridPanel, java.awt.BorderLayout.CENTER);
 
-    jTextField2.setText("jTextField1");
+    jPanel1.setLayout(new java.awt.GridLayout(6, 1, 0, 4));
+
+    check3.setLabel("3rd:");
+    jPanel1.add(check3);
+
+    check5.setText("5th:");
+    jPanel1.add(check5);
+
+    check7.setText("7th:");
+    jPanel1.add(check7);
+
+    check9.setText("9th (2nd):");
+    jPanel1.add(check9);
+
+    check11.setText("11th (4th):");
+    jPanel1.add(check11);
+
+    check13.setText("13th (6th):");
+    jPanel1.add(check13);
+
+    jPanel2.add(jPanel1, java.awt.BorderLayout.WEST);
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addContainerGap()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-              .addComponent(jLabel1)
-              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-              .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
           .addGroup(layout.createSequentialGroup()
-            .addComponent(jLabel3)
-            .addGap(10, 10, 10)
-            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-        .addGap(10, 10, 10)
-        .addComponent(chordGridPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
-        .addContainerGap())
+            .addGap(2, 2, 2)
+            .addComponent(jLabel1)
+            .addGap(18, 18, 18)
+            .addComponent(filterCombo, 0, 127, Short.MAX_VALUE))
+          .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-          .addComponent(chordGridPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
-          .addGroup(layout.createSequentialGroup()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-              .addComponent(jLabel1)
-              .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-              .addComponent(jLabel3)
-              .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)))
-        .addContainerGap())
+      .addGroup(layout.createSequentialGroup()
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel1)
+          .addComponent(filterCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE))
+      .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
     );
   }// </editor-fold>//GEN-END:initComponents
 
-  private void check11ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_check11ActionPerformed
-  {//GEN-HEADEREND:event_check11ActionPerformed
-    // TODO add your handling code here:
-  }//GEN-LAST:event_check11ActionPerformed
+  private void filterComboActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_filterComboActionPerformed
+  {//GEN-HEADEREND:event_filterComboActionPerformed
+    populateFilteredList();
+  }//GEN-LAST:event_filterComboActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox check11;
   private javax.swing.JCheckBox check13;
@@ -645,11 +447,11 @@ public class ChordPicker extends javax.swing.JPanel
   private javax.swing.JComboBox combo5;
   private javax.swing.JComboBox combo7;
   private javax.swing.JComboBox combo9;
-  private javax.swing.JComboBox jComboBox1;
+  private javax.swing.JComboBox filterCombo;
   private javax.swing.JLabel jLabel1;
-  private javax.swing.JLabel jLabel3;
+  private javax.swing.JPanel jPanel1;
+  private javax.swing.JPanel jPanel2;
   private javax.swing.JScrollPane jScrollPane2;
-  private javax.swing.JTextField jTextField2;
   private javax.swing.JList listChords;
   // End of variables declaration//GEN-END:variables
 }

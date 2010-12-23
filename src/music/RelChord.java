@@ -61,15 +61,23 @@ public class RelChord implements Cloneable
   //private BaseChordQual base = BaseChordQual.Major;
 
   public final static Interval standardIval[] =
-   {NamedInterval.M3.interval, NamedInterval.P5.interval, NamedInterval.M7.interval,
-    NamedInterval.M2.interval, NamedInterval.P4.interval, NamedInterval.M6.interval};
+   {NamedInterval.M3.interval, 
+    NamedInterval.P5.interval,
+    NamedInterval.M7.interval,
+    NamedInterval.M2.interval, 
+    NamedInterval.P4.interval,
+    NamedInterval.M6.interval};
 
   private NoteDegreeType steps[] = new NoteDegreeType[standardIval.length];
 
-  public RegistryChordDef origDef = null;
+  private RegistryChordDef origDef = null;
 
   public RelChord(Chord chord)
   {
+    if (chord.getNumNotes() == 0) {
+      return;
+    }
+    
     Note root = chord.notes[0];
 
     for (int i = 1; i < chord.notes.length; i++) {
@@ -160,12 +168,6 @@ public class RelChord implements Cloneable
 
       offset++;
     }
-
-//    for (int i = 0; i < steps.length; i++)
-//    {
-//      if (steps[i] == null)
-//        steps[i] = NoteDegreeType.None;
-//    }
   }
 
   private RelChord(NoteDegreeType[] steps, RegistryChordDef orig)
@@ -177,6 +179,7 @@ public class RelChord implements Cloneable
   public RelChord()
   {
     this.steps = new NoteDegreeType[standardIval.length];
+    origDef = ChordRegistry.mainRegistry().findSingleNoteChord();
   }
 
   @Override
@@ -229,16 +232,6 @@ public class RelChord implements Cloneable
     return steps[index];
   }
 
-//  public BaseChordQual getBaseQual()
-//  {
-//    return base;
-//  }
-//
-//  public void setBaseQual(BaseChordQual qual)
-//  {
-//    base = qual;
-//  }
-
   private void addNoteDegree(Vector<Note> notes,
           NoteDegreeType type,
           Note root,
@@ -249,9 +242,6 @@ public class RelChord implements Cloneable
     }
 
     switch (type) {
-//      case None:
-//        return;
-
       case Flat:
         notes.add(root.add(ival.flatten()));
         return;
@@ -276,6 +266,16 @@ public class RelChord implements Cloneable
   public static int indexToStep(int index)
   {
     return index*2 + 5;
+  }
+
+  public void setOrigDef(RegistryChordDef def)
+  {
+    origDef = def;
+  }
+
+  public RegistryChordDef getOrigDef()
+  {
+    return origDef;
   }
 
   @Override

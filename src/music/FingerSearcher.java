@@ -18,7 +18,7 @@ public class FingerSearcher
   final static int SKEW_ANGLE = 20;
   final static int MAX_DIST_BTWN_FINGER = SKEW_GRID * 4;
   final static int MAX_FINGER_SEQS = 50;
-  final static int MAX_FINGER_SEQS_PER_BUTTONSEQ = 40;
+  final static int MAX_FINGER_SEQS_PER_BUTTONSEQ = 2;
   static boolean debugOut = false;
   final static int FINGER_2 = 0;
   final static int FINGER_3 = 1;
