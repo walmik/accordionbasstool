@@ -61,7 +61,7 @@ public class TransposePanel extends javax.swing.JPanel
 
     jButton1.setText("jButton1");
 
-    ivalCombo.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+    ivalCombo.setFont(new java.awt.Font("Tahoma", 1, 12));
     ivalCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
     downButton.setText("Down");
@@ -81,6 +81,7 @@ public class TransposePanel extends javax.swing.JPanel
       }
     });
 
+    jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getStyle() | java.awt.Font.BOLD));
     jLabel1.setText("Transpose:");
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

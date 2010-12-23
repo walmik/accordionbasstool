@@ -10,18 +10,15 @@
  */
 package render;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import music.Note;
 
 /**
  *
  * @author Ilya
  */
-public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionListener, PropertyChangeListener
+public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionListener
 {
 
   SeqColumnModel columnModel;
@@ -45,21 +42,23 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
       computeButton.doClick();
     }
 
-    transNotePicker.addPropertyChangeListener(this);
+    transposePanel1.setSeqColModel(theModel);
+
+    //transNotePicker.addPropertyChangeListener(this);
   }
 
-  @Override
-  public void propertyChange(PropertyChangeEvent evt)
-  {
-    if (isUpdating) {
-      return;
-    }
-
-    if ((evt.getSource() == transNotePicker) && (evt.getPropertyName().equals("Note"))) {
-      Note newNote = (Note) evt.getNewValue();
-      columnModel.transposeAllFromSelectedColumn(newNote);
-    }
-  }
+//  @Override
+//  public void propertyChange(PropertyChangeEvent evt)
+//  {
+//    if (isUpdating) {
+//      return;
+//    }
+//
+//    if ((evt.getSource() == transNotePicker) && (evt.getPropertyName().equals("Note"))) {
+//      Note newNote = (Note) evt.getNewValue();
+//      columnModel.transposeAllFromSelectedColumn(newNote);
+//    }
+//  }
 
   @Override
   public void valueChanged(ListSelectionEvent e)
@@ -82,12 +81,12 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
   {
     this.chordTextField.setText(columnModel.toString());
 
-    int selColumn = columnModel.getSelectedColumn();
-    if ((selColumn >= 0) && (selColumn < columnModel.getColumnCount())) {
-      isUpdating = true;
-      this.transNotePicker.setNote(columnModel.getChordDef(selColumn).rootNote);
-      isUpdating = false;
-    }
+//    int selColumn = columnModel.getSelectedColumn();
+//    if ((selColumn >= 0) && (selColumn < columnModel.getColumnCount())) {
+//      //isUpdating = true;
+//      //this.transNotePicker.setNote(columnModel.getChordDef(selColumn).rootNote);
+//      isUpdating = false;
+//    }
   }
 
   /** This method is called from within the constructor to
@@ -103,7 +102,7 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
     jPanel1 = new javax.swing.JPanel();
     chordTextField = new javax.swing.JTextField();
     computeButton = new javax.swing.JButton();
-    transNotePicker = new render.NotePicker();
+    transposePanel1 = new render.TransposePanel();
 
     setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Chord Sequence Editor:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 14))); // NOI18N
 
@@ -117,6 +116,11 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
     chordTextField.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         chordTextFieldActionPerformed(evt);
+      }
+    });
+    chordTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+      public void focusLost(java.awt.event.FocusEvent evt) {
+        chordTextFieldFocusLost(evt);
       }
     });
 
@@ -149,7 +153,7 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
         .addComponent(computeButton))
     );
 
-    transNotePicker.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Transpose:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
+    transposePanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
@@ -163,8 +167,8 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))
           .addGroup(layout.createSequentialGroup()
-            .addComponent(transNotePicker, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addContainerGap(355, Short.MAX_VALUE))))
+            .addComponent(transposePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addContainerGap(304, Short.MAX_VALUE))))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -176,8 +180,8 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
           .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(transNotePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+            .addGap(18, 18, 18)
+            .addComponent(transposePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         .addContainerGap())
     );
   }// </editor-fold>//GEN-END:initComponents
@@ -199,11 +203,17 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
     {//GEN-HEADEREND:event_chordTextFieldActionPerformed
       this.computeButton.doClick();
     }//GEN-LAST:event_chordTextFieldActionPerformed
+
+    private void chordTextFieldFocusLost(java.awt.event.FocusEvent evt)//GEN-FIRST:event_chordTextFieldFocusLost
+    {//GEN-HEADEREND:event_chordTextFieldFocusLost
+      //this.computeButton.doClick();
+    }//GEN-LAST:event_chordTextFieldFocusLost
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JTextField chordTextField;
   private javax.swing.JButton computeButton;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JPanel jPanel1;
-  private render.NotePicker transNotePicker;
+  private render.TransposePanel transposePanel1;
   // End of variables declaration//GEN-END:variables
 }

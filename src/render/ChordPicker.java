@@ -157,6 +157,7 @@ public class ChordPicker extends javax.swing.JPanel
     listChords.setListData(vec);
 
     matchListToSelection();
+    chordChanged();
   }
 
   class StepChangeListener implements ActionListener

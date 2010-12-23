@@ -292,7 +292,7 @@ class SeqColumnModel extends DefaultTableColumnModel
     return str;
   }
 
-  void computeSeqs(int selIndex)
+  void computeSeqs(int colSel)
   {
     if (renderBoard == null) {
       return;
@@ -302,7 +302,7 @@ class SeqColumnModel extends DefaultTableColumnModel
       return;
     }
 
-    //System.out.println(toString());
+    int rowSel = rowSelModel.getAnchorSelectionIndex();
 
     music.BassBoard currBassBoard = renderBoard.getBassBoard();
     allComboSeqs = searcher.parseSequence(currBassBoard, getAllChords());
@@ -318,12 +318,16 @@ class SeqColumnModel extends DefaultTableColumnModel
     rowHeaderDataModel.fireListDataChanged();
     dataModel.fireTableDataChanged();
 
-    if (selIndex < currSeqArray.length) {
-      selComboModel.setSelectionInterval(selIndex, selIndex);
+    if (colSel < currSeqArray.length) {
+      selComboModel.setSelectionInterval(colSel, colSel);
     } else {
       selComboModel.setSelectionInterval(0, 0);
     }
-    rowSelModel.setSelectionInterval(0, 0);
+
+    if (rowSel >= dataModel.getRowCount()) {
+      rowSel = 0;
+    }
+    rowSelModel.setSelectionInterval(rowSel, rowSel);
   }
 
   public void recomputeSeqs()

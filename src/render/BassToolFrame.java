@@ -72,7 +72,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     tabPitchDetect.setSeqColModel(seqTablePanel.columnModel);
     checkPitchDetectPermissions();
 
-    initModeSelector();
+    //initModeSelector();
 
     renderBoardHeader.initBoardHeader(renderBassBoard, renderBoardScrollPane, seqTablePanel.columnModel);
 
@@ -338,7 +338,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     tabSeqEditor = new render.TabSeqEditor();
     tabOptions = new render.TabOptions();
     tabPitchDetect = new render.TabPitchDetect();
-    tabTester = new render.TabTester();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.7");
@@ -353,7 +352,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     );
     renderBassBoardLayout.setVerticalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 284, Short.MAX_VALUE)
+      .addGap(0, 245, Short.MAX_VALUE)
     );
 
     renderBoardScrollPane.setViewportView(renderBassBoard);
@@ -371,7 +370,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     toolTabs.addTab("Full Sequence Editor", tabSeqEditor);
     toolTabs.addTab("Options", tabOptions);
     toolTabs.addTab("Pitch Detector", tabPitchDetect);
-    toolTabs.addTab("tab5", tabTester);
 
     controlSplitPane.setLeftComponent(toolTabs);
 
@@ -390,7 +388,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private render.TabOptions tabOptions;
   private render.TabPitchDetect tabPitchDetect;
   private render.TabSeqEditor tabSeqEditor;
-  private render.TabTester tabTester;
   private javax.swing.JTabbedPane toolTabs;
   // End of variables declaration//GEN-END:variables
 }

@@ -93,9 +93,8 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="soundCheck" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="transposePanel1" alignment="1" pref="125" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace pref="20" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -111,9 +110,7 @@
                   <Component id="toolInsert" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="toolRemove" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="transposePanel1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="72" max="32767" attributes="0"/>
+                  <EmptySpace pref="171" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -175,8 +172,6 @@
           <Events>
             <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="soundCheckItemStateChanged"/>
           </Events>
-        </Component>
-        <Component class="render.TransposePanel" name="transposePanel1">
         </Component>
       </SubComponents>
     </Container>

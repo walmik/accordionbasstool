@@ -19,8 +19,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
 import music.ButtonCombo;
 import music.ChordRegistry;
 import music.FingerCombo;
@@ -30,7 +32,7 @@ import music.Note;
  *
  * @author Ilya
  */
-public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionListener
+public class SeqTablePanel extends javax.swing.JPanel implements TableColumnModelListener
 {
 
   SeqColumnModel columnModel;
@@ -49,9 +51,10 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
 
     seqViewer = new SeqViewerController(seqTable, seqTableScrollPane);
     columnModel = seqViewer.columnModel;
-    columnModel.selComboModel.addListSelectionListener(this);
+    //columnModel.selComboModel.addListSelectionListener(this);
+    columnModel.addColumnModelListener(this);
 
-    transposePanel1.setSeqColModel(columnModel);
+    //transposePanel1.setSeqColModel(columnModel);
 
     toolPlay = new JButton("Play");
     toolPlay.setActionCommand("PlaySeq");
@@ -131,17 +134,17 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
 
     Object obj = seqTable.getModel().getValueAt(row, col);
     if (obj instanceof FingerCombo) {
-      FingerCombo fingerCombo = (FingerCombo)obj;
-          return ((fingerCombo != null) ? (fingerCombo.getButtonCombo()) : null);
+      FingerCombo fingerCombo = (FingerCombo) obj;
+      return ((fingerCombo != null) ? (fingerCombo.getButtonCombo()) : null);
     } else if (obj instanceof ButtonCombo) {
-      return (ButtonCombo)obj;
+      return (ButtonCombo) obj;
     } else {
       return null;
     }
   }
 
   @Override
-  public void valueChanged(ListSelectionEvent e)
+  public void columnSelectionChanged(ListSelectionEvent e)
   {
     if (cornerPanel != null) {
       cornerPanel.setVisible(columnModel.getColumnCount() > 1);
@@ -152,7 +155,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     //****
     playCombo(combo);
     //****
-    
+
     String text = "<html>";
 
     if (combo != null) {
@@ -172,13 +175,46 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     statusText.setText(text);
   }
 
+  @Override
+  public void columnAdded(TableColumnModelEvent e)
+  {
+    columnCountChanged();
+  }
+
+  @Override
+  public void columnMarginChanged(ChangeEvent e)
+  {
+  }
+
+  @Override
+  public void columnMoved(TableColumnModelEvent e)
+  {
+  }
+
+  @Override
+  public void columnRemoved(TableColumnModelEvent e)
+  {
+    columnCountChanged();
+  }
+
+  void columnCountChanged()
+  {
+    boolean autoResize = (columnModel.getColumnCount() <= 4);
+
+    if (!autoResize) {
+      seqTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    } else {
+      seqTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+    }
+  }
+
   void toggleSeqControls(boolean allowed)
   {
     //sidebar.setVisible(allowed);
     toolAddChord.setVisible(allowed);
     toolInsert.setVisible(allowed);
     toolRemove.setVisible(allowed);
-    transposePanel1.setVisible(allowed);
+    //transposePanel1.setVisible(allowed);
     statusText.setVisible(allowed);
 
     if (!allowed && (columnModel.getColumnCount() > 1)) {
@@ -250,7 +286,6 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
     toolInsert = new javax.swing.JButton();
     toolRemove = new javax.swing.JButton();
     soundCheck = new javax.swing.JCheckBox();
-    transposePanel1 = new render.TransposePanel();
     statusText = new javax.swing.JLabel();
 
     seqTable.setAutoCreateColumnsFromModel(false);
@@ -316,9 +351,8 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
             .addComponent(toolRemove))
           .addGroup(sidebarLayout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(soundCheck))
-          .addComponent(transposePanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 125, Short.MAX_VALUE))
-        .addContainerGap())
+            .addComponent(soundCheck)))
+        .addContainerGap(20, Short.MAX_VALUE))
     );
     sidebarLayout.setVerticalGroup(
       sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -332,9 +366,7 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
         .addComponent(toolInsert)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(toolRemove)
-        .addGap(18, 18, 18)
-        .addComponent(transposePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(72, Short.MAX_VALUE))
+        .addContainerGap(171, Short.MAX_VALUE))
     );
 
     statusText.setFont(new java.awt.Font("Tahoma", 0, 16));
@@ -373,7 +405,6 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
   {//GEN-HEADEREND:event_soundCheckItemStateChanged
     setSoundEnabled(evt.getStateChange() == ItemEvent.SELECTED);
   }//GEN-LAST:event_soundCheckItemStateChanged
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JTable seqTable;
   private javax.swing.JScrollPane seqTableScrollPane;
@@ -384,6 +415,5 @@ public class SeqTablePanel extends javax.swing.JPanel implements ListSelectionLi
   private javax.swing.JButton toolAddChord;
   private javax.swing.JButton toolInsert;
   private javax.swing.JButton toolRemove;
-  private render.TransposePanel transposePanel1;
   // End of variables declaration//GEN-END:variables
 }

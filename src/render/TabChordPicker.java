@@ -10,16 +10,12 @@
  */
 package render;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.JComponent;
 import javax.swing.event.ListSelectionEvent;
 import music.Chord;
-import music.RegistryChordDef;
 import music.Note;
 import music.ParsedChordDef;
 import music.RelChord;
@@ -36,13 +32,10 @@ public class TabChordPicker extends javax.swing.JPanel
   {
     initComponents();
   }
-
   Note rootNote = new Note();
   RelChord currRelChord;
-
   Note addedBassNote = new Note();
   SeqColumnModel seqColumnModel = null;
-
   final static int DEFAULT_TABLE_COL_WIDTH = 96;
   int isUpdatingChord = 0;
   int lastColSel = -1;
@@ -113,6 +106,7 @@ public class TabChordPicker extends javax.swing.JPanel
       public void propertyChange(PropertyChangeEvent evt)
       {
         currRelChord = (RelChord) evt.getNewValue();
+        populateInversionCombo(inversionCombo.getSelectedIndex());
         changeInversion();
         updateChordInModel();
       }
@@ -127,7 +121,7 @@ public class TabChordPicker extends javax.swing.JPanel
 
       @Override
       public void itemStateChanged(ItemEvent evt)
-      {       
+      {
         boolean usingAddedBass = (evt.getStateChange() == ItemEvent.SELECTED);
 
         notePickerAdd.setVisible(usingAddedBass);
@@ -136,18 +130,10 @@ public class TabChordPicker extends javax.swing.JPanel
 
 
         if (!usingAddedBass) {
-          if (isUpdatingChord == 0) {
-            inversionCombo.setSelectedIndex(0);
-            mustBeLowestCheck.setEnabled(true);
-          }
+          inversionCombo.setSelectedIndex(0);
+          mustBeLowestCheck.setEnabled(true);
         }
 
-//        if (usingAddedBass) {
-//          isUpdatingChord++;
-//          toggleInversionBass(notePickerAdd, inversionCombo);
-//          checkInversion.setSelected(false);
-//          isUpdatingChord--;
-//        }
         updateChordInModel();
       }
     });
@@ -188,7 +174,7 @@ public class TabChordPicker extends javax.swing.JPanel
     info += "</html>";
 
     statusLabel.setText(info);
-    
+
     //hugeChordLabel.setText("<html>" + finalChord.nameHtml + "</html>");
 
 
@@ -253,6 +239,7 @@ public class TabChordPicker extends javax.swing.JPanel
     if (possChordDef.relChord != null) {
       chordPicker1.setRelChord(possChordDef.relChord);
       currRelChord = possChordDef.relChord;
+      possChordDef.updateStrings();
     } else {
       currRelChord = new RelChord();
     }
@@ -264,10 +251,15 @@ public class TabChordPicker extends javax.swing.JPanel
       notePickerAdd.setNote(newAddedBass);
     } else {
       addedBassCheck.setSelected(false);
+     // inversionCombo.setSelectedIndex(0);
     }
 
-    this.mustBeLowestCheck.setSelected(possChordDef.bassSetting == ParsedChordDef.BassSetting.LowestBass);
-
+    if (inversionCombo.getSelectedIndex() == 0) {
+      this.mustBeLowestCheck.setSelected(possChordDef.bassSetting == ParsedChordDef.BassSetting.LowestBass);
+    } else {
+      this.mustBeLowestCheck.setSelected(true);
+    }
+    
     isUpdatingChord--;
 
     updateChordUI(possChordDef);
@@ -280,9 +272,9 @@ public class TabChordPicker extends javax.swing.JPanel
 
     inversionCombo.removeAllItems();
     inversionCombo.addItem("Any");
-    inversionCombo.addItem("Root");
 
     if (chordLen >= 2) {
+      inversionCombo.addItem("Root");
       inversionCombo.addItem("1st");
 
       if (chordLen >= 3) {
@@ -290,6 +282,11 @@ public class TabChordPicker extends javax.swing.JPanel
 
         if (chordLen >= 4) {
           inversionCombo.addItem("3rd");
+
+          for (int i = 4; i < chordLen; i++)
+          {
+            inversionCombo.addItem(i + "th");
+          }
         }
       }
     }
@@ -307,7 +304,7 @@ public class TabChordPicker extends javax.swing.JPanel
 
     int index = simpleChord.findNotePos(addedBassNote);
     // -1 = Any, 0-3 = root, 1st, etc... inversions so just add 1
-    if (index >= inversionCombo.getItemCount()) {
+    if ((index + 1) >= inversionCombo.getItemCount()) {
       index = -1;
     }
     inversionCombo.setSelectedIndex(index + 1);
@@ -324,6 +321,13 @@ public class TabChordPicker extends javax.swing.JPanel
 
     int index = inversionCombo.getSelectedIndex();
 
+//    if (currRelChord.getChordLength() == 1) {
+//      index = 0;
+//      isUpdatingChord++;
+//      inversionCombo.setSelectedIndex(index);
+//      isUpdatingChord--;
+//    }
+
     mustBeLowestCheck.setEnabled(true);
 
     // Index 0 is any, so removing added bass option
@@ -335,9 +339,9 @@ public class TabChordPicker extends javax.swing.JPanel
     }
     //Skipping the any option and the option
     //Root = 1, 1st = 2, 2nd = 3, 3rd = 4
-    if ((index > 4)) {
-      return;
-    }
+//    if ((index > 4)) {
+//      return;
+//    }
 
     this.isUpdatingChord++;
 
@@ -352,320 +356,12 @@ public class TabChordPicker extends javax.swing.JPanel
       this.notePickerAdd.setNote(inverseRoot);
       this.addedBassCheck.setSelected(true);
       this.mustBeLowestCheck.setSelected(true);
-      mustBeLowestCheck.setEnabled(false);
+      this.mustBeLowestCheck.setEnabled(false);
     }
 
     this.isUpdatingChord--;
   }
 
-//  private class ChordTableSelectListener implements ListSelectionListener
-//  {
-//
-//    int selRow = 0;
-//    int selCol = -1;
-//    int invalidRow = -1, invalidCol = -1;
-//
-//    private RegistryChordDef getChordAt(int row, int col)
-//    {
-//      col = chordTable.convertColumnIndexToModel(col);
-//      return (RegistryChordDef) chordTable.getModel().getValueAt(row, col);
-//    }
-//
-//    @Override
-//    public void valueChanged(ListSelectionEvent e)
-//    {
-//      ListSelectionModel model = (ListSelectionModel) e.getSource();
-//      RegistryChordDef chordDef;
-//
-//      if (model == chordTable.getSelectionModel()) {
-//        int newRow = model.getAnchorSelectionIndex();
-//
-//        if ((newRow < 0) || (selCol < 0)) {
-//          selRow = newRow;
-//          return;
-//        }
-//
-//        if (newRow == selRow) {
-//          return;
-//        }
-//
-//        if ((invalidCol >= 0)
-//                && (getChordAt(newRow, invalidCol) != null)) {
-//          int newCol = invalidCol;
-//          invalidCol = -1;
-//          selRow = newRow;
-//          chordTable.setColumnSelectionInterval(newCol, newCol);
-//          return;
-//        }
-//
-//        chordDef = getChordAt(newRow, selCol);
-//
-//        if (chordDef == null) {
-//          invalidRow = newRow;
-//          chordTable.setRowSelectionInterval(selRow, selRow);
-//          return;
-//        } else {
-//          selRow = newRow;
-//        }
-//
-//        if (!e.getValueIsAdjusting()) {
-//          invalidRow = -1;
-//        }
-//
-//      } else if (model == chordTable.getColumnModel().getSelectionModel()) {
-//        int newCol = model.getAnchorSelectionIndex();
-//
-//        if ((newCol < 0) || (selRow < 0)) {
-//          selCol = newCol;
-//          return;
-//        }
-//
-//        if (newCol == selCol) {
-//          return;
-//        }
-//
-//        chordDef = getChordAt(selRow, newCol);
-//
-//        if (chordDef == null) {
-//          invalidCol = newCol;
-//          if (selCol < 0) {
-//            selCol = 0;
-//          }
-//          chordTable.setColumnSelectionInterval(selCol, selCol);
-//          return;
-//        } else {
-//          selCol = newCol;
-//        }
-//
-//        if (!e.getValueIsAdjusting()) {
-//          invalidCol = -1;
-//        }
-//      } else {
-//        return;
-//      }
-//
-//      currTableChord = chordDef;
-//      changeInversion();
-//      updateChordInModel();
-//    }
-//  }
-//  class ChordTableModel extends AbstractTableModel
-//  {
-//
-//    ChordTableModel()
-//    {
-//    }
-//
-//    private ChordRegistry.ChordGroupSet getSet()
-//    {
-//      ChordRegistry.ChordGroupSet theSet = ChordRegistry.mainRegistry().findChordSet(chordSet);
-//
-//      assert (theSet != null);
-//      return theSet;
-//    }
-//
-//    @Override
-//    public Class<?> getColumnClass(int columnIndex)
-//    {
-//      return RegistryChordDef.class;
-//    }
-//
-//    @Override
-//    public String getColumnName(int column)
-//    {
-//      return getSet().groupNames[column];
-//    }
-//
-//    @Override
-//    public int getColumnCount()
-//    {
-//      return getSet().groupNames.length;
-//    }
-//
-//    @Override
-//    public int getRowCount()
-//    {
-//      return getSet().maxChordsInGroup;
-//    }
-//
-//    @Override
-//    public Object getValueAt(int rowIndex, int columnIndex)
-//    {
-//      return getSet().getChordDef(columnIndex, rowIndex);
-//    }
-//  }
-//  DefaultTableCellRenderer emptyLabel = new DefaultTableCellRenderer();
-//  void initChordTable()
-//  {
-//    TableColumnModel colModel = chordTable.getColumnModel();
-//    colModel.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//
-//    //TableCellRenderer renderer = new ToggleButtonRenderer();
-//    TableCellRenderer renderer = new ChordCellRenderer();
-//    chordTable.setDefaultRenderer(RegistryChordDef.class, renderer);
-//
-//    JTableHeader header = chordTable.getTableHeader();
-//    header.setReorderingAllowed(true);
-//    header.setFont(header.getFont().deriveFont(Font.ITALIC | Font.BOLD, 14));
-//
-//    chordTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//    chordTable.setCellSelectionEnabled(true);
-//    chordTable.setShowGrid(true);
-//
-//    //chordTable.setBackground(emptyLabel.getBackground());
-//    //jScrollPane1.setBackground(emptyLabel.getBackground());
-//
-//    ChordTableSelectListener tablelist = new ChordTableSelectListener();
-//    chordTable.getSelectionModel().addListSelectionListener(tablelist);
-//    colModel.getSelectionModel().addListSelectionListener(tablelist);
-//
-//    if ((chordTable.getRowCount() > 0) && (chordTable.getColumnCount() > 0)) {
-//      chordTable.setRowSelectionInterval(0, 0);
-//      chordTable.setColumnSelectionInterval(0, 0);
-//    }
-//  }
-  private String getCellText(RegistryChordDef chordDef)
-  {
-    String cellText = chordDef.name;
-
-    if (cellText.length() == 0) {
-      cellText = "(note)";
-    }
-
-//      if (addedBassCheck.isSelected()) {
-//        cellText += "/" + addedBassNote.toString(true);
-//      }
-
-    return cellText;//("<html>" + cellText + "</html>");
-  }
-
-  private void toggleInversionBass(JComponent adding, JComponent removing)
-  {
-    controlGrid.remove(removing);
-    controlGrid.add(adding);
-    GridBagConstraints constraints = new GridBagConstraints();
-    constraints.gridx = 1;
-    constraints.gridy = 1;
-    constraints.gridheight = 2;
-    //constraints.fill = GridBagConstraints.BOTH;
-    ((GridBagLayout)controlGrid.getLayout()).setConstraints(adding, constraints);
-    removing.setVisible(false);
-    adding.setVisible(true);
-    controlGrid.repaint();
-  }
-
-//  class ChordCellRenderer extends DefaultTableCellRenderer
-//  {
-//
-//    Font plain, bold;
-//
-//    ChordCellRenderer()
-//    {
-//      initUI();
-//    }
-//
-//    private void initUI()
-//    {
-//      plain = getFont().deriveFont(Font.PLAIN, 18);
-//      bold = plain.deriveFont(Font.BOLD);
-//      this.setHorizontalAlignment(CENTER);
-//    }
-//
-//    @Override
-//    public Component getTableCellRendererComponent(JTable table,
-//            Object value,
-//            boolean isSelected,
-//            boolean hasFocus,
-//            int row, int column)
-//    {
-//      if (value == null) {
-//        return emptyLabel;
-//      }
-//
-//      super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-//
-//      // Chord Cell Rendering
-//      RegistryChordDef chordDef = (RegistryChordDef) value;
-//
-//      setText(getCellText(chordDef));
-//
-//      String statusInfo =
-//              "<html><b>" + rootNote.toString(true) + " " + chordDef.name + "</b><br/>" + chordDef.getTransposedString(rootNote) + "</html>";
-//
-//      this.setToolTipText(statusInfo);
-//
-//      //setSelected(isSelected);
-//      setFont(isSelected ? bold : plain);
-//      //button.setVisible(true);
-//      //button.setEnabled(table.isEnabled());
-//
-//      return this;
-//    }
-//  }
-//
-//  class ToggleButtonRenderer extends JPanel implements TableCellRenderer
-//  {
-//
-//    Font plain;
-//    Font bold;
-//    JToggleButton button = null;
-//
-//    public ToggleButtonRenderer()
-//    {
-//      button = new JToggleButton();
-//
-//      this.setLayout(new BorderLayout());
-//      this.add(button, BorderLayout.CENTER);
-//
-//      initUI();
-//    }
-//
-//    private void initUI()
-//    {
-//      if (button == null) {
-//        return;
-//      }
-//
-//      plain = getFont().deriveFont(Font.PLAIN, 18);
-//      bold = plain.deriveFont(Font.BOLD);
-//      button.setFont(plain);
-//    }
-//
-//    @Override
-//    public void setUI(PanelUI ui)
-//    {
-//      super.setUI(ui);
-//      initUI();
-//    }
-//
-//    @Override
-//    public Component getTableCellRendererComponent(JTable table,
-//            Object value,
-//            boolean isSelected,
-//            boolean hasFocus,
-//            int row, int column)
-//    {
-//      if (value == null) {
-//        return emptyLabel;
-//      }
-//
-//      // Chord Cell Rendering
-//      RegistryChordDef chordDef = (RegistryChordDef) value;
-//
-//      button.setText(getCellText(chordDef));
-//
-//      String statusInfo = "<html><b>" + rootNote.toString(true) + " " + chordDef.name + "</b><br/>" + chordDef.getTransposedString(rootNote) + "</html>";
-//
-//      this.setToolTipText(statusInfo);
-//
-//      button.setSelected(isSelected);
-//      button.setFont(isSelected ? bold : plain);
-//      button.setVisible(true);
-//      button.setEnabled(table.isEnabled());
-//
-//      return this;
-//    }
-//  }
   /** This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
@@ -797,7 +493,6 @@ public class TabChordPicker extends javax.swing.JPanel
       this.updateChordInModel();
     }
   }//GEN-LAST:event_inversionComboItemStateChanged
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox addedBassCheck;
   private render.ChordPicker chordPicker1;

@@ -16,6 +16,10 @@ public class ChordParser
       parser.skipWhiteSpace();
     }
 
+    if (notes.isEmpty()) {
+      notes.add(new Note());
+    }
+
     Note[] noteArray = new Note[notes.size()];
     return new Chord(notes.toArray(noteArray));
   }

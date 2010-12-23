@@ -24,6 +24,16 @@ public class Interval
 		return new Interval(newInterval, newScaleDist);
 	}
 
+  public int getNormScaleDist()
+  {
+    return Note.posmod(scaleDist, Note.NUM_NOTES);
+  }
+
+  public int getNormHalfStep()
+  {
+    return Note.signmod(interval, Note.NUM_HALFSTEPS);
+  }
+
   public Interval flatten()
   {
     return new Interval(interval - 1, scaleDist);

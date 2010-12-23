@@ -13,14 +13,15 @@ public class ParsedChordDef
 
   public enum BassSetting
   {
+
     NoLowestAllowed,
     NotLowestBass,
     LowestBass,
   }
+  public String namePlain;
+  public String nameHtml;
+  public String detail;
 
-  public final String namePlain;
-  public final String nameHtml;
-  public final String detail;
   public final Note rootNote;
   public final Note addedBassNote;
   public final Chord chord;
@@ -53,8 +54,8 @@ public class ParsedChordDef
       nameHtml = chord.toHtmlString();
     }
 
-    relChord = null;
-    detail = nameHtml;
+    relChord = new RelChord(chord);
+    detail = "";
     bassSetting = BassSetting.NotLowestBass;
   }
 
@@ -67,8 +68,37 @@ public class ParsedChordDef
 
     relChord = (pickedChord != null ? pickedChord : new RelChord());
 
+    addedBassNote = addedBass;
+
     Interval[] ivals;
 
+    {
+      RegistryChordDef origDef = relChord.getOrigDef();
+
+      if (origDef == null) {
+        Chord simpleChord = relChord.buildChord(root);
+        ivals = simpleChord.extractInterval();
+      } else {
+        ivals = origDef.ivals;
+      }
+    }
+
+    Chord aChord = new Chord(rootNote, ivals,
+            addedBassNote, (addedBassLowest == BassSetting.LowestBass));
+
+    if (addedBassLowest == BassSetting.NoLowestAllowed) {
+      chord = aChord.getUndupedChord();
+    } else {
+      chord = aChord;
+    }
+    
+    bassSetting = addedBassLowest;
+
+    updateStrings();
+  }
+
+  public void updateStrings()
+  {
     String tempAbbrevHtml;
     String tempAbbrevPlain;
     String tempDet;
@@ -78,35 +108,25 @@ public class ParsedChordDef
 
       // If custom chord
       if (origDef == null) {
-        Chord simpleChord = relChord.buildChord(root);
-        ivals = simpleChord.extractInterval();
+        Chord simpleChord = relChord.buildChord(rootNote);
+
+        //tempAbbrevHtml = rootNote.toString(true) + relChord.toString("+");
+        //tempAbbrevPlain = rootNote.toString(false) + relChord.toString("+");
         tempAbbrevHtml = simpleChord.toHtmlString();
-        tempAbbrevPlain = simpleChord.toString();
+        tempAbbrevPlain = "[" + simpleChord.toString() + "]";
         tempDet = "";
       } else {
-        ivals = origDef.ivals;
 
         tempAbbrevHtml = rootNote.toString(true) + origDef.abbrevHtml;
-        
+
         tempAbbrevPlain = rootNote.toString();
 
-        if (ivals.length > 0) {
+        if (origDef.ivals.length > 0) {
           tempAbbrevPlain += origDef.abbrevPlain;
         }
 
         tempDet = origDef.name;
       }
-    }
-
-    addedBassNote = addedBass;
-
-    Chord aChord = new Chord(rootNote, ivals,
-            addedBassNote, (addedBassLowest == BassSetting.LowestBass));
-
-    if (addedBassLowest == BassSetting.NoLowestAllowed) {
-      chord = aChord.getUndupedChord();
-    } else {
-      chord = aChord;
     }
 
     // -- Set HTML Abbrev
@@ -133,11 +153,9 @@ public class ParsedChordDef
       det += " over " + addedBassNote.toString(true);
     }
     detail = det;
-
-    bassSetting = addedBassLowest;
-
   }
 
+  
   public ParsedChordDef transposeBy(Interval ival)
   {
     Note newAddedBass = null;

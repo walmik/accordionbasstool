@@ -21,16 +21,15 @@ public class RelChord implements Cloneable
 //    Sus4,
 //    Sus2,
 //  };
-
   public static enum NoteDegreeType
   {
- //   None("-"),
+    //   None("-"),
+
     DoubleFlat("bb"),
     Flat("b"),
     Normal("N"),
     Sharp("#"),
     DoubleSharp("##");
-
     public final String label;
 
     NoteDegreeType()
@@ -57,19 +56,14 @@ public class RelChord implements Cloneable
       }
     }
   }
-
   //private BaseChordQual base = BaseChordQual.Major;
-
-  public final static Interval standardIval[] =
-   {NamedInterval.M3.interval, 
+  public final static Interval standardIval[] = {NamedInterval.M3.interval,
     NamedInterval.P5.interval,
     NamedInterval.M7.interval,
-    NamedInterval.M2.interval, 
+    NamedInterval.M2.interval,
     NamedInterval.P4.interval,
     NamedInterval.M6.interval};
-
   private NoteDegreeType steps[] = new NoteDegreeType[standardIval.length];
-
   private RegistryChordDef origDef = null;
 
   public RelChord(Chord chord)
@@ -77,17 +71,19 @@ public class RelChord implements Cloneable
     if (chord.getNumNotes() == 0) {
       return;
     }
-    
+
     Note root = chord.notes[0];
 
     for (int i = 1; i < chord.notes.length; i++) {
       Note note = chord.notes[i];
 
       Interval ival = note.diff(root);
+      int matchScaleDist = ival.getNormScaleDist();
+      int matchHalfStep = ival.getNormHalfStep();
 
       for (int j = 0; j < standardIval.length; j++) {
-        if (ival.scaleDist == standardIval[j].scaleDist) {
-          int ivalDiff = ival.interval - standardIval[j].interval;
+        if (matchScaleDist == standardIval[j].scaleDist) {
+          int ivalDiff = matchHalfStep - standardIval[j].getNormHalfStep();
           if (ivalDiff == 0) {
             steps[j] = NoteDegreeType.Normal;
           } else if (ivalDiff > 0) {
@@ -99,7 +95,7 @@ public class RelChord implements Cloneable
         }
       }
     }
-    
+
     // Find if Major, Minor or Sus2 or Sus4
 
 //    if (steps[0] == null) {
@@ -185,7 +181,7 @@ public class RelChord implements Cloneable
   @Override
   public RelChord clone()
   {
-    return new RelChord((NoteDegreeType[])steps.clone(), origDef);
+    return new RelChord((NoteDegreeType[]) steps.clone(), origDef);
   }
 
   public Chord buildChord(Note root)
@@ -194,8 +190,7 @@ public class RelChord implements Cloneable
 
     notes.add(root);
 
-    for (int i = 0; i < standardIval.length; i++)
-    {
+    for (int i = 0; i < standardIval.length; i++) {
       addNoteDegree(notes, steps[i], root, standardIval[i]);
     }
 
@@ -206,8 +201,7 @@ public class RelChord implements Cloneable
   {
     int count = 1;
 
-    for (int i = 0; i < steps.length; i++)
-    {
+    for (int i = 0; i < steps.length; i++) {
       if (steps[i] != null) {
         count++;
       }
@@ -223,7 +217,7 @@ public class RelChord implements Cloneable
 
   public void setStep(int index, NoteDegreeType stepVal)
   {
-    assert(index < getNumEditableSteps());
+    assert (index < getNumEditableSteps());
     steps[index] = stepVal;
   }
 
@@ -265,7 +259,7 @@ public class RelChord implements Cloneable
 
   public static int indexToStep(int index)
   {
-    return index*2 + 5;
+    return index * 2 + 5;
   }
 
   public void setOrigDef(RegistryChordDef def)
@@ -281,18 +275,26 @@ public class RelChord implements Cloneable
   @Override
   public String toString()
   {
+    return toString(", ");
+  }
+
+  public String toString(String sep)
+  {
     //String str = base.toString() + " ";
     String str = "";
 
-    for (int i = 0; i < steps.length; i++)
-    {
+    for (int i = 0; i < steps.length; i++) {
       int qual = indexToStep(i - 1);
-      
+
       if (steps[i] == null) {
         continue;
       }
 
-      str += steps[i].label + qual + ", ";
+      if (steps[i] != NoteDegreeType.Normal) {
+        str += steps[i].label;
+      }
+      
+      str += qual + sep;
     }
 
     return str;
