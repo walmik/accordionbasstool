@@ -20,6 +20,7 @@ public class Player
   Synthesizer synth;
   Timer audioTimer;
   LinkedList<AudioTask> cancelTasks;
+  int velocity = 50;
 
   public boolean init()
   {
@@ -69,24 +70,38 @@ public class Player
   }
   int chanUsed = 0;
 
-  public boolean playChords(int[] chordMasks)
+  public boolean playChords(int[] chordMasks, int delay)
   {
-    long delay = 0;
+    long totalDelay = 0;
 
-    for (int i = 0; i < chordMasks.length; i++)
-    {
-      AudioTask playTask = new AudioTask(chordMasks[i], true);
-      audioTimer.schedule(playTask, delay);
-      delay += 50;
+    for (int i = 0; i < chordMasks.length; i++) {
+      AudioTask playTask = new AudioTask(chordMasks[i], delay - 1);
+      audioTimer.schedule(playTask, totalDelay);
+      totalDelay += delay;
     }
     return true;
   }
 
-  public boolean playChord(int chordMask)
+  public boolean playArpeggiate(int chordMask, int delay)
+  {
+    long totalDelay = 0;
+
+    for (int i = 0; i < Note.NUM_HALFSTEPS * 2; i++) {
+      if ((chordMask & (1 << i)) != 0) {
+        AudioTask playTask = new AudioTask(1 << i, delay - 1);
+        audioTimer.schedule(playTask, totalDelay);
+        totalDelay += delay;
+      }
+    }
+
+    return true;
+  }
+
+  public boolean playChord(int chordMask, int duration)
   {
     try {
       MidiChannel[] chans = synth.getChannels();
-      int velocity = 50;
+      //int velocity = 50;
 
       if (chordMask == 0) {
         return false;
@@ -100,8 +115,8 @@ public class Player
         }
       }
 
-      AudioTask cancelTask = new AudioTask(chordMask, false);
-      audioTimer.schedule(cancelTask, 500);
+      AudioTask cancelTask = new AudioTask(chordMask, 0);
+      audioTimer.schedule(cancelTask, duration);
       cancelTasks.add(cancelTask);
       return true;
 
@@ -117,6 +132,11 @@ public class Player
     chans[chanUsed].allNotesOff();
     chans[chanUsed + 1].allNotesOff();
     cancelAllTasks();
+  }
+
+  public void setVelocity(int vel)
+  {
+    velocity = vel;
   }
 
   public void cancelAllTasks()
@@ -145,19 +165,21 @@ public class Player
   {
 
     int chordMask;
+    int duration;
     boolean toPlay;
 
-    AudioTask(int cmask, boolean play)
+    AudioTask(int cmask, int dur)
     {
       chordMask = cmask;
-      toPlay = play;
+      duration = dur;
+      toPlay = (dur > 0);
     }
 
     @Override
     public void run()
     {
       if (toPlay) {
-        playChord(chordMask);
+        playChord(chordMask, duration);
       } else {
         stopChord(chordMask);
       }

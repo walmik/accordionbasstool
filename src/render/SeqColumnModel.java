@@ -1,9 +1,15 @@
 package render;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableModelEvent;
 import music.ParsedChordDef;
 import java.util.Vector;
 import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
@@ -224,6 +230,12 @@ class SeqColumnModel extends DefaultTableColumnModel
     return rowHeaderDataModel;
   }
 
+  void addTableAndColumnListener(TableEventAdapter listener)
+  {
+    this.addColumnModelListener(listener);
+    this.getDataModel().addTableModelListener(listener);
+  }
+
   boolean setSelectedSeq(int index)
   {
     if (index < 0) {
@@ -324,7 +336,7 @@ class SeqColumnModel extends DefaultTableColumnModel
       selComboModel.setSelectionInterval(0, 0);
     }
 
-    if (rowSel >= dataModel.getRowCount()) {
+    if ((rowSel >= dataModel.getRowCount()) || (rowSel < 0)) {
       rowSel = 0;
     }
     rowSelModel.setSelectionInterval(rowSel, rowSel);
@@ -464,6 +476,47 @@ class SeqColumnModel extends DefaultTableColumnModel
       }
 
       return currSeqArray[index];
+    }
+  }
+
+  static class TableEventAdapter implements TableColumnModelListener, TableModelListener
+  {
+    @Override
+    public void columnAdded(TableColumnModelEvent e)
+    {
+      columnCountChanged(e);
+    }
+
+    @Override
+    public void columnMarginChanged(ChangeEvent e)
+    {
+    }
+
+    @Override
+    public void columnMoved(TableColumnModelEvent e)
+    {
+    }
+
+    @Override
+    public void columnRemoved(TableColumnModelEvent e)
+    {
+      columnCountChanged(e);
+    }
+
+    @Override
+    public void columnSelectionChanged(ListSelectionEvent e)
+    {
+    }
+
+    public void columnCountChanged(TableColumnModelEvent e)
+    {
+
+    }
+
+    @Override
+    public void tableChanged(TableModelEvent e)
+    {
+
     }
   }
 }

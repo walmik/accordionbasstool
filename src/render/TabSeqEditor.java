@@ -10,37 +10,42 @@
  */
 package render;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTable;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 /**
  *
  * @author Ilya
  */
-public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionListener
+public class TabSeqEditor extends javax.swing.JPanel implements TableModelListener
 {
 
   SeqColumnModel columnModel;
   JTable seqTable;
   boolean isUpdating = false;
+  DefaultComboBoxModel recentSeqs;
 
   /** Creates new form TabSeqEditor */
   public TabSeqEditor()
   {
     initComponents();
+
+    recentSeqs = new DefaultComboBoxModel();
+    comboRecent.setModel(recentSeqs);
   }
 
   void setSeqColModel(SeqColumnModel theModel, JTable theTable, String startChords)
   {
     columnModel = theModel;
     seqTable = theTable;
-    columnModel.selComboModel.addListSelectionListener(this);
+    columnModel.getDataModel().addTableModelListener(this);
 
-    if (startChords != null) {
-      chordTextField.setText(startChords);
-      computeButton.doClick();
-    }
+//    if (startChords != null) {
+//      chordTextField.setText(startChords);
+//      computeButton.doClick();
+//    }
 
     transposePanel1.setSeqColModel(theModel);
 
@@ -59,27 +64,40 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
 //      columnModel.transposeAllFromSelectedColumn(newNote);
 //    }
 //  }
-
   @Override
-  public void valueChanged(ListSelectionEvent e)
+  public void tableChanged(TableModelEvent e)
   {
-    if (isVisible() && (columnModel != null)) {
-      updateFromSequence();
-    }
+    updateFromSequence();
   }
 
   @Override
   public void setVisible(boolean visible)
   {
-    if (visible && (columnModel != null)) {
-      updateFromSequence();
-    }
     super.setVisible(visible);
+    updateFromSequence();
   }
 
   private void updateFromSequence()
   {
-    this.chordTextField.setText(columnModel.toString());
+    if (isUpdating) {
+      return;
+    }
+
+    if (isVisible() && (columnModel != null)) {
+      String text = columnModel.toString();
+
+      isUpdating = true;
+
+      int index = recentSeqs.getIndexOf(text);
+
+      if (index < 0) {
+        recentSeqs.insertElementAt(text, 0);
+        index = 0;
+      }
+      this.comboRecent.setSelectedIndex(index);
+
+      isUpdating = false;
+    }
 
 //    int selColumn = columnModel.getSelectedColumn();
 //    if ((selColumn >= 0) && (selColumn < columnModel.getColumnCount())) {
@@ -98,36 +116,33 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    jLabel1 = new javax.swing.JLabel();
     jPanel1 = new javax.swing.JPanel();
-    chordTextField = new javax.swing.JTextField();
     computeButton = new javax.swing.JButton();
+    comboRecent = new javax.swing.JComboBox();
+    buttonClearRecent = new javax.swing.JButton();
     transposePanel1 = new render.TransposePanel();
 
-    setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Chord Sequence Editor:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 14))); // NOI18N
-
-    jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11));
-    jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-    jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Current Sequence:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
-
-    chordTextField.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
-    chordTextField.setToolTipText("<html> <li>Enter a sequence of comma seperated chords  as text below</li><br/> <li>See Chord Editor tab for all valid chord names. (ex. M = Major, m = minor)</li><br/> <li>To specify a custom chord by notes, put the notes in [ ], (ex. [ABC], [D F# G])</li><br/> </html>");
-    chordTextField.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        chordTextFieldActionPerformed(evt);
-      }
-    });
-    chordTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-      public void focusLost(java.awt.event.FocusEvent evt) {
-        chordTextFieldFocusLost(evt);
-      }
-    });
+    jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Chord Sequence:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
     computeButton.setText("Update Sequence");
     computeButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         computeButtonActionPerformed(evt);
+      }
+    });
+
+    comboRecent.setEditable(true);
+    comboRecent.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
+    comboRecent.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        comboRecentActionPerformed(evt);
+      }
+    });
+
+    buttonClearRecent.setText("Clear Recent");
+    buttonClearRecent.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        buttonClearRecentActionPerformed(evt);
       }
     });
 
@@ -139,18 +154,22 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
         .addContainerGap()
         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(jPanel1Layout.createSequentialGroup()
-            .addComponent(chordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)
-            .addContainerGap())
-          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addComponent(buttonClearRecent)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(computeButton)
-            .addGap(124, 124, 124))))
+            .addGap(47, 47, 47))
+          .addGroup(jPanel1Layout.createSequentialGroup()
+            .addComponent(comboRecent, 0, 385, Short.MAX_VALUE)
+            .addContainerGap())))
     );
     jPanel1Layout.setVerticalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-        .addComponent(chordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(computeButton))
+        .addComponent(comboRecent, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(computeButton)
+          .addComponent(buttonClearRecent)))
     );
 
     transposePanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -164,33 +183,36 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))
-          .addGroup(layout.createSequentialGroup()
-            .addComponent(transposePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addContainerGap(304, Short.MAX_VALUE))))
+            .addContainerGap())
+          .addComponent(transposePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(layout.createSequentialGroup()
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
-            .addGap(161, 161, 161))
-          .addGroup(layout.createSequentialGroup()
-            .addContainerGap()
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addGap(18, 18, 18)
-            .addComponent(transposePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-        .addContainerGap())
+      .addGroup(layout.createSequentialGroup()
+        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addGap(18, 18, 18)
+        .addComponent(transposePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 
     private void computeButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_computeButtonActionPerformed
     {//GEN-HEADEREND:event_computeButtonActionPerformed
-      String text = chordTextField.getText();
-      if (text == null || text.length() == 0) {
+      Object obj = comboRecent.getSelectedItem();
+
+      String text;
+
+      if (obj == null) {
         text = "C";
+      } else {
+        text = obj.toString();
+        if (text.isEmpty()) {
+          text = "C";
+        }
+      }
+
+      if (columnModel.toString().equals(text)) {
+        return;
       }
 
       if (columnModel != null) {
@@ -199,20 +221,31 @@ public class TabSeqEditor extends javax.swing.JPanel implements ListSelectionLis
       seqTable.requestFocusInWindow();
 }//GEN-LAST:event_computeButtonActionPerformed
 
-    private void chordTextFieldActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_chordTextFieldActionPerformed
-    {//GEN-HEADEREND:event_chordTextFieldActionPerformed
-      this.computeButton.doClick();
-    }//GEN-LAST:event_chordTextFieldActionPerformed
+    private void comboRecentActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_comboRecentActionPerformed
+    {//GEN-HEADEREND:event_comboRecentActionPerformed
+      if (isUpdating) {
+        return;
+      }
 
-    private void chordTextFieldFocusLost(java.awt.event.FocusEvent evt)//GEN-FIRST:event_chordTextFieldFocusLost
-    {//GEN-HEADEREND:event_chordTextFieldFocusLost
-      //this.computeButton.doClick();
-    }//GEN-LAST:event_chordTextFieldFocusLost
+      computeButton.doClick();
+    }//GEN-LAST:event_comboRecentActionPerformed
+
+    private void buttonClearRecentActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_buttonClearRecentActionPerformed
+    {//GEN-HEADEREND:event_buttonClearRecentActionPerformed
+      isUpdating = true;
+
+      Object sel = recentSeqs.getSelectedItem();
+      recentSeqs.removeAllElements();
+      recentSeqs.addElement(sel);
+      //recentSeqs.setSelectedItem(sel);
+
+      isUpdating = false;
+    }//GEN-LAST:event_buttonClearRecentActionPerformed
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JTextField chordTextField;
+  private javax.swing.JButton buttonClearRecent;
+  private javax.swing.JComboBox comboRecent;
   private javax.swing.JButton computeButton;
-  private javax.swing.JLabel jLabel1;
   private javax.swing.JPanel jPanel1;
   private render.TransposePanel transposePanel1;
   // End of variables declaration//GEN-END:variables

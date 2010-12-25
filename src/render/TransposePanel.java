@@ -61,8 +61,7 @@ public class TransposePanel extends javax.swing.JPanel
 
     jButton1.setText("jButton1");
 
-    ivalCombo.setFont(new java.awt.Font("Tahoma", 1, 12));
-    ivalCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+    ivalCombo.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
 
     downButton.setText("Down");
     downButton.setFocusable(false);
@@ -95,8 +94,8 @@ public class TransposePanel extends javax.swing.JPanel
           .addComponent(jLabel1)
           .addGroup(layout.createSequentialGroup()
             .addComponent(downButton)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
-            .addComponent(upButton)))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(upButton, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE)))
         .addContainerGap())
     );
     layout.setVerticalGroup(

@@ -95,30 +95,6 @@ public class RelChord implements Cloneable
         }
       }
     }
-
-    // Find if Major, Minor or Sus2 or Sus4
-
-//    if (steps[0] == null) {
-//      if (steps[3] != null) {
-//        base = BaseChordQual.Sus2;
-//        steps[3] = null;
-//      } else if (steps[4] != null) {
-//        base = BaseChordQual.Sus4;
-//        steps[4] = null;
-//      } else {
-//        base = BaseChordQual.Root;
-//      }
-//    } else if (steps[0] == NoteDegreeType.Flat) {
-//      base = BaseChordQual.Minor;
-//    } else {
-//      base = BaseChordQual.Major;
-//    }
-
-//    for (int i = 0; i < steps.length; i++) {
-//      if (steps[i] == null) {
-//        steps[i] = NoteDegreeType.None;
-//      }
-//    }
   }
 
   public RelChord(String string)

@@ -388,7 +388,7 @@ public class TabChordPicker extends javax.swing.JPanel
     statusLabel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
     jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel1.setText("Root:");
+    jLabel1.setText("Root Note:");
 
     mustBeLowestCheck.setSelected(true);
     mustBeLowestCheck.setText("Must be in Bass");
@@ -420,10 +420,10 @@ public class TabChordPicker extends javax.swing.JPanel
       controlGridLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(controlGridLayout.createSequentialGroup()
         .addGroup(controlGridLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(addedBassCheck)
           .addGroup(controlGridLayout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
-          .addComponent(addedBassCheck))
+            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))
         .addGap(6, 6, 6)
         .addGroup(controlGridLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(controlGridLayout.createSequentialGroup()
@@ -441,17 +441,20 @@ public class TabChordPicker extends javax.swing.JPanel
     controlGridLayout.setVerticalGroup(
       controlGridLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(controlGridLayout.createSequentialGroup()
-        .addGroup(controlGridLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(notePickerRoot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, controlGridLayout.createSequentialGroup()
-            .addContainerGap()
-            .addComponent(jLabel2)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(inversionCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGroup(controlGridLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
           .addGroup(controlGridLayout.createSequentialGroup()
-            .addContainerGap()
-            .addComponent(jLabel1)))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(controlGridLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(notePickerRoot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+              .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, controlGridLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(inversionCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, controlGridLayout.createSequentialGroup()
+            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabel1)
+            .addGap(14, 14, 14)))
         .addGroup(controlGridLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addComponent(addedBassCheck)
           .addGroup(controlGridLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)

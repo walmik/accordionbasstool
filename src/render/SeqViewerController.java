@@ -670,6 +670,7 @@ public class SeqViewerController
             text += " (" + lowestInfo + ")";
           }
           //text = combo.toSortedNoteString(false);
+          this.setToolTipText(buttonCombo.toSortedNoteString(false));
         }
       } else {
         text += "Chord Not Possible";

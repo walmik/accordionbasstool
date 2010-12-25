@@ -49,12 +49,13 @@ public class ParsedChordDef
     if (achord.isSingleNote()) {
       namePlain = achord.toString();
       nameHtml = chord.toHtmlString();
+      relChord = new RelChord();
     } else {
       namePlain = "[" + chord.toString() + "]";
       nameHtml = chord.toHtmlString();
+      relChord = new RelChord(chord);
     }
 
-    relChord = new RelChord(chord);
     detail = "";
     bassSetting = BassSetting.NotLowestBass;
   }

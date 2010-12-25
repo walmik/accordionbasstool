@@ -10,7 +10,6 @@ public class ButtonCombo
 
   final BassBoard.Pos[] pos;
   final BassBoard board;
-
   private Chord.Mask chordMask = null;
   int boardDim = 0;
   GeoPos center;
@@ -119,13 +118,12 @@ public class ButtonCombo
 //
 //    return str;
 //	}
-
   public boolean isAcceptable()
   {
     if (optMaxDistThreshold == 0) {
       return true;
     }
-    
+
     return computeComboBounds() < optMaxDistThreshold;
   }
 
@@ -137,7 +135,6 @@ public class ButtonCombo
 
     return board.isSingleBassRow(pos[0].row);
   }
-  
   public static int optMaxDistThreshold = 5;
 
   public static void setMaxComboDistThreshold(int threshold)
@@ -258,7 +255,6 @@ public class ButtonCombo
     //Using hash version
     return getHash().contains(row, col);
   }
-
   static Note[] sortedNotes = new Note[Note.NUM_HALFSTEPS * 2];
 
   private void sortNotes()
@@ -293,28 +289,30 @@ public class ButtonCombo
     return lowestNote;
   }
 
-//  public String toSortedNoteString(boolean html)
-//  {
-//    String str = "";
-//
-//    if (sortedNotes == null) {
-//      sortNotes();
-//    }
-//
-//    for (int i = 0; i < sortedNotes.length; i++) {
-//      if (sortedNotes[i] == null) {
-//        continue;
-//      }
-//
-//      if (str.length() > 0) {
-//        str += " + ";
-//      }
-//      str += sortedNotes[i].toString(html);
-//
-//    }
-//
-//    return str;
-//  }
+  public String toSortedNoteString(boolean html)
+  {
+    String str = "";
+
+    for (int i = 0; i < sortedNotes.length; i++) {
+      sortedNotes[i] = null;
+    }
+
+    sortNotes();
+
+    for (int i = 0; i < sortedNotes.length; i++) {
+      if (sortedNotes[i] == null) {
+        continue;
+      }
+
+      if (str.length() > 0) {
+        str += " + ";
+      }
+      str += sortedNotes[i].toString(html);
+
+    }
+
+    return str;
+  }
 
   public int getChordMaskValue()
   {
