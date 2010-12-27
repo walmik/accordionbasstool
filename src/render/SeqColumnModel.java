@@ -24,7 +24,7 @@ import music.Interval;
 import music.Note;
 import music.StringParser;
 
-class SeqColumnModel extends DefaultTableColumnModel
+public class SeqColumnModel extends DefaultTableColumnModel
 {
 
   SelectedButtonCombo selComboModel;

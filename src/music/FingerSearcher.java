@@ -103,12 +103,12 @@ public class FingerSearcher
   {
     LinkedList<FingerCombo> fingerCombos = new LinkedList<FingerCombo>();
 
-    int comboLen = combo.pos.length;
+    int comboLen = combo.getLength();
 
     GeoPos[] pos = new GeoPos[comboLen];
 
     for (int i = 0; i < pos.length; i++) {
-      pos[i] = new GeoPos(combo.pos[i], combo.board.getCenter(), SKEW_GRID, SKEW_ANGLE);
+      pos[i] = new GeoPos(combo.getPos(i), combo.board.getCenter(), SKEW_GRID, SKEW_ANGLE);
     }
 
     if (fingerPerms == null) {
@@ -206,21 +206,21 @@ public class FingerSearcher
 
     // Finger 2 -- penalty if not on a chord row
     if (finger2 != -1) {
-      if (combo.board.isSingleBassRow(combo.pos[finger2].row)) {
+      if (combo.board.isSingleBassRow(combo.getPos(finger2).row)) {
         //heur += 10;
       }
     }
 
     // Finger 3 -- penalty if not on a bass row
     if (finger3 != -1) {
-      if (!combo.board.isSingleBassRow(combo.pos[finger3].row)) {
+      if (!combo.board.isSingleBassRow(combo.getPos(finger3).row)) {
         //heur += 10;
       }
     }
 
     // Finger 4 -- penalty if not on a bass row
     if (finger4 != -1) {
-      if (!combo.board.isSingleBassRow(combo.pos[finger4].row)) {
+      if (!combo.board.isSingleBassRow(combo.getPos(finger4).row)) {
         heur += 10;
       }
     }

@@ -69,8 +69,13 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     seqTablePanel.initChordPicker(tabChordPicker);
     seqTablePanel.initTextParser(tabSeqEditor);
     tabOptions.setSeqColModel(seqTablePanel.columnModel);
-    tabPitchDetect.setSeqColModel(seqTablePanel.columnModel);
-    checkPitchDetectPermissions();
+
+    if (checkPitchDetectPermissions()) {
+      tabPitchDetect.setSeqColModel(seqTablePanel.columnModel);
+    }
+    
+    tabButtonClicker.setSeqColModel(seqTablePanel.columnModel);
+    
 
     //initModeSelector();
 
@@ -87,7 +92,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
 
-    this.boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
+    boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
 
     // Add Default Chord!
     seqTablePanel.columnModel.addColumn(0);
@@ -338,6 +343,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     tabSeqEditor = new render.TabSeqEditor();
     tabOptions = new render.TabOptions();
     tabPitchDetect = new render.TabPitchDetect();
+    tabButtonClicker = new render.TabButtonClicker();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.7");
@@ -370,6 +376,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     toolTabs.addTab("Full Sequence Editor", tabSeqEditor);
     toolTabs.addTab("Options", tabOptions);
     toolTabs.addTab("Pitch Detector", tabPitchDetect);
+    toolTabs.addTab("Button Clicker", tabButtonClicker);
 
     controlSplitPane.setLeftComponent(toolTabs);
 
@@ -384,6 +391,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private render.RenderBoardHeader renderBoardHeader;
   private javax.swing.JScrollPane renderBoardScrollPane;
   private render.SeqTablePanel seqTablePanel;
+  private render.TabButtonClicker tabButtonClicker;
   private render.TabChordPicker tabChordPicker;
   private render.TabOptions tabOptions;
   private render.TabPitchDetect tabPitchDetect;

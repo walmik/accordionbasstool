@@ -26,13 +26,8 @@ public class BoardSearcher
 
       long start = (debugOut ? System.currentTimeMillis() : 0);
 
-      if (chord.isSingleNote()) {
-        // Optimized search for notes only
-        //combo = findAllNotes(board, chord.notes[0]);
-        combo = findAllIter(board, chord);
-      } else {
-        combo = findAllIter(board, chord);
-      }
+      // Iterate over all combinations of buttons
+      combo = findAllIter(board, chord);
 
       if (debugOut) {
         long end = System.currentTimeMillis();

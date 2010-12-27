@@ -7,9 +7,9 @@ import java.util.BitSet;
 
 public class ButtonCombo
 {
-
-  final BassBoard.Pos[] pos;
+  final private BassBoard.Pos[] pos;
   final BassBoard board;
+
   private Chord.Mask chordMask = null;
   int boardDim = 0;
   GeoPos center;
@@ -51,14 +51,14 @@ public class ButtonCombo
     }
   }
 
-  ButtonCombo(BassBoard.Pos singlePos, BassBoard board)
+  public ButtonCombo(BassBoard.Pos singlePos, BassBoard board)
   {
     this.board = board;
     pos = new BassBoard.Pos[1];
     pos[0] = singlePos;
   }
 
-  ButtonCombo(BassBoard.Pos[] newPos, BassBoard board)
+  public ButtonCombo(BassBoard.Pos[] newPos, BassBoard board)
   {
     this.board = board;
     pos = newPos;
@@ -82,6 +82,11 @@ public class ButtonCombo
     return board.getChordName(pos[index], html);
   }
 
+  public BassBoard getBoard()
+  {
+    return board;
+  }
+
   public String toButtonListingString(boolean html)
   {
     String str = "";
@@ -97,6 +102,25 @@ public class ButtonCombo
     }
 
     return str;
+  }
+
+  public BassBoard.Pos getPos(int index)
+  {
+    return pos[index];
+  }
+
+  void setPos(int index, BassBoard.Pos newPos)
+  {
+    this.hash = null;
+    this.heur = 0;
+    this.lowestNote = null;
+    this.boardDim = 0;
+    pos[index] = newPos;
+  }
+
+  public int getLength()
+  {
+    return pos.length;
   }
 
 //  public String toChordVoicingString(BassBoard board)

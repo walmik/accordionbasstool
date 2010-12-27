@@ -26,8 +26,6 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
   final static long serialVersionUID = 1;
 
-
-
   public RenderBassBoard()
   {
     this(BassBoard.bassBoard32());
@@ -50,28 +48,43 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     this._isHoriz = RenderBoardUI.defaultUI._isHoriz;
     this._slantAngle = RenderBoardUI.defaultUI._defaultSlantAngle;
 
-    this.addMouseListener(new MouseHandler());
-    this.addMouseMotionListener(new MouseHandler());
     ToolTipManager.sharedInstance().registerComponent(this);
 
     int borderMargin = RenderBoardUI.defaultUI.buttonXMargin + borderWidth / 2;
     this._borderInsets = new Insets(borderMargin, borderMargin, borderMargin, borderMargin);
   }
-
   Dimension margin = new Dimension();
   int borderWidth = 16;
   Dimension _contentDim = new Dimension(0, 0);
   Insets _borderInsets = null;
   BassBoard.Pos clickPos = null;
 
-  class MouseHandler extends MouseAdapter
+  public void toggleMouseClickHilite(boolean on)
   {
+    if (on) {
+      this.addMouseListener(new MouseHandler(this));
+      this.addMouseMotionListener(new MouseHandler(this));
+    } else {
+      this.removeMouseListener(new MouseHandler(this));
+      this.removeMouseMotionListener(new MouseHandler(this));
+    }
+  }
+
+  public static class MouseHandler extends MouseAdapter
+  {
+
+    RenderBassBoard renderBoard;
+
+    MouseHandler(RenderBassBoard board)
+    {
+      this.renderBoard = board;
+    }
 
     @Override
     public void mousePressed(MouseEvent e)
     {
       // TODO Auto-generated method stub
-      clickPos = hitTest(e.getX(), e.getY());
+      renderBoard.setClickPos(e);
 
       // Debug Stuff
       //int value = _theBoard.getChordAt(clickPos).getChordMask().getValue();
@@ -79,21 +92,21 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
       //int abc = ((1 << (Note.NUM_HALFSTEPS - lowestBit)) - 1) << lowestBit;
       //System.out.println(Integer.toBinaryString(abc));
 
-      repaint();
+      renderBoard.repaint();
     }
 
     @Override
     public void mouseDragged(MouseEvent e)
     {
-      clickPos = hitTest(e.getX(), e.getY());
-      repaint();
+      renderBoard.setClickPos(e);
+      renderBoard.repaint();
     }
 
     @Override
     public void mouseReleased(MouseEvent e)
     {
-      clickPos = null;
-      repaint();
+      renderBoard.clearClickPos();
+      renderBoard.repaint();
     }
   }
 
@@ -175,6 +188,21 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
   public boolean isHorizontal()
   {
     return _isHoriz;
+  }
+
+  public void setClickPos(MouseEvent e)
+  {
+    clickPos = hitTest(e);
+  }
+
+  public void clearClickPos()
+  {
+    clickPos = null;
+  }
+
+  public BassBoard.Pos hitTest(MouseEvent e)
+  {
+    return hitTest(e.getX(), e.getY());
   }
 
   public BassBoard.Pos hitTest(int x, int y)
@@ -393,7 +421,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
         String textStr = null;
         int finger = -1;
-        
+
         if (pressed) {
           finger = _selCombo.getFingerAt(realRow, realCol);
           if (finger >= 0) {

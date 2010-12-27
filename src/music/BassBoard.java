@@ -27,6 +27,21 @@ public class BassBoard
       col = c;
     }
 
+    @Override
+    public boolean equals(Object o)
+    {
+      if (o == null) {
+        return false;
+      }
+
+      if (!(o instanceof Pos)) {
+        return false;
+      }
+
+      Pos p = (Pos)o;
+      return (row == p.row) && (col == p.col);
+    }
+
     public boolean equals(int r, int c)
     {
       return (row == r) && (col == c);

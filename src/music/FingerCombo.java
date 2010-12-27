@@ -28,8 +28,8 @@ public class FingerCombo
 
   public int getFingerAt(int row, int col)
   {
-    for (int i = 0; i < buttoncombo.pos.length; i++) {
-      if (buttoncombo.pos[i].equals(row, col)) {
+    for (int i = 0; i < buttoncombo.getLength(); i++) {
+      if (buttoncombo.getPos(i).equals(row, col)) {
         return toFinger(i);
       }
     }
