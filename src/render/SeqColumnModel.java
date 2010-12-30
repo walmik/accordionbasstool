@@ -14,8 +14,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 import music.BoardSearcher;
+import music.ButtonCombo;
 import music.ButtonComboSequence;
-import music.Chord;
 import music.ChordParser;
 import music.CollSequence;
 import music.FingerComboSequence;
@@ -37,9 +37,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
   private SeqRowHeaderData rowHeaderDataModel;
   private SeqDataModel dataModel;
   private ListSelectionModel rowSelModel;
-
   public boolean optFingerSearch = false;
-
   final static int DEFAULT_COL_WIDTH = 120;
 
   SeqColumnModel(RenderBassBoard rBoard, ListSelectionModel selM)
@@ -122,6 +120,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
   {
     this.tableColumns.clear();
     this.addColumn(0);
+    //this.selComboModel.setSelectionInterval(0, 0);
   }
 
   void removeSelectedColumn()
@@ -211,11 +210,17 @@ public class SeqColumnModel extends DefaultTableColumnModel
     return (ParsedChordDef) getColumn(index).getHeaderValue();
   }
 
-  Vector<Chord> getAllChords()
+  ParsedChordDef getSelectedChordDef()
   {
-    Vector<Chord> vec = new Vector<Chord>();
+    int index = getSelectedColumn();
+    return ((index >= 0) && (index < getColumnCount()) ? getChordDef(index) : null);
+  }
+
+  Vector<ParsedChordDef> getAllChords()
+  {
+    Vector<ParsedChordDef> vec = new Vector<ParsedChordDef>();
     for (int i = 0; i < getColumnCount(); i++) {
-      vec.add(getChordDef(i).chord);
+      vec.add(getChordDef(i));
     }
     return vec;
   }
@@ -336,15 +341,86 @@ public class SeqColumnModel extends DefaultTableColumnModel
       selComboModel.setSelectionInterval(0, 0);
     }
 
-    if ((rowSel >= dataModel.getRowCount()) || (rowSel < 0)) {
-      rowSel = 0;
-    }
-    rowSelModel.setSelectionInterval(rowSel, rowSel);
+    updateRowSel(rowSel);
   }
 
   public void recomputeSeqs()
   {
     computeSeqs(getSelectedColumn());
+  }
+
+  public void selPrefSeq()
+  {
+    int index = findRowForPrefSeq();
+
+    if (index >= 0) {
+      rowSelModel.setSelectionInterval(index, index);
+    }
+  }
+
+  private void updateRowSel(int prevRow)
+  {
+    int index = findRowForPrefSeq();
+
+    if (index < 0) {
+      index = prevRow;
+    }
+
+    if ((index >= dataModel.getRowCount()) || (index < 0)) {
+      index = 0;
+    }
+
+    rowSelModel.setSelectionInterval(index, index);
+  }
+
+  public void clearPrefSeq()
+  {
+    for (int col = 0; col < this.getColumnCount(); col++) {
+      this.getChordDef(col).setPrefCombo(null);
+    }
+  }
+
+  private int findRowForPrefSeq()
+  {
+    boolean hasPrefCombo = false;
+
+    for (int row = 0; row < allComboSeqs.length; row++) {
+
+      boolean rowMatches = true;
+
+      if (allComboSeqs[row].getNumCombos() < this.getColumnCount()) {
+        continue;
+      }
+
+      for (int col = 0; col < this.getColumnCount(); col++) {
+
+        ButtonCombo matchCombo = this.getChordDef(col).getPrefCombo();
+
+        if (matchCombo == null) {
+          continue;
+        }
+
+        hasPrefCombo = true;
+
+        if (!allComboSeqs[row].getCombo(col).equals(matchCombo)) {
+          rowMatches = false;
+        }
+      }
+
+      if (!hasPrefCombo) {
+        return -1;
+      }
+
+      if (rowMatches) {
+        //rowSelModel.setSelectionInterval(row, row);
+        return row;
+      }
+    }
+
+    //rowSelModel.clearSelection();
+
+    //rowSelModel.setSelectionInterval(-1, -1);
+    return -1;
   }
 
   class SeqDataModel extends AbstractTableModel
@@ -481,6 +557,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
 
   static class TableEventAdapter implements TableColumnModelListener, TableModelListener
   {
+
     @Override
     public void columnAdded(TableColumnModelEvent e)
     {
@@ -510,13 +587,11 @@ public class SeqColumnModel extends DefaultTableColumnModel
 
     public void columnCountChanged(TableColumnModelEvent e)
     {
-
     }
 
     @Override
     public void tableChanged(TableModelEvent e)
     {
-
     }
   }
 }

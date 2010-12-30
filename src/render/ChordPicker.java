@@ -274,7 +274,7 @@ public class ChordPicker extends javax.swing.JPanel
 
   public void setRelChord(RelChord newRelChord)
   {
-    relChord = newRelChord;
+    relChord = (RelChord) newRelChord.clone();
 
     for (int i = 0; i < stepChangers.length; i++) {
       NoteDegreeType step = relChord.getStep(i);

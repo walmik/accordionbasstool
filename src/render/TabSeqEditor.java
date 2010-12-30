@@ -83,7 +83,7 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
       return;
     }
 
-    if (isVisible() && (columnModel != null)) {
+    if ((columnModel != null)) {
       String text = columnModel.toString();
 
       isUpdating = true;

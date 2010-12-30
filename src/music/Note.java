@@ -50,7 +50,7 @@ public class Note
 
   final ScaleNote note;
   final short sharpsOrFlats;
-  short octaveBit = 0;
+  boolean isBass = false;
 
   //Default note is C
   public Note()
@@ -64,6 +64,11 @@ public class Note
     sharpsOrFlats = (short) sof;
   }
 
+  Note duplicate()
+  {
+    return new Note(this.note, this.sharpsOrFlats);
+  }
+
   private int halfStepValue()
   {
     return note.halfStep + sharpsOrFlats;
@@ -74,6 +79,15 @@ public class Note
     return posmod(halfStepValue(), NUM_HALFSTEPS);
   }
 
+  public int getChordBitValue()
+  {
+    int bit = value();
+    if (!isBass) {
+      bit += NUM_HALFSTEPS;
+    }
+    return bit;
+  }
+  
   public int getSharpOrFlat()
   {
     return sharpsOrFlats;
@@ -131,7 +145,8 @@ public class Note
 
   public boolean isBassNote()
   {
-    return Chord.Mask.isLowerOctaveBit(this.octaveBit);
+    //return (octaveBit >= 0 && Chord.Mask.isLowerOctaveBit(this.octaveBit));
+    return isBass;
   }
 
   static String printNote(ScaleNote note, int sharpsOrFlats, boolean html)

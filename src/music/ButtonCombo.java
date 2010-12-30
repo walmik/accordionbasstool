@@ -10,13 +10,14 @@ public class ButtonCombo
   final private BassBoard.Pos[] pos;
   final BassBoard board;
 
-  private Chord.Mask chordMask = null;
+  private Chord.Mask allChordsMask = null;
   int boardDim = 0;
   GeoPos center;
   int heur = 0;
   Hash hash;
   GeoPos boundsMin, boundsMax;
   private Note lowestNote;
+  boolean preferred = false;
 
   class Hash
   {
@@ -48,6 +49,11 @@ public class ButtonCombo
     boolean contains(int row, int col)
     {
       return bitset.get((row * board.getNumCols()) + col);
+    }
+
+    public boolean equals(Hash hash)
+    {
+      return bitset.equals(hash.bitset);
     }
   }
 
@@ -104,9 +110,24 @@ public class ButtonCombo
     return str;
   }
 
+  public boolean isPreferred()
+  {
+    return this.preferred;
+  }
+
+  public void setPreferred(boolean b)
+  {
+    preferred = b;
+  }
+
   public BassBoard.Pos getPos(int index)
   {
     return pos[index];
+  }
+
+  public BassBoard.Pos[] getAllPos()
+  {
+    return pos;
   }
 
   void setPos(int index, BassBoard.Pos newPos)
@@ -279,17 +300,16 @@ public class ButtonCombo
     //Using hash version
     return getHash().contains(row, col);
   }
-  static Note[] sortedNotes = new Note[Note.NUM_HALFSTEPS * 2];
+  
+  public final static Note[] sortedNotes = new Note[Note.NUM_HALFSTEPS * 2];
 
   private void sortNotes()
   {
-    chordMask = new Chord.Mask();
+    allChordsMask = new Chord.Mask();
 
     for (int i = 0; i < pos.length; i++) {
       Chord theChord = board.getChordAt(pos[i]);
-      chordMask.concatMe(theChord.getChordMask());
-
-      Chord.Mask.sortNotesFromMask(theChord, sortedNotes);
+      allChordsMask.sortChordNotes(theChord, sortedNotes);
     }
   }
 
@@ -338,12 +358,27 @@ public class ButtonCombo
     return str;
   }
 
-  public int getChordMaskValue()
+  public Chord.Mask getChordMask()
   {
-    if (this.chordMask == null) {
+    if (this.allChordsMask == null) {
       sortNotes();
     }
 
-    return chordMask.getValue();
+    return allChordsMask;
+  }
+
+  @Override
+  public boolean equals(Object object)
+  {
+    return equals((ButtonCombo)object);
+  }
+
+  public boolean equals(ButtonCombo combo)
+  {
+    if (combo == null) {
+      return false;
+    }
+    
+    return (getHash().equals(combo.getHash()));
   }
 }

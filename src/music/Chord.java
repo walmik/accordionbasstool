@@ -27,33 +27,44 @@ public class Chord
       value = 0;
 
       for (int i = 0; i < chord.notes.length; i++) {
-        value = noteToMask(chord.notes[i], value);
+        noteToMask(chord.notes[i]);
       }
     }
 
-    static int noteToMask(Note note, int value)
+    private int noteToMask(Note note)
     {
       int bit = toUpperOctaveBit(note);
       if ((value & (1 << bit)) != 0) {
         bit = toLowerOctaveBit(bit);
+        note.isBass = true;
+      } else {
+        note.isBass = false;
       }
-      note.octaveBit = (short) bit;
+      //assert ((note.octaveBit == -1) || (note.octaveBit == bit));
+      //note.octaveBit = (short) bit;
       value |= (1 << bit);
       return value;
     }
 
-    public static void sortNotesFromMask(Chord chord, Note[] sortArray)
+    void sortChordNotes(Chord chord, Note[] sortArray)
     {
       // Highest bit in the byte is the lowest note
-      int value = 0;
+      chord.getChordMask(); //must create chord mask to determine bass notes
 
       for (int i = 0; i < chord.notes.length; i++) {
-        value = noteToMask(chord.notes[i], value);
+        Note note = chord.notes[i];
 
-        sortArray[chord.notes[i].octaveBit] = chord.notes[i];
+        int bit = note.getChordBitValue();
+
+        if (sortArray[bit] != null) {
+          assert(sortArray[bit].equals(note));
+          continue; //discard note, its a dup
+        }
+        
+        value |= (1 << bit);
+
+        sortArray[bit] = chord.notes[i];
       }
-
-      chord.mask = new Mask(value);
     }
 
     final static private int toUpperOctaveBit(Note note)
@@ -61,7 +72,12 @@ public class Chord
       return (note.value() + Note.NUM_HALFSTEPS);
     }
 
-    final static private int toLowerOctaveBit(int upperbit)
+    final static int toUpperOctaveBit(int lowerbit)
+    {
+      return (lowerbit + Note.NUM_HALFSTEPS);
+    }
+
+    final static int toLowerOctaveBit(int upperbit)
     {
       return (upperbit - Note.NUM_HALFSTEPS);
     }
@@ -75,17 +91,17 @@ public class Chord
 //    {
 //      return (1 << note.value());
 //    }
-    static boolean contains(int a, int b)
+    public static boolean contains(int a, int b)
     {
       return (a | b) == a;
     }
 
-    boolean contains(Mask otherMask)
+    public boolean contains(Mask otherMask)
     {
       return contains(value, otherMask.value);
     }
 
-    boolean contains(int bit)
+    public boolean contains(int bit)
     {
       return ((value & (1 << bit)) != 0);
     }
@@ -95,6 +111,11 @@ public class Chord
 //			int stripLowRegMask = otherMask.value % (1 << Note.NUM_HALFSTEPS);
 //			return contains(value, stripLowRegMask);
 //		}
+    boolean equals(int maskValue)
+    {
+      return (value == maskValue);
+    }
+
     boolean equals(Mask otherMask)
     {
       return (value == otherMask.value);
@@ -103,6 +124,20 @@ public class Chord
     boolean equals(Chord otherChord)
     {
       return equals(otherChord.getChordMask());
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+      if (obj instanceof Mask) {
+        return equals((Mask) obj);
+      }
+
+      if (obj instanceof Chord) {
+        return equals((Chord) obj);
+      }
+
+      return false;
     }
 
     Mask concat(Mask otherMask)
@@ -123,7 +158,7 @@ public class Chord
     public boolean hasLowerOctave()
     {
       //return (value >> Note.NUM_HALFSTEPS) != 0;
-      return (value & ((1 << Note.NUM_HALFSTEPS) - 1)) != 0;
+      return getLowerValue() != 0;
     }
 
     void unmaskRegister(Mask otherMask)
@@ -152,6 +187,16 @@ public class Chord
     public int getValue()
     {
       return value;
+    }
+
+    public int getLowerValue()
+    {
+      return (value & ((1 << Note.NUM_HALFSTEPS) - 1));
+    }
+
+    public int getUpperValue()
+    {
+      return (value & (((1 << Note.NUM_HALFSTEPS) - 1) << Note.NUM_HALFSTEPS));
     }
   }
   protected Mask mask;
@@ -203,8 +248,10 @@ public class Chord
 
   private void initBassNote(Note singleN, int count)
   {
-    for (int i = 0; i < count; i++) {
-      notes[i] = singleN;
+    notes[0] = singleN;
+
+    for (int i = 1; i < count; i++) {
+      notes[i] = singleN.duplicate();
     }
   }
 
@@ -264,8 +311,7 @@ public class Chord
   public Chord getUndupedChord()
   {
     Vector<Note> newNotes = new Vector<Note>();
-    for (int i = 0; i < notes.length; i++)
-    {
+    for (int i = 0; i < notes.length; i++) {
       if (!newNotes.contains(notes[i])) {
         newNotes.add(notes[i]);
       }

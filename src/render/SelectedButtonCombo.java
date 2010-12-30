@@ -4,13 +4,17 @@ package render;
 import javax.swing.DefaultListSelectionModel;
 import music.ButtonCombo;
 import music.ButtonComboSequence;
+import music.Chord;
 import music.FingerComboSequence;
 
 public class SelectedButtonCombo extends DefaultListSelectionModel
 {
   private static final long serialVersionUID = 1L;
+
   ButtonComboSequence _comboSeq = null;
   FingerComboSequence _fingerSeq = null;
+
+  //public boolean showEquivs = false;
 
   public int getFingerAt(int row, int col)
   {
@@ -29,6 +33,10 @@ public class SelectedButtonCombo extends DefaultListSelectionModel
 
   public boolean hasButtonInSeq(int row, int col)
   {
+//    if (showEquivs) {
+//      return hasButtonEquivToPressed(row, col);
+//    }
+
     if (_comboSeq == null) {
       return false;
     }
@@ -40,17 +48,23 @@ public class SelectedButtonCombo extends DefaultListSelectionModel
     return false;
   }
 
+  public boolean hasButtonEquivToPressed(int row, int col)
+  {
+    ButtonCombo currCombo = this.getSelectedButtonCombo();
+    if (currCombo == null) {
+      return false;
+    }
+
+    Chord buttonChord = currCombo.getBoard().getChordAt(row, col);
+
+    return currCombo.getChordMask().contains(buttonChord.getChordMask());
+  }
+
   public boolean hasButtonPressed(int row, int col)
   {
-    int currIndex = this.getAnchorSelectionIndex();
-    if ((currIndex < 0) || (_comboSeq == null)) {
-      return false; //none selected
-    }
-    if (currIndex < _comboSeq.getNumCombos()) {
-      // return if button is in the currently selected combo seq
-      return _comboSeq.getCombo(currIndex).hasButton(row, col);
-    }
-    return false;
+    ButtonCombo currCombo = this.getSelectedButtonCombo();
+
+    return (currCombo != null ? currCombo.hasButton(row, col) : false);
   }
 
   public void setButtonComboSeq(ButtonComboSequence seq)
@@ -67,6 +81,21 @@ public class SelectedButtonCombo extends DefaultListSelectionModel
     _fingerSeq = null;
     this.setSelectionInterval(0, 0);
     this.fireValueChanged(getAnchorSelectionIndex(), getAnchorSelectionIndex());
+  }
+
+  public ButtonCombo getSelectedButtonCombo()
+  {
+    if (_comboSeq == null) {
+      return null;
+    }
+
+    int index = getAnchorSelectionIndex();
+
+    if ((index < 0) || (index >= _comboSeq.getNumCombos())) {
+      return null;
+    }
+
+    return _comboSeq.getCombo(index);
   }
 
   public void setFingerComboSeq(FingerComboSequence seq)

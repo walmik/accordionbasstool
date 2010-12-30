@@ -4,6 +4,7 @@
  */
 package music;
 
+import java.util.Vector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -183,42 +184,149 @@ public class ChordRegistry
 
     return null;
   }
-//  public ChordGroupSet findChordSet(String chordSetName)
-//  {
-//    if (allSets == null)
-//      return null;
-//
-//    for (ChordGroupSet set : allSets) {
-//      if (set.name.equals(chordSetName)) {
-//        return set;
-//      }
-//    }
-//
-//    return null;
-//  }
-//
-//  public RegistryChordDef findChord(String chordSetName, StringParser parser)
-//  {
-//    ChordGroupSet chordSet = findChordSet(chordSetName);
-//
-//    if (chordSet != null) {
-//      return chordSet.findChord(parser);
-//    } else {
-//      return null;
-//    }
-//  }
-//
-//  public RegistryChordDef getDefaultChordDef()
-//  {
-//    if (allSets.length == 0)
-//      return null;
-//
-//    if (allSets[0].groupedChordDefs.length == 0)
-//      return null;
-//
-//    if (allSets[0].groupedChordDefs[0].length == 0)
-//      return null;
-//
-//    return allSets[0].groupedChordDefs[0][0];
-//  }
+
+  public Vector<ParsedChordDef> findChordFromButtonCombo(ButtonCombo combo, boolean allowInversion)
+  {
+    // Create an array of masks with one note removed, to find chords with an added bass
+    // Eg. C E G D, first search for exact match
+    // Create submasks for D E G, C E G, C D G, C D E
+    // This allows us to find CM = C E G
+
+    Chord.Mask mask = combo.getChordMask();
+    Note[] fullNotelist = ButtonCombo.sortedNotes;
+
+    int upperMaskOrig = mask.getUpperValue();
+    int upperMasks[] = new int[Note.NUM_HALFSTEPS];
+    int numUpperMasks = 0;
+
+    // Set the first entry to full mask
+    //upperMasks[numUpperMasks++] = upperMaskOrig;
+
+    for (int i = 0; i < Note.NUM_HALFSTEPS; i++) {
+      if (mask.contains(i)) {
+        upperMasks[numUpperMasks++] = (upperMaskOrig & ~(1 << Chord.Mask.toUpperOctaveBit(i)));
+      }
+    }
+
+    Vector<ParsedChordDef> possChordDefs = new Vector<ParsedChordDef>();
+
+    for (int n = Note.NUM_HALFSTEPS; n < fullNotelist.length; n++) {
+
+      Note note = fullNotelist[n];
+
+      if (note == null) {
+        continue;
+      }
+
+      RelChord matchedRelChord = null;
+      int matchedMask = 0;
+
+      // First Pass, find exact mask
+      for (int i = 0; i < allChordDefs.length; i++) {
+        if (allChordDefs[i].getSimpleChordAt(note).getChordMask().equals(upperMaskOrig)) {
+          matchedRelChord = allChordDefs[i].relChord;
+          matchedMask = upperMaskOrig;
+          break;
+        }
+      }
+
+
+      // Second Pass, try to match to one of the submasks with each note removed
+
+      if (matchedRelChord == null) {
+        for (int i = 0; i < allChordDefs.length; i++) {
+          for (int j = 0; j < numUpperMasks; j++) {
+            if (allChordDefs[i].getSimpleChordAt(note).getChordMask().equals(upperMasks[j])) {
+              matchedRelChord = allChordDefs[i].relChord;
+              matchedMask = upperMasks[j];
+              break;
+            }
+          }
+          if (matchedRelChord != null) {
+            break;
+          }
+        }
+      }
+
+      // If no registry chord found, just create a new chord
+      if (matchedRelChord == null) {
+        possChordDefs.add(getRotatedChordDef(fullNotelist, n, combo));
+        continue;
+      }
+
+      // See if it's a simple chord with only one bass note added, otherwise
+      // not a match
+
+      //If matched a partial mask, than the difference must be a bass note!
+      int bassNoteToMatch = upperMaskOrig & ~matchedMask;
+
+      Note additionalBass = null;
+      boolean validForm = true;
+
+      int matchedChordCount = 0; // Number of matched chords for sorting
+
+      for (int i = 0; i < Note.NUM_HALFSTEPS; i++) {
+        if (fullNotelist[i] == null) {
+          continue;
+        }
+
+        assert (fullNotelist[i].isBassNote() == true);
+
+        if (additionalBass != null) {
+          validForm = false;
+          continue;
+        }
+
+        if (!mask.contains(i)) {
+          validForm = false;
+          continue;
+        }
+
+        additionalBass = fullNotelist[i];
+      }
+
+      if (!allowInversion && (bassNoteToMatch == 0)) {
+        additionalBass = null;
+      }
+
+      // Don't do additional bass for single note
+      if (matchedRelChord.getOrigDef().ivals.length == 0) {
+        additionalBass = null;
+      }
+
+      if (!validForm) {
+        additionalBass = null;
+      }
+
+      if (validForm || (bassNoteToMatch == 0)) {
+        ParsedChordDef newChordDef = 
+                new ParsedChordDef(note, additionalBass, matchedRelChord, ParsedChordDef.BassSetting.LowestBass);
+
+        newChordDef.setPrefCombo(combo);
+
+        possChordDefs.add(matchedChordCount++, newChordDef);
+
+      } else {
+        possChordDefs.add(getRotatedChordDef(fullNotelist, n, combo));
+      }
+    }
+
+    return possChordDefs;
+  }
+
+  private static ParsedChordDef getRotatedChordDef(Note[] fullNotelist, int n, ButtonCombo combo)
+  {
+    Vector<Note> validNotes = new Vector<Note>();
+
+    for (int i = 0; i < fullNotelist.length; i++) {
+      int currIndex = (i + n) % fullNotelist.length;
+      if (fullNotelist[currIndex] != null) {
+        validNotes.add(fullNotelist[currIndex]);
+      }
+    }
+
+    ParsedChordDef chordDef = new ParsedChordDef(new Chord(validNotes));
+    chordDef.setPrefCombo(combo);
+    return chordDef;
+  }
 }

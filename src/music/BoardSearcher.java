@@ -11,53 +11,84 @@ public class BoardSearcher
   final static int MAX_COMBOS = 400;
   final static boolean debugOut = false;
 
-  public ButtonComboSequence[] parseSequence(BassBoard board, Vector<Chord> chordSeq)
+  public ButtonComboSequence[] parseSequence(BassBoard board, Vector<ParsedChordDef> chordDefSeq)
   {
     LinkedList<ButtonComboSequence> currSeqs = new LinkedList<ButtonComboSequence>();
-    if (!chordSeq.isEmpty()) {
+
+    if (!chordDefSeq.isEmpty()) {
       currSeqs.add(new ButtonComboSequence(board));
     }
 
     LinkedList<ButtonComboSequence> nextSeqs = new LinkedList<ButtonComboSequence>();
 
-    for (Chord chord : chordSeq) {
+    ButtonComboSequence bestPref = null;
 
-      LinkedList<ButtonCombo> combo = null;
+    for (ParsedChordDef def : chordDefSeq) {
+
+      LinkedList<ButtonCombo> combos = null;
 
       long start = (debugOut ? System.currentTimeMillis() : 0);
 
       // Iterate over all combinations of buttons
-      combo = findAllIter(board, chord);
+      combos = findAllIter(board, def.chord);
 
       if (debugOut) {
         long end = System.currentTimeMillis();
         System.out.println("Elapsed: " + (end - start));
       }
 
+      // Add the preferred combo if any
+      ButtonCombo prefCombo = def.getPrefCombo();
 
-      if (combo == null) {
+      if (prefCombo != null) {
+        if (prefCombo.getBoard() != board) {
+          def.setPrefCombo(null);
+          prefCombo.preferred = false;
+          prefCombo = null;
+        } else {
+          for (ButtonCombo curr : combos) {
+            if (curr.equals(def.getPrefCombo())) {
+              curr.preferred = true;
+              prefCombo = null;
+            }
+          }
+        }
+        
+        if (prefCombo != null) {
+          combos.addLast(prefCombo);
+        }
+      }
+
+
+      if (combos == null) {
         //TODO handle null case?
         continue;
       }
 
       if (debugOut) {
-        System.out.println("Combos " + combo.size());
+        System.out.println("Combos " + combos.size());
       }
 
       // Iterate over curr seqs
 
       for (ButtonComboSequence origSeq : currSeqs) {
 
-        for (ButtonCombo curr : combo) {
+        for (ButtonCombo curr : combos) {
           ButtonComboSequence seq;
 
-          if (curr == combo.getLast()) {
+          if (curr == combos.getLast()) {
             seq = origSeq;
           } else {
             seq = origSeq.clone();
           }
 
           seq.add(curr);
+
+          if (seq.getPrefRank() > 0) {
+            if ((bestPref == null) || (seq.getPrefRank() > bestPref.getPrefRank())) {
+              bestPref = seq;
+            }
+          }
 
           sortedInsert(nextSeqs, seq, MAX_SEQS);
         }
@@ -68,6 +99,12 @@ public class BoardSearcher
       currSeqs = nextSeqs;
       nextSeqs = temp;
       nextSeqs.clear();
+    }
+
+    if (bestPref != null) {
+      if (!currSeqs.contains(bestPref)) {
+        currSeqs.addLast(bestPref);
+      }
     }
 
     ButtonComboSequence[] seqArray = new ButtonComboSequence[currSeqs.size()];
@@ -276,7 +313,7 @@ public class BoardSearcher
           }
 
           if (ignoreAllBassCombos) {
-            boolean isBassOnly = newCombo.isUsingBassOnly();
+            boolean isBassOnly = newCombo.isUsingBassOnly() && (newCombo.getLength() > 1);
             if (chordComboFound && isBassOnly) {
               continue;
             }
@@ -308,8 +345,7 @@ public class BoardSearcher
     return combos;
   }
 
-  public static <T extends CollSequence>
-          boolean sortedInsert(LinkedList<T> nextSeqs, T newSeq, int maxSeqs)
+  public static <T extends CollSequence> boolean sortedInsert(LinkedList<T> nextSeqs, T newSeq, int maxSeqs)
   {
     boolean inserted = false;
 

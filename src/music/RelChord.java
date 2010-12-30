@@ -68,14 +68,23 @@ public class RelChord implements Cloneable
 
   public RelChord(Chord chord)
   {
-    if (chord.getNumNotes() == 0) {
+    this(chord.notes, 0, chord.notes.length);
+  }
+
+  public RelChord(Note[] notes, int offset, int length)
+  {
+    if (notes.length == 0) {
       return;
     }
 
-    Note root = chord.notes[0];
+    Note root = notes[offset];
 
-    for (int i = 1; i < chord.notes.length; i++) {
-      Note note = chord.notes[i];
+    for (int i = 1; i < length; i++) {
+      Note note = notes[(i + offset) % length + (notes.length - length)];
+
+      if (note == null) {
+        continue;
+      }
 
       Interval ival = note.diff(root);
       int matchScaleDist = ival.getNormScaleDist();
@@ -259,6 +268,10 @@ public class RelChord implements Cloneable
     //String str = base.toString() + " ";
     String str = "";
 
+    if (this.origDef != null) {
+      return origDef.toString();
+    }
+
     for (int i = 0; i < steps.length; i++) {
       int qual = indexToStep(i - 1);
 
@@ -266,11 +279,15 @@ public class RelChord implements Cloneable
         continue;
       }
 
+      if (!str.isEmpty()) {
+        str += sep;
+      }
+
       if (steps[i] != NoteDegreeType.Normal) {
         str += steps[i].label;
       }
-      
-      str += qual + sep;
+
+      str += qual;
     }
 
     return str;

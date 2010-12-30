@@ -702,6 +702,10 @@ public class SeqViewerController
         jcomp.setBackground((row % 2) == 0 ? defPlainColor1 : defPlainColor2);
         jcomp.setBorder(stdBorder);
       }
+
+//      if ((buttonCombo != null) && (buttonCombo.isPreferred())) {
+//        jcomp.setForeground(getForeground().darker());
+//      }
       jcomp.setFont(font);
 
       return jcomp;

@@ -129,11 +129,13 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
   public void setBassBoard(BassBoard newBoard)
   {
+    BassBoard oldBoard = _theBoard;
     _theBoard = newBoard;
     if (_theBoard != null) {
       _rows = _theBoard.getNumRows();
       _cols = _theBoard.getNumCols();
     }
+    this.firePropertyChange(BassBoard.class.getSimpleName(), oldBoard, newBoard);
   }
 
   public BassBoard getBassBoard()

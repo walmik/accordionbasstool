@@ -339,11 +339,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     controlSplitPane = new javax.swing.JSplitPane();
     seqTablePanel = new render.SeqTablePanel();
     toolTabs = new javax.swing.JTabbedPane();
+    tabButtonClicker = new render.TabButtonClicker();
     tabChordPicker = new render.TabChordPicker();
     tabSeqEditor = new render.TabSeqEditor();
     tabOptions = new render.TabOptions();
     tabPitchDetect = new render.TabPitchDetect();
-    tabButtonClicker = new render.TabButtonClicker();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.7");
@@ -372,11 +372,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     controlSplitPane.setOneTouchExpandable(true);
     controlSplitPane.setRightComponent(seqTablePanel);
 
+    toolTabs.addTab("Button Clicker", tabButtonClicker);
     toolTabs.addTab("Chord Picker", tabChordPicker);
     toolTabs.addTab("Full Sequence Editor", tabSeqEditor);
     toolTabs.addTab("Options", tabOptions);
     toolTabs.addTab("Pitch Detector", tabPitchDetect);
-    toolTabs.addTab("Button Clicker", tabButtonClicker);
 
     controlSplitPane.setLeftComponent(toolTabs);
 

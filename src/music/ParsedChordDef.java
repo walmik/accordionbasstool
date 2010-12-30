@@ -22,6 +22,8 @@ public class ParsedChordDef
   public String nameHtml;
   public String detail;
 
+  private ButtonCombo preferredCombo = null;
+
   public final Note rootNote;
   public final Note addedBassNote;
   public final Chord chord;
@@ -170,5 +172,40 @@ public class ParsedChordDef
     } else {
       return new ParsedChordDef(rootNote.add(ival), newAddedBass, this.relChord, this.bassSetting);
     }
+  }
+
+  public void setPrefCombo(ButtonCombo prefCombo)
+  {
+    if (this.preferredCombo != null) {
+      this.preferredCombo.preferred = false;
+    }
+    
+    this.preferredCombo = prefCombo;
+
+    if (this.preferredCombo != null) {
+      this.preferredCombo.preferred = true;
+    }
+  }
+
+  public ButtonCombo getPrefCombo()
+  {
+    return this.preferredCombo;
+  }
+
+  @Override
+  public String toString()
+  {
+    return this.namePlain;
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null) {
+      return false;
+    }
+
+    ParsedChordDef other = (ParsedChordDef)obj;
+    return other.toString().startsWith(toString());
   }
 }

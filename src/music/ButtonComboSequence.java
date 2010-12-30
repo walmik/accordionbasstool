@@ -12,6 +12,8 @@ public class ButtonComboSequence implements Cloneable, CollSequence<ButtonCombo>
 	// Cached heuristic of this combo seq
 	private int heur = 0;
 
+  private short preferredRank = 0;
+
   public int iconIndex;
 	
 	public ButtonComboSequence(BassBoard theBoard)
@@ -21,10 +23,11 @@ public class ButtonComboSequence implements Cloneable, CollSequence<ButtonCombo>
 	}
 	
 	private ButtonComboSequence(Vector<ButtonCombo> copyCombos,
-								BassBoard theBoard)
+								BassBoard theBoard, short prefRank)
 	{
 		combos = copyCombos;
 		board = theBoard;
+    preferredRank = prefRank;
 	}
 	
   @Override
@@ -48,6 +51,9 @@ public class ButtonComboSequence implements Cloneable, CollSequence<ButtonCombo>
 	{
 		combos.add(newCombo);
 		heur = 0;
+    if (newCombo.preferred) {
+      preferredRank++;
+    }
 	}
 
   @Override
@@ -75,10 +81,15 @@ public class ButtonComboSequence implements Cloneable, CollSequence<ButtonCombo>
 	public ButtonComboSequence clone()
 	{
 		ButtonComboSequence copy = 
-			new ButtonComboSequence((Vector<ButtonCombo>)combos.clone(), board);
+			new ButtonComboSequence((Vector<ButtonCombo>)combos.clone(), board, preferredRank);
 		
 		return copy;
 	}
+
+  public int getPrefRank()
+  {
+    return preferredRank;
+  }
 
   public int debugForceHeur()
   {
@@ -140,4 +151,26 @@ public class ButtonComboSequence implements Cloneable, CollSequence<ButtonCombo>
 		
 		return heur;
 	}
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    ButtonComboSequence seq = (ButtonComboSequence)obj;
+
+    if (getNumCombos() != seq.getNumCombos()) {
+      return false;
+    }
+
+    if (getHeur() != seq.getHeur()) {
+      return false;
+    }
+
+    for (int i = 0; i < combos.size(); i++) {
+      if (!combos.elementAt(i).equals(seq.combos.elementAt(i))) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
