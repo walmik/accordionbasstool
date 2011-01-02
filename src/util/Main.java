@@ -129,7 +129,7 @@ public class Main
 
   public static void verifyChordString(String input)
   {
-    String output = ChordParser.parse(new StringParser("[" + input + "]")).toString();
+    String output = ChordParser.parse(new StringParser("[" + input + "]"), false).toString();
 
     assert (output.equals(input)) : ("Parsing Test Fail - Input: "
             + input + " Output: " + output);

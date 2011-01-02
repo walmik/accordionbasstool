@@ -167,7 +167,7 @@ public class ParsedChordDef
       newAddedBass = addedBassNote.add(ival);
     }
 
-    if (relChord == null) {
+    if ((relChord == null) || (relChord.getOrigDef() == null)) {
       return new ParsedChordDef(chord.transposeBy(ival));
     } else {
       return new ParsedChordDef(rootNote.add(ival), newAddedBass, this.relChord, this.bassSetting);
@@ -178,12 +178,14 @@ public class ParsedChordDef
   {
     if (this.preferredCombo != null) {
       this.preferredCombo.preferred = false;
+      this.preferredCombo.extraneous = false;
     }
     
     this.preferredCombo = prefCombo;
 
     if (this.preferredCombo != null) {
       this.preferredCombo.preferred = true;
+      this.preferredCombo.extraneous = true;
     }
   }
 
@@ -207,5 +209,18 @@ public class ParsedChordDef
 
     ParsedChordDef other = (ParsedChordDef)obj;
     return other.toString().startsWith(toString());
+  }
+
+  public boolean equalForRecompute(ParsedChordDef other)
+  {
+    if (!chord.getChordMask().equals(other.chord.getChordMask())) {
+      return false;
+    }
+
+    if (this.preferredCombo != other.preferredCombo) {
+      return false;
+    }
+
+    return true;
   }
 }

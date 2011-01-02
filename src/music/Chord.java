@@ -49,7 +49,10 @@ public class Chord
     void sortChordNotes(Chord chord, Note[] sortArray)
     {
       // Highest bit in the byte is the lowest note
-      chord.getChordMask(); //must create chord mask to determine bass notes
+
+      if (chord.mask != this) { // if not the current chord's mask
+        chord.getChordMask(); //must create chord mask to determine bass notes
+      }
 
       for (int i = 0; i < chord.notes.length; i++) {
         Note note = chord.notes[i];

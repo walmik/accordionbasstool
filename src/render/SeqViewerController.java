@@ -74,7 +74,7 @@ public class SeqViewerController
 
     tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-    seqTable.setDefaultRenderer(CollSequence.class, new CellRenderer());
+    seqTable.setDefaultRenderer(CollSequence.class, new CellRenderer(seqTable));
 
     JTableHeader header = seqTable.getTableHeader();
     header.setResizingAllowed(true);
@@ -465,6 +465,13 @@ public class SeqViewerController
         String str = "#" + (index + 1);
         //str += " (" + heur + ")";
         this.setText(str);
+
+        if (seq.getExtraneous()) {
+          this.setForeground(Color.red);
+        } else {
+          this.setForeground(Color.black);
+        }
+        
       } else {
         this.setIcon(RenderBoardUI.defaultUI.optimalityIcons[RenderBoardUI.defaultUI.optimalityIcons.length - 1]);
         this.setText("None");
@@ -591,7 +598,7 @@ public class SeqViewerController
     }
   }
 
-  class CellRenderer extends DefaultTableCellRenderer
+  static class CellRenderer extends DefaultTableCellRenderer
   {
 
     Color defSelColor;
@@ -599,14 +606,20 @@ public class SeqViewerController
     Border highliteBorder;
     Border stdBorder;
     Font font;
+    JTable table;
 
-    CellRenderer()
+    CellRenderer(JTable theTable)
     {
+      table = theTable;
       initUI();
     }
 
     private void initUI()
     {
+      if (table == null) {
+        return;
+      }
+      
       highliteBorder = new CompoundBorder(
               new LineBorder(Color.black, 2),
               new EmptyBorder(2, 2, 2, 2));
@@ -614,7 +627,7 @@ public class SeqViewerController
       stdBorder = new EmptyBorder(4, 4, 4, 4);
       //stdBorder = BorderFactory.createMatteBorder(1, 1, 0, 0, Color.black);
 
-      defSelColor = super.getTableCellRendererComponent(seqTable, "", true, false, 0, 0).getBackground();
+      defSelColor = super.getTableCellRendererComponent(table, "", true, false, 0, 0).getBackground();
 
       defPlainColor1 = Color.white;//super.getTableCellRendererComponent(seqTable, "", false, false, 0, 0).getBackground();
       defPlainColor2 = UIManager.getColor("Table.alternateRowColor");
@@ -702,6 +715,7 @@ public class SeqViewerController
         jcomp.setBackground((row % 2) == 0 ? defPlainColor1 : defPlainColor2);
         jcomp.setBorder(stdBorder);
       }
+
 
 //      if ((buttonCombo != null) && (buttonCombo.isPreferred())) {
 //        jcomp.setForeground(getForeground().darker());

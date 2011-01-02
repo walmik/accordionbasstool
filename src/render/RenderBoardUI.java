@@ -59,6 +59,9 @@ public class RenderBoardUI
     
     UNSELECTED( Color.black, 1.f,     false),
     SELECTED(   Color.blue,           false),
+    
+    REDUNDS(    Color.gray,  0.75f,   true),
+    
     PRESSED_2(  Color.green, 1.f,     true),
     PRESSED_3(  Color.cyan,  1.f,     true),
     PRESSED_4(  Color.orange, 1.f,    true),
@@ -133,14 +136,21 @@ public class RenderBoardUI
 //    render3DButton(diamX, diamY, cylHeight, pressedIM.createGraphics(), Color.magenta, false, true);
   }
 
-  BoardButtonImage getBoardButtonImage(boolean pressed, boolean selected,
+  BoardButtonImage getBoardButtonImage(
+          boolean pressed,
+          boolean selected,
+          boolean redundant,
           int finger)
   {
-    if (!selected && !pressed) {
+    if (!selected && !pressed && !redundant) {
       return BoardButtonImage.UNSELECTED;
     }
 
-    if (!pressed) {
+    if (redundant && !pressed) {
+      return BoardButtonImage.REDUNDS;
+    }
+
+    if (selected && !pressed) {
       return BoardButtonImage.SELECTED;
     }
 
@@ -177,7 +187,7 @@ public class RenderBoardUI
     abstract void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY);
 
     abstract void draw(Graphics2D graphics, int col, int row, 
-            boolean pressed, boolean selected, BoardButtonImage boardButton);
+            boolean selected, BoardButtonImage boardButton);
   }
 
   class IconButtonDrawer extends ButtonDrawer
@@ -217,7 +227,7 @@ public class RenderBoardUI
 
     @Override
     void draw(Graphics2D graphics, int col, int row, 
-              boolean pressed, boolean selected, BoardButtonImage boardButton)
+              boolean selected, BoardButtonImage boardButton)
     {
       if (boardButton == null) {
         return;
@@ -231,7 +241,7 @@ public class RenderBoardUI
 
       //graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.f));
       
-      if (pressed) {
+      if (boardButton.pressed) {
         //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         //graphics.drawImage(pressedIM, 0, 0, imWidth, imHeight, null);
         graphics.translate(0, _pressedCylOff);
@@ -259,7 +269,7 @@ public class RenderBoardUI
 
     @Override
     void draw(Graphics2D graphics, int col, int row,
-            boolean pressed, boolean selected, BoardButtonImage boardButton)
+            boolean selected, BoardButtonImage boardButton)
     {
       Color lighterFill = Color.LIGHT_GRAY;
       Color darkerFill = Color.GRAY;
@@ -267,7 +277,7 @@ public class RenderBoardUI
       if (selected) {
         //TODO: System Color
         //lighterFill = Color.MAGENTA;
-        if (pressed) {
+        if (boardButton.pressed) {
           lighterFill = Color.magenta;
           darkerFill = Color.magenta.darker();
         } else {
@@ -276,7 +286,7 @@ public class RenderBoardUI
         }
       }
 
-      if (pressed) {
+      if (boardButton.pressed) {
         // Draw Pressed
         graphics.translate(0, _pressedCylOff);
         graphics.setColor(darkerFill);
@@ -298,7 +308,7 @@ public class RenderBoardUI
 
     private FontMetrics _fm;
     private int _tX, _tY;
-    private int _textHeight;
+    //private int _textHeight;
     private Font _font = new Font("Default", Font.BOLD, 14);
 
     void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
@@ -307,15 +317,15 @@ public class RenderBoardUI
       graphics.setFont(_font);
       _fm = graphics.getFontMetrics();
       int textDescent = _fm.getDescent() + 1;
-      _textHeight = _fm.getHeight() - 4;
+      //_textHeight = _fm.getHeight() - 4;
 
       _tX = diamX / 2;
       _tY = diamY / 2 + textDescent;
     }
 
-    void draw(Graphics2D graphics, int col, int row, boolean pressed, String chordStr)
+    void draw(Graphics2D graphics, int col, int row, BoardButtonImage buttonImage, String chordStr)
     {
-      if (pressed) {
+      if (buttonImage.pressed) {
         graphics.setColor(SystemColor.textText);
       } else {
         graphics.setColor(SystemColor.textText);

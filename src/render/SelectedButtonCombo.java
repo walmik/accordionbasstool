@@ -14,7 +14,7 @@ public class SelectedButtonCombo extends DefaultListSelectionModel
   ButtonComboSequence _comboSeq = null;
   FingerComboSequence _fingerSeq = null;
 
-  //public boolean showEquivs = false;
+  public boolean showRedunds = false;
 
   public int getFingerAt(int row, int col)
   {
@@ -33,10 +33,6 @@ public class SelectedButtonCombo extends DefaultListSelectionModel
 
   public boolean hasButtonInSeq(int row, int col)
   {
-//    if (showEquivs) {
-//      return hasButtonEquivToPressed(row, col);
-//    }
-
     if (_comboSeq == null) {
       return false;
     }
@@ -50,6 +46,10 @@ public class SelectedButtonCombo extends DefaultListSelectionModel
 
   public boolean hasButtonEquivToPressed(int row, int col)
   {
+    if (!showRedunds) {
+      return false;
+    }
+    
     ButtonCombo currCombo = this.getSelectedButtonCombo();
     if (currCombo == null) {
       return false;

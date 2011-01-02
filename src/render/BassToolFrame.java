@@ -78,6 +78,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     
 
     //initModeSelector();
+//    toolTabs.remove(tabButtonClicker);
+//    toolTabs.remove(tabPitchDetect);
 
     renderBoardHeader.initBoardHeader(renderBassBoard, renderBoardScrollPane, seqTablePanel.columnModel);
 

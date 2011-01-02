@@ -2,7 +2,6 @@ package music;
 
 import java.util.Vector;
 
-
 public class ChordParser
 {
 
@@ -24,12 +23,12 @@ public class ChordParser
     return new Chord(notes.toArray(noteArray));
   }
 
-  public static Vector<ParsedChordDef> parseChords(StringParser parser)
+  public static Vector<ParsedChordDef> parseChords(StringParser parser, boolean removeDupNotes)
   {
     Vector<ParsedChordDef> chordVec = new Vector<ParsedChordDef>();
 
     while (!parser.isDone()) {
-      chordVec.add(parse(parser));
+      chordVec.add(parse(parser, removeDupNotes));
 
       parser.skipThrough(", -+");
     }
@@ -37,13 +36,16 @@ public class ChordParser
     return chordVec;
   }
 
-  public static ParsedChordDef parse(StringParser parser)
+  public static ParsedChordDef parse(StringParser parser, boolean removeDupNotes)
   {
     // If starting with [ then we have a list of notes
     // so parse them individually
     if (parser.input().startsWith("[")) {
       parser.incOffset(1);
       Chord chord = parseNoteList(parser);
+      if (removeDupNotes) {
+        chord = chord.getUndupedChord();
+      }
       if (parser.input().startsWith("]")) {
         parser.incOffset(1);
       }

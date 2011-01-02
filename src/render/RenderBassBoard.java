@@ -418,8 +418,15 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
         graphics2D.translate(xP, yP);
 
-        boolean pressed = (_selCombo != null && _selCombo.hasButtonPressed(realRow, realCol));
-        boolean selected = (_selCombo != null && _selCombo.hasButtonInSeq(realRow, realCol));
+        boolean pressed = false;
+        boolean selected = false;
+        boolean redundant = false;
+
+        if (_selCombo != null) {
+          pressed = _selCombo.hasButtonPressed(realRow, realCol);
+          selected = _selCombo.hasButtonInSeq(realRow, realCol);
+          redundant = _selCombo.hasButtonEquivToPressed(realRow, realCol);
+        }
 
         String textStr = null;
         int finger = -1;
@@ -439,11 +446,12 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
           pressed = true;
         }
 
-        RenderBoardUI.BoardButtonImage boardButton = RenderBoardUI.defaultUI.getBoardButtonImage(pressed, selected, finger);
+        RenderBoardUI.BoardButtonImage boardButton = 
+                RenderBoardUI.defaultUI.getBoardButtonImage(pressed, selected, redundant, finger);
 
         {
-          buttonDrawer.draw(graphics2D, realCol, realRow, pressed, selected, boardButton);
-          textDrawer.draw(graphics2D, realCol, realRow, pressed, textStr);
+          buttonDrawer.draw(graphics2D, realCol, realRow, selected, boardButton);
+          textDrawer.draw(graphics2D, realCol, realRow, boardButton, textStr);
         }
 
         cOff += _cInc;

@@ -120,6 +120,7 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
     computeButton = new javax.swing.JButton();
     comboRecent = new javax.swing.JComboBox();
     buttonClearRecent = new javax.swing.JButton();
+    checkAllowDups = new javax.swing.JCheckBox();
     transposePanel1 = new render.TransposePanel();
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Chord Sequence:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
@@ -132,7 +133,7 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
     });
 
     comboRecent.setEditable(true);
-    comboRecent.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
+    comboRecent.setFont(new java.awt.Font("Monospaced", 0, 18));
     comboRecent.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         comboRecentActionPerformed(evt);
@@ -146,6 +147,9 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
       }
     });
 
+    checkAllowDups.setSelected(true);
+    checkAllowDups.setText("Duplicate Note for Bass");
+
     javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
     jPanel1.setLayout(jPanel1Layout);
     jPanel1Layout.setHorizontalGroup(
@@ -154,13 +158,13 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
         .addContainerGap()
         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(jPanel1Layout.createSequentialGroup()
-            .addComponent(buttonClearRecent)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(computeButton)
-            .addGap(47, 47, 47))
-          .addGroup(jPanel1Layout.createSequentialGroup()
-            .addComponent(comboRecent, 0, 385, Short.MAX_VALUE)
-            .addContainerGap())))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(buttonClearRecent)
+            .addGap(35, 35, 35)
+            .addComponent(checkAllowDups))
+          .addComponent(comboRecent, 0, 416, Short.MAX_VALUE))
+        .addContainerGap())
     );
     jPanel1Layout.setVerticalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -168,8 +172,9 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
         .addComponent(comboRecent, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(buttonClearRecent)
           .addComponent(computeButton)
-          .addComponent(buttonClearRecent)))
+          .addComponent(checkAllowDups)))
     );
 
     transposePanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -211,12 +216,12 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
         }
       }
 
-      if (columnModel.toString().equals(text)) {
-        return;
-      }
+//      if (columnModel.toString().equals(text)) {
+//        return;
+//      }
 
       if (columnModel != null) {
-        columnModel.populateFromText(text);
+        columnModel.populateFromText(text, !checkAllowDups.isSelected());
       }
       seqTable.requestFocusInWindow();
 }//GEN-LAST:event_computeButtonActionPerformed
@@ -244,6 +249,7 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton buttonClearRecent;
+  private javax.swing.JCheckBox checkAllowDups;
   private javax.swing.JComboBox comboRecent;
   private javax.swing.JButton computeButton;
   private javax.swing.JPanel jPanel1;

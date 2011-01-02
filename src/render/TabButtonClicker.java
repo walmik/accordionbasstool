@@ -165,7 +165,7 @@ public class TabButtonClicker extends javax.swing.JPanel
       Vector<ParsedChordDef> filtered = new Vector<ParsedChordDef>();
 
       for (ParsedChordDef def : matches) {
-        if (def.relChord != null && def.relChord.getOrigDef() != null) {
+        if (def != null && def.relChord.getOrigDef() != null) {
           filtered.add(def);
         }
       }
@@ -335,8 +335,9 @@ public class TabButtonClicker extends javax.swing.JPanel
     checkShowUnknownChords = new javax.swing.JCheckBox();
     buttonSelPref = new javax.swing.JButton();
     checkIncludeInv = new javax.swing.JCheckBox();
+    checkHiliteRedunds = new javax.swing.JCheckBox();
 
-    clickedLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+    clickedLabel.setFont(new java.awt.Font("Tahoma", 0, 18));
     clickedLabel.setText("None");
     clickedLabel.setBorder(javax.swing.BorderFactory.createTitledBorder("Clicked Buttons:"));
 
@@ -357,7 +358,7 @@ public class TabButtonClicker extends javax.swing.JPanel
     });
     jScrollPane1.setViewportView(possChordList);
 
-    checkShowUnknownChords.setText("Show Unnamed Chords");
+    checkShowUnknownChords.setText("Show Unnamed Inversions");
     checkShowUnknownChords.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         checkShowUnknownChordsActionPerformed(evt);
@@ -378,6 +379,13 @@ public class TabButtonClicker extends javax.swing.JPanel
       }
     });
 
+    checkHiliteRedunds.setText("Hilite Redundant Buttons");
+    checkHiliteRedunds.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        checkHiliteRedundsActionPerformed(evt);
+      }
+    });
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
@@ -386,39 +394,44 @@ public class TabButtonClicker extends javax.swing.JPanel
         .addContainerGap()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
-            .addComponent(clickedLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
-            .addContainerGap())
-          .addGroup(layout.createSequentialGroup()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
               .addGroup(layout.createSequentialGroup()
                 .addComponent(buttonClear)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonSelPref))
               .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(checkShowUnknownChords)
-              .addComponent(checkIncludeInv))
-            .addGap(36, 36, 36))))
+              .addGroup(layout.createSequentialGroup()
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                  .addComponent(checkShowUnknownChords)
+                  .addComponent(checkIncludeInv))
+                .addGap(36, 36, 36))
+              .addGroup(layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addComponent(checkHiliteRedunds, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE))))
+          .addComponent(clickedLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE))
+        .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addContainerGap()
         .addComponent(clickedLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(buttonClear)
-          .addComponent(buttonSelPref))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+          .addComponent(buttonSelPref)
+          .addComponent(checkHiliteRedunds))
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
-            .addGap(27, 27, 27)
+            .addGap(38, 38, 38)
             .addComponent(checkShowUnknownChords)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(checkIncludeInv))
-          .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+          .addGroup(layout.createSequentialGroup()
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)))
+        .addContainerGap())
     );
   }// </editor-fold>//GEN-END:initComponents
 
@@ -462,9 +475,18 @@ public class TabButtonClicker extends javax.swing.JPanel
     this.updateComboAndListUI(true);
   }//GEN-LAST:event_checkIncludeInvActionPerformed
 
+  private void checkHiliteRedundsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkHiliteRedundsActionPerformed
+  {//GEN-HEADEREND:event_checkHiliteRedundsActionPerformed
+    if (columnModel != null) {
+      columnModel.selComboModel.showRedunds = this.checkHiliteRedunds.isSelected();
+      renderBoard.repaint();
+    }
+  }//GEN-LAST:event_checkHiliteRedundsActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton buttonClear;
   private javax.swing.JButton buttonSelPref;
+  private javax.swing.JCheckBox checkHiliteRedunds;
   private javax.swing.JCheckBox checkIncludeInv;
   private javax.swing.JCheckBox checkShowUnknownChords;
   private javax.swing.JLabel clickedLabel;

@@ -184,16 +184,51 @@ public class ChordRegistry
 
     return null;
   }
+  
+  public ParsedChordDef findFirstChordFromNotes(Chord chord)
+  {
+    Chord.Mask mask = new Chord.Mask();
+    Note[] sortArray = new Note[Note.NUM_HALFSTEPS * 2];
+    mask.sortChordNotes(chord, sortArray);
+
+    Vector<ParsedChordDef> parsedDefs = findChordFromNotes(sortArray, mask, true, false);
+
+    for (ParsedChordDef def : parsedDefs) {
+      if (def.rootNote.equals(chord.getRootNote())) {
+        return def;
+      }
+    }
+
+    return (parsedDefs.isEmpty() ? null : parsedDefs.firstElement());
+  }
 
   public Vector<ParsedChordDef> findChordFromButtonCombo(ButtonCombo combo, boolean allowInversion)
+  {
+    Chord.Mask mask = combo.getChordMask();
+    Note[] fullNotelist = ButtonCombo.sortedNotes;
+
+    Vector<ParsedChordDef> parsedDefs = findChordFromNotes(fullNotelist, mask, allowInversion, true);
+
+    for (ParsedChordDef def : parsedDefs) {
+      def.setPrefCombo(combo);
+    }
+
+    return parsedDefs;
+  }
+
+  public Vector<ParsedChordDef> findChordFromNotes(
+          Note[] fullNotelist,
+          Chord.Mask mask,
+          boolean allowInversion,
+          boolean includeUnknown)
   {
     // Create an array of masks with one note removed, to find chords with an added bass
     // Eg. C E G D, first search for exact match
     // Create submasks for D E G, C E G, C D G, C D E
     // This allows us to find CM = C E G
 
-    Chord.Mask mask = combo.getChordMask();
-    Note[] fullNotelist = ButtonCombo.sortedNotes;
+    //Chord.Mask mask = combo.getChordMask();
+    //Note[] fullNotelist = ButtonCombo.sortedNotes;
 
     int upperMaskOrig = mask.getUpperValue();
     int upperMasks[] = new int[Note.NUM_HALFSTEPS];
@@ -250,7 +285,9 @@ public class ChordRegistry
 
       // If no registry chord found, just create a new chord
       if (matchedRelChord == null) {
-        possChordDefs.add(getRotatedChordDef(fullNotelist, n, combo));
+        if (includeUnknown) {
+          possChordDefs.add(getRotatedChordDef(fullNotelist, n));
+        }
         continue;
       }
 
@@ -302,19 +339,19 @@ public class ChordRegistry
         ParsedChordDef newChordDef = 
                 new ParsedChordDef(note, additionalBass, matchedRelChord, ParsedChordDef.BassSetting.LowestBass);
 
-        newChordDef.setPrefCombo(combo);
-
         possChordDefs.add(matchedChordCount++, newChordDef);
 
       } else {
-        possChordDefs.add(getRotatedChordDef(fullNotelist, n, combo));
+        if (includeUnknown) {
+          possChordDefs.add(getRotatedChordDef(fullNotelist, n));
+        }
       }
     }
 
     return possChordDefs;
   }
 
-  private static ParsedChordDef getRotatedChordDef(Note[] fullNotelist, int n, ButtonCombo combo)
+  private static ParsedChordDef getRotatedChordDef(Note[] fullNotelist, int n)
   {
     Vector<Note> validNotes = new Vector<Note>();
 
@@ -326,7 +363,6 @@ public class ChordRegistry
     }
 
     ParsedChordDef chordDef = new ParsedChordDef(new Chord(validNotes));
-    chordDef.setPrefCombo(combo);
     return chordDef;
   }
 }

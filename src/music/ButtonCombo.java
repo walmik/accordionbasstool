@@ -18,6 +18,7 @@ public class ButtonCombo
   GeoPos boundsMin, boundsMax;
   private Note lowestNote;
   boolean preferred = false;
+  boolean extraneous = false;
 
   class Hash
   {

@@ -35,6 +35,8 @@ public class ChordPicker extends javax.swing.JPanel
   StepChangeListener[] stepChangers;
   RegistryChordDef customDef;
 
+  boolean isUpdating = false;
+
   enum ChordFilter
   {
 
@@ -115,12 +117,11 @@ public class ChordPicker extends javax.swing.JPanel
 
     listChords.addListSelectionListener(new ListSelectionListener()
     {
-
       int lastIndex = -1;
 
       @Override
       public void valueChanged(ListSelectionEvent e)
-      {
+      {       
         int index = listChords.getSelectedIndex();
         if (index == lastIndex) {
           return;
@@ -130,8 +131,11 @@ public class ChordPicker extends javax.swing.JPanel
           return;
         }
 
-        RegistryChordDef chordDef = (RegistryChordDef) listChords.getSelectedValue();
-        selectChord(chordDef);
+        if (!isUpdating) {
+          RegistryChordDef chordDef = (RegistryChordDef) listChords.getSelectedValue();
+          selectChord(chordDef);
+        }
+
         lastIndex = index;
       }
     });
@@ -274,7 +278,8 @@ public class ChordPicker extends javax.swing.JPanel
 
   public void setRelChord(RelChord newRelChord)
   {
-    relChord = (RelChord) newRelChord.clone();
+    //relChord = (RelChord) newRelChord.clone();
+    relChord = newRelChord;
 
     for (int i = 0; i < stepChangers.length; i++) {
       NoteDegreeType step = relChord.getStep(i);
@@ -291,7 +296,6 @@ public class ChordPicker extends javax.swing.JPanel
     //statusLabel.setText("<html>" + string + "</html>");
     //System.out.println(string);
   }
-  boolean isUpdating = false;
 
   private void matchListToSelection()
   {
@@ -302,6 +306,7 @@ public class ChordPicker extends javax.swing.JPanel
     ListModel model = listChords.getModel();
 
     int index = 0;
+    
     if (relChord != null) {
       relChord.setOrigDef(null);
     }

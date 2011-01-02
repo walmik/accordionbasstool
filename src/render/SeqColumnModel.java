@@ -141,10 +141,10 @@ public class SeqColumnModel extends DefaultTableColumnModel
   }
   boolean isPopulating = false;
 
-  public void populateFromText(String text)
+  public void populateFromText(String text, boolean removeDupNotes)
   {
     StringParser parser = new StringParser(text);
-    Vector<ParsedChordDef> chords = ChordParser.parseChords(parser);
+    Vector<ParsedChordDef> chords = ChordParser.parseChords(parser, removeDupNotes);
 
     this.tableColumns.clear();
 
@@ -200,8 +200,14 @@ public class SeqColumnModel extends DefaultTableColumnModel
       return;
     }
 
+    ParsedChordDef oldChordDef = (ParsedChordDef)column.getHeaderValue();
     column.setHeaderValue(newChordDef);
-    computeSeqs(index);
+
+    if (!oldChordDef.equalForRecompute(newChordDef)) {
+      computeSeqs(index);
+    } else {
+      this.fireColumnMarginChanged();
+    }
   }
 
   ParsedChordDef getChordDef(int index)

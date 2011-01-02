@@ -49,12 +49,14 @@ public class BoardSearcher
           for (ButtonCombo curr : combos) {
             if (curr.equals(def.getPrefCombo())) {
               curr.preferred = true;
+              curr.extraneous = false;
               prefCombo = null;
             }
           }
         }
         
         if (prefCombo != null) {
+          prefCombo.extraneous = true;
           combos.addLast(prefCombo);
         }
       }
@@ -103,6 +105,7 @@ public class BoardSearcher
 
     if (bestPref != null) {
       if (!currSeqs.contains(bestPref)) {
+        bestPref.markExtraneous();
         currSeqs.addLast(bestPref);
       }
     }

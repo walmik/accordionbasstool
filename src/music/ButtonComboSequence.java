@@ -13,6 +13,7 @@ public class ButtonComboSequence implements Cloneable, CollSequence<ButtonCombo>
 	private int heur = 0;
 
   private short preferredRank = 0;
+  private short extraneous = 0;
 
   public int iconIndex;
 	
@@ -54,6 +55,9 @@ public class ButtonComboSequence implements Cloneable, CollSequence<ButtonCombo>
     if (newCombo.preferred) {
       preferredRank++;
     }
+    if (newCombo.extraneous) {
+      this.extraneous++;
+    }
 	}
 
   @Override
@@ -89,6 +93,16 @@ public class ButtonComboSequence implements Cloneable, CollSequence<ButtonCombo>
   public int getPrefRank()
   {
     return preferredRank;
+  }
+
+  public boolean getExtraneous()
+  {
+    return (extraneous > 0);
+  }
+
+  public void markExtraneous()
+  {
+    extraneous++;
   }
 
   public int debugForceHeur()
