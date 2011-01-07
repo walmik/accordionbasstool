@@ -94,20 +94,13 @@ public class Note
   }
 
   @Override
-  public boolean equals(Object o)
-  {
-    if (o instanceof Note)
-      return equals((Note)o);
-
-    return false;
-  }
-
-  public boolean equals(Note other)
+  public boolean equals(Object other)
   {
     if (other == null) {
       return false;
     }
-    return (value() == other.value());
+
+    return (value() == ((Note)other).value());
   }
 
   public Interval diff(Note other)

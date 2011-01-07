@@ -308,6 +308,10 @@ public class ButtonCombo
   {
     allChordsMask = new Chord.Mask();
 
+    for (int i = 0; i < sortedNotes.length; i++) {
+      sortedNotes[i] = null;
+    }
+
     for (int i = 0; i < pos.length; i++) {
       Chord theChord = board.getChordAt(pos[i]);
       allChordsMask.sortChordNotes(theChord, sortedNotes);
@@ -317,10 +321,6 @@ public class ButtonCombo
   public Note getLowestNote()
   {
     if (lowestNote == null) {
-      for (int i = 0; i < sortedNotes.length; i++) {
-        sortedNotes[i] = null;
-      }
-
       sortNotes();
 
       for (int i = 0; i < sortedNotes.length; i++) {
@@ -336,13 +336,9 @@ public class ButtonCombo
 
   public String toSortedNoteString(boolean html)
   {
-    String str = "";
-
-    for (int i = 0; i < sortedNotes.length; i++) {
-      sortedNotes[i] = null;
-    }
-
     sortNotes();
+
+    String str = "";
 
     for (int i = 0; i < sortedNotes.length; i++) {
       if (sortedNotes[i] == null) {
@@ -353,7 +349,6 @@ public class ButtonCombo
         str += " + ";
       }
       str += sortedNotes[i].toString(html);
-
     }
 
     return str;
@@ -371,11 +366,8 @@ public class ButtonCombo
   @Override
   public boolean equals(Object object)
   {
-    return equals((ButtonCombo)object);
-  }
-
-  public boolean equals(ButtonCombo combo)
-  {
+    ButtonCombo combo = (ButtonCombo)object;
+    
     if (combo == null) {
       return false;
     }

@@ -85,14 +85,14 @@
         <Property name="text" type="java.lang.String" value="None"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Clicked Buttons:"/>
+            <TitledBorder title="Currenly Select on Board:"/>
           </Border>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="buttonClear">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Clear"/>
+        <Property name="text" type="java.lang.String" value="Clear Clicked"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonClearActionPerformed"/>
@@ -136,7 +136,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="buttonSelPref">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Selected Picked Buttons"/>
+        <Property name="text" type="java.lang.String" value="Select Clicked"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSelPrefActionPerformed"/>

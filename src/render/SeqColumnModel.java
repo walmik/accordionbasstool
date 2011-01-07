@@ -18,6 +18,7 @@ import music.ButtonCombo;
 import music.ButtonComboSequence;
 import music.ChordParser;
 import music.CollSequence;
+import music.FingerCombo;
 import music.FingerComboSequence;
 import music.FingerSearcher;
 import music.Interval;
@@ -108,6 +109,26 @@ public class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
+  ButtonCombo getSelectedButtonCombo()
+  {
+    int row = this.rowSelModel.getAnchorSelectionIndex();
+    int col = this.getSelectedColumn();
+
+    Object obj = this.getDataModel().getValueAt(row, col);
+
+    if (obj == null) {
+      return null;
+    }
+
+    if (obj instanceof ButtonCombo) {
+      return (ButtonCombo)obj;
+    } else if (obj instanceof FingerCombo) {
+      return ((FingerCombo)obj).getButtonCombo();
+    }
+
+    return null;
+  }
+
   void editSelectedColumn(ParsedChordDef newDef)
   {
     int index = getSelectedColumn();
@@ -189,7 +210,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
       currCol.setHeaderValue(existingDef.transposeBy(transDiff));
     }
 
-    computeSeqs(getSelectedColumn());
+    recomputeSeqs();
   }
 
   private void editColumn(int index, ParsedChordDef newChordDef)
@@ -381,8 +402,18 @@ public class SeqColumnModel extends DefaultTableColumnModel
 
   public void clearPrefSeq()
   {
+    boolean clearedAny = false;
+
     for (int col = 0; col < this.getColumnCount(); col++) {
-      this.getChordDef(col).setPrefCombo(null);
+      ParsedChordDef def = this.getChordDef(col);
+      if (def.getPrefCombo() != null) {
+        def.setPrefCombo(null);
+        clearedAny = true;
+      }
+    }
+    
+    if (clearedAny) {
+      this.recomputeSeqs();
     }
   }
 

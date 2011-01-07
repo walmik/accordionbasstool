@@ -21,20 +21,6 @@
 
   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
   <SubComponents>
-    <Component class="javax.swing.JCheckBox" name="checkClickable">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
-          <FontInfo relative="true">
-            <Font bold="true" component="checkClickable" property="font" relativeSize="true" size="5"/>
-          </FontInfo>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Board Clickable"/>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[2, 2, 2, 20]"/>
-        </Property>
-        <Property name="opaque" type="boolean" value="false"/>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">

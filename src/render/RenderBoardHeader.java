@@ -183,18 +183,11 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    checkClickable = new javax.swing.JCheckBox();
     jLabel1 = new javax.swing.JLabel();
     boardCombo = new javax.swing.JComboBox();
     infoLabel = new javax.swing.JLabel();
 
     setBackground(java.awt.SystemColor.activeCaption);
-
-    checkClickable.setFont(checkClickable.getFont().deriveFont(checkClickable.getFont().getStyle() | java.awt.Font.BOLD, checkClickable.getFont().getSize()+5));
-    checkClickable.setText("Board Clickable");
-    checkClickable.setMargin(new java.awt.Insets(2, 2, 2, 20));
-    checkClickable.setOpaque(false);
-    add(checkClickable);
 
     jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getSize()+5f));
     jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -212,7 +205,6 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox boardCombo;
-  private javax.swing.JCheckBox checkClickable;
   private javax.swing.JLabel infoLabel;
   private javax.swing.JLabel jLabel1;
   // End of variables declaration//GEN-END:variables

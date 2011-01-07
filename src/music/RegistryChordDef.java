@@ -36,6 +36,11 @@ final public class RegistryChordDef
     return new Chord(rootNote, ivals);
   }
 
+  public boolean matchesMask(Chord.Mask mask)
+  {
+    return chord.getChordMask().equals(mask);
+  }
+
   public int getChordLength()
   {
     return ivals.length + 1;

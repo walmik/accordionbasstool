@@ -407,7 +407,6 @@ public class TabChordPicker extends javax.swing.JPanel
   private void initComponents() {
 
     mustBeLowestCheck = new javax.swing.JCheckBox();
-    statusLabel = new javax.swing.JLabel();
     chordPicker1 = new render.ChordPicker();
     controlGrid = new javax.swing.JPanel();
     notePickerRoot = new render.NotePicker();
@@ -417,6 +416,7 @@ public class TabChordPicker extends javax.swing.JPanel
     labelInversion = new javax.swing.JLabel();
     labelAddBass = new javax.swing.JLabel();
     labelSlash = new javax.swing.JLabel();
+    statusLabel = new javax.swing.JLabel();
 
     mustBeLowestCheck.setSelected(true);
     mustBeLowestCheck.setText("Must be in Bass");
@@ -427,11 +427,6 @@ public class TabChordPicker extends javax.swing.JPanel
         mustBeLowestCheckItemStateChanged(evt);
       }
     });
-
-    statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getSize()+3f));
-    statusLabel.setText("Info");
-    statusLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-    statusLabel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
     labelRoot.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     labelRoot.setText("Chord Root:");
@@ -444,7 +439,7 @@ public class TabChordPicker extends javax.swing.JPanel
     labelAddBass.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     labelAddBass.setText("Bass Note:");
 
-    labelSlash.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+    labelSlash.setFont(new java.awt.Font("Tahoma", 1, 24));
     labelSlash.setText("/");
 
     javax.swing.GroupLayout controlGridLayout = new javax.swing.GroupLayout(controlGrid);
@@ -483,24 +478,29 @@ public class TabChordPicker extends javax.swing.JPanel
         .addComponent(inversionCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
     );
 
+    statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getSize()+3f));
+    statusLabel.setText("Info");
+    statusLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+    statusLabel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addComponent(controlGrid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
       .addComponent(chordPicker1, javax.swing.GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(controlGrid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE))
+          .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE)
+          .addComponent(controlGrid, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(chordPicker1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addComponent(chordPicker1, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 

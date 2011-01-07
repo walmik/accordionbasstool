@@ -91,22 +91,18 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
       //int lowestBit = Integer.numberOfTrailingZeros(value);
       //int abc = ((1 << (Note.NUM_HALFSTEPS - lowestBit)) - 1) << lowestBit;
       //System.out.println(Integer.toBinaryString(abc));
-
-      renderBoard.repaint();
     }
 
     @Override
     public void mouseDragged(MouseEvent e)
     {
       renderBoard.setClickPos(e);
-      renderBoard.repaint();
     }
 
     @Override
     public void mouseReleased(MouseEvent e)
     {
       renderBoard.clearClickPos();
-      renderBoard.repaint();
     }
   }
 
@@ -194,12 +190,18 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
 
   public void setClickPos(MouseEvent e)
   {
-    clickPos = hitTest(e);
+    BassBoard.Pos newClickPos = hitTest(e);
+
+    if (!BassBoard.posEquals(clickPos, newClickPos)) {
+      repaint();
+      clickPos = newClickPos;
+    }
   }
 
   public void clearClickPos()
   {
     clickPos = null;
+    repaint();
   }
 
   public BassBoard.Pos hitTest(MouseEvent e)

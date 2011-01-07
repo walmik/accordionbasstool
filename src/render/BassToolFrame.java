@@ -72,14 +72,13 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     if (checkPitchDetectPermissions()) {
       tabPitchDetect.setSeqColModel(seqTablePanel.columnModel);
+    } else {
+      toolTabs.setEnabledAt(toolTabs.indexOfComponent(tabPitchDetect), false);
     }
     
     tabButtonClicker.setSeqColModel(seqTablePanel.columnModel);
     
-
     //initModeSelector();
-//    toolTabs.remove(tabButtonClicker);
-//    toolTabs.remove(tabPitchDetect);
 
     renderBoardHeader.initBoardHeader(renderBassBoard, renderBoardScrollPane, seqTablePanel.columnModel);
 
@@ -350,7 +349,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.7");
 
+    boardSplitPane.setDividerSize(16);
     boardSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+    boardSplitPane.setOneTouchExpandable(true);
 
     javax.swing.GroupLayout renderBassBoardLayout = new javax.swing.GroupLayout(renderBassBoard);
     renderBassBoard.setLayout(renderBassBoardLayout);
@@ -360,7 +361,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     );
     renderBassBoardLayout.setVerticalGroup(
       renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 245, Short.MAX_VALUE)
+      .addGap(0, 268, Short.MAX_VALUE)
     );
 
     renderBoardScrollPane.setViewportView(renderBassBoard);

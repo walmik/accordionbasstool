@@ -34,10 +34,6 @@ public class BassBoard
         return false;
       }
 
-      if (!(o instanceof Pos)) {
-        return false;
-      }
-
       Pos p = (Pos)o;
       return (row == p.row) && (col == p.col);
     }
@@ -46,6 +42,15 @@ public class BassBoard
     {
       return (row == r) && (col == c);
     }
+  }
+
+  public static boolean posEquals(Pos p1, Pos p2)
+  {
+    if (p1 == p2) {
+      return true;
+    }
+
+    return ((p1 != null) && p1.equals(p2));
   }
 
   public static BassBoard bassBoard120()

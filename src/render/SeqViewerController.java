@@ -675,7 +675,7 @@ public class SeqViewerController
       if (buttonCombo != null) {
         if (!buttonCombo.isSingleBass()) {
           Note lowest = buttonCombo.getLowestNote();
-          String lowestInfo = (lowest.isBassNote() ? "Bass" : "Chord") + space + lowest.toString(html);
+          String lowestInfo = (lowest.isBassNote() ? "Bass" : "Mid") + space + lowest.toString(html);
           //return "<html>" + info + " Low: " + lowest + "</html>";
           if (html) {
             text += " (<i>" + lowestInfo + "</i>)";

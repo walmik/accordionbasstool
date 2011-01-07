@@ -19,7 +19,9 @@ import javax.swing.JComboBox;
 import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import music.Chord;
 import music.ChordRegistry;
+import music.Note;
 import music.RegistryChordDef;
 import music.RelChord;
 import music.RelChord.NoteDegreeType;
@@ -34,7 +36,6 @@ public class ChordPicker extends javax.swing.JPanel
   RelChord relChord;
   StepChangeListener[] stepChangers;
   RegistryChordDef customDef;
-
   boolean isUpdating = false;
 
   enum ChordFilter
@@ -45,10 +46,9 @@ public class ChordPicker extends javax.swing.JPanel
     Show6th("6th"),
     Show7th("7th"),
     Show9th("9th"),
+    Show11th("11th"),
     ShowMisc("Misc"),
     ShowCustomOnly("Only Custom");
-
-    
     String desc;
 
     ChordFilter(String str)
@@ -75,6 +75,9 @@ public class ChordPicker extends javax.swing.JPanel
 
         case Show9th:
           return (relChordString.contains("9"));
+
+        case Show11th:
+          return (relChordString.contains("11"));
 
         case ShowMisc:
           return (def.group.equals("misc"));
@@ -117,11 +120,12 @@ public class ChordPicker extends javax.swing.JPanel
 
     listChords.addListSelectionListener(new ListSelectionListener()
     {
+
       int lastIndex = -1;
 
       @Override
       public void valueChanged(ListSelectionEvent e)
-      {       
+      {
         int index = listChords.getSelectedIndex();
         if (index == lastIndex) {
           return;
@@ -299,25 +303,25 @@ public class ChordPicker extends javax.swing.JPanel
 
   private void matchListToSelection()
   {
-    if (isUpdating) {
+    if (isUpdating || (relChord == null)) {
       return;
     }
 
     ListModel model = listChords.getModel();
 
     int index = 0;
+
+    relChord.setOrigDef(null);
     
-    if (relChord != null) {
-      relChord.setOrigDef(null);
-    }
+    Note defaultRoot = new Note();
+
+    Chord.Mask matchMask = relChord.buildChord(defaultRoot).getChordMask();
 
     for (int i = 1; i < model.getSize(); i++) {
       RegistryChordDef def = (RegistryChordDef) model.getElementAt(i);
-      if (def.relChord.equals(relChord)) {
+      if (def.matchesMask(matchMask)) {
         index = i;
-        if (relChord != null) {
-          relChord.setOrigDef(def);
-        }
+        relChord.setOrigDef(def);
         break;
       }
     }

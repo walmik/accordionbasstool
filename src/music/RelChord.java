@@ -293,15 +293,13 @@ public class RelChord implements Cloneable
     return str;
   }
 
-  public boolean equals(RelChord relChord)
+  public boolean equals(Object object)
   {
-    if (relChord == null) {
+    if (object == null) {
       return false;
     }
 
-//    if (base != relChord.base) {
-//      return false;
-//    }
+    RelChord relChord = (RelChord)object;
 
     for (int i = 0; i < standardIval.length; i++) {
       if (steps[i] != relChord.steps[i]) {

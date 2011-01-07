@@ -24,8 +24,12 @@
     <chord name="Half- Diminished 7th" notes="C Eb Gb Bb" abbrev="[Ø7]"></chord>
     <chord name="Diminished 7th" notes="C Eb Gb Bbb" abbrev="[dim7]*"></chord>
 
+    <chord name="Suspended 2 7th" notes="C D G Bb" abbrev="7sus2"></chord>
+    <chord name="Suspended 4 7th" notes="C F G Bb" abbrev="7sus4"></chord>
+
     <chord name="Dominant 9th (no 5th)" notes="C E Bb D" abbrev="9"></chord>
     <chord name="Dominant 9th" notes="C E G Bb D" abbrev="9*"></chord>
+    <chord name="Dominant 9th, flat 5" notes="C E Gb Bb D" abbrev="9b5"></chord>
     <chord name="Major 9th" notes="C E G B D" abbrev="M[9]"></chord>
     <chord name="Minor- Major 9th" notes="C Eb G B D" abbrev="min[M9]"></chord>
 
@@ -34,8 +38,16 @@
     <chord name="Minor 9th" notes="C Eb G Bb D" abbrev="min[9]"></chord>
     <chord name="Half- Diminished 9th" notes="C Eb Gb Bb Db" abbrev="[Ø9]"></chord>
     <chord name="Diminished 9th" notes="C Eb Gb Bbb Db" abbrev="dim[9]"></chord>
+
+    <chord name="Dominant 11th (no 5th)" notes="C E Bb D F" abbrev="11"></chord>
+    <chord name="Dominant 11th" notes="C E G Bb D F" abbrev="11*"></chord>
+    <chord name="Dominant 11th, flat 5" notes="C E Gb Bb D F" abbrev="11b5"></chord>
+    <chord name="Dominant 9th, Sus 4" notes="C G Bb D F" abbrev="9sus4"></chord>
+    <chord name="Dominant 9th (no 5th), Sus 4" notes="C Bb D F" abbrev="11no3"></chord>
   </chords>
-  <filters>
-    <filter name="*b9*"/>
-  </filters>
+  <scales>
+    <scale name="Major" notes="C, D, E, F, G, A, B"/>
+    <scale name="Hijaz/Freygish" notes="D, Eb, F#, G, A, Bb, C, D"/>
+    <scale name="Minor" notes="A, B, C, D, E, F, G"/>
+  </scales>
 </root>

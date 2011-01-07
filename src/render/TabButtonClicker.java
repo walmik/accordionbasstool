@@ -18,6 +18,7 @@ import java.beans.PropertyChangeListener;
 import java.util.Vector;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
+import javax.swing.JTabbedPane;
 import javax.swing.event.ListSelectionEvent;
 import music.BassBoard;
 import music.BoardSearcher;
@@ -33,10 +34,9 @@ public class TabButtonClicker extends javax.swing.JPanel
 {
 
   RenderBassBoard renderBoard;
-  int clickIndex;
   //SelectedButtonCombo localButtonCombo;
-  ButtonCombo clickCombo;
-  Vector<BassBoard.Pos> activeButtons;
+  ButtonCombo activeCombo;
+
   BoardMouseListener listener;
   SeqColumnModel columnModel;
   ParsedChordDef activeParsedChord;
@@ -47,20 +47,18 @@ public class TabButtonClicker extends javax.swing.JPanel
   {
     initComponents();
 
-    //localButtonCombo = new SelectedButtonCombo();
-
-    activeButtons = new Vector<BassBoard.Pos>();
-
     renderBoard = BassToolFrame.getRenderBoard();
 
     listener = new BoardMouseListener();
+    renderBoard.addMouseListener(listener);
+    renderBoard.addMouseMotionListener(listener);
 
     colModListener = new SeqColumnModel.TableEventAdapter()
     {
       @Override
       public void columnSelectionChanged(ListSelectionEvent e)
       {
-        //syncUI();
+        syncUI();
       }
     };
 
@@ -76,23 +74,11 @@ public class TabButtonClicker extends javax.swing.JPanel
   }
 
   @Override
-  public void setVisible(boolean b)
+  public void setVisible(boolean visible)
   {
-    if (b) {
-//      ButtonCombo combo = localButtonCombo.getSelectedButtonCombo();
-//
-//      if ((activeButtons.size() == 0)
-//              || (combo == null)
-//              || (combo.getBoard() != renderBoard.getBassBoard())) {
-//
-//        clearCombo();
-//        updateCombo();
-//      }
-
-      //renderBoard.setSelectedButtonCombo(localButtonCombo);
-
-      renderBoard.addMouseListener(listener);
-      renderBoard.addMouseMotionListener(listener);
+    if (visible) {
+      //renderBoard.addMouseListener(listener);
+      //renderBoard.addMouseMotionListener(listener);
       renderBoard.addPropertyChangeListener(BassBoard.class.getSimpleName(), listener);
 
       if (columnModel != null) {
@@ -107,12 +93,12 @@ public class TabButtonClicker extends javax.swing.JPanel
         columnModel.removeColumnModelListener(colModListener);
       }
 
-      renderBoard.removeMouseListener(listener);
-      renderBoard.removeMouseMotionListener(listener);
+      //renderBoard.removeMouseListener(listener);
+      //renderBoard.removeMouseMotionListener(listener);
       renderBoard.removePropertyChangeListener(BassBoard.class.getSimpleName(), listener);
     }
 
-    super.setVisible(b);
+    super.setVisible(visible);
   }
 
   private void clearCombo()
@@ -120,36 +106,61 @@ public class TabButtonClicker extends javax.swing.JPanel
     if (columnModel != null) {
       columnModel.clearPrefSeq();
     }
-    
-    activeButtons.clear();
-    clickCombo = null;
-    //activeButtons.add(renderBoard.getBassBoard().getCenter());
+
+    //clickButtons.clear();
+    //clickCombo = null;
   }
-  
   int isUpdating = 0;
 
-  private void updateComboAndListUI(boolean updateCurrColumn)
+  private void updateFromClicked()
   {
-    if (activeButtons.size() == 0) {
+    if (listener.clickButtons.size() == 0) {
       clickedLabel.setText("<html>None</html>");
       possChordList.setListData(new ParsedChordDef[0]);
       return;
     }
-    
-    BassBoard.Pos allPos[] = new BassBoard.Pos[activeButtons.size()];
-    activeButtons.toArray(allPos);
-    clickCombo = new ButtonCombo(allPos, renderBoard.getBassBoard());
-    //localButtonCombo.setButtonCombo(clickCombo);
 
-    String sortedNotesStr = clickCombo.toSortedNoteString(true);
+    BassBoard.Pos allPos[] = new BassBoard.Pos[listener.clickButtons.size()];
+    listener.clickButtons.toArray(allPos);
+    activeCombo = new ButtonCombo(allPos, renderBoard.getBassBoard());
+
+    Vector<ParsedChordDef> matches = updateChordDefsList();
+
+    if (matches.isEmpty()) {
+      return;
+    }
+
+    for (ParsedChordDef def : matches) {
+      def.setPrefCombo(activeCombo);
+    }
+
+    isTableDriven = true;
+
+    this.activeParsedChord = matches.firstElement();
+    columnModel.editSelectedColumn(activeParsedChord);
+
+    if (possChordList.getModel().getSize() > 0) {
+      possChordList.setSelectedIndex(0);
+    }
+
+    isTableDriven = false;
+  }
+
+  private Vector<ParsedChordDef> updateChordDefsList()
+  {
+    if (activeCombo == null) {
+      return new Vector<ParsedChordDef>();
+    }
+
+    String sortedNotesStr = activeCombo.toSortedNoteString(true);
 
     Vector<ParsedChordDef> matches =
             ChordRegistry.mainRegistry().
-            findChordFromButtonCombo(clickCombo, this.checkIncludeInv.isSelected());
+            findChordFromNotes(ButtonCombo.sortedNotes, activeCombo.getChordMask(), this.checkIncludeInv.isSelected(), true);
 
     String info = "<html>";
     info += "Buttons: ";
-    info += "<b>" + clickCombo.toButtonListingString(true) + "</b><br/>";
+    info += "<b>" + activeCombo.toButtonListingString(true) + "</b><br/>";
     info += "Notes: ";
     //info += "<font size=\'-1\'>";
     info += "<b>" + sortedNotesStr + "</b>";
@@ -173,20 +184,14 @@ public class TabButtonClicker extends javax.swing.JPanel
       possChordList.setListData(filtered);
     }
 
-    if (updateCurrColumn) {
-      this.activeParsedChord = matches.firstElement();
-      columnModel.editSelectedColumn(activeParsedChord);
-    }
-
-    if (possChordList.getModel().getSize() > 0) {
-      possChordList.setSelectedIndex(0);
-    }
-
-    possChordList.repaint();
+    //possChordList.repaint();
 
     isTableDriven = false;
+
+    return matches;
   }
 
+  
   private void handleBoardChange(BassBoard oldBoard, BassBoard newBoard)
   {
 //    this.syncUI();
@@ -204,13 +209,13 @@ public class TabButtonClicker extends javax.swing.JPanel
       return;
     }
 
-    activeButtons.clear();
+    listener.clickButtons.clear();
 
     for (BassBoard.Pos pos : selCombo.getAllPos()) {
-      activeButtons.add(pos);
+      listener.clickButtons.add(pos);
     }
   }
-  
+
   boolean isTableDriven = false;
   boolean isClickDriven = false;
 
@@ -224,17 +229,19 @@ public class TabButtonClicker extends javax.swing.JPanel
       return;
     }
 
-    isTableDriven = true;
-
     //System.out.println(columnModel.selComboModel.getSelectedButtonCombo());
 
     syncActiveButtons();
-    updateComboAndListUI(false);
+    activeCombo = columnModel.getSelectedButtonCombo();
+
+    if (activeCombo != null) {
+      updateChordDefsList();
+    }
 
     activeParsedChord = columnModel.getSelectedChordDef();
-    
-    possChordList.setSelectedValue(activeParsedChord, true);
 
+    isTableDriven = true;
+    possChordList.setSelectedValue(activeParsedChord, true);
     isTableDriven = false;
   }
 
@@ -244,7 +251,7 @@ public class TabButtonClicker extends javax.swing.JPanel
     @Override
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
     {
-      ParsedChordDef chordDef = (ParsedChordDef)value;
+      ParsedChordDef chordDef = (ParsedChordDef) value;
 
       String info = "<html>";
       info += chordDef.nameHtml;
@@ -256,27 +263,50 @@ public class TabButtonClicker extends javax.swing.JPanel
 
   class BoardMouseListener extends MouseAdapter implements PropertyChangeListener
   {
+    BassBoard.Pos lastClickPos;
+    boolean isClickShiftMode = true;
+    boolean isAltClick = false;
+    int clickIndex = -1;
+    Vector<BassBoard.Pos> clickButtons = new Vector<BassBoard.Pos>();
+
 
     @Override
     public void mouseDragged(MouseEvent e)
     {
+      if (isAltClick) {
+        renderBoard.setClickPos(e);
+        return;
+      }
+
       if (clickIndex >= 0) {
         BassBoard.Pos clickPos = renderBoard.hitTest(e);
-        if ((clickPos != null) && (clickIndex < activeButtons.size()) && !activeButtons.contains(clickPos)) {
-          activeButtons.setElementAt(clickPos, clickIndex);
+
+        if (BassBoard.posEquals(lastClickPos, clickPos)) {
+          return;
+        }
+
+        lastClickPos = clickPos;
+
+        if ((clickPos != null) && (clickIndex < clickButtons.size()) && !clickButtons.contains(clickPos)) {
+          clickButtons.setElementAt(clickPos, clickIndex);
         }
       }
 
-      updateComboAndListUI(true);
+      updateFromClicked();
     }
-    boolean isClickShiftMode = true;
 
     @Override
     public void mousePressed(MouseEvent e)
-    {
+    {     
+      if (e.isAltDown() || e.isAltGraphDown()) {
+        isAltClick = true;
+        renderBoard.setClickPos(e);
+        return;
+      }
+
       if (isClickShiftMode) {
         if (!e.isShiftDown()) {
-          activeButtons.clear();
+          clickButtons.clear();
         } else {
           syncActiveButtons();
         }
@@ -288,26 +318,30 @@ public class TabButtonClicker extends javax.swing.JPanel
       clickIndex = -1;
 
       if (clickPos != null) {
-        clickIndex = activeButtons.indexOf(clickPos);
+        clickIndex = clickButtons.indexOf(clickPos);
 
         if (clickIndex < 0) {
-          if (activeButtons.size() < BoardSearcher.optMaxComboLength) {
-            clickIndex = activeButtons.size();
-            activeButtons.addElement(clickPos);
+          if (clickButtons.size() < BoardSearcher.optMaxComboLength) {
+            clickIndex = clickButtons.size();
+            clickButtons.addElement(clickPos);
           }
         } else {
-          activeButtons.remove(clickIndex);
+          clickButtons.remove(clickIndex);
           clickIndex = -1;
         }
       }
+      lastClickPos = clickPos;
 
-      updateComboAndListUI(true);
+      updateFromClicked();
     }
 
     @Override
     public void mouseReleased(MouseEvent e)
     {
-      super.mouseReleased(e);
+      if (isAltClick) {
+        renderBoard.clearClickPos();
+        isAltClick = false;
+      }
     }
 
     @Override
@@ -337,11 +371,11 @@ public class TabButtonClicker extends javax.swing.JPanel
     checkIncludeInv = new javax.swing.JCheckBox();
     checkHiliteRedunds = new javax.swing.JCheckBox();
 
-    clickedLabel.setFont(new java.awt.Font("Tahoma", 0, 18));
+    clickedLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
     clickedLabel.setText("None");
-    clickedLabel.setBorder(javax.swing.BorderFactory.createTitledBorder("Clicked Buttons:"));
+    clickedLabel.setBorder(javax.swing.BorderFactory.createTitledBorder("Currenly Select on Board:"));
 
-    buttonClear.setText("Clear");
+    buttonClear.setText("Clear Clicked");
     buttonClear.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         buttonClearActionPerformed(evt);
@@ -365,7 +399,7 @@ public class TabButtonClicker extends javax.swing.JPanel
       }
     });
 
-    buttonSelPref.setText("Selected Picked Buttons");
+    buttonSelPref.setText("Select Clicked");
     buttonSelPref.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         buttonSelPrefActionPerformed(evt);
@@ -435,15 +469,15 @@ public class TabButtonClicker extends javax.swing.JPanel
     );
   }// </editor-fold>//GEN-END:initComponents
 
-  private void buttonClearActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_buttonClearActionPerformed
-  {//GEN-HEADEREND:event_buttonClearActionPerformed
-    clearCombo();
-    updateComboAndListUI(true);
-  }//GEN-LAST:event_buttonClearActionPerformed
-
   private void checkShowUnknownChordsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkShowUnknownChordsActionPerformed
   {//GEN-HEADEREND:event_checkShowUnknownChordsActionPerformed
-    updateComboAndListUI(true);
+    updateChordDefsList();
+
+    isTableDriven = true;
+
+    possChordList.setSelectedValue(activeParsedChord, true);
+
+    isTableDriven = false;
   }//GEN-LAST:event_checkShowUnknownChordsActionPerformed
 
   private void possChordListValueChanged(javax.swing.event.ListSelectionEvent evt)//GEN-FIRST:event_possChordListValueChanged
@@ -466,13 +500,15 @@ public class TabButtonClicker extends javax.swing.JPanel
 
   private void buttonSelPrefActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_buttonSelPrefActionPerformed
   {//GEN-HEADEREND:event_buttonSelPrefActionPerformed
-    this.updateComboAndListUI(true);
     columnModel.selPrefSeq();
   }//GEN-LAST:event_buttonSelPrefActionPerformed
 
   private void checkIncludeInvActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkIncludeInvActionPerformed
   {//GEN-HEADEREND:event_checkIncludeInvActionPerformed
-    this.updateComboAndListUI(true);
+    // Reselect the same chord in the list, may however be with an inversion
+    int index = possChordList.getSelectedIndex();
+    this.updateChordDefsList();
+    possChordList.setSelectedIndex(index);
   }//GEN-LAST:event_checkIncludeInvActionPerformed
 
   private void checkHiliteRedundsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkHiliteRedundsActionPerformed
@@ -482,6 +518,11 @@ public class TabButtonClicker extends javax.swing.JPanel
       renderBoard.repaint();
     }
   }//GEN-LAST:event_checkHiliteRedundsActionPerformed
+
+  private void buttonClearActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_buttonClearActionPerformed
+  {//GEN-HEADEREND:event_buttonClearActionPerformed
+    clearCombo();
+  }//GEN-LAST:event_buttonClearActionPerformed
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton buttonClear;

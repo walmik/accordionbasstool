@@ -31,8 +31,8 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <Component id="controlGrid" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="statusLabel" pref="198" max="32767" attributes="1"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="statusLabel" pref="204" max="32767" attributes="1"/>
           </Group>
           <Component id="chordPicker1" alignment="0" pref="501" max="32767" attributes="1"/>
       </Group>
@@ -41,32 +41,16 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="controlGrid" min="-2" max="-2" attributes="1"/>
                   <Component id="statusLabel" pref="73" max="32767" attributes="3"/>
+                  <Component id="controlGrid" alignment="1" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="chordPicker1" max="32767" attributes="0"/>
+              <Component id="chordPicker1" pref="187" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="statusLabel">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
-          <FontInfo relative="true">
-            <Font component="statusLabel" property="font" relativeSize="true" size="3"/>
-          </FontInfo>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Info"/>
-        <Property name="verticalAlignment" type="int" value="1"/>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder/>
-          </Border>
-        </Property>
-      </Properties>
-    </Component>
     <Component class="render.ChordPicker" name="chordPicker1">
     </Component>
     <Container class="javax.swing.JPanel" name="controlGrid">
@@ -160,5 +144,21 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JLabel" name="statusLabel">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
+          <FontInfo relative="true">
+            <Font component="statusLabel" property="font" relativeSize="true" size="3"/>
+          </FontInfo>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Info"/>
+        <Property name="verticalAlignment" type="int" value="1"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+            <TitledBorder/>
+          </Border>
+        </Property>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>

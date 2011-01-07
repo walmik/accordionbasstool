@@ -184,7 +184,7 @@ public class ChordRegistry
 
     return null;
   }
-  
+
   public ParsedChordDef findFirstChordFromNotes(Chord chord)
   {
     Chord.Mask mask = new Chord.Mask();
@@ -202,20 +202,19 @@ public class ChordRegistry
     return (parsedDefs.isEmpty() ? null : parsedDefs.firstElement());
   }
 
-  public Vector<ParsedChordDef> findChordFromButtonCombo(ButtonCombo combo, boolean allowInversion)
-  {
-    Chord.Mask mask = combo.getChordMask();
-    Note[] fullNotelist = ButtonCombo.sortedNotes;
-
-    Vector<ParsedChordDef> parsedDefs = findChordFromNotes(fullNotelist, mask, allowInversion, true);
-
-    for (ParsedChordDef def : parsedDefs) {
-      def.setPrefCombo(combo);
-    }
-
-    return parsedDefs;
-  }
-
+//  public Vector<ParsedChordDef> findChordFromButtonCombo(ButtonCombo combo, boolean allowInversion, boolean setPrefCombo)
+//  {
+//    Chord.Mask mask = combo.getChordMask();
+//    Note[] fullNotelist = ButtonCombo.sortedNotes;
+//
+//    Vector<ParsedChordDef> parsedDefs = findChordFromNotes(fullNotelist, mask, allowInversion, true);
+//
+//    for (ParsedChordDef def : parsedDefs) {
+//      def.setPrefCombo(combo);
+//    }
+//
+//    return parsedDefs;
+//  }
   public Vector<ParsedChordDef> findChordFromNotes(
           Note[] fullNotelist,
           Chord.Mask mask,
@@ -336,7 +335,7 @@ public class ChordRegistry
       }
 
       if (validForm || (bassNoteToMatch == 0)) {
-        ParsedChordDef newChordDef = 
+        ParsedChordDef newChordDef =
                 new ParsedChordDef(note, additionalBass, matchedRelChord, ParsedChordDef.BassSetting.LowestBass);
 
         possChordDefs.add(matchedChordCount++, newChordDef);
@@ -358,11 +357,15 @@ public class ChordRegistry
     for (int i = 0; i < fullNotelist.length; i++) {
       int currIndex = (i + n) % fullNotelist.length;
       if (fullNotelist[currIndex] != null) {
-        validNotes.add(fullNotelist[currIndex]);
+        if (!fullNotelist[currIndex].isBassNote()) {
+          validNotes.add(fullNotelist[currIndex]);
+        }
       }
     }
 
-    ParsedChordDef chordDef = new ParsedChordDef(new Chord(validNotes));
+    Chord theChord = new Chord(validNotes);
+
+    ParsedChordDef chordDef = new ParsedChordDef(theChord);
     return chordDef;
   }
 }
