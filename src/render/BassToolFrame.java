@@ -355,7 +355,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     tabPitchDetect = new render.TabPitchDetect();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-    setTitle("Accordion Bass Tool v0.7");
+    setTitle("Accordion Bass Tool v0.8");
 
     boardSplitPane.setDividerSize(16);
     boardSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
