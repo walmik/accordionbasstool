@@ -35,6 +35,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   boolean editorVis = true;
   boolean editorLeft = true;
   ModeSelector modeSelector;
+  BoardMouseListener mouseListener;
 
   enum ToolMode
   {
@@ -65,6 +66,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     initComponents();
 
+    //toolTabs.remove(tabButtonClicker);
+    //toolTabs.remove(tabChordPicker);
+
     // Init Tabs
     seqTablePanel.initChordPicker(tabChordPicker);
     seqTablePanel.initTextParser(tabSeqEditor);
@@ -77,6 +81,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     }
     
     tabButtonClicker.setSeqColModel(seqTablePanel.columnModel);
+    
+    mouseListener = new BoardMouseListener(renderBassBoard, seqTablePanel.columnModel, tabButtonClicker);
+    renderBassBoard.addMouseListener(mouseListener);
+    renderBassBoard.addMouseMotionListener(mouseListener);
     
     //initModeSelector();
 
@@ -375,9 +383,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     controlSplitPane.setOneTouchExpandable(true);
     controlSplitPane.setRightComponent(seqTablePanel);
 
-    toolTabs.addTab("Button Clicker", tabButtonClicker);
-    toolTabs.addTab("Chord Picker", tabChordPicker);
-    toolTabs.addTab("Full Sequence Editor", tabSeqEditor);
+    toolTabs.addTab("Pick Chord/Notes", tabButtonClicker);
+    toolTabs.addTab("Edit Chord", tabChordPicker);
+    toolTabs.addTab("Edit Sequence/Scale", tabSeqEditor);
     toolTabs.addTab("Options", tabOptions);
     toolTabs.addTab("Pitch Detector", tabPitchDetect);
 
@@ -386,6 +394,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     boardSplitPane.setLeftComponent(controlSplitPane);
 
     getContentPane().add(boardSplitPane, java.awt.BorderLayout.CENTER);
+
+    getAccessibleContext().setAccessibleName("Accordion Bass Tool v0.8");
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JSplitPane boardSplitPane;

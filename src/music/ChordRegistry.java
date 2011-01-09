@@ -191,7 +191,7 @@ public class ChordRegistry
     Note[] sortArray = new Note[Note.NUM_HALFSTEPS * 2];
     mask.sortChordNotes(chord, sortArray);
 
-    Vector<ParsedChordDef> parsedDefs = findChordFromNotes(sortArray, mask, true, false);
+    Vector<ParsedChordDef> parsedDefs = findChordFromNotes(sortArray, mask, true, false, true);
 
     for (ParsedChordDef def : parsedDefs) {
       if (def.rootNote.equals(chord.getRootNote())) {
@@ -219,7 +219,8 @@ public class ChordRegistry
           Note[] fullNotelist,
           Chord.Mask mask,
           boolean allowInversion,
-          boolean includeUnknown)
+          boolean includeUnknown,
+          boolean findFirstOnly)
   {
     // Create an array of masks with one note removed, to find chords with an added bass
     // Eg. C E G D, first search for exact match
@@ -339,6 +340,9 @@ public class ChordRegistry
                 new ParsedChordDef(note, additionalBass, matchedRelChord, ParsedChordDef.BassSetting.LowestBass);
 
         possChordDefs.add(matchedChordCount++, newChordDef);
+        if (findFirstOnly) {
+          return possChordDefs;
+        }
 
       } else {
         if (includeUnknown) {

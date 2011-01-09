@@ -103,47 +103,75 @@ public class SeqViewerController
     header.addMouseMotionListener(headerMouse);
     seqTable.addMouseListener(headerMouse);
 
+    // Row Selection
+    seqTable.getSelectionModel().addListSelectionListener(new SeqTableEventAdapter()
+    {
+
+      @Override
+      protected void selectionChanged(int index)
+      {
+        if (columnModel.setSelectedSeq(index)) {
+          seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
+          BassToolFrame.getRenderBoard().repaint();
+        }
+      }
+    });
+
+    // Column Selection
+    columnModel.selComboModel.addListSelectionListener(new SeqTableEventAdapter()
+    {
+
+      @Override
+      protected void selectionChanged(int index)
+      {
+        seqTable.getTableHeader().repaint();
+      }
+      
+    });
+
+
+
     // Row Selection Change
-    seqTable.getSelectionModel().addListSelectionListener(
-            new javax.swing.event.ListSelectionListener()
-            {
-
-              int lastIndex = -1;
-
-              @Override
-              public void valueChanged(ListSelectionEvent e)
-              {
-                int index = seqTable.getSelectedRow();
-                if (index == lastIndex) {
-                  return;
-                }
-                lastIndex = index;
-
-                if (columnModel.setSelectedSeq(index)) {
-                  seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
-                }
-              }
-            });
-
-    //Column Selection Change
-    columnModel.getSelectionModel().addListSelectionListener(
-            new javax.swing.event.ListSelectionListener()
-            {
-
-              int lastSel = -1;
-
-              @Override
-              public void valueChanged(ListSelectionEvent e)
-              {
-                int newSel = seqTable.getSelectedColumn();
-                if (lastSel == newSel) {
-                  return;
-                }
-
-                lastSel = newSel;
-                seqTable.getTableHeader().repaint();
-              }
-            });
+//    seqTable.getSelectionModel().addListSelectionListener(
+//            new javax.swing.event.ListSelectionListener()
+//            {
+//
+//              int lastIndex = -1;
+//
+//              @Override
+//              public void valueChanged(ListSelectionEvent e)
+//              {
+//                int index = seqTable.getSelectedRow();
+//                if (index == lastIndex) {
+//                  return;
+//                }
+//                lastIndex = index;
+//
+//                if (columnModel.setSelectedSeq(index)) {
+//                  seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
+//                }
+//              }
+//            });
+//
+//    //Column Selection Change
+//    columnModel.getSelectionModel().addListSelectionListener(
+//            new javax.swing.event.ListSelectionListener()
+//            {
+//
+//              int lastSel = -1;
+//
+//              @Override
+//              public void valueChanged(ListSelectionEvent e)
+//              {
+//                int newSel = seqTable.getSelectedColumn();
+//                if (lastSel == newSel) {
+//                  return;
+//                }
+//
+//                lastSel = newSel;
+//                seqTable.getTableHeader().repaint();
+//              }
+//            });
   }
 
   static class SliderTableHeaderUI extends TableHeaderUI

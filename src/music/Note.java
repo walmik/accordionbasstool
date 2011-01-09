@@ -183,6 +183,12 @@ public class Note
 
   private String toString(int maxAccidental, boolean html)
   {
+    Note note = normalize(maxAccidental);
+    return printNote(note.note, note.sharpsOrFlats, html);
+  }
+
+  public Note normalize(int maxAccidental)
+  {
     ScaleNote newNote = note;
     int newSOF = sharpsOrFlats;
     int noteChange = 0;
@@ -224,8 +230,9 @@ public class Note
 
     } while (noteChange != 0);
 
-    return printNote(newNote, newSOF, html);
+    return new Note(newNote, newSOF);
   }
+
   static int lastParserOffset = 0;
 
   public static Note fromString(StringParser parser)

@@ -183,11 +183,24 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
+    checkHiliteRedunds = new javax.swing.JCheckBox();
     jLabel1 = new javax.swing.JLabel();
     boardCombo = new javax.swing.JComboBox();
     infoLabel = new javax.swing.JLabel();
 
     setBackground(java.awt.SystemColor.activeCaption);
+
+    checkHiliteRedunds.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+    checkHiliteRedunds.setText("Press Redundant Buttons");
+    checkHiliteRedunds.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    checkHiliteRedunds.setMargin(new java.awt.Insets(2, 2, 2, 20));
+    checkHiliteRedunds.setOpaque(false);
+    checkHiliteRedunds.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        checkHiliteRedundsActionPerformed(evt);
+      }
+    });
+    add(checkHiliteRedunds);
 
     jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getSize()+5f));
     jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -203,8 +216,16 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     infoLabel.setText("info");
     add(infoLabel);
   }// </editor-fold>//GEN-END:initComponents
+
+  private void checkHiliteRedundsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkHiliteRedundsActionPerformed
+  {//GEN-HEADEREND:event_checkHiliteRedundsActionPerformed
+    renderBoard.getSelectedButtonCombo().showRedunds = checkHiliteRedunds.isSelected();
+    renderBoard.repaint();
+  }//GEN-LAST:event_checkHiliteRedundsActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox boardCombo;
+  private javax.swing.JCheckBox checkHiliteRedunds;
   private javax.swing.JLabel infoLabel;
   private javax.swing.JLabel jLabel1;
   // End of variables declaration//GEN-END:variables

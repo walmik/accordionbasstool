@@ -49,25 +49,20 @@ public class RenderBoardUI
   //BufferedImage selectedIM, unselectedIM, pressedIM;
   boolean use3DDrawer = true;
   int lastIMScale = 0;
-
   BufferedImage optimalityImage;
   ImageIcon optimalityIcons[];
 
-
   public static enum BoardButtonImage
   {
-    
-    UNSELECTED( Color.black, 1.f,     false),
-    SELECTED(   Color.blue,           false),
-    
-    REDUNDS(    Color.gray,  0.75f,   true),
-    
-    PRESSED_2(  Color.green, 1.f,     true),
-    PRESSED_3(  Color.cyan,  1.f,     true),
-    PRESSED_4(  Color.orange, 1.f,    true),
-    PRESSED_5(  Color.red, 1.f,       true),
-    PRESSED_ANY(Color.magenta,        true);
 
+    UNSELECTED(Color.black, 1.f, false),
+    SELECTED(Color.blue, false),
+    REDUNDS(Color.gray, 0.75f, true),
+    PRESSED_2(Color.green, 1.f, true),
+    PRESSED_3(Color.cyan, 1.f, true),
+    PRESSED_4(Color.orange, 1.f, true),
+    PRESSED_5(Color.red, 1.f, true),
+    PRESSED_ANY(Color.magenta, true);
 
     BoardButtonImage(Color bcol, boolean press)
     {
@@ -82,13 +77,11 @@ public class RenderBoardUI
       alpha = alph;
       pressed = press;
     }
-
     Color color;
     BufferedImage image;
     float alpha;
     boolean pressed;
   }
-
   int currImageWidth = 1;
   int currImageHeight = 1;
 
@@ -119,9 +112,8 @@ public class RenderBoardUI
 
     currImageWidth = (int) (diamX * shadowScale);
     currImageHeight = (int) (diamY * shadowScale) + cylHeight;
-    
-    for (BoardButtonImage boardButton : BoardButtonImage.values())
-    {
+
+    for (BoardButtonImage boardButton : BoardButtonImage.values()) {
       boardButton.image = new BufferedImage(currImageWidth, currImageHeight, BufferedImage.TYPE_INT_ARGB);
       render3DButton(diamX, diamY, cylHeight, boardButton.image.createGraphics(), boardButton.color, boardButton.pressed);
     }
@@ -146,26 +138,24 @@ public class RenderBoardUI
       return BoardButtonImage.UNSELECTED;
     }
 
-    if (redundant && !pressed) {
-      return BoardButtonImage.REDUNDS;
-    }
-
-    if (selected && !pressed) {
-      return BoardButtonImage.SELECTED;
-    }
-
     if (finger < 2) {
+      if (redundant && !pressed) {
+        return BoardButtonImage.REDUNDS;
+      }
+
+      if (selected && !pressed) {
+        return BoardButtonImage.SELECTED;
+      }
+
       return BoardButtonImage.PRESSED_ANY;
     }
 
     if (finger <= 5) {
-      return BoardButtonImage.values()[finger];
+      return BoardButtonImage.values()[finger + 1];
     }
 
     return BoardButtonImage.PRESSED_ANY;
   }
-
-
 
   ButtonDrawer getButtonDrawer()
   {
@@ -186,7 +176,7 @@ public class RenderBoardUI
 
     abstract void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY);
 
-    abstract void draw(Graphics2D graphics, int col, int row, 
+    abstract void draw(Graphics2D graphics, int col, int row,
             boolean selected, BoardButtonImage boardButton);
   }
 
@@ -210,7 +200,7 @@ public class RenderBoardUI
       if (scale < 1) {
         scale = 1;
       }
-      
+
       //Recreate Images every time?
       //****************
       createButtonImages(scale);
@@ -226,8 +216,8 @@ public class RenderBoardUI
     }
 
     @Override
-    void draw(Graphics2D graphics, int col, int row, 
-              boolean selected, BoardButtonImage boardButton)
+    void draw(Graphics2D graphics, int col, int row,
+            boolean selected, BoardButtonImage boardButton)
     {
       if (boardButton == null) {
         return;
@@ -240,7 +230,7 @@ public class RenderBoardUI
       graphics.drawImage(boardButton.image, 0, 0, imWidth, imHeight, null);
 
       //graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.f));
-      
+
       if (boardButton.pressed) {
         //     graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         //graphics.drawImage(pressedIM, 0, 0, imWidth, imHeight, null);
@@ -455,9 +445,9 @@ public class RenderBoardUI
     float fractions[] = {0.0f, 0.5f, 1.0f};
     Color colors[] = {Color.green.darker(), Color.yellow, Color.red};
     optimalityImage = new BufferedImage(imageDim, imageDim, BufferedImage.TYPE_INT_ARGB);
-    LinearGradientPaint gradient = new LinearGradientPaint(0, imageDim/2, imageDim, imageDim/2, fractions, colors);
+    LinearGradientPaint gradient = new LinearGradientPaint(0, imageDim / 2, imageDim, imageDim / 2, fractions, colors);
 
-    Graphics2D graphics = (Graphics2D)optimalityImage.getGraphics();
+    Graphics2D graphics = (Graphics2D) optimalityImage.getGraphics();
     graphics.setPaint(gradient);
     graphics.fillRect(0, 0, imageDim, imageDim);
   }
@@ -468,14 +458,13 @@ public class RenderBoardUI
 
     // Golden Ratio
     int iconHeight = 16;
-    int iconWidth = (int)(iconHeight);// * 1.61803399);
+    int iconWidth = (int) (iconHeight);// * 1.61803399);
 
     int stepWidth = optimalityImage.getWidth() / numIcons;
     int stepHeight = optimalityImage.getHeight();
 
-    for (int i = 0; i < optimalityIcons.length; i++)
-    {
-      optimalityIcons[i] = new ImageIcon(optimalityImage.getSubimage(i*stepWidth, 0, stepWidth, stepHeight).
+    for (int i = 0; i < optimalityIcons.length; i++) {
+      optimalityIcons[i] = new ImageIcon(optimalityImage.getSubimage(i * stepWidth, 0, stepWidth, stepHeight).
               getScaledInstance(iconWidth, iconHeight, BufferedImage.SCALE_FAST));
     }
   }

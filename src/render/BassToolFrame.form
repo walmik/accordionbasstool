@@ -9,6 +9,9 @@
     <Property name="defaultCloseOperation" type="int" value="3"/>
     <Property name="title" type="java.lang.String" value="Accordion Bass Tool v0.7"/>
   </Properties>
+  <AccessibilityProperties>
+    <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Accordion Bass Tool v0.8"/>
+  </AccessibilityProperties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="2"/>
   </SyntheticProperties>
@@ -106,8 +109,8 @@
                 <Component class="render.TabButtonClicker" name="tabButtonClicker">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="Button Clicker">
-                        <Property name="tabTitle" type="java.lang.String" value="Button Clicker"/>
+                      <JTabbedPaneConstraints tabName="Pick Chord/Notes">
+                        <Property name="tabTitle" type="java.lang.String" value="Pick Chord/Notes"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>
@@ -115,8 +118,8 @@
                 <Component class="render.TabChordPicker" name="tabChordPicker">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="Chord Picker">
-                        <Property name="tabTitle" type="java.lang.String" value="Chord Picker"/>
+                      <JTabbedPaneConstraints tabName="Edit Chord">
+                        <Property name="tabTitle" type="java.lang.String" value="Edit Chord"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>
@@ -124,8 +127,8 @@
                 <Component class="render.TabSeqEditor" name="tabSeqEditor">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="Full Sequence Editor">
-                        <Property name="tabTitle" type="java.lang.String" value="Full Sequence Editor"/>
+                      <JTabbedPaneConstraints tabName="Edit Sequence/Scale">
+                        <Property name="tabTitle" type="java.lang.String" value="Edit Sequence/Scale"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>

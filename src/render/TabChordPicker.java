@@ -27,7 +27,7 @@ import music.RelChord;
  * @author Ilya
  */
 public class TabChordPicker extends javax.swing.JPanel
-        implements ActionListener, PropertyChangeListener, ListSelectionListener
+        implements ActionListener, PropertyChangeListener
 {
 
   /** Creates new form TabChordPicker3 */
@@ -41,13 +41,25 @@ public class TabChordPicker extends javax.swing.JPanel
   SeqColumnModel seqColumnModel = null;
   final static int DEFAULT_TABLE_COL_WIDTH = 96;
   int isUpdatingChord = 0;
-  int lastColSel = -1;
+  SeqTableEventAdapter listselAdapter;
   boolean usingAddedBass;
 
   void setSeqColModel(SeqColumnModel model)
   {
     seqColumnModel = model;
-    seqColumnModel.getSelectionModel().addListSelectionListener(this);
+
+    listselAdapter = new SeqTableEventAdapter()
+    {
+      @Override
+      protected void selectionChanged(int index)
+      {
+        if (isVisible()) {
+          setupChord(seqColumnModel.getChordDef(index));
+        }
+      }
+    };
+
+    seqColumnModel.getSelectionModel().addListSelectionListener(listselAdapter);
   }
 
   public void init()
@@ -122,28 +134,26 @@ public class TabChordPicker extends javax.swing.JPanel
     }
   }
 
-  @Override
-  public void valueChanged(ListSelectionEvent e)
-  {
-    //Column Selection Change
-    if (!isVisible()) {
-      return;
-    }
-
-    int index = seqColumnModel.getSelectedColumn();
-    if (index == lastColSel) {
-      return;
-    }
-
-    lastColSel = index;
-
-    if (index < 0) {
-      return;
-    }
-
-    setupChord(seqColumnModel.getChordDef(index));
-  }
-
+//  public void selectionChanged(int index)
+//  {
+//    //Column Selection Change
+//    if (!isVisible()) {
+//      return;
+//    }
+//
+//    //int index = seqColumnModel.getSelectedColumn();
+//    //if (index == lastColSel) {
+//    //  return;
+//    //}
+//
+//    //lastColSel = index;
+//
+//    //if (index < 0) {
+//    //  return;
+//    //}
+//
+//    setupChord(seqColumnModel.getChordDef(index));
+//  }
   private void updateChordInModel()
   {
     if (isUpdatingChord > 0) {
@@ -219,7 +229,7 @@ public class TabChordPicker extends javax.swing.JPanel
       int index = seqColumnModel.getSelectedColumn();
       if ((index >= 0) && (index < seqColumnModel.getColumnCount())) {
         setupChord(this.seqColumnModel.getChordDef(index));
-        lastColSel = -1;
+        listselAdapter.clearLastIndex();
       }
     }
     super.setVisible(visible);
@@ -379,7 +389,7 @@ public class TabChordPicker extends javax.swing.JPanel
     }
 
     // Select specific inversion note
-    
+
     index -= 2;
 
     Chord simpleChord = currRelChord.buildChord(rootNote);

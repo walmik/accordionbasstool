@@ -21,7 +21,7 @@ import javax.swing.event.ListSelectionListener;
 import music.BassBoard;
 import music.ButtonComboSequence;
 
-public class RenderBassBoard extends JPanel implements ListSelectionListener
+public class RenderBassBoard extends JPanel
 {
 
   final static long serialVersionUID = 1;
@@ -139,17 +139,18 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
     return _theBoard;
   }
 
-  @Override
-  public void valueChanged(ListSelectionEvent e)
-  {
-    repaint();
-  }
-
   public void setSelectedButtonCombo(SelectedButtonCombo newSel)
   {
     _selCombo = newSel;
     if (_selCombo != null) {
-      _selCombo.addListSelectionListener(this);
+      _selCombo.addListSelectionListener(new SeqTableEventAdapter()
+      {
+        @Override
+        public void selectionChanged(int index)
+        {
+          repaint();
+        }
+      });
     }
     repaint();
   }
@@ -448,7 +449,7 @@ public class RenderBassBoard extends JPanel implements ListSelectionListener
           pressed = true;
         }
 
-        RenderBoardUI.BoardButtonImage boardButton = 
+        RenderBoardUI.BoardButtonImage boardButton =
                 RenderBoardUI.defaultUI.getBoardButtonImage(pressed, selected, redundant, finger);
 
         {

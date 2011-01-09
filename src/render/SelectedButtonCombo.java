@@ -71,7 +71,7 @@ public class SelectedButtonCombo extends DefaultListSelectionModel
   {
     _comboSeq = seq;
     _fingerSeq = null;
-    this.fireValueChanged(getAnchorSelectionIndex(), getAnchorSelectionIndex());
+    //this.fireValueChanged(getAnchorSelectionIndex(), getAnchorSelectionIndex());
   }
 
   public void setButtonCombo(ButtonCombo combo)
@@ -80,7 +80,7 @@ public class SelectedButtonCombo extends DefaultListSelectionModel
     _comboSeq.add(combo);
     _fingerSeq = null;
     this.setSelectionInterval(0, 0);
-    this.fireValueChanged(getAnchorSelectionIndex(), getAnchorSelectionIndex());
+    //this.fireValueChanged(getAnchorSelectionIndex(), getAnchorSelectionIndex());
   }
 
   public ButtonCombo getSelectedButtonCombo()
@@ -102,6 +102,6 @@ public class SelectedButtonCombo extends DefaultListSelectionModel
   {
     _fingerSeq = seq;
     _comboSeq = seq.getButtonComboSeq();
-    this.fireValueChanged(getAnchorSelectionIndex(), getAnchorSelectionIndex());
+    //this.fireValueChanged(getAnchorSelectionIndex(), getAnchorSelectionIndex());
   }
 }

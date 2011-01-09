@@ -15,11 +15,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import javax.swing.Timer;
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import music.ButtonCombo;
 import music.ChordRegistry;
@@ -149,7 +147,7 @@ public class SeqTablePanel extends javax.swing.JPanel
     }
   }
 
-  private class ColumnChangeListener extends SeqColumnModel.TableEventAdapter
+  private class ColumnChangeListener extends SeqTableEventAdapter
   {
 
     @Override
@@ -169,7 +167,7 @@ public class SeqTablePanel extends javax.swing.JPanel
     }
 
     @Override
-    public void columnSelectionChanged(ListSelectionEvent e)
+    public void selectionChanged(int index)
     {
       if (toolPlay != null) {
         toolPlay.setVisible(columnModel.getColumnCount() > 1);
@@ -423,7 +421,7 @@ public class SeqTablePanel extends javax.swing.JPanel
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
 
-    statusText.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+    statusText.setFont(new java.awt.Font("Tahoma", 0, 16));
     statusText.setText("Status");
     statusText.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -445,10 +443,10 @@ public class SeqTablePanel extends javax.swing.JPanel
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
             .addGap(11, 11, 11)
-            .addComponent(seqTableScrollPane, 0, 0, Short.MAX_VALUE))
+            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
           .addComponent(sidebar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(statusText, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))

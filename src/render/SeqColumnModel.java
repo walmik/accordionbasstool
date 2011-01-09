@@ -1,15 +1,9 @@
 package render;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.TableColumnModelEvent;
-import javax.swing.event.TableModelEvent;
 import music.ParsedChordDef;
 import java.util.Vector;
 import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.TableColumnModelListener;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
@@ -59,10 +53,6 @@ public class SeqColumnModel extends DefaultTableColumnModel
 
     dataModel = new SeqDataModel();
     rowHeaderDataModel = new SeqRowHeaderData();
-
-//    if (renderBoard != null) {
-//      renderBoard.setSelectedButtonCombo(selComboModel);
-//    }
 
     this.setSelectionModel(selComboModel);
   }
@@ -121,27 +111,28 @@ public class SeqColumnModel extends DefaultTableColumnModel
     }
 
     if (obj instanceof ButtonCombo) {
-      return (ButtonCombo)obj;
+      return (ButtonCombo) obj;
     } else if (obj instanceof FingerCombo) {
-      return ((FingerCombo)obj).getButtonCombo();
+      return ((FingerCombo) obj).getButtonCombo();
     }
 
     return null;
   }
 
-  void editSelectedColumn(ParsedChordDef newDef)
+  boolean editSelectedColumn(ParsedChordDef newDef)
   {
     int index = getSelectedColumn();
     if (index >= 0) {
-      editColumn(index, newDef);
+      return editColumn(index, newDef);
     }
+
+    return false;
   }
 
   void resetToSingleColumn()
   {
     this.tableColumns.clear();
     this.addColumn(0);
-    //this.selComboModel.setSelectionInterval(0, 0);
   }
 
   void removeSelectedColumn()
@@ -213,21 +204,23 @@ public class SeqColumnModel extends DefaultTableColumnModel
     recomputeSeqs();
   }
 
-  private void editColumn(int index, ParsedChordDef newChordDef)
+  private boolean editColumn(int index, ParsedChordDef newChordDef)
   {
     TableColumn column = this.getColumn(index);
 
     if (newChordDef == null) {
-      return;
+      return false;
     }
 
-    ParsedChordDef oldChordDef = (ParsedChordDef)column.getHeaderValue();
+    ParsedChordDef oldChordDef = (ParsedChordDef) column.getHeaderValue();
     column.setHeaderValue(newChordDef);
 
     if (!oldChordDef.equalForRecompute(newChordDef)) {
       computeSeqs(index);
+      return true;
     } else {
       this.fireColumnMarginChanged();
+      return false;
     }
   }
 
@@ -262,7 +255,12 @@ public class SeqColumnModel extends DefaultTableColumnModel
     return rowHeaderDataModel;
   }
 
-  void addTableAndColumnListener(TableEventAdapter listener)
+  public ListSelectionModel getRowSelModel()
+  {
+    return this.rowSelModel;
+  }
+
+  void addTableAndColumnListener(SeqTableEventAdapter listener)
   {
     this.addColumnModelListener(listener);
     this.getDataModel().addTableModelListener(listener);
@@ -362,13 +360,13 @@ public class SeqColumnModel extends DefaultTableColumnModel
     rowHeaderDataModel.fireListDataChanged();
     dataModel.fireTableDataChanged();
 
+    updateRowSel(rowSel);
+
     if (colSel < currSeqArray.length) {
       selComboModel.setSelectionInterval(colSel, colSel);
     } else {
       selComboModel.setSelectionInterval(0, 0);
     }
-
-    updateRowSel(rowSel);
   }
 
   public void recomputeSeqs()
@@ -411,7 +409,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
         clearedAny = true;
       }
     }
-    
+
     if (clearedAny) {
       this.recomputeSeqs();
     }
@@ -510,55 +508,6 @@ public class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
-//  class ButtonSeqDataModel extends AbstractTableModel
-//  {
-//
-//    @Override
-//    public Class<?> getColumnClass(int columnIndex)
-//    {
-//      return ButtonCombo.class;
-//    }
-//
-//    @Override
-//    public String getColumnName(int column)
-//    {
-//      return SeqColumnModel.this.getChordDef(column).nameHtml;
-//    }
-//
-//    public ButtonSeqDataModel()
-//    {
-//    }
-//
-//    @Override
-//    public int getColumnCount()
-//    {
-//      return SeqColumnModel.this.getColumnCount();
-//    }
-//
-//    @Override
-//    public int getRowCount()
-//    {
-//      if (allComboSeqs.length == 0) {
-//        return 1;
-//      }
-//
-//      return allComboSeqs.length;
-//    }
-//
-//    @Override
-//    public Object getValueAt(int rowIndex, int columnIndex)
-//    {
-//      if ((rowIndex < 0) || (rowIndex >= allComboSeqs.length)) {
-//        return null;
-//      }
-//
-//      if ((columnIndex < 0) || (columnIndex >= allComboSeqs[rowIndex].getNumCombos())) {
-//        return null;
-//      }
-//
-//      return allComboSeqs[rowIndex].getCombo(columnIndex);
-//    }
-//  }
   class SeqRowHeaderData extends AbstractListModel
   {
 
@@ -589,46 +538,6 @@ public class SeqColumnModel extends DefaultTableColumnModel
       }
 
       return currSeqArray[index];
-    }
-  }
-
-  static class TableEventAdapter implements TableColumnModelListener, TableModelListener
-  {
-
-    @Override
-    public void columnAdded(TableColumnModelEvent e)
-    {
-      columnCountChanged(e);
-    }
-
-    @Override
-    public void columnMarginChanged(ChangeEvent e)
-    {
-    }
-
-    @Override
-    public void columnMoved(TableColumnModelEvent e)
-    {
-    }
-
-    @Override
-    public void columnRemoved(TableColumnModelEvent e)
-    {
-      columnCountChanged(e);
-    }
-
-    @Override
-    public void columnSelectionChanged(ListSelectionEvent e)
-    {
-    }
-
-    public void columnCountChanged(TableColumnModelEvent e)
-    {
-    }
-
-    @Override
-    public void tableChanged(TableModelEvent e)
-    {
     }
   }
 }
