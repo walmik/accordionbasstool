@@ -35,7 +35,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
   public boolean optFingerSearch = false;
   final static int DEFAULT_COL_WIDTH = 120;
 
-  SeqColumnModel(RenderBassBoard rBoard, ListSelectionModel selM)
+  public SeqColumnModel(RenderBassBoard rBoard, ListSelectionModel selM)
   {
     selComboModel = new SelectedButtonCombo();
     selComboModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

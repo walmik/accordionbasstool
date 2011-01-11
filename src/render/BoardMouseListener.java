@@ -6,11 +6,10 @@ import java.util.Vector;
 import music.BassBoard;
 import music.BoardSearcher;
 import music.ButtonCombo;
-import music.Chord;
 import music.ChordRegistry;
 import music.ParsedChordDef;
 
-class BoardMouseListener extends MouseAdapter
+public class BoardMouseListener extends MouseAdapter
 {
 
   private RenderBassBoard renderBoard;
@@ -33,6 +32,9 @@ class BoardMouseListener extends MouseAdapter
     clickButtons = new Vector<BassBoard.Pos>();
     tabClicker = clicker;
     this.sound = sound;
+
+    renderBoard.addMouseListener(this);
+    renderBoard.addMouseMotionListener(this);
   }
 
   private void updateFromClicked()
@@ -42,7 +44,8 @@ class BoardMouseListener extends MouseAdapter
     ButtonCombo activeCombo = new ButtonCombo(allPos, renderBoard.getBassBoard());
 
     Vector<ParsedChordDef> matches = ChordRegistry.mainRegistry().
-            findChordFromNotes(ButtonCombo.sortedNotes, activeCombo.getChordMask(), tabClicker.optIncludeInversion, true, true);
+            findChordFromNotes(ButtonCombo.sortedNotes, activeCombo.getChordMask(),
+            (tabClicker != null) ? tabClicker.optIncludeInversion : true, true, true);
 
     if (matches.isEmpty()) {
       return;
@@ -53,8 +56,12 @@ class BoardMouseListener extends MouseAdapter
     }
 
     ParsedChordDef activeParsedChord = matches.firstElement();
-    columnModel.editSelectedColumn(activeParsedChord);
-    tabClicker.setMatchedChords(matches);
+    if (columnModel != null) {
+      columnModel.editSelectedColumn(activeParsedChord);
+    }
+    if (tabClicker != null) {
+      tabClicker.setMatchedChords(matches);
+    }
   }
 
   @Override
@@ -65,7 +72,11 @@ class BoardMouseListener extends MouseAdapter
       return;
     }
 
-    sound.play(renderBoard.getBassBoard().getChordAt(clickPos));
+    if (this.isInstaClick) {
+      sound.play(renderBoard.getBassBoard().getChordAt(clickPos), true);
+    } else {
+      sound.play(renderBoard.getBassBoard().getChordAt(clickPos), false);
+    }
 
     lastClickPos = clickPos;
 
@@ -98,13 +109,15 @@ class BoardMouseListener extends MouseAdapter
   public void mousePressed(MouseEvent e)
   {
     BassBoard.Pos clickPos = renderBoard.hitTest(e);
-    sound.play(renderBoard.getBassBoard().getChordAt(clickPos));
-    
-    if (e.isAltDown()) {
+
+    if (e.isAltDown() || (columnModel == null)) {
       isInstaClick = true;
+      sound.play(renderBoard.getBassBoard().getChordAt(clickPos), true);
       renderBoard.setClickPos(clickPos);
       return;
     }
+
+    sound.play(renderBoard.getBassBoard().getChordAt(clickPos), false);
 
     if (isClickShiftMode) {
       if (!e.isShiftDown()) {
@@ -139,6 +152,7 @@ class BoardMouseListener extends MouseAdapter
     if (isInstaClick) {
       renderBoard.clearClickPos();
       isInstaClick = false;
+      sound.stop();
     }
   }
 }

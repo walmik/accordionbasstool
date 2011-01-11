@@ -48,10 +48,10 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     initComponents();
   }
 
-  void initBoardHeader(RenderBassBoard renderBoard, 
-                       JScrollPane pane,
-                       SeqColumnModel model,
-                       Vector<BoardDef> boards)
+  public void initBoardHeader(RenderBassBoard renderBoard,
+          JScrollPane pane,
+          SeqColumnModel model,
+          Vector<BoardDef> boards)
   {
     this.renderBoard = renderBoard;
     this.columnModel = model;
@@ -62,7 +62,7 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     } else {
       boardCombo.setModel(new DefaultComboBoxModel(BoardRegistry.mainRegistry().allBoardDefs));
     }
-    
+
     boardCombo.addActionListener(this);
 
     // Init to standard 120 bass board
@@ -70,6 +70,11 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     if (initialBoardDef != null) {
       boardCombo.setSelectedItem(initialBoardDef);
     }
+  }
+  
+  public JPanel getExtPanel()
+  {
+    return this.extPanel;
   }
   
   Component hiddenBox;
@@ -96,7 +101,7 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   {
     paintGradientBack(this, g);
   }
-  
+
   private static void paintGradientBack(JComponent comp, Graphics g)
   {
     int height = comp.getHeight();
@@ -128,16 +133,20 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     if ((cont != null) && cont.isVisible() && (cont instanceof JFrame)) {
       JFrame frame = (JFrame) cont;
 
-      int diff = 0;
-      if (renderBoard.isHorizontal()) {
-        diff = (renderBoard.getPreferredSize().height - boardScrollPane.getHeight());
-      } else {
-        diff = (renderBoard.getPreferredSize().width - boardScrollPane.getWidth());
-      }
-
-      if (!boardScrollPane.isValid() || !renderBoard.isValid()) {
+      if ((frame.getExtendedState() & JFrame.MAXIMIZED_BOTH) != 0) {
         return;
       }
+
+      int diff = 0;
+      if (renderBoard.isHorizontal()) {
+        diff = (renderBoard.getPreferredSize().height - renderBoard.getHeight());
+      } else {
+        diff = (renderBoard.getPreferredSize().width - renderBoard.getWidth());
+      }
+
+//      if (!boardScrollPane.isValid() || !renderBoard.isValid()) {
+//        return;
+//      }
 
       if (renderBoard.isHorizontal()) {
         renderBoard.setSize(renderBoard.getWidth(), renderBoard.getHeight() + diff);
@@ -166,11 +175,14 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
 
         renderBoard.setBassBoard(newBoard);
         boardScrollPane.revalidate();
-        boardScrollPane.doLayout();
+        //boardScrollPane.doLayout();
+        renderBoard.repaint();
 
         autoSize();
 
-        columnModel.recomputeSeqs();
+        if (columnModel != null) {
+          columnModel.recomputeSeqs();
+        }
 
         String info = "<html>Range: <b>";
         info += newBoard.getMinRootNote().toString(true);
@@ -191,24 +203,15 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    checkHiliteRedunds = new javax.swing.JCheckBox();
+    extPanel = new javax.swing.JPanel();
     jLabel1 = new javax.swing.JLabel();
     boardCombo = new javax.swing.JComboBox();
     infoLabel = new javax.swing.JLabel();
 
     setBackground(java.awt.SystemColor.activeCaption);
 
-    checkHiliteRedunds.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-    checkHiliteRedunds.setText("Press Redundant Buttons");
-    checkHiliteRedunds.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    checkHiliteRedunds.setMargin(new java.awt.Insets(2, 2, 2, 20));
-    checkHiliteRedunds.setOpaque(false);
-    checkHiliteRedunds.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        checkHiliteRedundsActionPerformed(evt);
-      }
-    });
-    add(checkHiliteRedunds);
+    extPanel.setOpaque(false);
+    add(extPanel);
 
     jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getSize()+5f));
     jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -216,24 +219,19 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     add(jLabel1);
 
     boardCombo.setFont(boardCombo.getFont().deriveFont(boardCombo.getFont().getStyle() | java.awt.Font.BOLD, boardCombo.getFont().getSize()+5));
-    boardCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+    boardCombo.setToolTipText("<html>\nClick and select one of the possible bass board layouts.<br/>\nStandard boards vary in the number of bass and chord rows and which<br/>\nchords are included.<br/>\nThe standard bass layout is 120-basses.<br/>\nThe smallest is usually 8 basses.<br/>\n</html>");
     add(boardCombo);
 
     infoLabel.setFont(infoLabel.getFont().deriveFont(infoLabel.getFont().getSize()+5f));
     infoLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     infoLabel.setText("info");
+    infoLabel.setToolTipText("<html>\nThe chord on the left/bottom of the bass side to<br/>\nThe chord on the right/top of the bass side.<br/>\nHigher basses have a wider ranger of chords.<br/>\n72-bass boards and up have chords for all 12 notes\n</html>");
     add(infoLabel);
   }// </editor-fold>//GEN-END:initComponents
 
-  private void checkHiliteRedundsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkHiliteRedundsActionPerformed
-  {//GEN-HEADEREND:event_checkHiliteRedundsActionPerformed
-    renderBoard.getSelectedButtonCombo().showRedunds = checkHiliteRedunds.isSelected();
-    renderBoard.repaint();
-  }//GEN-LAST:event_checkHiliteRedundsActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox boardCombo;
-  private javax.swing.JCheckBox checkHiliteRedunds;
+  private javax.swing.JPanel extPanel;
   private javax.swing.JLabel infoLabel;
   private javax.swing.JLabel jLabel1;
   // End of variables declaration//GEN-END:variables

@@ -62,7 +62,7 @@ public class SeqViewerController
     seqTable = table;
     tableScrollPane = scroll;
 
-    RenderBassBoard renderBoard = BassToolFrame.getRenderBoard();
+    RenderBassBoard renderBoard = RenderBassBoard.getStaticRenderBoard();
 
     columnModel = new SeqColumnModel(renderBoard, seqTable.getSelectionModel());
 
@@ -112,7 +112,7 @@ public class SeqViewerController
       {
         if (columnModel.setSelectedSeq(index)) {
           seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
-          BassToolFrame.getRenderBoard().repaint();
+          RenderBassBoard.getStaticRenderBoard().repaint();
         }
       }
     });

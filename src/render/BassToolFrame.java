@@ -17,11 +17,9 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.sound.sampled.AudioPermission;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import music.BoardRegistry;
 
@@ -36,6 +34,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   boolean editorLeft = true;
   ModeSelector modeSelector;
   BoardMouseListener mouseListener;
+  RenderBassBoard renderBassBoard;
 
   enum ToolMode
   {
@@ -63,11 +62,13 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   public BassToolFrame()
   {
     BoardRegistry.mainRegistry();
+ 
+    renderBassBoard = RenderBassBoard.getStaticRenderBoard();
 
     initComponents();
 
-    //toolTabs.remove(tabButtonClicker);
-    //toolTabs.remove(tabChordPicker);
+    renderBoardControl.getHeader().
+            initBoardHeader(renderBassBoard, renderBoardControl, seqTablePanel.columnModel, null);
 
     // Init Tabs
     seqTablePanel.initChordPicker(tabChordPicker);
@@ -87,22 +88,21 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
             seqTablePanel.columnModel,
             tabButtonClicker,
             seqTablePanel.sound);
-    
-    renderBassBoard.addMouseListener(mouseListener);
-    renderBassBoard.addMouseMotionListener(mouseListener);
+
+    this.renderBoardControl.getHeader().getExtPanel().add(this.checkHiliteRedunds);
     
     //initModeSelector();
 
-    renderBoardHeader.initBoardHeader(
-            renderBassBoard,
-            renderBoardScrollPane,
-            seqTablePanel.columnModel,
-            null);
-
-    renderBoardScrollPane.setColumnHeaderView(renderBoardHeader);
-    renderBoardScrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, renderBoardHeader.getCornerComp());
-    renderBoardScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
-    renderBoardScrollPane.setBorder(BorderFactory.createEmptyBorder());
+//    renderBoardHeader.initBoardHeader(
+//            renderBassBoard,
+//            renderBoardScrollPane,
+//            seqTablePanel.columnModel,
+//            null);
+//
+//    renderBoardScrollPane.setColumnHeaderView(renderBoardHeader);
+//    renderBoardScrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, renderBoardHeader.getCornerComp());
+//    renderBoardScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
+//    renderBoardScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
     renderBassBoard.setSelectedButtonCombo(seqTablePanel.columnModel.selComboModel);
 
@@ -203,7 +203,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       controlSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
     }
 
-    renderBassBoard.setIsHorizontal(!isHoriz);
+    renderBoardControl.toggleOrientation(!isHoriz);
 
     this.computeDividerLocation();
   }
@@ -260,8 +260,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       }
     }
 
-    renderBoardHeader.toggleOrientation(isHoriz);
-
 //    boardAndHeaderPanel.remove(renderBoardHeader);
 //    if (isHoriz && isTopLeft) {
 //      boardAndHeaderPanel.add(BorderLayout.SOUTH, renderBoardHeader);
@@ -271,16 +269,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 //      renderBoardHeader.flipHeader(false);
 //    }
   }
-  private static RenderBassBoard theBoard = null;
 
-  public static RenderBassBoard getRenderBoard()
-  {
-    if (theBoard == null) {
-      theBoard = new RenderBassBoard();
-    }
-
-    return theBoard;
-  }
+//  public static RenderBassBoard getRenderBoard()
+//  {
+//    return RenderBassBoard.getStaticRenderBoard();
+//  }
 
   void initModeSelector()
   {
@@ -350,10 +343,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    renderBoardHeader = new render.RenderBoardHeader();
+    checkHiliteRedunds = new javax.swing.JCheckBox();
     boardSplitPane = new javax.swing.JSplitPane();
-    renderBoardScrollPane = new javax.swing.JScrollPane();
-    renderBassBoard = getRenderBoard();
     controlSplitPane = new javax.swing.JSplitPane();
     seqTablePanel = new render.SeqTablePanel();
     toolTabs = new javax.swing.JTabbedPane();
@@ -362,6 +353,18 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     tabSeqEditor = new render.TabSeqEditor();
     tabOptions = new render.TabOptions();
     tabPitchDetect = new render.TabPitchDetect();
+    renderBoardControl = new render.RenderBoardControl();
+
+    checkHiliteRedunds.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+    checkHiliteRedunds.setText("Press Redundant Buttons");
+    checkHiliteRedunds.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    checkHiliteRedunds.setMargin(new java.awt.Insets(2, 2, 2, 20));
+    checkHiliteRedunds.setOpaque(false);
+    checkHiliteRedunds.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        checkHiliteRedundsActionPerformed(evt);
+      }
+    });
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Accordion Bass Tool v0.8");
@@ -369,23 +372,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     boardSplitPane.setDividerSize(16);
     boardSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
     boardSplitPane.setOneTouchExpandable(true);
-
-    javax.swing.GroupLayout renderBassBoardLayout = new javax.swing.GroupLayout(renderBassBoard);
-    renderBassBoard.setLayout(renderBassBoardLayout);
-    renderBassBoardLayout.setHorizontalGroup(
-      renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 1091, Short.MAX_VALUE)
-    );
-    renderBassBoardLayout.setVerticalGroup(
-      renderBassBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 268, Short.MAX_VALUE)
-    );
-
-    renderBoardScrollPane.setViewportView(renderBassBoard);
-
-    renderBoardScrollPane.getVerticalScrollBar().setBlockIncrement(24);
-    renderBoardScrollPane.getVerticalScrollBar().setUnitIncrement(8);
-    boardSplitPane.setBottomComponent(renderBoardScrollPane);
 
     controlSplitPane.setDividerSize(16);
     controlSplitPane.setAutoscrolls(true);
@@ -401,17 +387,22 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     controlSplitPane.setLeftComponent(toolTabs);
 
     boardSplitPane.setLeftComponent(controlSplitPane);
+    boardSplitPane.setRightComponent(renderBoardControl);
 
     getContentPane().add(boardSplitPane, java.awt.BorderLayout.CENTER);
-
-    getAccessibleContext().setAccessibleName("Accordion Bass Tool v0.8");
   }// </editor-fold>//GEN-END:initComponents
+
+  private void checkHiliteRedundsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkHiliteRedundsActionPerformed
+  {//GEN-HEADEREND:event_checkHiliteRedundsActionPerformed
+    renderBassBoard.getSelectedButtonCombo().showRedunds = checkHiliteRedunds.isSelected();
+    renderBassBoard.repaint();
+}//GEN-LAST:event_checkHiliteRedundsActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JSplitPane boardSplitPane;
+  private javax.swing.JCheckBox checkHiliteRedunds;
   private javax.swing.JSplitPane controlSplitPane;
-  private render.RenderBassBoard renderBassBoard;
-  private render.RenderBoardHeader renderBoardHeader;
-  private javax.swing.JScrollPane renderBoardScrollPane;
+  private render.RenderBoardControl renderBoardControl;
   private render.SeqTablePanel seqTablePanel;
   private render.TabButtonClicker tabButtonClicker;
   private render.TabChordPicker tabChordPicker;

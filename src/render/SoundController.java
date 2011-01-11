@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package render;
 
 import music.ButtonCombo;
@@ -15,9 +14,16 @@ import music.midi.Player;
  */
 public class SoundController
 {
+
   Player player;
   boolean soundEnabled = false;
   boolean arpeggiating = false;
+
+  public SoundController()
+  {
+    player = new music.midi.Player();
+    player.init();
+  }
 
   public void setEnabled(boolean enabled)
   {
@@ -39,25 +45,36 @@ public class SoundController
     arpeggiating = arp;
   }
 
-  public boolean play(ButtonCombo combo)
+  public void stop()
   {
+    player.stopAll();
+  }
+
+  public boolean play(ButtonCombo combo, boolean manualStop)
+  {
+    if (manualStop) {
+      stop();
+    }
+    
     if (combo != null) {
-      return play(combo.getChordMask());
+      return play(combo.getChordMask(), manualStop);
     }
 
     return false;
   }
 
-  public boolean play(Chord chord)
+  public boolean play(Chord chord, boolean manualStop)
   {
     if (chord != null) {
-      return play(chord.getChordMask());
+      return play(chord.getChordMask(), manualStop);
+    } else if (manualStop) {
+      stop();
     }
 
     return false;
   }
 
-  public boolean play(Chord.Mask chordMask)
+  public boolean play(Chord.Mask chordMask, boolean manualStop)
   {
     if (!soundEnabled || (chordMask == null)) {
       if (player != null) {
@@ -76,7 +93,7 @@ public class SoundController
     if (arpeggiating) {
       return player.playArpeggiate(chordMask.getValue(), 200);
     } else {
-      return player.playChord(chordMask.getValue(), 500);
+      return player.playChord(chordMask.getValue(), 500, manualStop);
     }
   }
 }

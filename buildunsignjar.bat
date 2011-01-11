@@ -1,0 +1,1 @@
+jar cf ./web/AccordTools.jar -C ./build/classes .

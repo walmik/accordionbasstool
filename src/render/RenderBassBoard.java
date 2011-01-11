@@ -24,6 +24,16 @@ public class RenderBassBoard extends JPanel
 {
 
   final static long serialVersionUID = 1;
+  static RenderBassBoard staticBoard;
+
+  public static RenderBassBoard getStaticRenderBoard()
+  {
+    if (staticBoard == null) {
+      staticBoard = new RenderBassBoard();
+    }
+
+    return staticBoard;
+  }
 
   public RenderBassBoard()
   {
@@ -247,6 +257,9 @@ public class RenderBassBoard extends JPanel
     rPos -= margin.height / 2;
 
     row = rPos / _rInc;
+    if (rPos < 0) {
+      row = -1;
+    }
     cPos -= (_cStart + row * _slope);
     col = (cPos + _cInc) / _cInc - 1;
 
@@ -276,8 +289,11 @@ public class RenderBassBoard extends JPanel
     margin.width = 3 * RenderBoardUI.defaultUI.buttonXMargin;
     margin.height = 2 * RenderBoardUI.defaultUI.buttonXMargin;
 
-    w = getWidth() - (_borderInsets.left + _borderInsets.right) - margin.width;
-    h = getHeight() - (_borderInsets.top + _borderInsets.bottom) - margin.height;
+    int usedWidth = getWidth();
+    int usedHeight = getHeight();
+
+    w = usedWidth - (_borderInsets.left + _borderInsets.right) - margin.width;
+    h = usedHeight - (_borderInsets.top + _borderInsets.bottom) - margin.height;
 
     if (!_isHoriz) {
       int t = w;

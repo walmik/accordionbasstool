@@ -147,7 +147,7 @@ public class SeqTablePanel extends javax.swing.JPanel
 
       if (combo != null) {
         //****
-        sound.play(combo);
+        sound.play(combo, false);
         //****
 
         Note lowest = combo.getLowestNote();
@@ -209,7 +209,7 @@ public class SeqTablePanel extends javax.swing.JPanel
       } else if (e.getActionCommand().equals("PlaySeq")) {
         if (!playTimer.isRunning()) {
           toolPlay.setText("Stop");
-          sound.play(getCurrCombo());
+          sound.play(getCurrCombo(), false);
           playTimer.restart();
         } else {
           toolPlay.setText("Play");

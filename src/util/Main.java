@@ -51,7 +51,7 @@ public class Main
     return doc;
   }
 
-  private static boolean setNimbus()
+  public static boolean setNimbus()
   {
     try {
       for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
