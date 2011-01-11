@@ -130,12 +130,13 @@ public class ButtonComboSequence implements Cloneable, CollSequence<ButtonCombo>
 		ButtonCombo firstCombo = null;
 
     final BassBoard.Pos boardCenter = board.getCenter();
+    GeoPos geoCenter = new GeoPos(boardCenter, boardCenter);
 		
 		while (combosList.hasMoreElements())
 		{
 			ButtonCombo combo = combosList.nextElement();
 			
-			dist += combo.evalHeur(boardCenter);
+			dist += combo.evalHeur(geoCenter);
       maxP.max(combo.boundsMax);
       minP.min(combo.boundsMin);
 			

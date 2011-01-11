@@ -6,31 +6,33 @@ import java.util.Vector;
 import music.BassBoard;
 import music.BoardSearcher;
 import music.ButtonCombo;
+import music.Chord;
 import music.ChordRegistry;
 import music.ParsedChordDef;
 
 class BoardMouseListener extends MouseAdapter
 {
-  
+
   private RenderBassBoard renderBoard;
   private SeqColumnModel columnModel;
   private TabButtonClicker tabClicker;
-  
   private BassBoard.Pos lastClickPos;
   private boolean isClickShiftMode = true;
-  private boolean isAltClick = false;
+  private boolean isInstaClick = false;
   private int clickIndex = -1;
   private Vector<BassBoard.Pos> clickButtons;
-  
+  private SoundController sound;
 
-  public BoardMouseListener(RenderBassBoard renderB, 
-                            SeqColumnModel model,
-                            TabButtonClicker clicker)
+  public BoardMouseListener(RenderBassBoard renderB,
+          SeqColumnModel model,
+          TabButtonClicker clicker,
+          SoundController sound)
   {
     renderBoard = renderB;
     columnModel = model;
     clickButtons = new Vector<BassBoard.Pos>();
     tabClicker = clicker;
+    this.sound = sound;
   }
 
   private void updateFromClicked()
@@ -58,21 +60,23 @@ class BoardMouseListener extends MouseAdapter
   @Override
   public void mouseDragged(MouseEvent e)
   {
-    if (isAltClick) {
-      renderBoard.setClickPos(e);
+    BassBoard.Pos clickPos = renderBoard.hitTest(e);
+    if (BassBoard.posEquals(lastClickPos, clickPos)) {
       return;
     }
-    if (clickIndex >= 0) {
-      BassBoard.Pos clickPos = renderBoard.hitTest(e);
-      if (BassBoard.posEquals(lastClickPos, clickPos)) {
-        return;
-      }
-      lastClickPos = clickPos;
+
+    sound.play(renderBoard.getBassBoard().getChordAt(clickPos));
+
+    lastClickPos = clickPos;
+
+    if (isInstaClick) {
+      renderBoard.setClickPos(clickPos);
+    } else if (clickIndex >= 0) {
       if ((clickPos != null) && (clickIndex < clickButtons.size()) && !clickButtons.contains(clickPos)) {
         clickButtons.setElementAt(clickPos, clickIndex);
       }
+      updateFromClicked();
     }
-    updateFromClicked();
   }
 
   private void syncActiveButtons()
@@ -93,11 +97,15 @@ class BoardMouseListener extends MouseAdapter
   @Override
   public void mousePressed(MouseEvent e)
   {
-    if (e.isAltDown() || e.isAltGraphDown()) {
-      isAltClick = true;
-      renderBoard.setClickPos(e);
+    BassBoard.Pos clickPos = renderBoard.hitTest(e);
+    sound.play(renderBoard.getBassBoard().getChordAt(clickPos));
+    
+    if (e.isAltDown()) {
+      isInstaClick = true;
+      renderBoard.setClickPos(clickPos);
       return;
     }
+
     if (isClickShiftMode) {
       if (!e.isShiftDown()) {
         clickButtons.clear();
@@ -107,7 +115,7 @@ class BoardMouseListener extends MouseAdapter
     } else {
       syncActiveButtons();
     }
-    BassBoard.Pos clickPos = renderBoard.hitTest(e);
+
     clickIndex = -1;
     if (clickPos != null) {
       clickIndex = clickButtons.indexOf(clickPos);
@@ -128,9 +136,9 @@ class BoardMouseListener extends MouseAdapter
   @Override
   public void mouseReleased(MouseEvent e)
   {
-    if (isAltClick) {
+    if (isInstaClick) {
       renderBoard.clearClickPos();
-      isAltClick = false;
+      isInstaClick = false;
     }
   }
 }

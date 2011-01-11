@@ -5,6 +5,7 @@ public class BassBoard
 
   public enum RowType
   {
+
     BassRoot,
     BassMaj3,
     BassMin3,
@@ -13,7 +14,6 @@ public class BassBoard
     Chord7th,
     ChordDim,
   }
-  
 
   public static class Pos
   {
@@ -34,7 +34,7 @@ public class BassBoard
         return false;
       }
 
-      Pos p = (Pos)o;
+      Pos p = (Pos) o;
       return (row == p.row) && (col == p.col);
     }
 
@@ -56,7 +56,7 @@ public class BassBoard
   public static BassBoard bassBoard120()
   {
     BoardRegistry.mainRegistry();
-    
+
     RowType[] layout = {RowType.BassMaj3,
       RowType.BassRoot,
       RowType.ChordMajor,
@@ -95,7 +95,7 @@ public class BassBoard
   public static BassBoard bassBoard32()
   {
     BoardRegistry.mainRegistry();
-    
+
     RowType[] layout = {RowType.BassMaj3,
       RowType.BassRoot,
       RowType.ChordMajor,
@@ -103,7 +103,6 @@ public class BassBoard
 
     return new BassBoard(layout, 8);
   }
-
   final protected BoardRow[] rowLayout;
   final int cols;
   final Pos centerPos;
@@ -111,7 +110,7 @@ public class BassBoard
 
   public BoardRow getRow(int index)
   {
-    assert(index < rowLayout.length);
+    assert (index < rowLayout.length);
     return rowLayout[index];
   }
 
@@ -203,7 +202,7 @@ public class BassBoard
 
   public Chord getChordAt(Pos pos)
   {
-    return getChordAt(pos.row, pos.col);
+    return ((pos != null) ? getChordAt(pos.row, pos.col) : null);
   }
 
   public Chord getChordAt(int row, int col)

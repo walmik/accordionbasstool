@@ -249,6 +249,9 @@
             <Property name="actionCommand" type="java.lang.String" value="Arepggiate Chords"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkArpeggActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="toolResetAll">
           <Properties>

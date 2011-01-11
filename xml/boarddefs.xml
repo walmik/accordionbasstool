@@ -13,7 +13,7 @@
 
   <boards>
 <!--Notes Only)-->
-    <board name="Notes Only" middleNote="C" numColumns="12">
+    <board name="Notes Only" numColumns="12" filter="extra">
       <row name="BassMaj3"/>
       <row name="BassRoot"/>
     </board>
@@ -118,7 +118,7 @@
       <row name="ChordDim"/>
     </board>
 <!--Aug 140-->
-    <board name="Aug 140" numColumns="12">
+    <board name="Aug 140" numColumns="12" filter="extra">
       <row name="ChordAug"/>
       <row name="BassMaj3"/>
       <row name="BassRoot"/>

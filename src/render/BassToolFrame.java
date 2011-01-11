@@ -82,13 +82,22 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     
     tabButtonClicker.setSeqColModel(seqTablePanel.columnModel);
     
-    mouseListener = new BoardMouseListener(renderBassBoard, seqTablePanel.columnModel, tabButtonClicker);
+    mouseListener =
+            new BoardMouseListener(renderBassBoard,
+            seqTablePanel.columnModel,
+            tabButtonClicker,
+            seqTablePanel.sound);
+    
     renderBassBoard.addMouseListener(mouseListener);
     renderBassBoard.addMouseMotionListener(mouseListener);
     
     //initModeSelector();
 
-    renderBoardHeader.initBoardHeader(renderBassBoard, renderBoardScrollPane, seqTablePanel.columnModel);
+    renderBoardHeader.initBoardHeader(
+            renderBassBoard,
+            renderBoardScrollPane,
+            seqTablePanel.columnModel,
+            null);
 
     renderBoardScrollPane.setColumnHeaderView(renderBoardHeader);
     renderBoardScrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, renderBoardHeader.getCornerComp());

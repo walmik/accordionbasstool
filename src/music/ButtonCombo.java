@@ -215,7 +215,7 @@ public class ButtonCombo
     return boardDim;
   }
 
-  int evalHeur(final BassBoard.Pos boardCenter)
+  int evalHeur(GeoPos boardCenter)
   {
     if ((heur != 0)) {
       return heur;
@@ -223,34 +223,10 @@ public class ButtonCombo
 
     heur = 1;
 
-//    center = GeoPos.zero();
-//    GeoPos minP = GeoPos.maxPos();
-//    GeoPos maxP = GeoPos.minPos();
-//    GeoPos currPos = GeoPos.zero();
-//
-//    // Compute center and corners of the buttoncombo
-//    for (int i = 0; i < pos.length; i++) {
-//      currPos.set(pos[i], boardCenter);
-//      center.add(currPos);
-//      minP.min(currPos);
-//      maxP.max(currPos);
-//    }
-//
-//    if (pos.length > 0) {
-//      center.divide(pos.length);
-//    }
-//
-//    // Update max min bounds, if provided
-//    if (boundsMax != null && boundsMin != null) {
-//      boundsMax.max(maxP);
-//      boundsMin.min(minP);
-//    }
-//
-//    maxP.subtract(minP);
-
     // Span width + height
     heur += this.computeComboBounds() * 8;
-    //heur += center.absValue();
+    heur += center.subtract(boardCenter).absValue();
+    
     heur += (pos.length - 1) * 10;
 
     return heur;

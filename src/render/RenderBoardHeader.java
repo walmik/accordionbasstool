@@ -19,6 +19,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -28,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import music.BassBoard;
 import music.BoardRegistry;
+import music.BoardRegistry.BoardDef;
 
 /**
  *
@@ -46,15 +48,21 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     initComponents();
   }
 
-  void initBoardHeader(RenderBassBoard renderBoard, JScrollPane pane, SeqColumnModel model)
+  void initBoardHeader(RenderBassBoard renderBoard, 
+                       JScrollPane pane,
+                       SeqColumnModel model,
+                       Vector<BoardDef> boards)
   {
     this.renderBoard = renderBoard;
     this.columnModel = model;
     this.boardScrollPane = pane;
 
-    //renderBoard.setupHeaders(boardScrollPane);
-
-    boardCombo.setModel(new DefaultComboBoxModel(BoardRegistry.mainRegistry().allBoardDefs));
+    if (boards != null) {
+      boardCombo.setModel(new DefaultComboBoxModel(boards));
+    } else {
+      boardCombo.setModel(new DefaultComboBoxModel(BoardRegistry.mainRegistry().allBoardDefs));
+    }
+    
     boardCombo.addActionListener(this);
 
     // Init to standard 120 bass board

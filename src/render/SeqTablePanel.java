@@ -30,13 +30,12 @@ import music.Note;
  */
 public class SeqTablePanel extends javax.swing.JPanel
 {
-
   SeqColumnModel columnModel;
   ChordTableAction chordTableAction;
   Timer playTimer;
-  //JPanel cornerPanel;// = new JPanel();
-  //JButton toolPlay;
+
   SeqViewerController seqViewer;
+  SoundController sound;
 
   /** Creates new form SeqTablePanel */
   public SeqTablePanel()
@@ -47,8 +46,9 @@ public class SeqTablePanel extends javax.swing.JPanel
 
     seqViewer = new SeqViewerController(seqTable, seqTableScrollPane);
     columnModel = seqViewer.columnModel;
-    //columnModel.selComboModel.addListSelectionListener(this);
     columnModel.addColumnModelListener(new ColumnChangeListener());
+
+    sound = new SoundController();
 
     //transposePanel1.setSeqColModel(columnModel);
 
@@ -91,44 +91,12 @@ public class SeqTablePanel extends javax.swing.JPanel
   {
     textParser.setSeqColModel(columnModel, seqTable, null);
   }
-  music.midi.Player player;
-  boolean soundEnabled = false;
 
-  public void setSoundEnabled(boolean sound)
+  public void setSoundEnabled(boolean soundEnabled)
   {
-    soundEnabled = sound;
-    if (player != null) {
-      player.stopAll();
-    }
+    sound.setEnabled(soundEnabled);
     volumeSlider.setEnabled(soundEnabled);
     checkArpegg.setEnabled(soundEnabled);
-  }
-
-  private boolean playCombo(ButtonCombo combo)
-  {
-    if (!soundEnabled) {
-      if (player != null) {
-        player.stopAll();
-      }
-      return false;
-    }
-
-    if (combo == null) {
-      return false;
-    }
-
-    if (player == null) {
-      player = new music.midi.Player();
-      player.init();
-    }
-
-    player.stopAll();
-
-    if (checkArpegg.isSelected()) {
-      return player.playArpeggiate(combo.getChordMask().getValue(), 200);
-    } else {
-      return player.playChord(combo.getChordMask().getValue(), 500);
-    }
   }
 
   private ButtonCombo getCurrCombo()
@@ -175,13 +143,13 @@ public class SeqTablePanel extends javax.swing.JPanel
 
       ButtonCombo combo = getCurrCombo();
 
-      //****
-      playCombo(combo);
-      //****
-
       String text = "<html>";
 
       if (combo != null) {
+        //****
+        sound.play(combo);
+        //****
+
         Note lowest = combo.getLowestNote();
 
         text += "Low Note: " + "<b>" + (lowest.isBassNote() ? "Bass " : "Chord ") + lowest.toString() + "</b>";
@@ -241,7 +209,7 @@ public class SeqTablePanel extends javax.swing.JPanel
       } else if (e.getActionCommand().equals("PlaySeq")) {
         if (!playTimer.isRunning()) {
           toolPlay.setText("Stop");
-          playCombo(getCurrCombo());
+          sound.play(getCurrCombo());
           playTimer.restart();
         } else {
           toolPlay.setText("Play");
@@ -371,6 +339,11 @@ public class SeqTablePanel extends javax.swing.JPanel
     checkArpegg.setText("Arpeggiate Chords");
     checkArpegg.setActionCommand("Arepggiate Chords");
     checkArpegg.setEnabled(false);
+    checkArpegg.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        checkArpeggActionPerformed(evt);
+      }
+    });
 
     toolResetAll.setText("Clear All Chords");
     toolResetAll.setActionCommand("ResetAll");
@@ -460,10 +433,14 @@ public class SeqTablePanel extends javax.swing.JPanel
 
   private void volumeSliderStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_volumeSliderStateChanged
   {//GEN-HEADEREND:event_volumeSliderStateChanged
-    if (player != null) {
-      player.setVelocity(volumeSlider.getValue());
-    }
+    sound.setVolume(volumeSlider.getValue());
   }//GEN-LAST:event_volumeSliderStateChanged
+
+  private void checkArpeggActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkArpeggActionPerformed
+  {//GEN-HEADEREND:event_checkArpeggActionPerformed
+    sound.setArpeggiating(checkArpegg.isSelected());
+  }//GEN-LAST:event_checkArpeggActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkArpegg;
   private javax.swing.JCheckBox checkSound;

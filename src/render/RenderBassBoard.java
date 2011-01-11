@@ -15,11 +15,10 @@ import javax.swing.JComponent;
 
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import music.BassBoard;
 import music.ButtonComboSequence;
+import music.Chord;
 
 public class RenderBassBoard extends JPanel
 {
@@ -192,7 +191,11 @@ public class RenderBassBoard extends JPanel
   public void setClickPos(MouseEvent e)
   {
     BassBoard.Pos newClickPos = hitTest(e);
+    setClickPos(newClickPos);
+  }
 
+  public void setClickPos(BassBoard.Pos newClickPos)
+  {
     if (!BassBoard.posEquals(clickPos, newClickPos)) {
       repaint();
       clickPos = newClickPos;
@@ -203,6 +206,15 @@ public class RenderBassBoard extends JPanel
   {
     clickPos = null;
     repaint();
+  }
+
+  public Chord getClickedChord()
+  {
+    if (clickPos != null) {
+      return getBassBoard().getChordAt(clickPos);
+    } else {
+      return null;
+    }
   }
 
   public BassBoard.Pos hitTest(MouseEvent e)
