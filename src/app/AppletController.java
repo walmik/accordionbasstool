@@ -54,7 +54,7 @@ public class AppletController implements ActionListener
       }
     });
 
-    toggleFrameButton = new JButton("Show in Seperate Window");
+    toggleFrameButton = new JButton("Show in Separate Window");
     toggleFrameButton.addActionListener(this);
 
     theApplet.getContentPane().add(BorderLayout.NORTH, toggleFrameButton);
@@ -85,7 +85,7 @@ public class AppletController implements ActionListener
       theApplet.getContentPane().add(BorderLayout.CENTER, toggleFrameButton);
 
     } else {
-      toggleFrameButton.setText("Show In Seperate Window");
+      toggleFrameButton.setText("Show In Separate Window");
 
       Component comp = frameLayout.getLayoutComponent(BorderLayout.CENTER);
 

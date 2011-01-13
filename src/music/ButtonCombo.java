@@ -181,6 +181,11 @@ public class ButtonCombo
 
     return board.isSingleBassRow(pos[0].row);
   }
+
+  public boolean isEmpty()
+  {
+    return pos.length == 0;
+  }
   public static int optMaxDistThreshold = 5;
 
   public static void setMaxComboDistThreshold(int threshold)

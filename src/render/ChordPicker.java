@@ -17,6 +17,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.ListModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import music.Chord;
 import music.ChordRegistry;
 import music.Note;
@@ -116,10 +118,10 @@ public class ChordPicker extends javax.swing.JPanel
 
     populateFilteredList();
 
-    listChords.addListSelectionListener(new SeqTableEventAdapter()
+    listChords.addListSelectionListener(new ListSelectionListener()
     {
       @Override
-      public void selectionChanged(int index)
+      public void valueChanged(ListSelectionEvent e)
       {
         if (!isUpdating) {
           RegistryChordDef chordDef = (RegistryChordDef) listChords.getSelectedValue();

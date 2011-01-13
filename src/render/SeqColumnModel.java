@@ -22,7 +22,8 @@ import music.StringParser;
 public class SeqColumnModel extends DefaultTableColumnModel
 {
 
-  SelectedButtonCombo selComboModel;
+  public final SelectedButtonCombo selComboModel;
+  public final MatchingChordStore matchingChordStore;
   private ButtonComboSequence[] allComboSeqs;
   private BoardSearcher searcher;
   private FingerComboSequence[] fingerComboSeqs;
@@ -51,18 +52,32 @@ public class SeqColumnModel extends DefaultTableColumnModel
     renderBoard = rBoard;
     rowSelModel = selM;
 
+    renderBoard.setSelListeners(selComboModel, rowSelModel);
+
     dataModel = new SeqDataModel();
     rowHeaderDataModel = new SeqRowHeaderData();
 
     this.setSelectionModel(selComboModel);
+
+    matchingChordStore = new MatchingChordStore(this);
+
+    rowSelModel.addListSelectionListener(new SeqTableEventAdapter()
+    {
+
+      @Override
+      protected void selectionChanged(int index)
+      {
+        setSelectedSeq(index);
+      }
+    });
   }
 
-  void addColumn(int index)
+  public void addColumn(int index)
   {
-    addColumn(ParsedChordDef.getDefaultChordDef(), index);
+    addColumn(ParsedChordDef.newDefaultChordDef(), index);
   }
 
-  void addColumn(ParsedChordDef def, int index)
+  public void addColumn(ParsedChordDef def, int index)
   {
     if (def == null) {
       return;
@@ -90,7 +105,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
-  int getSelectedColumn()
+  public int getSelectedColumn()
   {
     if (this.getSelectedColumnCount() > 0) {
       return this.getSelectedColumns()[0];
@@ -99,7 +114,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
-  ButtonCombo getSelectedButtonCombo()
+  public ButtonCombo getSelectedButtonCombo()
   {
     int row = this.rowSelModel.getAnchorSelectionIndex();
     int col = this.getSelectedColumn();
@@ -119,23 +134,65 @@ public class SeqColumnModel extends DefaultTableColumnModel
     return null;
   }
 
-  boolean editSelectedColumn(ParsedChordDef newDef)
+  public String getSelectedComboStateString()
+  {
+    ButtonCombo activeCombo = getSelectedButtonCombo();
+    ParsedChordDef activeChord = getSelectedChordDef();
+
+    String info = "<html>";
+
+    if ((activeChord == null) || activeChord.isEmptyChord() || (activeCombo == null)) {
+      info += "<i>No Buttons Clicked</i>";
+    } else {
+      String sortedNotesStr = activeChord.toSortedNoteString(true);
+
+      if (activeCombo.isEmpty()) {
+        info += "Buttons: <i>None possible on this board</i>";
+      } else {
+        info += "Buttons: ";
+        info += "<b>" + activeCombo.toButtonListingString(true) + "</b>";
+      }
+
+      info += "<br/>Notes: ";
+      info += "<b>" + sortedNotesStr + "</b>";
+    }
+    info += "</html>";
+    return info;
+  }
+
+  public boolean editSelectedColumn(ParsedChordDef newDef)
+  {
+    return editSelectedColumn(newDef, null);
+  }
+
+  public boolean editSelectedColumn(ParsedChordDef newDef, Vector<ParsedChordDef> matchingChords)
   {
     int index = getSelectedColumn();
     if (index >= 0) {
-      return editColumn(index, newDef);
+      matchingChordStore.setValid(matchingChords);
+      boolean updated = editColumn(index, newDef);
+      if (!updated) {
+        matchingChordStore.resetIfNotValid();
+      }
+      return updated;
     }
 
     return false;
   }
 
-  void resetToSingleColumn()
+  public void resetColumns(boolean addFirst)
   {
     this.tableColumns.clear();
-    this.addColumn(0);
+
+    if (addFirst) {
+      this.addColumn(0);
+    } else {
+      computeSeqs(-1);
+      setSelectedSeq(-1);
+    }
   }
 
-  void removeSelectedColumn()
+  public void removeSelectedColumn()
   {
     if (getColumnCount() < 2) {
       return;
@@ -224,19 +281,19 @@ public class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
-  ParsedChordDef getChordDef(int index)
+  public ParsedChordDef getChordDef(int index)
   {
     assert ((index >= 0) && (index < getColumnCount()));
     return (ParsedChordDef) getColumn(index).getHeaderValue();
   }
 
-  ParsedChordDef getSelectedChordDef()
+  public ParsedChordDef getSelectedChordDef()
   {
     int index = getSelectedColumn();
     return ((index >= 0) && (index < getColumnCount()) ? getChordDef(index) : null);
   }
 
-  Vector<ParsedChordDef> getAllChords()
+  public Vector<ParsedChordDef> getAllChords()
   {
     Vector<ParsedChordDef> vec = new Vector<ParsedChordDef>();
     for (int i = 0; i < getColumnCount(); i++) {
@@ -260,7 +317,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
     return this.rowSelModel;
   }
 
-  void addTableAndColumnListener(SeqTableEventAdapter listener)
+  public void addTableAndColumnListener(SeqTableEventAdapter listener)
   {
     this.addColumnModelListener(listener);
     this.getDataModel().addTableModelListener(listener);
@@ -357,16 +414,26 @@ public class SeqColumnModel extends DefaultTableColumnModel
       currSeqArray = allComboSeqs;
     }
 
+    // ...
+    this.matchingChordStore.resetIfNotValid();
+
     rowHeaderDataModel.fireListDataChanged();
-    dataModel.fireTableDataChanged();
+    dataModel.fireTableStructureChanged();
 
-    updateRowSel(rowSel);
+    // Insure selection is cleared as we reset it here
+    selComboModel.setAnchorSelectionIndex(-1);
+    rowSelModel.setAnchorSelectionIndex(-1);
 
+    // Set Col Selection
     if (colSel < currSeqArray.length) {
       selComboModel.setSelectionInterval(colSel, colSel);
     } else {
       selComboModel.setSelectionInterval(0, 0);
     }
+
+    // Set Row Selection
+    rowSel = updateRowSel(rowSel);
+    rowSelModel.setSelectionInterval(rowSel, rowSel);
   }
 
   public void recomputeSeqs()
@@ -383,7 +450,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
-  private void updateRowSel(int prevRow)
+  private int updateRowSel(int prevRow)
   {
     int index = findRowForPrefSeq();
 
@@ -392,10 +459,10 @@ public class SeqColumnModel extends DefaultTableColumnModel
     }
 
     if ((index >= dataModel.getRowCount()) || (index < 0)) {
-      index = 0;
+      index = (dataModel.getRowCount() >= 0) ? 0 : -1;
     }
 
-    rowSelModel.setSelectionInterval(index, index);
+    return index;
   }
 
   public void clearPrefSeq()

@@ -10,6 +10,7 @@
  */
 package app;
 
+import java.awt.Graphics;
 import java.util.Vector;
 import javax.swing.JApplet;
 import music.BoardRegistry;
@@ -25,16 +26,18 @@ import render.SoundController;
  */
 public class AccordionBoardViewer extends JApplet
 {
+
   SoundController sound;
   AppletController controller;
 
   public void init()
   {
     util.Main.setNimbus();
-    
+
     try {
       java.awt.EventQueue.invokeAndWait(new Runnable()
       {
+
         public void run()
         {
           initComponents();
@@ -45,29 +48,24 @@ public class AccordionBoardViewer extends JApplet
       ex.printStackTrace();
     }
   }
-  
 
   protected void initClientApplet()
   {
     controller = new AppletController(this);
 
     RenderBassBoard renderBoard = RenderBassBoard.getStaticRenderBoard();
-    
-    sound = new SoundController();
+
+    sound = new SoundController(false);
     sound.setEnabled(checkSoundEnabled.isSelected());
 
-    Vector<BoardDef> allowedBoards = new Vector<BoardDef>();
+    Vector<BoardDef> allowedBoards = BoardRegistry.mainRegistry().getStandardBoards();
 
-    for (BoardDef def : BoardRegistry.mainRegistry().allBoardDefs) {
-      if (def.name.isEmpty()) {
-        allowedBoards.add(def);
-      }
-    }
-    
-    new BoardMouseListener(renderBoard, null, null, sound);
+    BoardMouseListener mouseListener = new BoardMouseListener(renderBoard, null, sound);
 
     RenderBoardHeader header = this.renderBoardControl.getHeader();
     header.initBoardHeader(renderBoard, renderBoardControl, null, allowedBoards);
+    header.selectFirstBoardByBassCount(48);
+
     header.getExtPanel().add(checkSoundEnabled);
     header.getExtPanel().add(checkVertical);
   }
@@ -85,7 +83,7 @@ public class AccordionBoardViewer extends JApplet
     checkVertical = new javax.swing.JCheckBox();
     renderBoardControl = new render.RenderBoardControl();
 
-    checkSoundEnabled.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+    checkSoundEnabled.setFont(new java.awt.Font("Tahoma", 0, 18));
     checkSoundEnabled.setText("Enable Sound");
     checkSoundEnabled.setMargin(new java.awt.Insets(2, 2, 2, 10));
     checkSoundEnabled.setOpaque(false);
@@ -95,7 +93,7 @@ public class AccordionBoardViewer extends JApplet
       }
     });
 
-    checkVertical.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+    checkVertical.setFont(new java.awt.Font("Tahoma", 0, 18));
     checkVertical.setText("Display Vertically");
     checkVertical.setMargin(new java.awt.Insets(2, 2, 2, 10));
     checkVertical.setOpaque(false);
@@ -122,7 +120,6 @@ public class AccordionBoardViewer extends JApplet
     }
     this.renderBoardControl.revalidate();
   }//GEN-LAST:event_checkVerticalActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkSoundEnabled;
   private javax.swing.JCheckBox checkVertical;

@@ -71,6 +71,11 @@ public class BoardSearcher
         System.out.println("Combos " + combos.size());
       }
 
+      // Add New "Empty" combo as only option
+      if (combos.isEmpty()) {
+        combos.add(new ButtonCombo(new BassBoard.Pos[0], board));
+      }
+
       // Iterate over curr seqs
 
       for (ButtonComboSequence origSeq : currSeqs) {

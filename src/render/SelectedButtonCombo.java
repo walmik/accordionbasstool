@@ -83,7 +83,12 @@ public class SelectedButtonCombo extends DefaultListSelectionModel
     //this.fireValueChanged(getAnchorSelectionIndex(), getAnchorSelectionIndex());
   }
 
-  public ButtonCombo getSelectedButtonCombo()
+  public ButtonComboSequence getSelectButtonComboSeq()
+  {
+    return _comboSeq;
+  }
+
+  private ButtonCombo getSelectedButtonCombo()
   {
     if (_comboSeq == null) {
       return null;

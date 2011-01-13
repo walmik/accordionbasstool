@@ -14,10 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import music.Chord;
-import music.ChordRegistry;
 import music.Note;
 import music.ParsedChordDef;
 import music.RelChord;
@@ -117,16 +114,14 @@ public class TabChordPicker extends javax.swing.JPanel
 
       } else if (evt.getSource() == this.notePickerAdd) {
         addedBassNote = (Note) evt.getNewValue();
-        syncInversionCombo();
+        populateSyncInversionCombo();
       }
       updateChordInModel();
     }
     if (evt.getPropertyName().equals("Chord") && (evt.getSource() == chordPicker1)) {
       currRelChord = (RelChord) evt.getNewValue();
 
-      populateInversionCombo(inversionCombo.getSelectedIndex());
-
-      syncInversionCombo();
+      populateSyncInversionCombo();
       changeInversion();
 
       updateChordInModel();
@@ -245,12 +240,13 @@ public class TabChordPicker extends javax.swing.JPanel
       return;
     }
 
-    if ((possChordDef.relChord != null) && (possChordDef.relChord.getOrigDef() == null)) {
-      ParsedChordDef matchChord = ChordRegistry.mainRegistry().findFirstChordFromNotes(possChordDef.chord);
-      if (matchChord != null) {
-        possChordDef = matchChord;
-      }
-    }
+//    if ((possChordDef.relChord != null) && (possChordDef.relChord.getOrigDef() == null)) {
+////      ParsedChordDef matchChord = ChordRegistry.mainRegistry().findFirstChordFromNotes(possChordDef.chord);
+//      ParsedChordDef matchChord = seqColumnModel.matchingChordStore.getFirstKnownMatchingChord();
+//      if (matchChord != null) {
+//        possChordDef = matchChord;
+//      }
+//    }
 
     Note newRoot = possChordDef.rootNote;
 
@@ -281,8 +277,7 @@ public class TabChordPicker extends javax.swing.JPanel
       //addedBassCheck.setSelected(false);
       // inversionCombo.setSelectedIndex(0);
     }
-    populateInversionCombo(-1);
-    syncInversionCombo();
+    populateSyncInversionCombo();
 
 //    if (inversionCombo.getSelectedIndex() == 0) {
 //      this.mustBeLowestCheck.setSelected(possChordDef.bassSetting == ParsedChordDef.BassSetting.LowestBass);
@@ -297,8 +292,7 @@ public class TabChordPicker extends javax.swing.JPanel
     updateChordUI(possChordDef);
   }
 
-  void populateInversionCombo(
-          int selectIndex)
+  void populateSyncInversionCombo()
   {
     isUpdatingChord++;
 
@@ -325,19 +319,13 @@ public class TabChordPicker extends javax.swing.JPanel
       }
     }
 
-    if (selectIndex >= inversionCombo.getItemCount()) {
-      selectIndex = 1;
-    }
-    if (selectIndex >= 0) {
-      inversionCombo.setSelectedIndex(selectIndex);
-    }
+//    if (selectIndex >= inversionCombo.getItemCount()) {
+//      selectIndex = 1;
+//    }
+//    if (selectIndex >= 0) {
+//      inversionCombo.setSelectedIndex(selectIndex);
+//    }
 
-    isUpdatingChord--;
-  }
-
-  void syncInversionCombo()
-  {
-    isUpdatingChord++;
 
     Chord simpleChord = currRelChord.buildChord(rootNote);
 

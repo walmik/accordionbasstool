@@ -185,6 +185,17 @@ public class ChordRegistry
     return null;
   }
 
+  public Vector<ParsedChordDef> findAllChordsForNotes(Chord chord, boolean allowInversion)
+  {
+    Chord.Mask mask = new Chord.Mask();
+    Note[] sortArray = new Note[Note.NUM_HALFSTEPS * 2];
+    mask.sortChordNotes(chord, sortArray);
+
+    Vector<ParsedChordDef> parsedDefs = findChordFromNotes(sortArray, mask, allowInversion, false, false);
+
+    return parsedDefs;
+  }
+
   public ParsedChordDef findFirstChordFromNotes(Chord chord)
   {
     Chord.Mask mask = new Chord.Mask();

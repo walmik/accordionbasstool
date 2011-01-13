@@ -110,10 +110,9 @@ public class SeqViewerController
       @Override
       protected void selectionChanged(int index)
       {
-        if (columnModel.setSelectedSeq(index)) {
+        //if (columnModel.setSelectedSeq(index)) {
           seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
-          RenderBassBoard.getStaticRenderBoard().repaint();
-        }
+        //}
       }
     });
 
@@ -700,7 +699,7 @@ public class SeqViewerController
         text += "<span>" + buttonCombo.toButtonListingString(html) + "</span>";
       }
 
-      if (buttonCombo != null) {
+      if ((buttonCombo != null) && (buttonCombo.getLength() > 0)) {
         if (!buttonCombo.isSingleBass()) {
           Note lowest = buttonCombo.getLowestNote();
           String lowestInfo = (lowest.isBassNote() ? "Bass" : "Mid") + space + lowest.toString(html);

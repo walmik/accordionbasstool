@@ -14,6 +14,7 @@ import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
 
 import javax.swing.JPanel;
+import javax.swing.ListSelectionModel;
 import javax.swing.ToolTipManager;
 
 import music.BassBoard;
@@ -148,18 +149,28 @@ public class RenderBassBoard extends JPanel
     return _theBoard;
   }
 
-  public void setSelectedButtonCombo(SelectedButtonCombo newSel)
+  class RepaintListener extends SeqTableEventAdapter
+  {
+    RepaintListener()
+    {
+      super(true);
+    }
+
+    @Override
+    public void selectionChanged(int index)
+    {
+      repaint();
+    }
+  }
+
+  public void setSelListeners(SelectedButtonCombo newSel, ListSelectionModel rowSel)
   {
     _selCombo = newSel;
     if (_selCombo != null) {
-      _selCombo.addListSelectionListener(new SeqTableEventAdapter()
-      {
-        @Override
-        public void selectionChanged(int index)
-        {
-          repaint();
-        }
-      });
+      _selCombo.addListSelectionListener(new RepaintListener());
+    }
+    if (rowSel != null) {
+      rowSel.addListSelectionListener(new RepaintListener());
     }
     repaint();
   }
@@ -473,12 +484,14 @@ public class RenderBassBoard extends JPanel
           textStr = _theBoard.getChordName(realRow, realCol, false);
         }
 
+        boolean fastClick = false;
+
         if (!pressed && (clickPos != null) && clickPos.equals(realRow, realCol)) {
-          pressed = true;
+          fastClick = true;
         }
 
         RenderBoardUI.BoardButtonImage boardButton =
-                RenderBoardUI.defaultUI.getBoardButtonImage(pressed, selected, redundant, finger);
+                RenderBoardUI.defaultUI.getBoardButtonImage(pressed, selected, redundant, fastClick, finger);
 
         {
           buttonDrawer.draw(graphics2D, realCol, realRow, selected, boardButton);

@@ -33,12 +33,12 @@ public class TransposePanel extends javax.swing.JPanel
     ivalCombo.setSelectedItem(NamedInterval.P5);
   }
   
-  void setSeqColModel(SeqColumnModel model)
+  public void setSeqColModel(SeqColumnModel model)
   {
     columnModel = model;
   }
 
-  Interval getCurrInterval()
+  public Interval getCurrInterval()
   {
     NamedInterval entry = (NamedInterval)ivalCombo.getSelectedItem();
     return entry.interval;

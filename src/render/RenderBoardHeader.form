@@ -43,7 +43,7 @@
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
           <FontInfo relative="true">
-            <Font bold="true" component="boardCombo" property="font" relativeSize="true" size="5"/>
+            <Font bold="true" component="boardCombo" property="font" relativeSize="true" size="7"/>
           </FontInfo>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Click and select one of the possible bass board layouts.&lt;br/&gt;&#xa;Standard boards vary in the number of bass and chord rows and which&lt;br/&gt;&#xa;chords are included.&lt;br/&gt;&#xa;The standard bass layout is 120-basses.&lt;br/&gt;&#xa;The smallest is usually 8 basses.&lt;br/&gt;&#xa;&lt;/html&gt;"/>

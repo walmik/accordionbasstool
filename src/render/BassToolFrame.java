@@ -81,13 +81,12 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       toolTabs.setEnabledAt(toolTabs.indexOfComponent(tabPitchDetect), false);
     }
     
-    tabButtonClicker.setSeqColModel(seqTablePanel.columnModel);
-    
     mouseListener =
             new BoardMouseListener(renderBassBoard,
             seqTablePanel.columnModel,
-            tabButtonClicker,
             seqTablePanel.sound);
+
+    tabButtonClicker.setSeqColModel(seqTablePanel.columnModel, mouseListener);
 
     this.renderBoardControl.getHeader().getExtPanel().add(this.checkHiliteRedunds);
     
@@ -104,13 +103,17 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 //    renderBoardScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
 //    renderBoardScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-    renderBassBoard.setSelectedButtonCombo(seqTablePanel.columnModel.selComboModel);
-
     seqTablePanel.toggleChordPicker.addActionListener(this);
 
     controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
 
     boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
+
+
+    // Setup intiial state
+
+    // Set Board to default 120
+    renderBoardControl.getHeader().selectFirstBoardByBassCount(120);
 
     // Add Default Chord!
     seqTablePanel.columnModel.addColumn(0);

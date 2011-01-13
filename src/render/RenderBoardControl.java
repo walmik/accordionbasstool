@@ -22,6 +22,7 @@ public class RenderBoardControl extends javax.swing.JScrollPane
   {
     renderBoardHeader = new render.RenderBoardHeader();
     renderBassBoard = RenderBassBoard.getStaticRenderBoard();
+    renderBassBoard.setDoubleBuffered(true);
 
 //    add(renderBoardHeader);
 //    add(renderBassBoard);

@@ -4,6 +4,7 @@
  */
 package music;
 
+import java.util.Vector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -29,7 +30,7 @@ public class BoardRegistry
     {
       name = root.getAttribute("name");
       desc = root.getAttribute("desc");
-      
+
       Note note = Note.fromString(root.getAttribute("middleNote"));
       if (note == null) {
         note = new Note();
@@ -127,5 +128,29 @@ public class BoardRegistry
     }
 
     return null;
+  }
+
+  public BoardDef findByDims(int rows, int cols)
+  {
+    for (BoardDef def : allBoardDefs) {
+      if ((def.numCols == cols) && (def.rowLayout.length == rows)) {
+        return def;
+      }
+    }
+
+    return null;
+  }
+
+  public Vector<BoardDef> getStandardBoards()
+  {
+    Vector<BoardDef> standardBoards = new Vector<BoardDef>();
+
+    for (BoardDef def : allBoardDefs) {
+      if (def.name.isEmpty()) {
+        standardBoards.add(def);
+      }
+    }
+
+    return standardBoards;
   }
 }

@@ -47,8 +47,9 @@ public class SeqTablePanel extends javax.swing.JPanel
     seqViewer = new SeqViewerController(seqTable, seqTableScrollPane);
     columnModel = seqViewer.columnModel;
     columnModel.addColumnModelListener(new ColumnChangeListener());
+    columnModel.getRowSelModel().addListSelectionListener(new ColumnChangeListener());
 
-    sound = new SoundController();
+    sound = new SoundController(true);
 
     //transposePanel1.setSeqColModel(columnModel);
 
@@ -99,21 +100,21 @@ public class SeqTablePanel extends javax.swing.JPanel
     checkArpegg.setEnabled(soundEnabled);
   }
 
-  private ButtonCombo getCurrCombo()
-  {
-    int row = seqTable.getSelectedRow();
-    int col = columnModel.getSelectedColumn();
-
-    Object obj = seqTable.getModel().getValueAt(row, col);
-    if (obj instanceof FingerCombo) {
-      FingerCombo fingerCombo = (FingerCombo) obj;
-      return ((fingerCombo != null) ? (fingerCombo.getButtonCombo()) : null);
-    } else if (obj instanceof ButtonCombo) {
-      return (ButtonCombo) obj;
-    } else {
-      return null;
-    }
-  }
+//  private ButtonCombo getCurrCombo()
+//  {
+//    int row = seqTable.getSelectedRow();
+//    int col = columnModel.getSelectedColumn();
+//
+//    Object obj = seqTable.getModel().getValueAt(row, col);
+//    if (obj instanceof FingerCombo) {
+//      FingerCombo fingerCombo = (FingerCombo) obj;
+//      return ((fingerCombo != null) ? (fingerCombo.getButtonCombo()) : null);
+//    } else if (obj instanceof ButtonCombo) {
+//      return (ButtonCombo) obj;
+//    } else {
+//      return null;
+//    }
+//  }
 
   private class ColumnChangeListener extends SeqTableEventAdapter
   {
@@ -141,11 +142,11 @@ public class SeqTablePanel extends javax.swing.JPanel
         toolPlay.setVisible(columnModel.getColumnCount() > 1);
       }
 
-      ButtonCombo combo = getCurrCombo();
+      ButtonCombo combo = columnModel.getSelectedButtonCombo();
 
       String text = "<html>";
 
-      if (combo != null) {
+      if ((combo != null) && (combo.getLength() > 0)) {
         //****
         sound.play(combo, false);
         //****
@@ -177,7 +178,7 @@ public class SeqTablePanel extends javax.swing.JPanel
     statusText.setVisible(allowed);
 
     if (!allowed && (columnModel.getColumnCount() > 1)) {
-      columnModel.resetToSingleColumn();
+      columnModel.resetColumns(true);
     }
 
     if (allowed) {
@@ -205,11 +206,11 @@ public class SeqTablePanel extends javax.swing.JPanel
       } else if (e.getActionCommand().equals("RemoveChord")) {
         columnModel.removeSelectedColumn();
       } else if (e.getActionCommand().equals("ResetAll")) {
-        columnModel.resetToSingleColumn();
+        columnModel.resetColumns(true);
       } else if (e.getActionCommand().equals("PlaySeq")) {
         if (!playTimer.isRunning()) {
           toolPlay.setText("Stop");
-          sound.play(getCurrCombo(), false);
+          sound.play(columnModel.getSelectedButtonCombo(), false);
           playTimer.restart();
         } else {
           toolPlay.setText("Play");

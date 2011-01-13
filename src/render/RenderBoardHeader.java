@@ -64,12 +64,17 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     }
 
     boardCombo.addActionListener(this);
+  }
 
-    // Init to standard 120 bass board
-    BoardRegistry.BoardDef initialBoardDef = BoardRegistry.mainRegistry().findByBassCount(120);
-    if (initialBoardDef != null) {
-      boardCombo.setSelectedItem(initialBoardDef);
+  public boolean selectFirstBoardByBassCount(int bassCount)
+  {
+    BoardRegistry.BoardDef boardDef = BoardRegistry.mainRegistry().findByBassCount(bassCount);
+    if (boardDef != null) {
+      boardCombo.setSelectedItem(boardDef);
+      return true;
     }
+
+    return false;
   }
   
   public JPanel getExtPanel()
@@ -218,7 +223,7 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     jLabel1.setText("Current Board:");
     add(jLabel1);
 
-    boardCombo.setFont(boardCombo.getFont().deriveFont(boardCombo.getFont().getStyle() | java.awt.Font.BOLD, boardCombo.getFont().getSize()+5));
+    boardCombo.setFont(boardCombo.getFont().deriveFont(boardCombo.getFont().getStyle() | java.awt.Font.BOLD, boardCombo.getFont().getSize()+7));
     boardCombo.setToolTipText("<html>\nClick and select one of the possible bass board layouts.<br/>\nStandard boards vary in the number of bass and chord rows and which<br/>\nchords are included.<br/>\nThe standard bass layout is 120-basses.<br/>\nThe smallest is usually 8 basses.<br/>\n</html>");
     add(boardCombo);
 

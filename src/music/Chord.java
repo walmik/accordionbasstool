@@ -12,17 +12,17 @@ public class Chord
 
     private int value = 0;
 
-    Mask()
+    public Mask()
     {
       value = 0;
     }
 
-    Mask(int val)
+    public Mask(int val)
     {
       value = val;
     }
 
-    Mask(Chord chord)
+    public Mask(Chord chord)
     {
       value = 0;
 
@@ -345,7 +345,11 @@ public class Chord
 
   public Note getRootNote()
   {
-    return notes[0];
+    if (notes.length > 0) {
+      return notes[0];
+    } else {
+      return null;
+    }
   }
 
   public int getNumNotes()
@@ -397,6 +401,10 @@ public class Chord
   private String toString(String sep, boolean html)
   {
     String str = "";
+
+    if (notes.length == 0) {
+      return "[Empty]";
+    }
 
     for (int i = 0; i < notes.length; i++) {
       if (i > 0) {

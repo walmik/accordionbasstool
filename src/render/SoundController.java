@@ -19,10 +19,12 @@ public class SoundController
   boolean soundEnabled = false;
   boolean arpeggiating = false;
 
-  public SoundController()
+  public SoundController(boolean initNow)
   {
-    player = new music.midi.Player();
-    player.init();
+    if (initNow) {
+      player = new music.midi.Player();
+      player.init();
+    }
   }
 
   public void setEnabled(boolean enabled)
@@ -47,7 +49,9 @@ public class SoundController
 
   public void stop()
   {
-    player.stopAll();
+    if (player != null) {
+      player.stopAll();
+    }
   }
 
   public boolean play(ButtonCombo combo, boolean manualStop)
@@ -55,7 +59,7 @@ public class SoundController
     if (manualStop) {
       stop();
     }
-    
+
     if (combo != null) {
       return play(combo.getChordMask(), manualStop);
     }

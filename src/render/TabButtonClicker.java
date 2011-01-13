@@ -13,12 +13,10 @@ package render;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Vector;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import music.ButtonCombo;
 import music.Chord;
-import music.ChordRegistry;
 import music.ParsedChordDef;
 
 /**
@@ -32,8 +30,7 @@ public class TabButtonClicker extends javax.swing.JPanel
   SeqColumnModel columnModel;
   ParsedChordDef activeParsedChord;
   SelListener colModListener, rowModListener;
-  Vector<ParsedChordDef> matches;
-  boolean optIncludeInversion = false;
+  BoardMouseListener mouseListener;
 
   class SelListener extends SeqTableEventAdapter
   {
@@ -41,7 +38,7 @@ public class TabButtonClicker extends javax.swing.JPanel
     @Override
     public void selectionChanged(int index)
     {
-      matches = null;
+      //matches = null;
       syncUI();
     }
   }
@@ -63,44 +60,44 @@ public class TabButtonClicker extends javax.swing.JPanel
       {
         Chord chord = (Chord) evt.getNewValue();
         if ((chord == null) || !columnModel.editSelectedColumn(new ParsedChordDef(chord))) {
-          matches = null;
+          //matches = null;
           syncUI();
         }
       }
     });
   }
 
-  public void setSeqColModel(SeqColumnModel model)
+  public void setSeqColModel(SeqColumnModel model, BoardMouseListener listener)
   {
     columnModel = model;
+    mouseListener = listener;
 
-    if (columnModel != null) {
-      columnModel.addColumnModelListener(colModListener);
+    toggleListeners(true);
+  }
+
+  private void toggleListeners(boolean attach)
+  {
+    if (columnModel == null) {
+      return;
+    }
+
+    if (attach) {
+      columnModel.selComboModel.addListSelectionListener(colModListener);
       columnModel.getRowSelModel().addListSelectionListener(rowModListener);
+
+    } else {
+      columnModel.selComboModel.removeListSelectionListener(rowModListener);
+      columnModel.getRowSelModel().removeListSelectionListener(rowModListener);
     }
   }
 
   @Override
   public void setVisible(boolean visible)
   {
+    toggleListeners(visible);
+
     if (visible) {
-      //renderBoard.addMouseListener(listener);
-      //renderBoard.addMouseMotionListener(listener);
-      //renderBoard.addPropertyChangeListener(BassBoard.class.getSimpleName(), this);
-
-      if (columnModel != null) {
-        columnModel.addColumnModelListener(colModListener);
-        columnModel.getRowSelModel().addListSelectionListener(rowModListener);
-      }
-
       syncUI();
-
-    } else {
-      if (columnModel != null) {
-        //renderBoard.setSelectedButtonCombo(columnModel.selComboModel);
-        columnModel.removeColumnModelListener(rowModListener);
-        columnModel.getRowSelModel().removeListSelectionListener(rowModListener);
-      }
     }
 
     super.setVisible(visible);
@@ -113,71 +110,32 @@ public class TabButtonClicker extends javax.swing.JPanel
     }
   }
 
-  public void setMatchedChords(Vector<ParsedChordDef> newMatches)
+  private void updateChordDefsList()
   {
-    matches = newMatches;
-  }
-
-  private void updateChordDefsList(ButtonCombo prefCombo)
-  {
-    if (activeCombo == null) {
-      this.clickedLabel.setText("<Html>No Possible Combo</html>");
-      isTableDriven = true;
-      possChordList.setListData(new ParsedChordDef[0]);
-      isTableDriven = false;
-      return;
-    }
-
-    String sortedNotesStr = activeCombo.toSortedNoteString(true);
-
-    //Vector<ParsedChordDef> matches = possChords;
-
-    if (matches == null) {
-      matches = ChordRegistry.mainRegistry().
-              findChordFromNotes(ButtonCombo.sortedNotes, activeCombo.getChordMask(), optIncludeInversion, true, false);
-
-      if (prefCombo != null) {
-        for (ParsedChordDef def : matches) {
-          def.setPrefCombo(prefCombo);
-        }
-      }
-    }
-
-    String info = "<html>";
-    info += "Buttons: ";
-    info += "<b>" + activeCombo.toButtonListingString(true) + "</b><br/>";
-    info += "Notes: ";
-    //info += "<font size=\'-1\'>";
-    info += "<b>" + sortedNotesStr + "</b>";
-    //info += "</font>";
-    info += "</html>";
-    this.clickedLabel.setText(info);
-
     isTableDriven = true;
 
-    this.noteChordSelector1.setChord(activeCombo.getChordMask());
-
-    // If check show all unknowns, or if the list is empty
-    // just set the whole list
-    if (checkShowUnknownChords.isSelected() || matches.isEmpty()) {
-  //          || (matches.firstElement().relChord.getOrigDef() == null)) {
-      possChordList.setListData(matches);
+    if ((activeCombo == null) || activeCombo.isEmpty()) {
+      possChordList.setListData(new ParsedChordDef[0]);
+      this.noteChordSelector1.setChord(new Chord.Mask());
     } else {
-      // Otherwise, filter out the unknown chords
-      Vector<ParsedChordDef> filtered = new Vector<ParsedChordDef>();
 
-      for (ParsedChordDef def : matches) {
-        if (def.relChord.getOrigDef() != null) {
-          filtered.add(def);
-        }
+      this.noteChordSelector1.setChord(activeCombo.getChordMask());
+
+      // If check show all unknowns, or if the list is empty
+      // just set the whole list
+      if (checkShowUnknownChords.isSelected()) {
+        possChordList.setListData(columnModel.matchingChordStore.getAllMatchingSelChords());
+      } else {
+        // Otherwise, filter out the unknown chords
+        possChordList.setListData(columnModel.matchingChordStore.getKnownMatchingSelChords());
       }
-
-      possChordList.setListData(filtered);
     }
 
-    //possChordList.repaint();
-
     isTableDriven = false;
+
+    this.clickedLabel.setText(columnModel.getSelectedComboStateString());
+
+
   }
   boolean isTableDriven = false;
   boolean isClickDriven = false;
@@ -192,12 +150,9 @@ public class TabButtonClicker extends javax.swing.JPanel
       return;
     }
 
-    //System.out.println(columnModel.selComboModel.getSelectedButtonCombo());
-
-    //syncActiveButtons();
     activeCombo = columnModel.getSelectedButtonCombo();
 
-    updateChordDefsList(null);
+    updateChordDefsList();
 
     activeParsedChord = columnModel.getSelectedChordDef();
 
@@ -240,7 +195,7 @@ public class TabButtonClicker extends javax.swing.JPanel
     checkIncludeInv = new javax.swing.JCheckBox();
     noteChordSelector1 = new render.NoteChordSelector();
 
-    clickedLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+    clickedLabel.setFont(new java.awt.Font("Tahoma", 0, 18));
     clickedLabel.setText("<None>");
 
     buttonClear.setText("Clear Clicked");
@@ -274,6 +229,7 @@ public class TabButtonClicker extends javax.swing.JPanel
       }
     });
 
+    checkIncludeInv.setSelected(true);
     checkIncludeInv.setText("Specify Optional Bass");
     checkIncludeInv.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -311,7 +267,6 @@ public class TabButtonClicker extends javax.swing.JPanel
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
           .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
             .addContainerGap())
           .addGroup(layout.createSequentialGroup()
@@ -329,7 +284,7 @@ public class TabButtonClicker extends javax.swing.JPanel
 
   private void checkShowUnknownChordsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkShowUnknownChordsActionPerformed
   {//GEN-HEADEREND:event_checkShowUnknownChordsActionPerformed
-    updateChordDefsList(null);
+    updateChordDefsList();
 
     isTableDriven = true;
 
@@ -365,12 +320,10 @@ public class TabButtonClicker extends javax.swing.JPanel
   {//GEN-HEADEREND:event_checkIncludeInvActionPerformed
     // Reselect the same chord in the list, may however be with an inversion
     int index = possChordList.getSelectedIndex();
-    optIncludeInversion = this.checkIncludeInv.isSelected();
+    columnModel.matchingChordStore.toggleOptInclude(this.checkIncludeInv.isSelected());
 
-    matches = null;
-    ParsedChordDef curr = columnModel.getSelectedChordDef();
-    ButtonCombo pref = ((curr != null) ? curr.getPrefCombo() : null);
-    updateChordDefsList(pref);
+    //matches = null;
+    updateChordDefsList();
 
     possChordList.setSelectedIndex(index);
   }//GEN-LAST:event_checkIncludeInvActionPerformed

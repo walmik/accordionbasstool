@@ -4,6 +4,8 @@
  */
 package music;
 
+import java.util.Vector;
+
 /**
  *
  * @author Ilya
@@ -21,9 +23,7 @@ public class ParsedChordDef
   public String namePlain;
   public String nameHtml;
   public String detail;
-
   private ButtonCombo preferredCombo = null;
-
   public final Note rootNote;
   public final Note addedBassNote;
   public final Chord chord;
@@ -32,9 +32,14 @@ public class ParsedChordDef
   //public final short regRow, regCol;
   public final BassSetting bassSetting;
 
-  public static ParsedChordDef getDefaultChordDef()
+  public static ParsedChordDef newDefaultChordDef()
   {
     return new ParsedChordDef(new Note(), null, new RelChord(), BassSetting.NotLowestBass);
+  }
+
+  public static ParsedChordDef newEmptyChordDef()
+  {
+    return new ParsedChordDef(new Chord(new Note[0]));
   }
 
   public ParsedChordDef(Note root)
@@ -94,7 +99,7 @@ public class ParsedChordDef
     } else {
       chord = aChord;
     }
-    
+
     bassSetting = addedBassLowest;
 
     updateStrings();
@@ -158,7 +163,6 @@ public class ParsedChordDef
     detail = det;
   }
 
-  
   public ParsedChordDef transposeBy(Interval ival)
   {
     Note newAddedBass = null;
@@ -180,7 +184,7 @@ public class ParsedChordDef
       this.preferredCombo.preferred = false;
       this.preferredCombo.extraneous = false;
     }
-    
+
     this.preferredCombo = prefCombo;
 
     if (this.preferredCombo != null) {
@@ -192,6 +196,39 @@ public class ParsedChordDef
   public ButtonCombo getPrefCombo()
   {
     return this.preferredCombo;
+  }
+
+  public boolean isEmptyChord()
+  {
+    return chord.getNumNotes() == 0;
+  }
+
+  public Note[] getSortedNotes()
+  {
+    Chord.Mask mask = new Chord.Mask();
+    Note[] sortArray = new Note[Note.NUM_HALFSTEPS * 2];
+    mask.sortChordNotes(chord, sortArray);
+    return sortArray;
+  }
+
+  public String toSortedNoteString(boolean html)
+  {
+    Note[] sortedNotes = getSortedNotes();
+
+    String str = "";
+
+    for (int i = 0; i < sortedNotes.length; i++) {
+      if (sortedNotes[i] == null) {
+        continue;
+      }
+
+      if (str.length() > 0) {
+        str += " + ";
+      }
+      str += sortedNotes[i].toString(html);
+    }
+
+    return str;
   }
 
   @Override
@@ -207,7 +244,7 @@ public class ParsedChordDef
       return false;
     }
 
-    ParsedChordDef other = (ParsedChordDef)obj;
+    ParsedChordDef other = (ParsedChordDef) obj;
     return other.toString().startsWith(toString());
   }
 

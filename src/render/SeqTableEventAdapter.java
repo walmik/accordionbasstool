@@ -4,7 +4,6 @@
  */
 package render;
 
-import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -18,11 +17,23 @@ import javax.swing.event.TableModelListener;
  *
  * @author Ilya
  */
-public class SeqTableEventAdapter implements TableColumnModelListener, 
-                                             TableModelListener,
-                                             ListSelectionListener
+public class SeqTableEventAdapter implements TableColumnModelListener,
+        TableModelListener,
+        ListSelectionListener
 {
+
   int lastIndex = -1;
+  boolean acceptNoneSel;
+
+  public SeqTableEventAdapter()
+  {
+    acceptNoneSel = false;
+  }
+
+  public SeqTableEventAdapter(boolean noneSel)
+  {
+    acceptNoneSel = noneSel;
+  }
 
   public void clearLastIndex()
   {
@@ -57,25 +68,27 @@ public class SeqTableEventAdapter implements TableColumnModelListener,
   @Override
   public final void valueChanged(ListSelectionEvent e)
   {
-    if (e.getSource() instanceof ListSelectionModel) {
-      handleSelectionChanged(((ListSelectionModel) e.getSource()).getAnchorSelectionIndex());
-    } else if (e.getSource() instanceof JList) {
-      handleSelectionChanged(((JList) e.getSource()).getSelectedIndex());
-    }
+    assert (e.getSource() instanceof ListSelectionModel);
+    handleSelectionChanged(((ListSelectionModel) e.getSource()).getAnchorSelectionIndex());
+//    if (e.getSource() instanceof ListSelectionModel) {
+//      handleSelectionChanged(((ListSelectionModel) e.getSource()).getAnchorSelectionIndex());
+//    } else if (e.getSource() instanceof JList) {
+//      handleSelectionChanged(((JList) e.getSource()).getSelectedIndex());
+//    }
   }
 
   @Override
   public final void columnSelectionChanged(ListSelectionEvent e)
   {
-    if (e.getSource() instanceof ListSelectionModel) {
-      handleSelectionChanged(((ListSelectionModel) e.getSource()).getAnchorSelectionIndex());
-    }
+//    if (e.getSource() instanceof ListSelectionModel) {
+    handleSelectionChanged(((ListSelectionModel) e.getSource()).getAnchorSelectionIndex());
+//    }
   }
 
   private void handleSelectionChanged(int index)
   {
     if (index != lastIndex) {
-      if (index >= 0) {
+      if (acceptNoneSel || (index >= 0)) {
         selectionChanged(index);
       }
       lastIndex = index;

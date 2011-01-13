@@ -6,7 +6,6 @@ import java.util.Vector;
 import music.BassBoard;
 import music.BoardSearcher;
 import music.ButtonCombo;
-import music.ChordRegistry;
 import music.ParsedChordDef;
 
 public class BoardMouseListener extends MouseAdapter
@@ -14,7 +13,6 @@ public class BoardMouseListener extends MouseAdapter
 
   private RenderBassBoard renderBoard;
   private SeqColumnModel columnModel;
-  private TabButtonClicker tabClicker;
   private BassBoard.Pos lastClickPos;
   private boolean isClickShiftMode = true;
   private boolean isInstaClick = false;
@@ -24,13 +22,11 @@ public class BoardMouseListener extends MouseAdapter
 
   public BoardMouseListener(RenderBassBoard renderB,
           SeqColumnModel model,
-          TabButtonClicker clicker,
           SoundController sound)
   {
     renderBoard = renderB;
     columnModel = model;
     clickButtons = new Vector<BassBoard.Pos>();
-    tabClicker = clicker;
     this.sound = sound;
 
     renderBoard.addMouseListener(this);
@@ -39,29 +35,92 @@ public class BoardMouseListener extends MouseAdapter
 
   private void updateFromClicked()
   {
+    if (columnModel == null) {
+      return;
+    }
+
+    if (clickButtons.size() == 0) {
+      columnModel.editSelectedColumn(ParsedChordDef.newEmptyChordDef());
+      return;
+    }
+
     BassBoard.Pos[] allPos = new BassBoard.Pos[clickButtons.size()];
     clickButtons.toArray(allPos);
     ButtonCombo activeCombo = new ButtonCombo(allPos, renderBoard.getBassBoard());
 
-    Vector<ParsedChordDef> matches = ChordRegistry.mainRegistry().
-            findChordFromNotes(ButtonCombo.sortedNotes, activeCombo.getChordMask(),
-            (tabClicker != null) ? tabClicker.optIncludeInversion : true, true, true);
+    Vector<ParsedChordDef> matchedChords = columnModel.matchingChordStore.getAllMatchingSelChords(activeCombo);
 
-    if (matches.isEmpty()) {
+//    Vector<ParsedChordDef> matchedChords = ChordRegistry.mainRegistry().
+//            findChordFromNotes(ButtonCombo.sortedNotes, activeCombo.getChordMask(),
+//            optIncludeInversion, true, false);
+
+    if (matchedChords.isEmpty()) {
       return;
     }
 
-    for (ParsedChordDef def : matches) {
+    for (ParsedChordDef def : matchedChords) {
       def.setPrefCombo(activeCombo);
     }
 
-    ParsedChordDef activeParsedChord = matches.firstElement();
-    if (columnModel != null) {
-      columnModel.editSelectedColumn(activeParsedChord);
+    ParsedChordDef activeParsedChord = matchedChords.firstElement();
+    columnModel.editSelectedColumn(activeParsedChord, matchedChords);
+  }
+
+  private void syncActiveButtons()
+  {
+    if (columnModel == null) {
+      return;
     }
-    if (tabClicker != null) {
-      tabClicker.setMatchedChords(matches);
+    ButtonCombo selCombo = columnModel.getSelectedButtonCombo();
+    if (selCombo == null) {
+      return;
     }
+    clickButtons.clear();
+    for (BassBoard.Pos pos : selCombo.getAllPos()) {
+      clickButtons.add(pos);
+    }
+  }
+
+  @Override
+  public void mousePressed(MouseEvent e)
+  {
+    BassBoard.Pos clickPos = renderBoard.hitTest(e);
+
+    if (e.isAltDown() || (columnModel == null)) {
+      isInstaClick = true;
+      sound.play(renderBoard.getBassBoard().getChordAt(clickPos), true);
+      renderBoard.setClickPos(clickPos);
+      return;
+    }
+
+    if (isClickShiftMode) {
+      if (!e.isShiftDown()) {
+        clickButtons.clear();
+      } else {
+        syncActiveButtons();
+      }
+    } else {
+      syncActiveButtons();
+    }
+
+    clickIndex = -1;
+    if (clickPos != null) {
+      clickIndex = clickButtons.indexOf(clickPos);
+      if (clickIndex < 0) {
+        if (clickButtons.size() < BoardSearcher.optMaxComboLength) {
+          clickIndex = clickButtons.size();
+          clickButtons.addElement(clickPos);
+        } else {
+          return;
+        }
+      } else {
+        clickButtons.remove(clickIndex);
+        clickIndex = -1;
+      }
+    }
+    lastClickPos = clickPos;
+    sound.play(renderBoard.getBassBoard().getChordAt(clickPos), false);
+    updateFromClicked();
   }
 
   @Override
@@ -88,62 +147,6 @@ public class BoardMouseListener extends MouseAdapter
       }
       updateFromClicked();
     }
-  }
-
-  private void syncActiveButtons()
-  {
-    if (columnModel == null) {
-      return;
-    }
-    ButtonCombo selCombo = columnModel.selComboModel.getSelectedButtonCombo();
-    if (selCombo == null) {
-      return;
-    }
-    clickButtons.clear();
-    for (BassBoard.Pos pos : selCombo.getAllPos()) {
-      clickButtons.add(pos);
-    }
-  }
-
-  @Override
-  public void mousePressed(MouseEvent e)
-  {
-    BassBoard.Pos clickPos = renderBoard.hitTest(e);
-
-    if (e.isAltDown() || (columnModel == null)) {
-      isInstaClick = true;
-      sound.play(renderBoard.getBassBoard().getChordAt(clickPos), true);
-      renderBoard.setClickPos(clickPos);
-      return;
-    }
-
-    sound.play(renderBoard.getBassBoard().getChordAt(clickPos), false);
-
-    if (isClickShiftMode) {
-      if (!e.isShiftDown()) {
-        clickButtons.clear();
-      } else {
-        syncActiveButtons();
-      }
-    } else {
-      syncActiveButtons();
-    }
-
-    clickIndex = -1;
-    if (clickPos != null) {
-      clickIndex = clickButtons.indexOf(clickPos);
-      if (clickIndex < 0) {
-        if (clickButtons.size() < BoardSearcher.optMaxComboLength) {
-          clickIndex = clickButtons.size();
-          clickButtons.addElement(clickPos);
-        }
-      } else {
-        clickButtons.remove(clickIndex);
-        clickIndex = -1;
-      }
-    }
-    lastClickPos = clickPos;
-    updateFromClicked();
   }
 
   @Override

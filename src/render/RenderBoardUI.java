@@ -57,6 +57,7 @@ public class RenderBoardUI
 
     UNSELECTED(Color.black, 1.f, false),
     SELECTED(Color.blue, false),
+    FAST_CLICK(Color.black, 1.f, true),
     REDUNDS(Color.gray, 0.75f, true),
     PRESSED_2(Color.green, 1.f, true),
     PRESSED_3(Color.cyan, 1.f, true),
@@ -89,7 +90,6 @@ public class RenderBoardUI
   {
     createButtonImages(1);
   }
-  //
 
   private void createButtonImages(int scale)
   {
@@ -132,8 +132,13 @@ public class RenderBoardUI
           boolean pressed,
           boolean selected,
           boolean redundant,
+          boolean fastClick,
           int finger)
   {
+    if (fastClick) {
+      return BoardButtonImage.FAST_CLICK;
+    }
+    
     if (!selected && !pressed && !redundant) {
       return BoardButtonImage.UNSELECTED;
     }
@@ -151,7 +156,7 @@ public class RenderBoardUI
     }
 
     if (finger <= 5) {
-      return BoardButtonImage.values()[finger + 1];
+      return BoardButtonImage.values()[finger - 2 + BoardButtonImage.PRESSED_2.ordinal()];
     }
 
     return BoardButtonImage.PRESSED_ANY;
