@@ -10,7 +10,6 @@
  */
 package app;
 
-import java.awt.Graphics;
 import java.util.Vector;
 import javax.swing.JApplet;
 import music.BoardRegistry;
@@ -32,7 +31,7 @@ public class AccordionBoardViewer extends JApplet
 
   public void init()
   {
-    util.Main.setNimbus();
+    app.Main.setNimbus();
 
     try {
       java.awt.EventQueue.invokeAndWait(new Runnable()

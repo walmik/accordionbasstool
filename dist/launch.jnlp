@@ -16,7 +16,7 @@
 
     </resources>
     <update check="always" policy="always"/>
-    <application-desc main-class="util.Main">
+    <application-desc main-class="app.Main">
 
     </application-desc>
 </jnlp>

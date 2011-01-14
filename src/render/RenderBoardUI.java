@@ -32,7 +32,7 @@ import javax.swing.ImageIcon;
 public class RenderBoardUI
 {
 
-  static RenderBoardUI defaultUI = new RenderBoardUI();
+  public final static RenderBoardUI defaultUI = new RenderBoardUI();
   private Path2D unpressedCyl, pressedCyl;
   private Ellipse2D _buttonTop, _shadowFloor;
   float shadowScale = 1.1f;
@@ -78,6 +78,12 @@ public class RenderBoardUI
       alpha = alph;
       pressed = press;
     }
+
+    public BufferedImage getImage()
+    {
+      return image;
+    }
+    
     Color color;
     BufferedImage image;
     float alpha;
@@ -443,7 +449,9 @@ public class RenderBoardUI
     graphics.fill(_buttonTop);
   }
 
-  void renderOptimalityImage()
+  // Optimality Icons
+
+  public void renderOptimalityImage()
   {
     int imageDim = 32;
 
@@ -457,7 +465,7 @@ public class RenderBoardUI
     graphics.fillRect(0, 0, imageDim, imageDim);
   }
 
-  void buildOptimalityIcons(int numIcons)
+  public void buildOptimalityIcons(int numIcons)
   {
     optimalityIcons = new ImageIcon[numIcons];
 
@@ -474,6 +482,16 @@ public class RenderBoardUI
     }
   }
 
+  public ImageIcon getOptimalityIcon(int index)
+  {
+    return optimalityIcons[index];
+  }
+
+  public int getNumOptimalityIcons()
+  {
+    return optimalityIcons.length;
+  }
+  
   ///Border Stuff
 //  private void drawShearBorder(Graphics2D g)
 //  {

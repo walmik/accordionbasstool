@@ -16,10 +16,10 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 import javax.swing.ToolTipManager;
-
 import music.BassBoard;
 import music.ButtonComboSequence;
 import music.Chord;
+
 
 public class RenderBassBoard extends JPanel
 {
@@ -44,10 +44,6 @@ public class RenderBassBoard extends JPanel
   public RenderBassBoard(BassBoard newBoard)
   {
     setBassBoard(newBoard);
-
-    if (RenderBoardUI.defaultUI == null) {
-      RenderBoardUI.defaultUI = new RenderBoardUI();
-    }
 
     _selCombo = new SelectedButtonCombo();
 

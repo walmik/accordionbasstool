@@ -36,7 +36,7 @@ public class ClickChordMatcher extends javax.swing.JApplet
   /** Initializes the applet ClickChordMatcher */
   public void init()
   {
-    util.Main.setNimbus();
+    app.Main.setNimbus();
 
     try {
       java.awt.EventQueue.invokeAndWait(new Runnable()

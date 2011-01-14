@@ -1,4 +1,4 @@
-package util;
+package app;
 
 import music.StringParser;
 import java.net.URL;

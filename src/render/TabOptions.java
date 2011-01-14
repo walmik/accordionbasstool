@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import music.BoardSearcher;
 import music.ButtonCombo;
-import util.Main;
+import app.Main;
 
 /**
  *
