@@ -206,7 +206,7 @@ public class TabChordPicker extends javax.swing.JPanel
   {
     // If an inversion is set, then this value is irrelevant as the bass note
     // is already implied. Returning false to avoid duplicating the note an extra time.
-    if (inversionCombo.getSelectedIndex() != 0) {
+    if (inversionCombo.getSelectedIndex() != 1) {
       return ParsedChordDef.BassSetting.NotLowestBass;
     }
 
@@ -435,7 +435,7 @@ public class TabChordPicker extends javax.swing.JPanel
     labelInversion.setText("Inversion:");
 
     labelAddBass.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    labelAddBass.setText("Bass Note:");
+    labelAddBass.setText("Lowest Note:");
 
     labelSlash.setFont(new java.awt.Font("Tahoma", 1, 24));
     labelSlash.setText("/");
