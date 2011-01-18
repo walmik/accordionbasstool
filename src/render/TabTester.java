@@ -13,6 +13,7 @@ package render;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import music.BassBoard;
 
 /**
  *
@@ -27,50 +28,6 @@ public class TabTester extends javax.swing.JPanel
     initComponents();
   }
 
-  @Override
-  public void paint(Graphics g)
-  {
-    super.paint(g);
-    
-    Graphics2D graphics = (Graphics2D) g;
-
-    graphics.translate(50, 50);
-
-    if (RenderBoardUI.defaultUI == null) {
-      return;
-    }
-
-    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-//    int scale = 5;
-//    int imWidth = RenderBoardUI.defaultUI.selectedIM.getWidth() * scale;
-//    int imHeight = RenderBoardUI.defaultUI.selectedIM.getHeight() * scale;
-
-
-   
-
-
-    //graphics.setComposite(AlphaComposite.SrcAtop);
-//    graphics.setColor(new Color(0.f, 1.f, 0.f, 1.0f));
-//    graphics.fillRect(0, 0, imWidth, imHeight);
-//    graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_ATOP, 1.0f));
-//    graphics.drawImage(RenderBoardUI.defaultUI.selectedIM, 0, 0, imWidth, imHeight, null, this);
-
-//  graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_IN, 1.0f));
-//  graphics.setColor(new Color(1.f, 1.f, 0.f, 1.0f));
-//  graphics.fillRect(0, 0, imWidth, imHeight);
-
-//    graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 1.0f));
-//    graphics.drawImage(RenderBoardUI.defaultUI.selectedIM, 0, 0, imWidth, imHeight, null, this);
-//
-//
-//    graphics.translate(imWidth + 10, 0);
-//    graphics.drawImage(RenderBoardUI.defaultUI.unselectedIM, 0, 0, imWidth, imHeight, null, this);
-//
-//    graphics.translate(imWidth + 10, 0);
-//    graphics.drawImage(RenderBoardUI.defaultUI.pressedIM, 0, 0, imWidth, imHeight, null, this);
-  }
-
   /** This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
@@ -80,17 +37,40 @@ public class TabTester extends javax.swing.JPanel
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
+    jButton1 = new javax.swing.JButton();
+
+    jButton1.setText("jButton1");
+    jButton1.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jButton1ActionPerformed(evt);
+      }
+    });
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 422, Short.MAX_VALUE)
+      .addGroup(layout.createSequentialGroup()
+        .addGap(83, 83, 83)
+        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap(163, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 281, Short.MAX_VALUE)
+      .addGroup(layout.createSequentialGroup()
+        .addGap(75, 75, 75)
+        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap(131, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
+
+  private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton1ActionPerformed
+  {//GEN-HEADEREND:event_jButton1ActionPerformed
+    RenderBassBoard.getStaticRenderBoard().
+            drawPos(new BassBoard.Pos(0, 1), RenderBoardUI.BoardButtonImage.SELECTED);
+  }//GEN-LAST:event_jButton1ActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JButton jButton1;
   // End of variables declaration//GEN-END:variables
 }

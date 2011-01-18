@@ -4,8 +4,6 @@
  */
 package music;
 
-import java.util.Vector;
-
 /**
  *
  * @author Ilya
@@ -245,7 +243,8 @@ public class ParsedChordDef
     }
 
     ParsedChordDef other = (ParsedChordDef) obj;
-    return other.toString().startsWith(toString());
+    return other.namePlain.equals(namePlain);
+    //return other.toString().startsWith(toString());
   }
 
   public boolean equalForRecompute(ParsedChordDef other)

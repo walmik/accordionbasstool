@@ -324,8 +324,13 @@ public class RenderBoardUI
       _tY = diamY / 2 + textDescent;
     }
 
-    void draw(Graphics2D graphics, int col, int row, BoardButtonImage buttonImage, String chordStr)
+    void setFont(Graphics2D graphics)
     {
+      graphics.setFont(_font);
+    }
+
+    void draw(Graphics2D graphics, int col, int row, BoardButtonImage buttonImage, String chordStr)
+    {      
       if (buttonImage.pressed) {
         graphics.setColor(SystemColor.textText);
       } else {

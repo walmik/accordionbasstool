@@ -11,6 +11,7 @@ public class Note
 
   enum ScaleNote
   {
+
     C(0, 0),
     D(1, 2),
     E(2, 4),
@@ -18,7 +19,6 @@ public class Note
     G(4, 7),
     A(5, 9),
     B(6, 11);
-
     final short halfStep;
     final short scaleDist;
 
@@ -36,10 +36,8 @@ public class Note
 
       char theChar = Character.toUpperCase(input.charAt(0));
 
-      for (ScaleNote scale : values())
-      {
-        if (scale.toString().charAt(0) == theChar)
-        {
+      for (ScaleNote scale : values()) {
+        if (scale.toString().charAt(0) == theChar) {
           return scale;
         }
       }
@@ -47,6 +45,34 @@ public class Note
       return null;
     }
   }
+
+  private final static Note[] tuple(ScaleNote scale)
+  {
+    Note note = new Note(scale, 0);
+    Note tup[] = {note, note};
+    return tup;
+  }
+
+  private final static Note[] tuple(ScaleNote scaleSharp, ScaleNote scaleFlat)
+  {
+    Note tup[] = {new Note(scaleSharp, 1), new Note(scaleFlat, -1)};
+    return tup;
+  }
+
+  final static Note[][] reverseMapping = {
+    tuple(ScaleNote.C),
+    tuple(ScaleNote.C, ScaleNote.D),
+    tuple(ScaleNote.D),
+    tuple(ScaleNote.D, ScaleNote.E),
+    tuple(ScaleNote.E),
+    tuple(ScaleNote.F),
+    tuple(ScaleNote.F, ScaleNote.G),
+    tuple(ScaleNote.G),
+    tuple(ScaleNote.G, ScaleNote.A),
+    tuple(ScaleNote.A),
+    tuple(ScaleNote.A, ScaleNote.B),
+    tuple(ScaleNote.B)
+  };
 
   final ScaleNote note;
   final short sharpsOrFlats;
@@ -58,10 +84,16 @@ public class Note
     this(ScaleNote.C, 0);
   }
 
-  Note(ScaleNote n, int sof)
+  private Note(ScaleNote n, int sof)
   {
     note = n;
     sharpsOrFlats = (short) sof;
+  }
+
+  public Note getNote(int index, int flatBit)
+  {
+    assert ((index >= 0) && (index < reverseMapping.length));
+    return reverseMapping[index][flatBit];
   }
 
   Note duplicate()
@@ -87,7 +119,7 @@ public class Note
     }
     return bit;
   }
-  
+
   public int getSharpOrFlat()
   {
     return sharpsOrFlats;
@@ -100,13 +132,13 @@ public class Note
       return false;
     }
 
-    return (value() == ((Note)other).value());
+    return (value() == ((Note) other).value());
   }
 
   public Interval diff(Note other)
   {
     return new Interval(halfStepValue() - other.halfStepValue(),
-                        note.scaleDist - other.note.scaleDist);
+            note.scaleDist - other.note.scaleDist);
   }
 
   public Note add(Interval ival)
@@ -232,7 +264,6 @@ public class Note
 
     return new Note(newNote, newSOF);
   }
-
   static int lastParserOffset = 0;
 
   public static Note fromString(StringParser parser)

@@ -45,9 +45,26 @@
     <chord name="Dominant 9th, Sus 4" notes="C G Bb D F" abbrev="9sus4"></chord>
     <chord name="Dominant 9th (no 5th), Sus 4" notes="C Bb D F" abbrev="11no3"></chord>
   </chords>
-  <scales>
-    <scale name="Major" notes="C, D, E, F, G, A, B"/>
-    <scale name="Hijaz/Freygish" notes="D, Eb, F#, G, A, Bb, C, D"/>
-    <scale name="Minor" notes="A, B, C, D, E, F, G"/>
-  </scales>
+  <seqs name="Common Bass Patterns">
+    <seq name="Major Oom-Pah" notes="C, CM"/>
+    <seq name="Major Oom-Pah Cross-Over" notes="C, CM, G, CM"/>
+    <seq name="Major Waltz" notes="C, CM, CM"/>
+    <seq name="Major Waltz Cross-Over" notes="C, CM, CM, G, CM, CM"/>
+
+    <seq name="Minor Oom-Pah" notes="C, Cm"/>
+    <seq name="Minor Oom-Pah Cross-Over" notes="C, Cm, G, Cm"/>
+    <seq name="Minor Waltz" notes="C, Cm, Cm"/>
+    <seq name="Minor Waltz Cross-Over" notes="C, Cm, Cm, G, Cm, Cm"/>
+
+    <seq name="7th Oom-Pah" notes="C, C7"/>
+    <seq name="7th Oom-Pah Cross-Over" notes="C, C7, G, C7"/>
+    <seq name="7th Waltz" notes="C, C7, C7"/>
+    <seq name="7th Waltz Cross-Over" notes="C, C7, C7, G, C7, C7"/>
+  </seqs>
+
+  <seqs name="Scales">
+    <seq name="Major" notes="C, D, E, F, G, A, B"/>
+    <seq name="Hijaz/Freygish" notes="D, Eb, F#, G, A, Bb, C"/>
+    <seq name="Minor" notes="A, B, C, D, E, F, G"/>
+  </seqs>
 </root>

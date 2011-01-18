@@ -7,11 +7,10 @@ import music.ParsedChordDef;
 
 public class MatchingChordStore
 {
+
   private Vector<ParsedChordDef> cacheMatchingChords;
   private int matchingChordCol = -1;
-
-  private boolean optIncludeInv = true;
-  private boolean optFirstOnly = false;
+  private boolean removeInversion = false;
   private boolean validForNextChange = false;
   private SeqColumnModel columnModel;
 
@@ -20,7 +19,7 @@ public class MatchingChordStore
     this.columnModel = columnModel;
   }
 
-  public Vector<ParsedChordDef> getAllMatchingSelChords()
+  public Vector<ParsedChordDef> getAllMatchingSelChords(boolean preferCombo)
   {
     int colSel = columnModel.getSelectedColumn();
     if (colSel == -1) {
@@ -31,14 +30,18 @@ public class MatchingChordStore
       return cacheMatchingChords;
     }
 
+    ButtonCombo activeCombo = columnModel.getSelectedButtonCombo();
+
+    if ((activeCombo != null) && !activeCombo.isEmpty()) {
+      return getAllMatchingSelChords(activeCombo, preferCombo);
+    }
+
     return getAllMatchingSelChords(columnModel.getSelectedChordDef());
-    //ButtonCombo activeCombo = columnModel.getSelectedButtonCombo();
-    //return getAllMatchingSelChords(activeCombo);
   }
 
-  public Vector<ParsedChordDef> getKnownMatchingSelChords()
+  public Vector<ParsedChordDef> getKnownMatchingSelChords(boolean preferCombo)
   {
-    getAllMatchingSelChords();
+    getAllMatchingSelChords(preferCombo);
     Vector<ParsedChordDef> knownChords = new Vector<ParsedChordDef>();
     for (ParsedChordDef def : cacheMatchingChords) {
       if (def.relChord.getOrigDef() != null) {
@@ -48,9 +51,9 @@ public class MatchingChordStore
     return knownChords;
   }
 
-  public ParsedChordDef getFirstKnownMatchingChord()
+  public ParsedChordDef getFirstKnownMatchingChord(boolean preferCombo)
   {
-    getAllMatchingSelChords();
+    getAllMatchingSelChords(preferCombo);
 
     for (ParsedChordDef def : cacheMatchingChords) {
       if (def.relChord.getOrigDef() != null) {
@@ -66,46 +69,46 @@ public class MatchingChordStore
     if (existingChordDef == null) {
       cacheMatchingChords = new Vector<ParsedChordDef>();
     } else {
-      cacheMatchingChords = ChordRegistry.mainRegistry().findAllChordsForNotes(existingChordDef.chord, optIncludeInv);
+      cacheMatchingChords = ChordRegistry.mainRegistry().findAllChordsForNotes(existingChordDef.chord, removeInversion);
     }
 
     matchingChordCol = columnModel.getSelectedColumn();
     return cacheMatchingChords;
   }
 
-  public Vector<ParsedChordDef> getAllMatchingSelChords(ButtonCombo activeCombo)
+  public Vector<ParsedChordDef> getAllMatchingSelChords(ButtonCombo activeCombo, boolean preferCombo)
   {
     if (activeCombo == null) {
       cacheMatchingChords = new Vector<ParsedChordDef>();
     } else {
       cacheMatchingChords = ChordRegistry.mainRegistry().findChordFromNotes(
-              ButtonCombo.sortedNotes,
-              activeCombo.getChordMask(),
-              optIncludeInv,
-              true,
-              optFirstOnly);
+              activeCombo.sortNotes(),
+              activeCombo.getChordMask(), removeInversion, true, false);
+
+      if (preferCombo) {
+        for (ParsedChordDef def : cacheMatchingChords) {
+          def.setPrefCombo(activeCombo);
+        }
+      }
     }
+
     matchingChordCol = columnModel.getSelectedColumn();
     return cacheMatchingChords;
   }
 
-  public void toggleOptInclude(boolean value)
+  public void setRemoveInversion(boolean value)
   {
-    this.optIncludeInv = value;
-    this.matchingChordCol = -1;
+    this.removeInversion = value;
+    matchingChordCol = -1;
   }
 
-  public void toggleOptFirstOnly(boolean value)
+  void setValid(boolean valid)
   {
-    this.optFirstOnly = value;
-    this.matchingChordCol = -1;
-  }
-
-  void setValid(Vector<ParsedChordDef> matchingChords)
-  {
-    matchingChordCol = columnModel.getSelectedColumn();
-    cacheMatchingChords = matchingChords;
-    validForNextChange = true;
+    matchingChordCol = (valid ? columnModel.getSelectedColumn() : -1);
+    validForNextChange = valid;
+    if (!valid) {
+      cacheMatchingChords = null;
+    }
   }
 
   void resetIfNotValid()

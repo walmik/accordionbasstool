@@ -89,7 +89,7 @@ public class BassBoard
       RowType.Chord7th,
       RowType.ChordDim};
 
-    return new BassBoard(layout, new Note(Note.ScaleNote.C, 0), 20);
+    return new BassBoard(layout, new Note(), 20);
   }
 
   public static BassBoard bassBoard32()
@@ -170,7 +170,7 @@ public class BassBoard
 
   protected BassBoard(RowType[] layout, int numCols)
   {
-    this(layout, new Note(Note.ScaleNote.C, 0), numCols);
+    this(layout, new Note(), numCols);
   }
 
   public Note getNoteAt(int col)

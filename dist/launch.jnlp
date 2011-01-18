@@ -14,7 +14,8 @@
 <jar eager="true" href="AccordionBassTool.jar" main="true"/>
 
 
-    </resources>
+    <jar href="lib/swing-layout-1.0.4.jar"/>
+</resources>
     <update check="always" policy="always"/>
     <application-desc main-class="app.Main">
 

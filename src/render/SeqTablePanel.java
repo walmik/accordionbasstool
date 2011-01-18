@@ -13,7 +13,6 @@ package render;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
-import javax.swing.Timer;
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -21,7 +20,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.TableColumnModelEvent;
 import music.ButtonCombo;
 import music.ChordRegistry;
-import music.FingerCombo;
 import music.Note;
 
 /**
@@ -32,10 +30,10 @@ public class SeqTablePanel extends javax.swing.JPanel
 {
   SeqColumnModel columnModel;
   ChordTableAction chordTableAction;
-  Timer playTimer;
 
   SeqViewerController seqViewer;
   SoundController sound;
+  SeqAnimController anim;
 
   /** Creates new form SeqTablePanel */
   public SeqTablePanel()
@@ -50,6 +48,7 @@ public class SeqTablePanel extends javax.swing.JPanel
     columnModel.getRowSelModel().addListSelectionListener(new ColumnChangeListener());
 
     sound = new SoundController(true);
+    anim = new SeqAnimController(columnModel, sound, 500, 100);
 
     //transposePanel1.setSeqColModel(columnModel);
 
@@ -62,10 +61,6 @@ public class SeqTablePanel extends javax.swing.JPanel
     toolRemove.addActionListener(chordTableAction);
     toolPlay.addActionListener(chordTableAction);
     toolResetAll.addActionListener(chordTableAction);
-
-    playTimer = new Timer(1000, chordTableAction);
-    playTimer.setActionCommand("Timer");
-
 
     //cornerPanel = new JPanel();
     //cornerPanel.add(toolPlay);
@@ -100,21 +95,6 @@ public class SeqTablePanel extends javax.swing.JPanel
     checkArpegg.setEnabled(soundEnabled);
   }
 
-//  private ButtonCombo getCurrCombo()
-//  {
-//    int row = seqTable.getSelectedRow();
-//    int col = columnModel.getSelectedColumn();
-//
-//    Object obj = seqTable.getModel().getValueAt(row, col);
-//    if (obj instanceof FingerCombo) {
-//      FingerCombo fingerCombo = (FingerCombo) obj;
-//      return ((fingerCombo != null) ? (fingerCombo.getButtonCombo()) : null);
-//    } else if (obj instanceof ButtonCombo) {
-//      return (ButtonCombo) obj;
-//    } else {
-//      return null;
-//    }
-//  }
 
   private class ColumnChangeListener extends SeqTableEventAdapter
   {
@@ -148,7 +128,7 @@ public class SeqTablePanel extends javax.swing.JPanel
 
       if ((combo != null) && (combo.getLength() > 0)) {
         //****
-        sound.play(combo, false);
+        sound.play(combo, anim.isRunning());
         //****
 
         Note lowest = combo.getLowestNote();
@@ -208,25 +188,11 @@ public class SeqTablePanel extends javax.swing.JPanel
       } else if (e.getActionCommand().equals("ResetAll")) {
         columnModel.resetColumns(true);
       } else if (e.getActionCommand().equals("PlaySeq")) {
-        if (!playTimer.isRunning()) {
+        if (anim.toggleRun()) {
           toolPlay.setText("Stop");
-          sound.play(columnModel.getSelectedButtonCombo(), false);
-          playTimer.restart();
         } else {
           toolPlay.setText("Play");
-          playTimer.stop();
         }
-      } else if (e.getActionCommand().equals("Timer")) {
-
-        int index = columnModel.getSelectedColumn();
-
-        index++;
-        if (index >= columnModel.getColumnCount()) {
-          index = 0;
-        }
-
-        columnModel.selComboModel.setSelectionInterval(index, index);
-        seqTable.scrollRectToVisible(seqTable.getCellRect(seqTable.getSelectedRow(), index, true));
       }
     }
   }

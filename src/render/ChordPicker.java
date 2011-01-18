@@ -143,7 +143,7 @@ public class ChordPicker extends javax.swing.JPanel
 
     Vector<RegistryChordDef> vec = new Vector<RegistryChordDef>();
     vec.add(customDef);
-    for (RegistryChordDef def : ChordRegistry.mainRegistry().getAllChords()) {
+    for (RegistryChordDef def : ChordRegistry.mainRegistry().allChordDefs) {
       if (filter.accepts(def)) {
         vec.add(def);
       }
@@ -354,7 +354,6 @@ public class ChordPicker extends javax.swing.JPanel
     });
     jScrollPane2.setViewportView(listChords);
 
-    filterCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Show All Chords", "Show Simple Chords", "Show 7th Chords", "Show 9th Chords", "Show Other Chords" }));
     filterCombo.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         filterComboActionPerformed(evt);

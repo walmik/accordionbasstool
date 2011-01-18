@@ -86,11 +86,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
             seqTablePanel.columnModel,
             seqTablePanel.sound);
 
-    tabButtonClicker.setSeqColModel(seqTablePanel.columnModel, mouseListener);
+    tabButtonClicker.setSeqColModel(seqTablePanel.columnModel);
 
     this.renderBoardControl.getHeader().getExtPanel().add(this.checkHiliteRedunds);
-    
-    //initModeSelector();
 
 //    renderBoardHeader.initBoardHeader(
 //            renderBassBoard,
@@ -356,9 +354,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     tabSeqEditor = new render.TabSeqEditor();
     tabOptions = new render.TabOptions();
     tabPitchDetect = new render.TabPitchDetect();
+    tabTester1 = new render.TabTester();
     renderBoardControl = new render.RenderBoardControl();
 
-    checkHiliteRedunds.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+    checkHiliteRedunds.setFont(new java.awt.Font("Tahoma", 1, 14));
     checkHiliteRedunds.setText("Press Redundant Buttons");
     checkHiliteRedunds.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     checkHiliteRedunds.setMargin(new java.awt.Insets(2, 2, 2, 20));
@@ -386,6 +385,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     toolTabs.addTab("Edit Sequence/Scale", tabSeqEditor);
     toolTabs.addTab("Options", tabOptions);
     toolTabs.addTab("Pitch Detector", tabPitchDetect);
+    toolTabs.addTab("tab6", tabTester1);
 
     controlSplitPane.setLeftComponent(toolTabs);
 
@@ -412,6 +412,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private render.TabOptions tabOptions;
   private render.TabPitchDetect tabPitchDetect;
   private render.TabSeqEditor tabSeqEditor;
+  private render.TabTester tabTester1;
   private javax.swing.JTabbedPane toolTabs;
   // End of variables declaration//GEN-END:variables
 }

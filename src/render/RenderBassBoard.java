@@ -1,5 +1,6 @@
 package render;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -19,7 +20,6 @@ import javax.swing.ToolTipManager;
 import music.BassBoard;
 import music.ButtonComboSequence;
 import music.Chord;
-
 
 public class RenderBassBoard extends JPanel
 {
@@ -147,6 +147,7 @@ public class RenderBassBoard extends JPanel
 
   class RepaintListener extends SeqTableEventAdapter
   {
+
     RepaintListener()
     {
       super(true);
@@ -214,15 +215,21 @@ public class RenderBassBoard extends JPanel
   public void setClickPos(BassBoard.Pos newClickPos)
   {
     if (!BassBoard.posEquals(clickPos, newClickPos)) {
-      repaint();
+      if (clickPos != null) {
+        this.drawPos(clickPos, null);
+      }
+      //repaint();
       clickPos = newClickPos;
+
+      if (clickPos != null) {
+        this.drawPos(clickPos, RenderBoardUI.BoardButtonImage.FAST_CLICK);
+      }
     }
   }
 
   public void clearClickPos()
   {
-    clickPos = null;
-    repaint();
+    setClickPos((BassBoard.Pos) null);
   }
 
   public Chord getClickedChord()
@@ -345,12 +352,6 @@ public class RenderBassBoard extends JPanel
   }
 
   @Override
-  public void update(Graphics graphics)
-  {
-    paint(graphics);
-  }
-
-  @Override
   public void paint(Graphics graphics)
   {
 
@@ -429,6 +430,7 @@ public class RenderBassBoard extends JPanel
     textDrawer.setup(graphics2D, xW, yW, diamX, diamY);
 
     AffineTransform orig = graphics2D.getTransform();
+    orig.translate(xP, yP);
 
     AffineTransform offset = new AffineTransform();
     int rOff = 0;
@@ -449,55 +451,113 @@ public class RenderBassBoard extends JPanel
 
         int realCol = c;
         int realRow = r;
+
         if (!_isHoriz) {
           realCol = _cols - c - 1;
           realRow = _rows - r - 1;
         }
 
-        graphics2D.translate(xP, yP);
+        //graphics2D.translate(xP, yP);
 
-        boolean pressed = false;
-        boolean selected = false;
-        boolean redundant = false;
-
-        if (_selCombo != null) {
-          pressed = _selCombo.hasButtonPressed(realRow, realCol);
-          selected = _selCombo.hasButtonInSeq(realRow, realCol);
-          redundant = _selCombo.hasButtonEquivToPressed(realRow, realCol);
-        }
-
-        String textStr = null;
-        int finger = -1;
-
-        if (pressed) {
-          finger = _selCombo.getFingerAt(realRow, realCol);
-          if (finger >= 0) {
-            textStr = String.valueOf(finger);
-          }
-        }
-
-        if (textStr == null) {
-          textStr = _theBoard.getChordName(realRow, realCol, false);
-        }
-
-        boolean fastClick = false;
-
-        if (!pressed && (clickPos != null) && clickPos.equals(realRow, realCol)) {
-          fastClick = true;
-        }
-
-        RenderBoardUI.BoardButtonImage boardButton =
-                RenderBoardUI.defaultUI.getBoardButtonImage(pressed, selected, redundant, fastClick, finger);
-
+        getStateBoardButton(realCol, realRow);
         {
-          buttonDrawer.draw(graphics2D, realCol, realRow, selected, boardButton);
-          textDrawer.draw(graphics2D, realCol, realRow, boardButton, textStr);
+          buttonDrawer.draw(graphics2D, realCol, realRow, currSelected, currBoardButton);
+          textDrawer.draw(graphics2D, realCol, realRow, currBoardButton, currTextStr);
         }
 
         cOff += _cInc;
       }
       rOff += _rInc;
     }
+  }
+
+  private RenderBoardUI.BoardButtonImage currBoardButton;
+  private String currTextStr;
+  private boolean currSelected;
+
+  private void getStateBoardButton(int realCol, int realRow)
+  {
+    boolean pressed = false;
+    boolean selected = false;
+    boolean redundant = false;
+
+    if (_selCombo != null) {
+      pressed = _selCombo.hasButtonPressed(realRow, realCol);
+      currSelected = selected = _selCombo.hasButtonInSeq(realRow, realCol);
+      redundant = _selCombo.hasButtonEquivToPressed(realRow, realCol);
+    }
+
+    currTextStr = null;
+    int finger = -1;
+
+    if (pressed) {
+      finger = _selCombo.getFingerAt(realRow, realCol);
+      if (finger >= 0) {
+        currTextStr = String.valueOf(finger);
+      }
+    }
+
+    if (currTextStr == null) {
+      currTextStr = _theBoard.getChordName(realRow, realCol, false);
+    }
+
+    boolean fastClick = false;
+
+//    if (!pressed && (clickPos != null) && clickPos.equals(realRow, realCol)) {
+//      fastClick = true;
+//    }
+
+    currBoardButton =
+            RenderBoardUI.defaultUI.getBoardButtonImage(pressed, selected, redundant, fastClick, finger);
+
+  }
+
+  public void drawPos(BassBoard.Pos pos, RenderBoardUI.BoardButtonImage boardButton)
+  {
+    int col, row;
+
+    if (!_isHoriz) {
+      col = _cols - pos.col - 1;
+      row = _rows - pos.row - 1;
+    } else {
+      col = pos.col;
+      row = pos.row;
+    }
+
+    double cOff = _cStart + (row * _slope);
+    cOff += (col * _cInc);
+    double rOff = row * _rInc;
+
+    getStateBoardButton(pos.col, pos.row);
+    if (boardButton == null) {
+      boardButton = currBoardButton;
+    }
+
+    Graphics2D graphics2D = (Graphics2D) this.getGraphics();
+
+    if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
+      graphics2D.translate((getWidth() - _contentDim.width - margin.width) / 2, 0);
+    }
+
+    int xP = _borderInsets.left + margin.width / 2;
+    int yP = _borderInsets.top + margin.height / 2;
+    graphics2D.translate(xP, yP);
+
+    if (_isHoriz) {
+      graphics2D.translate(cOff, rOff);
+    } else {
+      graphics2D.translate(rOff, cOff);
+    }
+
+    graphics2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+    graphics2D.setPaint(getBackground());
+    graphics2D.setClip(0, 0, _cInc, _rInc);
+    graphics2D.fillRect(0, 0, boardButton.image.getWidth(), boardButton.image.getHeight());
+
+    buttonDrawer.draw(graphics2D, col, row, true, boardButton);
+
+    textDrawer.setFont(graphics2D);
+    textDrawer.draw(graphics2D, col, row, boardButton, currTextStr);
   }
 
   @Override

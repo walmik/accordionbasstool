@@ -14,10 +14,11 @@ import music.midi.Player;
  */
 public class SoundController
 {
-
   Player player;
   boolean soundEnabled = false;
   boolean arpeggiating = false;
+  int playDuration = 500;
+  int arpegStepDuration = 200;
 
   public SoundController(boolean initNow)
   {
@@ -95,9 +96,9 @@ public class SoundController
     player.stopAll();
 
     if (arpeggiating) {
-      return player.playArpeggiate(chordMask.getValue(), 200);
+      return player.playArpeggiate(chordMask.getValue(), arpegStepDuration);
     } else {
-      return player.playChord(chordMask.getValue(), 500, manualStop);
+      return player.playChord(chordMask.getValue(), playDuration, manualStop);
     }
   }
 }

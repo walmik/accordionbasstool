@@ -18,126 +18,55 @@ public class ChordRegistry
 {
 
   private static ChordRegistry _mainRegistry = null;
-  static RegistryChordDef defaultChord;
+  //static RegistryChordDef defaultChord;
 
   public static ChordRegistry mainRegistry()
   {
     if (_mainRegistry == null) {
-      _mainRegistry = new ChordRegistry();
-      _mainRegistry.loadFromXml("chorddefs.xml");
+      _mainRegistry = new ChordRegistry("chorddefs.xml");
     }
 
     return _mainRegistry;
   }
   //==============================================================
-//  static public class ChordGroupSet
-//  {
-//    // Chord Defs (loaded from XML)
-//
-//    final RegistryChordDef groupedChordDefs[][];
-//    public final String groupNames[];
-//    public final int maxChordsInGroup;
-//    public final String name;
-//
-//    ChordGroupSet(String chordSetName)
-//    {
-//      name = chordSetName;
-//      groupedChordDefs = new RegistryChordDef[0][];
-//      groupNames = new String[0];
-//      maxChordsInGroup = 0;
-//    }
-//
-//    ChordGroupSet(Element root)
-//    {
-//      name = root.getAttribute("name");
-//      NodeList groups = root.getElementsByTagName("chordgroup");
-//      groupNames = new String[groups.getLength()];
-//      groupedChordDefs = new RegistryChordDef[groupNames.length][];
-//      int maxChords = 0;
-//
-//      for (int i = 0; i < groupedChordDefs.length; i++) {
-//        Element group = (Element) groups.item(i);
-//        groupNames[i] = group.getAttribute("name");
-//
-//        NodeList chords = group.getElementsByTagName("chord");
-//
-//        groupedChordDefs[i] = new RegistryChordDef[chords.getLength()];
-//        maxChords = Math.max(maxChords, groupedChordDefs[i].length);
-//
-//        for (int j = 0; j < groupedChordDefs[i].length; j++) {
-//          Element chord = (Element) chords.item(j);
-//          String chordName = chord.getAttribute("name");
-//          String abbrev = chord.getAttribute("abbrev");
-//          String notelist = chord.getAttribute("notes");
-//          groupedChordDefs[i][j] = new RegistryChordDef(chordName, abbrev, notelist, j, i);
-//        }
-//      }
-//
-//      maxChordsInGroup = maxChords;
-//    }
-//
-//    public RegistryChordDef getChordDef(int groupIndex, int chordIndex)
-//    {
-//      assert ((chordIndex >= 0) && (groupIndex >= 0));
-//
-//      if (chordIndex < groupedChordDefs[groupIndex].length) {
-//        return groupedChordDefs[groupIndex][chordIndex];
-//      } else {
-//        return null;
-//      }
-//    }
-//
-//    public RegistryChordDef[] getChordDefs(int groupIndex)
-//    {
-//      assert(groupIndex >= 0);
-//      return groupedChordDefs[groupIndex];
-//    }
-//
-//    public RegistryChordDef findChord(StringParser parser)
-//    {
-//      int prevMatchLength = 0;
-//      RegistryChordDef bestMatch = null;
-//      String chordToMatch = parser.input();
-//
-//      for (int col = 0; col < groupedChordDefs.length; col++) {
-//        for (int row = 0; row < groupedChordDefs[col].length; row++) {
-//          RegistryChordDef currChord = groupedChordDefs[col][row];
-//          String currAbbrev = currChord.abbrevPlain.trim();
-//          if ((currAbbrev.length() > prevMatchLength)
-//                  && chordToMatch.startsWith(currAbbrev)) {
-//
-//            bestMatch = currChord;
-//            prevMatchLength = currAbbrev.length();
-//          }
-//        }
-//      }
-//
-//      parser.incOffset(prevMatchLength);
-//      return bestMatch;
-//    }
-//  }
-  private RegistryChordDef allChordDefs[];
-
-  public ChordRegistry()
+  public final RegistryChordDef allChordDefs[];
+  public final String[] allSeqGroupNames;
+  public final SeqDef[][] allSeqDefs;
+  //==============================================================
+  
+  public class SeqDef
   {
+    public final String name;
+    public final String noteSeq;
+
+    SeqDef(Element elem)
+    {
+      name = elem.getAttribute("name");
+      noteSeq = elem.getAttribute("notes");
+    }
+
+    @Override
+    public String toString()
+    {
+      return name;
+    }
   }
 
-  public RegistryChordDef[] getAllChords()
-  {
-    return allChordDefs;
-  }
 
-  public void loadFromXml(String filename)
+  public ChordRegistry(String filename)
   {
     Document doc = Main.loadXmlFile(filename, "./xml/");
 
     if (doc == null) {
       allChordDefs = new RegistryChordDef[0];
+      allSeqDefs = new SeqDef[0][0];
+      allSeqGroupNames = new String[0];
       return;
     }
 
     Element root = doc.getDocumentElement();
 
+    // Load Chords
     NodeList chords = root.getElementsByTagName("chords");
 
     chords = ((Element) chords.item(0)).getElementsByTagName("chord");
@@ -151,6 +80,23 @@ public class ChordRegistry
       String notelist = chord.getAttribute("notes");
       String group = chord.getAttribute("group");
       allChordDefs[i] = new RegistryChordDef(chordName, abbrev, notelist, group);
+    }
+
+    // Load Seqs
+    NodeList seqGroups = root.getElementsByTagName("seqs");
+    allSeqDefs = new SeqDef[seqGroups.getLength()][];
+    allSeqGroupNames = new String[seqGroups.getLength()];
+
+    for (int i = 0; i < seqGroups.getLength(); i++) {
+      Element seqGroup = (Element)seqGroups.item(i);
+      allSeqGroupNames[i] = seqGroup.getAttribute("name");
+
+      NodeList seqs = seqGroup.getElementsByTagName("seq");
+      allSeqDefs[i] = new SeqDef[seqs.getLength()];
+
+      for (int j = 0; j < seqs.getLength(); j++) {
+        allSeqDefs[i][j] = new SeqDef((Element)seqs.item(j));
+      }
     }
   }
 
@@ -185,13 +131,13 @@ public class ChordRegistry
     return null;
   }
 
-  public Vector<ParsedChordDef> findAllChordsForNotes(Chord chord, boolean allowInversion)
+  public Vector<ParsedChordDef> findAllChordsForNotes(Chord chord, boolean removeInversion)
   {
     Chord.Mask mask = new Chord.Mask();
     Note[] sortArray = new Note[Note.NUM_HALFSTEPS * 2];
     mask.sortChordNotes(chord, sortArray);
 
-    Vector<ParsedChordDef> parsedDefs = findChordFromNotes(sortArray, mask, allowInversion, false, false);
+    Vector<ParsedChordDef> parsedDefs = findChordFromNotes(sortArray, mask, removeInversion, true, false);
 
     return parsedDefs;
   }
@@ -229,7 +175,7 @@ public class ChordRegistry
   public Vector<ParsedChordDef> findChordFromNotes(
           Note[] fullNotelist,
           Chord.Mask mask,
-          boolean allowInversion,
+          boolean removeInversion,
           boolean includeUnknown,
           boolean findFirstOnly)
   {
@@ -318,7 +264,9 @@ public class ChordRegistry
           continue;
         }
 
-        assert (fullNotelist[i].isBassNote() == true);
+        if (fullNotelist[i].isBassNote() != true) {
+          System.out.println("isBassNote() false for " + fullNotelist[i]);
+        }
 
         if (additionalBass != null) {
           validForm = false;
@@ -333,10 +281,6 @@ public class ChordRegistry
         additionalBass = fullNotelist[i];
       }
 
-      if (!allowInversion && (bassNoteToMatch == 0)) {
-        additionalBass = null;
-      }
-
       // Don't do additional bass for single note
       if (matchedRelChord.getOrigDef().ivals.length == 0) {
         additionalBass = null;
@@ -346,7 +290,12 @@ public class ChordRegistry
         additionalBass = null;
       }
 
+      if (removeInversion && (bassNoteToMatch == 0)) {
+        additionalBass = null;
+      }
+
       if (validForm || (bassNoteToMatch == 0)) {
+        
         ParsedChordDef newChordDef =
                 new ParsedChordDef(note, additionalBass, matchedRelChord, ParsedChordDef.BassSetting.LowestBass);
 

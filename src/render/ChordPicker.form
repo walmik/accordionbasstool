@@ -69,17 +69,6 @@
       </SubComponents>
     </Container>
     <Component class="javax.swing.JComboBox" name="filterCombo">
-      <Properties>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="5">
-            <StringItem index="0" value="Show All Chords"/>
-            <StringItem index="1" value="Show Simple Chords"/>
-            <StringItem index="2" value="Show 7th Chords"/>
-            <StringItem index="3" value="Show 9th Chords"/>
-            <StringItem index="4" value="Show Other Chords"/>
-          </StringArray>
-        </Property>
-      </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filterComboActionPerformed"/>
       </Events>

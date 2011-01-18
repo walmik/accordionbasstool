@@ -144,32 +144,35 @@ public class SeqColumnModel extends DefaultTableColumnModel
     if ((activeChord == null) || activeChord.isEmptyChord() || (activeCombo == null)) {
       info += "<i>No Buttons Clicked</i>";
     } else {
-      String sortedNotesStr = activeChord.toSortedNoteString(true);
+      String sortedNotesStr;
 
       if (activeCombo.isEmpty()) {
         info += "Buttons: <i>None possible on this board</i>";
+        sortedNotesStr = activeChord.toSortedNoteString(true);
       } else {
         info += "Buttons: ";
         info += "<b>" + activeCombo.toButtonListingString(true) + "</b>";
+        sortedNotesStr = activeCombo.toSortedNoteString(true);
       }
 
       info += "<br/>Notes: ";
       info += "<b>" + sortedNotesStr + "</b>";
     }
+
     info += "</html>";
     return info;
   }
 
   public boolean editSelectedColumn(ParsedChordDef newDef)
   {
-    return editSelectedColumn(newDef, null);
+    return editSelectedColumn(newDef, false);
   }
 
-  public boolean editSelectedColumn(ParsedChordDef newDef, Vector<ParsedChordDef> matchingChords)
+  public boolean editSelectedColumn(ParsedChordDef newDef, boolean keepMatchedChords)
   {
     int index = getSelectedColumn();
     if (index >= 0) {
-      matchingChordStore.setValid(matchingChords);
+      matchingChordStore.setValid(keepMatchedChords);
       boolean updated = editColumn(index, newDef);
       if (!updated) {
         matchingChordStore.resetIfNotValid();
@@ -210,10 +213,12 @@ public class SeqColumnModel extends DefaultTableColumnModel
   }
   boolean isPopulating = false;
 
-  public void populateFromText(String text, boolean removeDupNotes)
+  public void populateFromText(String text, boolean removeDupNotes, Note rootNote)
   {
     StringParser parser = new StringParser(text);
     Vector<ParsedChordDef> chords = ChordParser.parseChords(parser, removeDupNotes);
+
+    int colSel = this.getSelectedColumn();
 
     this.tableColumns.clear();
 
@@ -223,8 +228,12 @@ public class SeqColumnModel extends DefaultTableColumnModel
       this.addColumn(chords.elementAt(i), i);
     }
 
+    if (rootNote != null) {
+      transposeAllFromFirstColumn(rootNote);
+    }
     isPopulating = false;
-    syncModelToView(0, 0);
+    
+    computeSeqs(colSel);
   }
 
   private void syncModelToView(int index, int selIndex)
@@ -239,6 +248,22 @@ public class SeqColumnModel extends DefaultTableColumnModel
   public void transposeAllFromSelectedColumn(Note newNote)
   {
     TableColumn column = this.getColumn(getSelectedColumn());
+
+    transposeAllFromColumn(newNote, column);
+  }
+
+  public void transposeAllFromFirstColumn(Note newNote)
+  {
+    TableColumn column = this.getColumn(0);
+
+    transposeAllFromColumn(newNote, column);
+  }
+
+  public void transposeAllFromColumn(Note newNote, TableColumn column)
+  {
+    if (column == null) {
+      return;
+    }
 
     // Find interval diff between new and old and apply to all
     ParsedChordDef existingDef = (ParsedChordDef) column.getHeaderValue();

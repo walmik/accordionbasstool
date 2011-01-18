@@ -48,22 +48,14 @@ public class BoardMouseListener extends MouseAdapter
     clickButtons.toArray(allPos);
     ButtonCombo activeCombo = new ButtonCombo(allPos, renderBoard.getBassBoard());
 
-    Vector<ParsedChordDef> matchedChords = columnModel.matchingChordStore.getAllMatchingSelChords(activeCombo);
-
-//    Vector<ParsedChordDef> matchedChords = ChordRegistry.mainRegistry().
-//            findChordFromNotes(ButtonCombo.sortedNotes, activeCombo.getChordMask(),
-//            optIncludeInversion, true, false);
+    Vector<ParsedChordDef> matchedChords = columnModel.matchingChordStore.getAllMatchingSelChords(activeCombo, true);
 
     if (matchedChords.isEmpty()) {
       return;
     }
 
-    for (ParsedChordDef def : matchedChords) {
-      def.setPrefCombo(activeCombo);
-    }
-
     ParsedChordDef activeParsedChord = matchedChords.firstElement();
-    columnModel.editSelectedColumn(activeParsedChord, matchedChords);
+    columnModel.editSelectedColumn(activeParsedChord, true);
   }
 
   private void syncActiveButtons()

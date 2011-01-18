@@ -47,7 +47,8 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
 //      computeButton.doClick();
 //    }
 
-    transposePanel1.setSeqColModel(theModel);
+//    transposePanel1.setSeqColModel(theModel);
+    seqPicker1.setSeqColModel(theModel);
 
     //transNotePicker.addPropertyChangeListener(this);
   }
@@ -116,12 +117,12 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
+    seqPicker1 = new render.SeqPicker();
     jPanel1 = new javax.swing.JPanel();
     computeButton = new javax.swing.JButton();
     comboRecent = new javax.swing.JComboBox();
     buttonClearRecent = new javax.swing.JButton();
     checkAllowDups = new javax.swing.JCheckBox();
-    transposePanel1 = new render.TransposePanel();
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Chord Sequence:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
@@ -177,27 +178,24 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
           .addComponent(checkAllowDups)))
     );
 
-    transposePanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
-
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(layout.createSequentialGroup()
+      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
         .addContainerGap()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(layout.createSequentialGroup()
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addContainerGap())
-          .addComponent(transposePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addComponent(seqPicker1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 448, Short.MAX_VALUE)
+          .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addGap(18, 18, 18)
-        .addComponent(transposePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addComponent(seqPicker1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap())
     );
   }// </editor-fold>//GEN-END:initComponents
 
@@ -221,7 +219,7 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
 //      }
 
       if (columnModel != null) {
-        columnModel.populateFromText(text, !checkAllowDups.isSelected());
+        columnModel.populateFromText(text, !checkAllowDups.isSelected(), null);
       }
       seqTable.requestFocusInWindow();
 }//GEN-LAST:event_computeButtonActionPerformed
@@ -253,6 +251,6 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
   private javax.swing.JComboBox comboRecent;
   private javax.swing.JButton computeButton;
   private javax.swing.JPanel jPanel1;
-  private render.TransposePanel transposePanel1;
+  private render.SeqPicker seqPicker1;
   // End of variables declaration//GEN-END:variables
 }
