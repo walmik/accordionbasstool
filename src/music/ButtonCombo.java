@@ -17,6 +17,7 @@ public class ButtonCombo
   Hash hash;
   GeoPos boundsMin, boundsMax;
   private Note lowestNote;
+  private Note[] sortedNotes = null;
   boolean preferred = false;
   boolean extraneous = false;
 
@@ -283,20 +284,21 @@ public class ButtonCombo
     return getHash().contains(row, col);
   }
   
-  public final static Note[] sortedNotes = new Note[Note.NUM_HALFSTEPS * 2];
-
-  private void sortNotes()
+  public Note[] sortNotes()
   {
-    allChordsMask = new Chord.Mask();
-
-    for (int i = 0; i < sortedNotes.length; i++) {
-      sortedNotes[i] = null;
+    if (sortedNotes != null) {
+      return sortedNotes;
     }
+    
+    allChordsMask = new Chord.Mask();
+    sortedNotes = new Note[Note.NUM_HALFSTEPS * 2];
 
     for (int i = 0; i < pos.length; i++) {
       Chord theChord = board.getChordAt(pos[i]);
       allChordsMask.sortChordNotes(theChord, sortedNotes);
     }
+
+    return sortedNotes;
   }
 
   public Note getLowestNote()
