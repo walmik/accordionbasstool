@@ -104,15 +104,6 @@ public class ChordPicker extends javax.swing.JPanel
     initComponents();
 
     customDef = RegistryChordDef.getCustomDef();
-    //relChord = customDef.relChord;
-
-//    Vector<RegistryChordDef> vec = new Vector<RegistryChordDef>();
-//    vec.add(customDef);
-//    for (RegistryChordDef def : ChordRegistry.mainRegistry().getAllChords()) {
-//      vec.add(def);
-//    }
-//
-//    listChords.setListData(vec);
 
     filterCombo.setModel(new DefaultComboBoxModel(ChordFilter.values()));
 
@@ -130,11 +121,7 @@ public class ChordPicker extends javax.swing.JPanel
       }
     });
 
-    //initBaseCombo();
-    //initTable();
     initStepControls();
-
-    //listChords.setSelectedIndex(1);
   }
 
   void populateFilteredList()
@@ -224,29 +211,8 @@ public class ChordPicker extends javax.swing.JPanel
 
     stepChangers = new StepChangeListener[combos.length];
 
-//    GridBagLayout gridbag = new GridBagLayout();
-//    chordGridPanel.removeAll();
-//    chordGridPanel.setLayout(gridbag);
-//
-//    GridBagConstraints cons = new GridBagConstraints();
-//    cons.gridx = cons.gridy = 0;
-//    cons.ipadx = 2;
-//    cons.ipady = 2;
-
     for (int i = 0; i < stepChangers.length; i++) {
       stepChangers[i] = new StepChangeListener(i, combos[i], checks[i]);
-
-//      cons.gridx = 0;
-//      cons.gridwidth = 1;
-//      gridbag.setConstraints(checks[i], cons);
-//      chordGridPanel.add(checks[i]);
-//
-//      cons.gridx = 1;
-//      cons.gridwidth = 1;
-//      gridbag.setConstraints(combos[i], cons);
-//      chordGridPanel.add(combos[i]);
-//
-//      cons.gridy++;
     }
   }
 
@@ -408,9 +374,9 @@ public class ChordPicker extends javax.swing.JPanel
             .addComponent(jLabel1)
             .addGap(18, 18, 18)
             .addComponent(filterCombo, 0, 127, Short.MAX_VALUE))
-          .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE))
+          .addComponent(jScrollPane2))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE))
+        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -419,8 +385,8 @@ public class ChordPicker extends javax.swing.JPanel
           .addComponent(jLabel1)
           .addComponent(filterCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE))
-      .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
+      .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 167, Short.MAX_VALUE)
     );
   }// </editor-fold>//GEN-END:initComponents
 

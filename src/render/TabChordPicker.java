@@ -23,44 +23,26 @@ import music.RelChord;
  *
  * @author Ilya
  */
-public class TabChordPicker extends javax.swing.JPanel
+public class TabChordPicker extends ToolPanel
         implements ActionListener, PropertyChangeListener
 {
 
-  /** Creates new form TabChordPicker3 */
+  Note rootNote = new Note();
+  RelChord currRelChord;
+  Note addedBassNote = new Note();
+  final static int DEFAULT_TABLE_COL_WIDTH = 96;
+  int isUpdatingChord = 0;
+  boolean usingAddedBass;
+
   public TabChordPicker()
   {
     initComponents();
   }
-  Note rootNote = new Note();
-  RelChord currRelChord;
-  Note addedBassNote = new Note();
-  SeqColumnModel seqColumnModel = null;
-  final static int DEFAULT_TABLE_COL_WIDTH = 96;
-  int isUpdatingChord = 0;
-  SeqTableEventAdapter listselAdapter;
-  boolean usingAddedBass;
 
-  void setSeqColModel(SeqColumnModel model)
+  @Override
+  public void init(SeqColumnModel model)
   {
-    seqColumnModel = model;
-
-    listselAdapter = new SeqTableEventAdapter()
-    {
-      @Override
-      protected void selectionChanged(int index)
-      {
-        if (isVisible()) {
-          setupChord(seqColumnModel.getChordDef(index));
-        }
-      }
-    };
-
-    seqColumnModel.getSelectionModel().addListSelectionListener(listselAdapter);
-  }
-
-  public void init()
-  {
+    super.init(model);
     notePickerRoot.addPropertyChangeListener("Note", this);
     notePickerAdd.addPropertyChangeListener("Note", this);
     chordPicker1.addPropertyChangeListener("Chord", this);
@@ -69,30 +51,18 @@ public class TabChordPicker extends javax.swing.JPanel
     notePickerAdd.setVisible(usingAddedBass);
     labelAddBass.setVisible(usingAddedBass);
     labelSlash.setVisible(usingAddedBass);
+  }
 
-    //slashLabel.setVisible(addedBassCheck.isSelected());
-    //mustBeLowestCheck.setVisible(addedBassCheck.isSelected());
+  @Override
+  protected void columnSelectionChanged(int index)
+  {
+    setupChord(columnModel.getChordDef(index));
+  }
 
-//    addedBassCheck.addItemListener(new ItemListener()
-//    {
-//
-//      @Override
-//      public void itemStateChanged(ItemEvent evt)
-//      {
-//        boolean usingAddedBass = (evt.getStateChange() == ItemEvent.SELECTED);
-//
-//        notePickerAdd.setVisible(usingAddedBass);
-//        //slashLabel.setVisible(usingAddedBass);
-//        //mustBeLowestCheck.setVisible(usingAddedBass);
-//
-//        if (!usingAddedBass) {
-//          inversionCombo.setSelectedIndex(0);
-//          //mustBeLowestCheck.setEnabled(true);
-//        }
-//
-//        updateChordInModel();
-//      }
-//    });
+  @Override
+  protected boolean listenToCols()
+  {
+    return true;
   }
 
   @Override
@@ -129,26 +99,6 @@ public class TabChordPicker extends javax.swing.JPanel
     }
   }
 
-//  public void selectionChanged(int index)
-//  {
-//    //Column Selection Change
-//    if (!isVisible()) {
-//      return;
-//    }
-//
-//    //int index = seqColumnModel.getSelectedColumn();
-//    //if (index == lastColSel) {
-//    //  return;
-//    //}
-//
-//    //lastColSel = index;
-//
-//    //if (index < 0) {
-//    //  return;
-//    //}
-//
-//    setupChord(seqColumnModel.getChordDef(index));
-//  }
   private void updateChordInModel()
   {
     if (isUpdatingChord > 0) {
@@ -159,8 +109,8 @@ public class TabChordPicker extends javax.swing.JPanel
 
     ParsedChordDef finalChord = getPickedChord();
 
-    if (seqColumnModel != null) {
-      seqColumnModel.editSelectedColumn(finalChord);
+    if (columnModel != null) {
+      columnModel.editSelectedColumn(finalChord);
     }
 
     isUpdatingChord--;
@@ -218,16 +168,12 @@ public class TabChordPicker extends javax.swing.JPanel
   }
 
   @Override
-  public void setVisible(boolean visible)
+  protected void syncUIToDataModel()
   {
-    if (visible && (seqColumnModel != null)) {
-      int index = seqColumnModel.getSelectedColumn();
-      if ((index >= 0) && (index < seqColumnModel.getColumnCount())) {
-        setupChord(this.seqColumnModel.getChordDef(index));
-        listselAdapter.clearLastIndex();
-      }
+    int index = columnModel.getSelectedColumn();
+    if ((index >= 0) && (index < columnModel.getColumnCount())) {
+      setupChord(this.columnModel.getChordDef(index));
     }
-    super.setVisible(visible);
   }
 
   private void setupChord(ParsedChordDef possChordDef)
@@ -242,7 +188,7 @@ public class TabChordPicker extends javax.swing.JPanel
 
 //    if ((possChordDef.relChord != null) && (possChordDef.relChord.getOrigDef() == null)) {
 ////      ParsedChordDef matchChord = ChordRegistry.mainRegistry().findFirstChordFromNotes(possChordDef.chord);
-//      ParsedChordDef matchChord = seqColumnModel.matchingChordStore.getFirstKnownMatchingChord();
+//      ParsedChordDef matchChord = columnModel.matchingChordStore.getFirstKnownMatchingChord();
 //      if (matchChord != null) {
 //        possChordDef = matchChord;
 //      }
@@ -488,17 +434,17 @@ public class TabChordPicker extends javax.swing.JPanel
       .addGroup(layout.createSequentialGroup()
         .addComponent(controlGrid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
-      .addComponent(chordPicker1, javax.swing.GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
+        .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE))
+      .addComponent(chordPicker1, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE)
-          .addComponent(controlGrid, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+          .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addComponent(controlGrid, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(chordPicker1, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE))
+        .addComponent(chordPicker1, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 

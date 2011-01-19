@@ -19,10 +19,8 @@ import javax.swing.event.TableModelListener;
  *
  * @author Ilya
  */
-public class TabSeqEditor extends javax.swing.JPanel implements TableModelListener
+public class TabSeqEditor extends ToolPanel implements TableModelListener
 {
-
-  SeqColumnModel columnModel;
   JTable seqTable;
   boolean isUpdating = false;
   DefaultComboBoxModel recentSeqs;
@@ -36,49 +34,26 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
     comboRecent.setModel(recentSeqs);
   }
 
-  void setSeqColModel(SeqColumnModel theModel, JTable theTable, String startChords)
+  @Override
+  public void init(SeqColumnModel theModel)
   {
-    columnModel = theModel;
-    seqTable = theTable;
+    super.init(theModel);
+    //seqTable = theTable;
     columnModel.getDataModel().addTableModelListener(this);
 
-//    if (startChords != null) {
-//      chordTextField.setText(startChords);
-//      computeButton.doClick();
-//    }
-
-//    transposePanel1.setSeqColModel(theModel);
-    seqPicker1.setSeqColModel(theModel);
+    seqPicker1.init(theModel);
 
     //transNotePicker.addPropertyChangeListener(this);
   }
 
-//  @Override
-//  public void propertyChange(PropertyChangeEvent evt)
-//  {
-//    if (isUpdating) {
-//      return;
-//    }
-//
-//    if ((evt.getSource() == transNotePicker) && (evt.getPropertyName().equals("Note"))) {
-//      Note newNote = (Note) evt.getNewValue();
-//      columnModel.transposeAllFromSelectedColumn(newNote);
-//    }
-//  }
   @Override
   public void tableChanged(TableModelEvent e)
   {
-    updateFromSequence();
+    syncUIToDataModel();
   }
 
   @Override
-  public void setVisible(boolean visible)
-  {
-    super.setVisible(visible);
-    updateFromSequence();
-  }
-
-  private void updateFromSequence()
+  protected void syncUIToDataModel()
   {
     if (isUpdating) {
       return;
@@ -221,7 +196,7 @@ public class TabSeqEditor extends javax.swing.JPanel implements TableModelListen
       if (columnModel != null) {
         columnModel.populateFromText(text, !checkAllowDups.isSelected(), null);
       }
-      seqTable.requestFocusInWindow();
+      //seqTable.requestFocusInWindow();
 }//GEN-LAST:event_computeButtonActionPerformed
 
     private void comboRecentActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_comboRecentActionPerformed

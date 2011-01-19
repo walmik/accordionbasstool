@@ -22,11 +22,10 @@ import music.input.PitchDetect;
  *
  * @author Ilya
  */
-public class TabPitchDetect extends javax.swing.JPanel implements PitchDetect.PitchUpdater
+public class TabPitchDetect extends ToolPanel implements PitchDetect.PitchUpdater
 {
 
   PitchDetect pitchDetector;
-  SeqColumnModel columnModel;
   Note lastNote, newNote;
 
   /** Creates new form TabPitchDetect */
@@ -44,11 +43,6 @@ public class TabPitchDetect extends javax.swing.JPanel implements PitchDetect.Pi
     this.samplingRate.setModel(new ExpSpinnerModel(pitchDetector.getSamplingRate(), 2, 44100/8, 44100*2));
   }
 
-  void setSeqColModel(SeqColumnModel model)
-  {
-    columnModel = model;
-  }
-
   @Override
   public synchronized void newNote(Note note, double freq)
   {
@@ -63,6 +57,12 @@ public class TabPitchDetect extends javax.swing.JPanel implements PitchDetect.Pi
       newNote = note;
       repaint();
     }
+  }
+
+  @Override
+  protected void syncUIToDataModel()
+  {
+
   }
 
   @Override

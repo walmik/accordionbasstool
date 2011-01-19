@@ -20,30 +20,13 @@ import music.ParsedChordDef;
  *
  * @author Ilya
  */
-public class TabButtonClicker extends javax.swing.JPanel
+public class TabButtonClicker extends ToolPanel
 {
-  SeqColumnModel columnModel;
-
-  SelListener colModListener, rowModListener;
-
-
-  class SelListener extends SeqTableEventAdapter
-  {
-
-    @Override
-    public void selectionChanged(int index)
-    {
-      syncUI();
-    }
-  }
 
   /** Creates new form TabButtonClicker */
   public TabButtonClicker()
   {
     initComponents();
-
-    colModListener = new SelListener();
-    rowModListener = new SelListener();
 
     this.noteChordSelector1.addPropertyChangeListener("Chord", new PropertyChangeListener()
     {
@@ -53,70 +36,47 @@ public class TabButtonClicker extends javax.swing.JPanel
       {
         Chord chord = (Chord) evt.getNewValue();
         if ((chord == null) || !columnModel.editSelectedColumn(new ParsedChordDef(chord))) {
-          syncUI();
+          syncUIToDataModel();
         }
       }
     });
   }
 
-  public void setSeqColModel(SeqColumnModel model)
+  @Override
+  public void init(SeqColumnModel model)
   {
-    columnModel = model;
-    this.chordSelInfoPanel.setSeqColModel(model);
-    toggleListeners(true);
-  }
-
-  private void toggleListeners(boolean attach)
-  {
-    if (columnModel == null) {
-      return;
-    }
-
-    if (attach) {
-      columnModel.selComboModel.addListSelectionListener(colModListener);
-      columnModel.getRowSelModel().addListSelectionListener(rowModListener);
-
-    } else {
-      columnModel.selComboModel.removeListSelectionListener(rowModListener);
-      columnModel.getRowSelModel().removeListSelectionListener(rowModListener);
-    }
+    super.init(model);
+    chordSelInfoPanel.init(model);
   }
 
   @Override
-  public void setVisible(boolean visible)
+  protected boolean listenToCols()
   {
-    toggleListeners(visible);
-
-    if (visible) {
-      syncUI();
-    }
-
-    super.setVisible(visible);
+    return true;
   }
 
-  
-  private void syncUI()
+  @Override
+  public void setVisible(boolean vis)
   {
-    if (columnModel == null) {
-      return;
-    }
+    super.setVisible(vis);
+    chordSelInfoPanel.setVisible(vis);
+  }
 
-    ButtonCombo activeCombo = columnModel.getSelectedButtonCombo();
+  @Override
+  protected void syncUIToDataModel()
+  {
+//    ButtonCombo activeCombo = columnModel.getSelectedButtonCombo();
     ParsedChordDef activeChordDef = columnModel.getSelectedChordDef();
 
 //    if (activeCombo != null) {
 //      this.noteChordSelector1.setChord(activeCombo.getChordMask());
 //    } else
-      if (activeChordDef != null) {
+    if (activeChordDef != null) {
       this.noteChordSelector1.setChord(activeChordDef.chord.getChordMask());
     } else {
       this.noteChordSelector1.setChord(new Chord.Mask());
     }
-
-    this.chordSelInfoPanel.updateStateFromModel();
   }
-
-  
 
   /** This method is called from within the constructor to
    * initialize the form.
@@ -145,7 +105,6 @@ public class TabButtonClicker extends javax.swing.JPanel
         .addComponent(chordSelInfoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private render.ChordsSelInfoPanel chordSelInfoPanel;
   private render.NoteChordSelector noteChordSelector1;

@@ -36,7 +36,7 @@ public class SeqPicker extends javax.swing.JPanel implements PropertyChangeListe
     notePickerRoot.addPropertyChangeListener("Note", this);
   }
 
-  public void setSeqColModel(SeqColumnModel model)
+  public void init(SeqColumnModel model)
   {
     columnModel = model;
     filterCombo.setSelectedIndex(-1);

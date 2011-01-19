@@ -20,9 +20,9 @@ import music.ParsedChordDef;
  *
  * @author Ilya
  */
-public class ChordsSelInfoPanel extends javax.swing.JPanel
+public class ChordsSelInfoPanel extends ToolPanel
 {
-  private SeqColumnModel columnModel;
+
   boolean displayUnknown = false;
   boolean listChanging = false;
 
@@ -33,18 +33,16 @@ public class ChordsSelInfoPanel extends javax.swing.JPanel
     matchesListBox.setCellRenderer(new ChordListRender());
   }
 
-  public void setSeqColModel(SeqColumnModel model)
+  @Override
+  public void init(SeqColumnModel model)
   {
-    columnModel = model;
+    super.init(model);
     clickedLabel.setText(columnModel.getSelectedComboStateString());
   }
 
-  public void updateStateFromModel()
+  @Override
+  protected void syncUIToDataModel()
   {
-    if (columnModel == null) {
-      return;
-    }
-
     listChanging = true;
 
     Vector<ParsedChordDef> listItems;
@@ -58,7 +56,7 @@ public class ChordsSelInfoPanel extends javax.swing.JPanel
     }
 
     matchesListBox.setListData(listItems);
-    
+
     matchesListBox.setSelectedValue(columnModel.getSelectedChordDef(), true);
 
     listChanging = false;
@@ -66,16 +64,28 @@ public class ChordsSelInfoPanel extends javax.swing.JPanel
     clickedLabel.setText(columnModel.getSelectedComboStateString());
   }
 
+  @Override
+  protected boolean listenToCols()
+  {
+    return true;
+  }
+
+  @Override
+  protected boolean listenToRows()
+  {
+    return true;
+  }
+
   public void setDisplayUnknown(boolean display)
   {
     displayUnknown = display;
-    updateStateFromModel();
+    syncUIToDataModel();
   }
 
   public void setDisplayInversion(boolean display)
   {
     columnModel.matchingChordStore.setRemoveInversion(display);
-    updateStateFromModel();
+    syncUIToDataModel();
   }
 
   class ChordListRender extends DefaultListCellRenderer
@@ -173,7 +183,7 @@ public class ChordsSelInfoPanel extends javax.swing.JPanel
     if (listChanging) {
       return;
     }
-    
+
     ParsedChordDef chordDef = (ParsedChordDef) this.matchesListBox.getSelectedValue();
     if (chordDef != null) {
       columnModel.editSelectedColumn(chordDef, true);
@@ -190,7 +200,6 @@ public class ChordsSelInfoPanel extends javax.swing.JPanel
     // Reselect the same chord in the list, may however be with an inversion
     this.setDisplayInversion(this.checkIgnoreInversion.isSelected());
 }//GEN-LAST:event_checkIgnoreInversionActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkIgnoreInversion;
   private javax.swing.JCheckBox checkShowUnknownChords;

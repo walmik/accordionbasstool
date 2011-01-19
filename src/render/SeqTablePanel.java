@@ -76,18 +76,6 @@ public class SeqTablePanel extends javax.swing.JPanel
     this.add(BorderLayout.SOUTH, this.statusText);
   }
 
-  void initChordPicker(TabChordPicker picker)
-  {
-    picker.init();
-    picker.setSeqColModel(columnModel);
-    //columnModel.addColumn(picker.getPickedChord(), 0);
-  }
-
-  void initTextParser(TabSeqEditor textParser)
-  {
-    textParser.setSeqColModel(columnModel, seqTable, null);
-  }
-
   public void setSoundEnabled(boolean soundEnabled)
   {
     sound.setEnabled(soundEnabled);

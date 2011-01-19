@@ -22,8 +22,9 @@ public class SeqTableEventAdapter implements TableColumnModelListener,
         ListSelectionListener
 {
 
-  int lastIndex = -1;
+  //int lastIndex = -1;
   boolean acceptNoneSel;
+  boolean isAlreadyAdjusting = false;
 
   public SeqTableEventAdapter()
   {
@@ -35,15 +36,15 @@ public class SeqTableEventAdapter implements TableColumnModelListener,
     acceptNoneSel = noneSel;
   }
 
-  public void clearLastIndex()
-  {
-    lastIndex = -2;
-  }
+//  public void clearLastIndex()
+//  {
+//    lastIndex = -2;
+//  }
 
   @Override
   public void columnAdded(TableColumnModelEvent e)
   {
-    clearLastIndex();
+    //clearLastIndex();
     columnCountChanged(e);
   }
 
@@ -55,44 +56,39 @@ public class SeqTableEventAdapter implements TableColumnModelListener,
   @Override
   public void columnMoved(TableColumnModelEvent e)
   {
-    clearLastIndex();
+    //clearLastIndex();
   }
 
   @Override
   public void columnRemoved(TableColumnModelEvent e)
   {
-    clearLastIndex();
+    //clearLastIndex();
     columnCountChanged(e);
   }
 
   @Override
   public final void valueChanged(ListSelectionEvent e)
   {
-    assert (e.getSource() instanceof ListSelectionModel);
-    handleSelectionChanged(((ListSelectionModel) e.getSource()).getAnchorSelectionIndex());
-//    if (e.getSource() instanceof ListSelectionModel) {
-//      handleSelectionChanged(((ListSelectionModel) e.getSource()).getAnchorSelectionIndex());
-//    } else if (e.getSource() instanceof JList) {
-//      handleSelectionChanged(((JList) e.getSource()).getSelectedIndex());
-//    }
+    if (!e.getValueIsAdjusting() && this.isAlreadyAdjusting) {
+      this.isAlreadyAdjusting = false;
+      return;
+    }
+    this.isAlreadyAdjusting = e.getValueIsAdjusting();
+    
+    int index = ((ListSelectionModel) e.getSource()).getAnchorSelectionIndex();
+
+    //if (index != lastIndex) {
+      if (acceptNoneSel || (index >= 0)) {
+        selectionChanged(index);
+      }
+      //lastIndex = index;
+    //}
   }
 
   @Override
   public final void columnSelectionChanged(ListSelectionEvent e)
   {
-//    if (e.getSource() instanceof ListSelectionModel) {
-    handleSelectionChanged(((ListSelectionModel) e.getSource()).getAnchorSelectionIndex());
-//    }
-  }
-
-  private void handleSelectionChanged(int index)
-  {
-    if (index != lastIndex) {
-      if (acceptNoneSel || (index >= 0)) {
-        selectionChanged(index);
-      }
-      lastIndex = index;
-    }
+    valueChanged(e);
   }
 
   protected void selectionChanged(int index)
@@ -106,6 +102,6 @@ public class SeqTableEventAdapter implements TableColumnModelListener,
   @Override
   public void tableChanged(TableModelEvent e)
   {
-    clearLastIndex();
+    //clearLastIndex();
   }
 }

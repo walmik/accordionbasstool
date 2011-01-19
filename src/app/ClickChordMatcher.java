@@ -19,7 +19,6 @@ import render.BoardMouseListener;
 import render.RenderBassBoard;
 import render.RenderBoardHeader;
 import render.SeqColumnModel;
-import render.SeqTableEventAdapter;
 import render.SoundController;
 
 /**
@@ -73,16 +72,8 @@ public class ClickChordMatcher extends javax.swing.JApplet
     header.selectFirstBoardByBassCount(48);
 
     //transposePanel.setSeqColModel(columnModel);
-    this.chordsSelInfoPanel1.setSeqColModel(columnModel);
+    this.chordsSelInfoPanel1.init(columnModel);
 
-    columnModel.getRowSelModel().addListSelectionListener(new SeqTableEventAdapter()
-    {
-      @Override
-      public void selectionChanged(int index)
-      {
-        chordsSelInfoPanel1.updateStateFromModel();
-      }
-    });
 
     //header.getExtPanel().add(checkSoundEnabled);
     //header.getExtPanel().add(checkVertical);

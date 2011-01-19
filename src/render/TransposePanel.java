@@ -33,7 +33,7 @@ public class TransposePanel extends javax.swing.JPanel
     ivalCombo.setSelectedItem(NamedInterval.P5);
   }
   
-  public void setSeqColModel(SeqColumnModel model)
+  public void init(SeqColumnModel model)
   {
     columnModel = model;
   }

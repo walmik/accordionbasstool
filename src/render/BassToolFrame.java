@@ -48,7 +48,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     {
       title = str;
     }
-    
     String title;
 
     @Override
@@ -62,46 +61,41 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   public BassToolFrame()
   {
     BoardRegistry.mainRegistry();
- 
+
     renderBassBoard = RenderBassBoard.getStaticRenderBoard();
 
     initComponents();
 
+    SeqColumnModel columnModel = seqTablePanel.columnModel;
+
     renderBoardControl.getHeader().
-            initBoardHeader(renderBassBoard, renderBoardControl, seqTablePanel.columnModel, null);
+            initBoardHeader(renderBassBoard, renderBoardControl, columnModel, null);
 
     // Init Tabs
-    seqTablePanel.initChordPicker(tabChordPicker);
-    seqTablePanel.initTextParser(tabSeqEditor);
-    tabOptions.setSeqColModel(seqTablePanel.columnModel);
+    tabChordPicker.init(columnModel);
+    tabSeqEditor.init(columnModel);
+    tabOptions.init(columnModel);
 
     if (checkPitchDetectPermissions()) {
-      tabPitchDetect.setSeqColModel(seqTablePanel.columnModel);
+      tabPitchDetect.init(columnModel);
     } else {
       toolTabs.setEnabledAt(toolTabs.indexOfComponent(tabPitchDetect), false);
     }
-    
+
     mouseListener =
             new BoardMouseListener(renderBassBoard,
-            seqTablePanel.columnModel,
+            columnModel,
             seqTablePanel.sound);
 
-    tabButtonClicker.setSeqColModel(seqTablePanel.columnModel);
+    tabButtonClicker.init(columnModel);
 
-    this.renderBoardControl.getHeader().getExtPanel().add(this.checkHiliteRedunds);
-
-//    renderBoardHeader.initBoardHeader(
-//            renderBassBoard,
-//            renderBoardScrollPane,
-//            seqTablePanel.columnModel,
-//            null);
-//
-//    renderBoardScrollPane.setColumnHeaderView(renderBoardHeader);
-//    renderBoardScrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, renderBoardHeader.getCornerComp());
-//    renderBoardScrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
-//    renderBoardScrollPane.setBorder(BorderFactory.createEmptyBorder());
+    renderBoardControl.getHeader().getExtPanel().add(this.checkHiliteRedunds);
 
     seqTablePanel.toggleChordPicker.addActionListener(this);
+
+//    controlSplitPane.setRightComponent(null);
+//    toolTabs.removeAll();
+//    toolTabs.addTab("Test", tabChordPicker);
 
     controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
 
@@ -275,7 +269,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 //  {
 //    return RenderBassBoard.getStaticRenderBoard();
 //  }
-
   void initModeSelector()
   {
     modeSelector = new ModeSelector();
@@ -400,7 +393,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     renderBassBoard.getSelectedButtonCombo().showRedunds = checkHiliteRedunds.isSelected();
     renderBassBoard.repaint();
 }//GEN-LAST:event_checkHiliteRedundsActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JSplitPane boardSplitPane;
   private javax.swing.JCheckBox checkHiliteRedunds;

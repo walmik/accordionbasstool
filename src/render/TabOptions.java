@@ -25,10 +25,8 @@ import app.Main;
  *
  * @author Ilya
  */
-public class TabOptions extends javax.swing.JPanel
+public class TabOptions extends ToolPanel
 {
-
-  SeqColumnModel columnModel;
 
   /** Creates new form TabOptions */
   public TabOptions()
@@ -36,25 +34,18 @@ public class TabOptions extends javax.swing.JPanel
     initComponents();
 
     initLNFCombo();
-    syncOptions();
+    syncUIToDataModel();
   }
 
-  void setSeqColModel(SeqColumnModel mod)
+  @Override
+  public void init(SeqColumnModel mod)
   {
-    columnModel = mod;
+    super.init(mod);
     this.checkFingerSearch.setSelected(columnModel.optFingerSearch);
   }
 
   @Override
-  public void setVisible(boolean vis)
-  {
-    super.setVisible(vis);
-    if (vis) {
-      syncOptions();
-    }
-  }
-
-  private void syncOptions()
+  protected void syncUIToDataModel()
   {
     this.maxComboThreshSpin.setValue(new Integer(ButtonCombo.optMaxDistThreshold));
     this.maxComboLenSpin.setValue(new Integer(BoardSearcher.optMaxComboLength));
