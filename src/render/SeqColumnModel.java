@@ -1,8 +1,10 @@
 package render;
 
+import java.util.ListIterator;
 import music.ParsedChordDef;
 import java.util.Vector;
 import javax.swing.AbstractListModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableColumnModel;
@@ -33,10 +35,11 @@ public class SeqColumnModel extends DefaultTableColumnModel
   private SeqRowHeaderData rowHeaderDataModel;
   private SeqDataModel dataModel;
   private ListSelectionModel rowSelModel;
+  private ChordIterator chordSeqIter;
   public boolean optFingerSearch = false;
   final static int DEFAULT_COL_WIDTH = 120;
 
-  public SeqColumnModel(RenderBassBoard rBoard, ListSelectionModel selM)
+  public SeqColumnModel(RenderBassBoard rBoard)
   {
     selComboModel = new SelectedButtonCombo();
     selComboModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -49,8 +52,11 @@ public class SeqColumnModel extends DefaultTableColumnModel
 
     currSeqArray = (optFingerSearch ? fingerComboSeqs : allComboSeqs);
 
+    chordSeqIter = new ChordIterator();
+
     renderBoard = rBoard;
-    rowSelModel = selM;
+    rowSelModel = new DefaultListSelectionModel();
+    rowSelModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     renderBoard.setSelListeners(selComboModel, rowSelModel);
 
@@ -232,7 +238,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
       transposeAllFromFirstColumn(rootNote);
     }
     isPopulating = false;
-    
+
     computeSeqs(colSel);
   }
 
@@ -275,14 +281,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
 
   public void transposeAllByInterval(Interval transDiff)
   {
-    ParsedChordDef existingDef;
-
-    for (int i = 0; i < getColumnCount(); i++) {
-      TableColumn currCol = this.getColumn(i);
-      existingDef = (ParsedChordDef) currCol.getHeaderValue();
-      currCol.setHeaderValue(existingDef.transposeBy(transDiff));
-    }
-
+    ParsedChordDef.transposeAllByInterval(this.getChordSeqIter(), transDiff);
     recomputeSeqs();
   }
 
@@ -316,15 +315,6 @@ public class SeqColumnModel extends DefaultTableColumnModel
   {
     int index = getSelectedColumn();
     return ((index >= 0) && (index < getColumnCount()) ? getChordDef(index) : null);
-  }
-
-  public Vector<ParsedChordDef> getAllChords()
-  {
-    Vector<ParsedChordDef> vec = new Vector<ParsedChordDef>();
-    for (int i = 0; i < getColumnCount(); i++) {
-      vec.add(getChordDef(i));
-    }
-    return vec;
   }
 
   SeqDataModel getDataModel()
@@ -377,17 +367,8 @@ public class SeqColumnModel extends DefaultTableColumnModel
   @Override
   public String toString()
   {
-    String str = "";
-    for (int i = 0; i < getColumnCount(); i++) {
-      if (i > 0) {
-        str += ", ";
-      }
-
-      ParsedChordDef def = getChordDef(i);
-      str += def.namePlain;
-    }
-
-    return str;
+    chordSeqIter.reset();
+    return ParsedChordDef.toString(chordSeqIter, false);
   }
 
   public String toHtmlString(boolean hiliteSelected)
@@ -428,8 +409,9 @@ public class SeqColumnModel extends DefaultTableColumnModel
 
     int rowSel = rowSelModel.getAnchorSelectionIndex();
 
+    chordSeqIter.reset();
     music.BassBoard currBassBoard = renderBoard.getBassBoard();
-    allComboSeqs = searcher.parseSequence(currBassBoard, getAllChords());
+    allComboSeqs = searcher.parseSequence(currBassBoard, chordSeqIter);
     assert (allComboSeqs != null);
 
     if (optFingerSearch) {
@@ -548,6 +530,81 @@ public class SeqColumnModel extends DefaultTableColumnModel
 
     //rowSelModel.setSelectionInterval(-1, -1);
     return -1;
+  }
+
+  public ChordIterator getChordSeqIter()
+  {
+    return new ChordIterator();
+  }
+
+  public class ChordIterator implements ListIterator<ParsedChordDef>
+  {
+
+    private short index = 0;
+    private short setIndex = -1;
+
+    public void reset()
+    {
+      index = 0;
+    }
+
+    @Override
+    public void add(ParsedChordDef e)
+    {
+      throw new UnsupportedOperationException("Not supported");
+    }
+
+    @Override
+    public int nextIndex()
+    {
+      return index;
+    }
+
+    @Override
+    public boolean hasNext()
+    {
+      return (index < SeqColumnModel.this.getColumnCount());
+    }
+
+    @Override
+    public ParsedChordDef next()
+    {
+      setIndex = index;
+      return SeqColumnModel.this.getChordDef(index++);
+    }
+
+    @Override
+    public int previousIndex()
+    {
+      return (index - 1);
+    }
+
+    @Override
+    public boolean hasPrevious()
+    {
+      return (index >= 1);
+    }
+
+    @Override
+    public ParsedChordDef previous()
+    {
+      setIndex = index;
+      return SeqColumnModel.this.getChordDef(--index);
+    }
+
+    @Override
+    public void set(ParsedChordDef chordDef)
+    {
+      if ((setIndex >= 0) && (setIndex <= SeqColumnModel.this.getColumnCount())) {
+        SeqColumnModel.this.getColumn(setIndex).setHeaderValue(chordDef);
+      }
+    }
+
+    @Override
+    public void remove()
+    {
+      throw new UnsupportedOperationException("Not supported");
+    }
   }
 
   class SeqDataModel extends AbstractTableModel

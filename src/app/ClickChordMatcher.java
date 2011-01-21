@@ -55,9 +55,9 @@ public class ClickChordMatcher extends javax.swing.JApplet
   {
     AppletController controller = new AppletController(this);
 
-    RenderBassBoard renderBoard = RenderBassBoard.getStaticRenderBoard();
+    RenderBassBoard renderBoard = renderBoardControl.renderBassBoard;
 
-    columnModel = new SeqColumnModel(renderBoard, new DefaultListSelectionModel());
+    columnModel = new SeqColumnModel(renderBoard);
     columnModel.addColumn(ParsedChordDef.newEmptyChordDef(), 0);
 
     SoundController sound = new SoundController(false);
@@ -67,12 +67,12 @@ public class ClickChordMatcher extends javax.swing.JApplet
 
     mouseListener = new BoardMouseListener(renderBoard, columnModel, sound);
 
-    RenderBoardHeader header = this.renderBoardControl.getHeader();
+    RenderBoardHeader header = this.renderBoardControl.renderBoardHeader;
     header.initBoardHeader(renderBoard, renderBoardControl, columnModel, allowedBoards);
     header.selectFirstBoardByBassCount(48);
 
     //transposePanel.setSeqColModel(columnModel);
-    this.chordsSelInfoPanel1.init(columnModel);
+    //this.chordsSelInfoPanel1.init(columnModel);
 
 
     //header.getExtPanel().add(checkSoundEnabled);
@@ -90,7 +90,6 @@ public class ClickChordMatcher extends javax.swing.JApplet
 
     jPanel1 = new javax.swing.JPanel();
     renderBoardControl = new render.RenderBoardControl();
-    chordsSelInfoPanel1 = new render.ChordsSelInfoPanel();
 
     setName("Accordion Board Clicker"); // NOI18N
 
@@ -99,20 +98,17 @@ public class ClickChordMatcher extends javax.swing.JApplet
     jPanel1Layout.setHorizontalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addComponent(renderBoardControl, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-      .addComponent(chordsSelInfoPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
     );
     jPanel1Layout.setVerticalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(jPanel1Layout.createSequentialGroup()
-        .addComponent(chordsSelInfoPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(renderBoardControl, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE))
+        .addGap(22, 22, 22)
+        .addComponent(renderBoardControl, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE))
     );
 
     getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private render.ChordsSelInfoPanel chordsSelInfoPanel1;
   private javax.swing.JPanel jPanel1;
   private render.RenderBoardControl renderBoardControl;
   // End of variables declaration//GEN-END:variables

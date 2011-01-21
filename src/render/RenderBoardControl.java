@@ -14,18 +14,15 @@ import javax.swing.JScrollPane;
  */
 public class RenderBoardControl extends javax.swing.JScrollPane
 {
-  private RenderBassBoard renderBassBoard;
-  private RenderBoardHeader renderBoardHeader;
+  public final RenderBassBoard renderBassBoard;
+  public final RenderBoardHeader renderBoardHeader;
 
   /** Creates new form RenderBoardControl */
   public RenderBoardControl()
   {
     renderBoardHeader = new render.RenderBoardHeader();
-    renderBassBoard = RenderBassBoard.getStaticRenderBoard();
+    renderBassBoard = new RenderBassBoard();
     renderBassBoard.setDoubleBuffered(true);
-
-//    add(renderBoardHeader);
-//    add(renderBassBoard);
 
     setColumnHeaderView(renderBoardHeader);
     setViewportView(renderBassBoard);
@@ -34,11 +31,7 @@ public class RenderBoardControl extends javax.swing.JScrollPane
 
     setViewportBorder(BorderFactory.createEmptyBorder());
     setBorder(BorderFactory.createEmptyBorder());
-  }
 
-  public RenderBoardHeader getHeader()
-  {
-    return renderBoardHeader;
   }
 
   public void toggleOrientation(boolean isHoriz)

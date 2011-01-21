@@ -85,11 +85,11 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
               <SubComponents>
-                <Component class="render.TabButtonClicker" name="tabButtonClicker">
+                <Component class="render.TabChordInfo" name="tabChordInfo">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="Pick Chord/Notes">
-                        <Property name="tabTitle" type="java.lang.String" value="Pick Chord/Notes"/>
+                      <JTabbedPaneConstraints tabName="Chord Info">
+                        <Property name="tabTitle" type="java.lang.String" value="Chord Info"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>
@@ -97,8 +97,8 @@
                 <Component class="render.TabChordPicker" name="tabChordPicker">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="Edit Chord">
-                        <Property name="tabTitle" type="java.lang.String" value="Edit Chord"/>
+                      <JTabbedPaneConstraints tabName="Pick Chord">
+                        <Property name="tabTitle" type="java.lang.String" value="Pick Chord"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>
@@ -106,8 +106,17 @@
                 <Component class="render.TabSeqEditor" name="tabSeqEditor">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="Edit Sequence/Scale">
-                        <Property name="tabTitle" type="java.lang.String" value="Edit Sequence/Scale"/>
+                      <JTabbedPaneConstraints tabName="Edit Sequence">
+                        <Property name="tabTitle" type="java.lang.String" value="Edit Sequence"/>
+                      </JTabbedPaneConstraints>
+                    </Constraint>
+                  </Constraints>
+                </Component>
+                <Component class="render.SeqPicker" name="seqPicker">
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                      <JTabbedPaneConstraints tabName="Pick Scale/Pattern">
+                        <Property name="tabTitle" type="java.lang.String" value="Pick Scale/Pattern"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>
@@ -126,15 +135,6 @@
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                       <JTabbedPaneConstraints tabName="Pitch Detector">
                         <Property name="tabTitle" type="java.lang.String" value="Pitch Detector"/>
-                      </JTabbedPaneConstraints>
-                    </Constraint>
-                  </Constraints>
-                </Component>
-                <Component class="render.TabTester" name="tabTester1">
-                  <Constraints>
-                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="tab6">
-                        <Property name="tabTitle" type="java.lang.String" value="tab6"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>

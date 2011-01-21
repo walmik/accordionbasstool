@@ -42,19 +42,6 @@ public class SeqTablePanel extends javax.swing.JPanel
 
     ChordRegistry.mainRegistry();
 
-    seqViewer = new SeqViewerController(seqTable, seqTableScrollPane);
-    columnModel = seqViewer.columnModel;
-    columnModel.addColumnModelListener(new ColumnChangeListener());
-    columnModel.getRowSelModel().addListSelectionListener(new ColumnChangeListener());
-
-    sound = new SoundController(true);
-    anim = new SeqAnimController(columnModel, sound, 500, 100);
-
-    //transposePanel1.setSeqColModel(columnModel);
-
-    //toolPlay = new JButton("Play");
-    //toolPlay.setActionCommand("PlaySeq");
-
     chordTableAction = new ChordTableAction();
     toolAddChord.addActionListener(chordTableAction);
     toolInsert.addActionListener(chordTableAction);
@@ -62,10 +49,20 @@ public class SeqTablePanel extends javax.swing.JPanel
     toolPlay.addActionListener(chordTableAction);
     toolResetAll.addActionListener(chordTableAction);
 
-    //cornerPanel = new JPanel();
-    //cornerPanel.add(toolPlay);
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, controlPanel);
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER, new JPanel());
+  }
+
+  public void init(SeqColumnModel model, RenderBassBoard renderBoard)
+  {
+    columnModel = model;
+    seqTable.setSelectionModel(columnModel.getRowSelModel());
+    seqViewer = new SeqViewerController(seqTable, columnModel, seqTableScrollPane, renderBoard);
+    columnModel.addColumnModelListener(new ColumnChangeListener());
+    columnModel.getRowSelModel().addListSelectionListener(new ColumnChangeListener());
+
+    sound = new SoundController(true);
+    anim = new SeqAnimController(renderBoard, columnModel, sound, 500, 100);
   }
 
   void toggleLeftRight(boolean left)
@@ -322,10 +319,8 @@ public class SeqTablePanel extends javax.swing.JPanel
             .addGroup(sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
               .addComponent(toolAddChord)
               .addComponent(toolInsert)
-              .addComponent(toolRemove)))
-          .addGroup(sidebarLayout.createSequentialGroup()
-            .addContainerGap()
-            .addComponent(toolResetAll)))
+              .addComponent(toolRemove)
+              .addComponent(toolResetAll))))
         .addContainerGap(24, Short.MAX_VALUE))
     );
     sidebarLayout.setVerticalGroup(
@@ -338,7 +333,7 @@ public class SeqTablePanel extends javax.swing.JPanel
         .addComponent(volumeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(checkArpegg)
-        .addGap(30, 30, 30)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
         .addComponent(toolAddChord)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(toolInsert)
@@ -349,7 +344,7 @@ public class SeqTablePanel extends javax.swing.JPanel
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
 
-    statusText.setFont(new java.awt.Font("Tahoma", 0, 16));
+    statusText.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
     statusText.setText("Status");
     statusText.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -371,10 +366,8 @@ public class SeqTablePanel extends javax.swing.JPanel
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(layout.createSequentialGroup()
-            .addGap(11, 11, 11)
-            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addComponent(seqTableScrollPane, 0, 0, Short.MAX_VALUE)
           .addComponent(sidebar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(statusText, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))

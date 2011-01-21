@@ -20,14 +20,17 @@ public class SeqAnimController implements ActionListener
   Timer playTimer, playStopTimer;
   SeqColumnModel columnModel;
   SoundController sound;
+  RenderBassBoard renderBoard;
 
-  public SeqAnimController(SeqColumnModel model,
+  public SeqAnimController(RenderBassBoard board,
+          SeqColumnModel model,
           SoundController sound,
           int playDuration, int pauseDuration)
   {
     columnModel = model;
     this.sound = sound;
     sound.playDuration = playDuration;
+    renderBoard = board;
 
     playTimer = new Timer(playDuration + pauseDuration, this);
     playTimer.setActionCommand("Timer");
@@ -52,7 +55,7 @@ public class SeqAnimController implements ActionListener
     } else {
       playTimer.stop();
       sound.stop();
-      RenderBassBoard.getStaticRenderBoard().repaint();
+      renderBoard.repaint();
       playStopTimer.stop();
       return false;
     }
@@ -80,9 +83,9 @@ public class SeqAnimController implements ActionListener
       if (combo == null) {
         return;
       }
-      RenderBassBoard board = RenderBassBoard.getStaticRenderBoard();
+
       for (Pos pos : combo.getAllPos()) {
-        board.drawPos(pos, RenderBoardUI.BoardButtonImage.SELECTED);
+        renderBoard.drawPos(pos, RenderBoardUI.BoardButtonImage.SELECTED);
       }
       sound.stop();
     }

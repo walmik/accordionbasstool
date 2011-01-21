@@ -23,18 +23,7 @@ import music.Chord;
 
 public class RenderBassBoard extends JPanel
 {
-
   final static long serialVersionUID = 1;
-  static RenderBassBoard staticBoard;
-
-  public static RenderBassBoard getStaticRenderBoard()
-  {
-    if (staticBoard == null) {
-      staticBoard = new RenderBassBoard();
-    }
-
-    return staticBoard;
-  }
 
   public RenderBassBoard()
   {
@@ -59,6 +48,7 @@ public class RenderBassBoard extends JPanel
     int borderMargin = RenderBoardUI.defaultUI.buttonXMargin + borderWidth / 2;
     this._borderInsets = new Insets(borderMargin, borderMargin, borderMargin, borderMargin);
   }
+
   Dimension margin = new Dimension();
   int borderWidth = 16;
   Dimension _contentDim = new Dimension(0, 0);

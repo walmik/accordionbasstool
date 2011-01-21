@@ -1,7 +1,9 @@
 package app;
 
+import java.awt.BorderLayout;
 import music.StringParser;
 import java.net.URL;
+import javax.swing.JApplet;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -53,16 +55,24 @@ public class Main
 
   public static boolean setNimbus()
   {
+    return setLookAndFeel("Nimbus");
+  }
+
+  public static boolean setLookAndFeel(String lookandfeel)
+  {
+    if (UIManager.getLookAndFeel().getName().contains(lookandfeel)) {
+      return true;
+    }
+    
     try {
       for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-        if ("Nimbus".equals(info.getName())) {
+        if (info.getName().equals(lookandfeel)) {
           UIManager.setLookAndFeel(info.getClassName());
           return true;
         }
       }
     } catch (Exception e) {
       return false;
-      // If Nimbus is not available, you can set the GUI to another look and feel.
     }
 
     return false;
@@ -73,6 +83,18 @@ public class Main
 //    String notes = "C Eb Gb Bbb Db";
 //    Chord chord = music.ChordParser.parseNoteList(new StringParser(notes));
 //    System.out.println(new RelChord(chord));
+  }
+
+  static void initApplet(JApplet applet)
+  {
+    applet.setSize(400, 400);
+    applet.init();
+    JFrame frame = new JFrame();
+    frame.getContentPane().setLayout(new BorderLayout());
+    frame.getContentPane().add(applet, BorderLayout.CENTER);
+    frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+    frame.pack();
+    frame.setVisible(true);
   }
 
 
@@ -95,6 +117,9 @@ public class Main
     JFrame frame = new BassToolFrame();
     _rootFrame = frame;
     frame.setVisible(true);
+
+//    initApplet(new AccordionBoardViewer());
+//    initApplet(new ClickChordMatcher());
 
 //		JFrame jframe = new JFrame("BassLayout");
 //		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -4,7 +4,7 @@
  */
 
 /*
- * ChordsSelInfoPanel.java
+ * TabChordInfo.java
  *
  * Created on Jan 14, 2011, 12:33:07 AM
  */
@@ -20,14 +20,14 @@ import music.ParsedChordDef;
  *
  * @author Ilya
  */
-public class ChordsSelInfoPanel extends ToolPanel
+public class TabChordInfo extends ToolPanel
 {
 
   boolean displayUnknown = false;
   boolean listChanging = false;
 
-  /** Creates new form ChordsSelInfoPanel */
-  public ChordsSelInfoPanel()
+  /** Creates new form TabChordInfo */
+  public TabChordInfo()
   {
     initComponents();
     matchesListBox.setCellRenderer(new ChordListRender());
@@ -88,7 +88,7 @@ public class ChordsSelInfoPanel extends ToolPanel
     syncUIToDataModel();
   }
 
-  class ChordListRender extends DefaultListCellRenderer
+  private class ChordListRender extends DefaultListCellRenderer
   {
 
     @Override

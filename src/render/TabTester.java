@@ -10,9 +10,6 @@
  */
 package render;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import music.BassBoard;
 
 /**
@@ -66,8 +63,8 @@ public class TabTester extends javax.swing.JPanel
 
   private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton1ActionPerformed
   {//GEN-HEADEREND:event_jButton1ActionPerformed
-    RenderBassBoard.getStaticRenderBoard().
-            drawPos(new BassBoard.Pos(0, 1), RenderBoardUI.BoardButtonImage.SELECTED);
+//    RenderBassBoard.getStaticRenderBoard().
+//            drawPos(new BassBoard.Pos(0, 1), RenderBoardUI.BoardButtonImage.SELECTED);
   }//GEN-LAST:event_jButton1ActionPerformed
 
   // Variables declaration - do not modify//GEN-BEGIN:variables

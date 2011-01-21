@@ -33,7 +33,7 @@
   <SubComponents>
     <Component class="render.NoteChordSelector" name="noteChordSelector1">
     </Component>
-    <Component class="render.ChordsSelInfoPanel" name="chordSelInfoPanel">
+    <Component class="render.TabChordInfo" name="chordSelInfoPanel">
     </Component>
   </SubComponents>
 </Form>

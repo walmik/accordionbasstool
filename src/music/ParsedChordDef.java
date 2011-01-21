@@ -4,6 +4,8 @@
  */
 package music;
 
+import java.util.ListIterator;
+
 /**
  *
  * @author Ilya
@@ -258,5 +260,31 @@ public class ParsedChordDef
     }
 
     return true;
+  }
+
+  // Sequence operations
+  public static void transposeAllByInterval(ListIterator<ParsedChordDef> defs,
+          Interval interval)
+  {
+    while (defs.hasNext()) {
+      ParsedChordDef existingDef = defs.next();
+      defs.set(existingDef.transposeBy(interval));
+    }
+  }
+
+  public static String toString(ListIterator<ParsedChordDef> chords, boolean html)
+  {
+    String str = "";
+
+    while (chords.hasNext()) {
+      if (chords.hasPrevious()) {
+        str += ", ";
+      }
+
+      ParsedChordDef def = chords.next();
+      str += (html ? def.nameHtml : def.namePlain);
+    }
+
+    return str;
   }
 }

@@ -1,5 +1,6 @@
 package music;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Vector;
@@ -11,11 +12,11 @@ public class BoardSearcher
   final static int MAX_COMBOS = 400;
   final static boolean debugOut = false;
 
-  public ButtonComboSequence[] parseSequence(BassBoard board, Vector<ParsedChordDef> chordDefSeq)
+  public ButtonComboSequence[] parseSequence(BassBoard board, Iterator<ParsedChordDef> chordDefSeq)
   {
     LinkedList<ButtonComboSequence> currSeqs = new LinkedList<ButtonComboSequence>();
 
-    if (!chordDefSeq.isEmpty()) {
+    if (chordDefSeq.hasNext()) {
       currSeqs.add(new ButtonComboSequence(board));
     }
 
@@ -23,7 +24,8 @@ public class BoardSearcher
 
     ButtonComboSequence bestPref = null;
 
-    for (ParsedChordDef def : chordDefSeq) {
+    while (chordDefSeq.hasNext()) {
+      ParsedChordDef def = chordDefSeq.next();
 
       LinkedList<ButtonCombo> combos = null;
 

@@ -39,7 +39,6 @@ public class AppletController implements ActionListener
     assert (objLayout instanceof BorderLayout);
     appletLayout = (BorderLayout) objLayout;
 
-
     frame = new JFrame(theApplet.getName());
     frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     frameLayout = new BorderLayout();

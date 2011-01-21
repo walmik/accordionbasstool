@@ -35,67 +35,40 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   ModeSelector modeSelector;
   BoardMouseListener mouseListener;
   RenderBassBoard renderBassBoard;
-
-  enum ToolMode
-  {
-
-    BUTTON_FOR_CHORD("Single Chord Buttons"),
-    CHORD_SEQ("Chord Sequence Buttons"),
-    //CHORD_FOR_BUTTON,
-    ALL("All");
-
-    ToolMode(String str)
-    {
-      title = str;
-    }
-    String title;
-
-    @Override
-    public String toString()
-    {
-      return title;
-    }
-  }
-
+ 
   /** Creates new form BassToolFrame */
   public BassToolFrame()
   {
     BoardRegistry.mainRegistry();
 
-    renderBassBoard = RenderBassBoard.getStaticRenderBoard();
-
     initComponents();
 
-    SeqColumnModel columnModel = seqTablePanel.columnModel;
+    renderBassBoard = renderBoardControl.renderBassBoard;
 
-    renderBoardControl.getHeader().
+    SeqColumnModel columnModel = new SeqColumnModel(renderBassBoard);
+
+    seqTablePanel.init(columnModel, renderBassBoard);
+
+    renderBoardControl.renderBoardHeader.
             initBoardHeader(renderBassBoard, renderBoardControl, columnModel, null);
 
     // Init Tabs
-    tabChordPicker.init(columnModel);
-    tabSeqEditor.init(columnModel);
-    tabOptions.init(columnModel);
+    for (int i = 0; i < toolTabs.getTabCount(); i++) {
+      Component tab = toolTabs.getComponentAt(i);
+      if (tab instanceof ToolPanel) {
+        ((ToolPanel)tab).init(columnModel);
+      }
+    }
 
-    if (checkPitchDetectPermissions()) {
-      tabPitchDetect.init(columnModel);
-    } else {
+    if (!checkPitchDetectPermissions()) {
       toolTabs.setEnabledAt(toolTabs.indexOfComponent(tabPitchDetect), false);
     }
 
-    mouseListener =
-            new BoardMouseListener(renderBassBoard,
-            columnModel,
-            seqTablePanel.sound);
+    mouseListener = new BoardMouseListener(renderBassBoard, columnModel, seqTablePanel.sound);
 
-    tabButtonClicker.init(columnModel);
-
-    renderBoardControl.getHeader().getExtPanel().add(this.checkHiliteRedunds);
+    renderBoardControl.renderBoardHeader.getExtPanel().add(this.checkHiliteRedunds);
 
     seqTablePanel.toggleChordPicker.addActionListener(this);
-
-//    controlSplitPane.setRightComponent(null);
-//    toolTabs.removeAll();
-//    toolTabs.addTab("Test", tabChordPicker);
 
     controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
 
@@ -105,7 +78,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     // Setup intiial state
 
     // Set Board to default 120
-    renderBoardControl.getHeader().selectFirstBoardByBassCount(120);
+    renderBoardControl.renderBoardHeader.selectFirstBoardByBassCount(120);
 
     // Add Default Chord!
     seqTablePanel.columnModel.addColumn(0);
@@ -265,12 +238,30 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 //    }
   }
 
-//  public static RenderBassBoard getRenderBoard()
-//  {
-//    return RenderBassBoard.getStaticRenderBoard();
-//  }
-  void initModeSelector()
-  {
+ enum ToolMode
+ {
+    BoardOnly("Accordion Board Only"),
+
+    BUTTON_FOR_CHORD("Single Chord Buttons"),
+    CHORD_SEQ("Chord Sequence Buttons"),
+    //CHORD_FOR_BUTTON,
+    ALL("All");
+
+    ToolMode(String str)
+    {
+      title = str;
+    }
+    String title;
+
+    @Override
+    public String toString()
+    {
+      return title;
+    }
+  }
+
+ void initModeSelector()
+ {
     modeSelector = new ModeSelector();
     JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
     flowPanel.add(modeSelector);
@@ -342,12 +333,12 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     controlSplitPane = new javax.swing.JSplitPane();
     seqTablePanel = new render.SeqTablePanel();
     toolTabs = new javax.swing.JTabbedPane();
-    tabButtonClicker = new render.TabButtonClicker();
+    tabChordInfo = new render.TabChordInfo();
     tabChordPicker = new render.TabChordPicker();
     tabSeqEditor = new render.TabSeqEditor();
+    seqPicker = new render.SeqPicker();
     tabOptions = new render.TabOptions();
     tabPitchDetect = new render.TabPitchDetect();
-    tabTester1 = new render.TabTester();
     renderBoardControl = new render.RenderBoardControl();
 
     checkHiliteRedunds.setFont(new java.awt.Font("Tahoma", 1, 14));
@@ -373,12 +364,12 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     controlSplitPane.setOneTouchExpandable(true);
     controlSplitPane.setRightComponent(seqTablePanel);
 
-    toolTabs.addTab("Pick Chord/Notes", tabButtonClicker);
-    toolTabs.addTab("Edit Chord", tabChordPicker);
-    toolTabs.addTab("Edit Sequence/Scale", tabSeqEditor);
+    toolTabs.addTab("Chord Info", tabChordInfo);
+    toolTabs.addTab("Pick Chord", tabChordPicker);
+    toolTabs.addTab("Edit Sequence", tabSeqEditor);
+    toolTabs.addTab("Pick Scale/Pattern", seqPicker);
     toolTabs.addTab("Options", tabOptions);
     toolTabs.addTab("Pitch Detector", tabPitchDetect);
-    toolTabs.addTab("tab6", tabTester1);
 
     controlSplitPane.setLeftComponent(toolTabs);
 
@@ -398,13 +389,13 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private javax.swing.JCheckBox checkHiliteRedunds;
   private javax.swing.JSplitPane controlSplitPane;
   private render.RenderBoardControl renderBoardControl;
+  private render.SeqPicker seqPicker;
   private render.SeqTablePanel seqTablePanel;
-  private render.TabButtonClicker tabButtonClicker;
+  private render.TabChordInfo tabChordInfo;
   private render.TabChordPicker tabChordPicker;
   private render.TabOptions tabOptions;
   private render.TabPitchDetect tabPitchDetect;
   private render.TabSeqEditor tabSeqEditor;
-  private render.TabTester tabTester1;
   private javax.swing.JTabbedPane toolTabs;
   // End of variables declaration//GEN-END:variables
 }

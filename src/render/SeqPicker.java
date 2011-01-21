@@ -12,35 +12,49 @@ package render;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
+import music.BassBoard;
+import music.Chord;
+import music.ChordParser;
 import music.ChordRegistry;
+import music.Interval;
+import music.NamedInterval;
 import music.Note;
+import music.ParsedChordDef;
+import music.StringParser;
 
 /**
  *
  * @author Ilya
  */
-public class SeqPicker extends javax.swing.JPanel implements PropertyChangeListener
+public class SeqPicker extends ToolPanel implements PropertyChangeListener
 {
 
   Note rootNote = new Note();
-  SeqColumnModel columnModel;
 
   /** Creates new form SeqPicker */
   public SeqPicker()
   {
     initComponents();
 
-    filterCombo.setModel(new DefaultComboBoxModel(ChordRegistry.mainRegistry().allSeqGroupNames));
-
     notePickerRoot.addPropertyChangeListener("Note", this);
   }
 
+  @Override
   public void init(SeqColumnModel model)
   {
-    columnModel = model;
-    filterCombo.setSelectedIndex(-1);
-    filterCombo.setSelectedIndex(0);
+    super.init(model);
+    filterCombo.setModel(new DefaultComboBoxModel(ChordRegistry.mainRegistry().allSeqGroupNames));
+    if (ChordRegistry.mainRegistry().allSeqDefs.length > 0) {
+      listSeqs.setListData(ChordRegistry.mainRegistry().allSeqDefs[0]);
+    }
+  }
+
+  @Override
+  protected void syncUIToDataModel()
+  {
+
   }
 
   @Override
@@ -50,7 +64,32 @@ public class SeqPicker extends javax.swing.JPanel implements PropertyChangeListe
       rootNote = (Note) evt.getNewValue();
     }
 
-    updateModelSeq();
+    updateCurrSeq();
+  }
+
+  private void updateCurrSeq()
+  {
+    ChordRegistry.SeqDef seqDef = (ChordRegistry.SeqDef) listSeqs.getSelectedValue();
+
+    if (seqDef == null) {
+      return;
+    }
+
+    StringParser parser = new StringParser(seqDef.noteSeq);
+    Vector<ParsedChordDef> chords = ChordParser.parseChords(parser, false);
+
+    if (chords.isEmpty()) {
+      return;
+    }
+
+    Interval ival = rootNote.diff(chords.firstElement().rootNote);
+
+    ParsedChordDef.transposeAllByInterval(chords.listIterator(), ival);
+    this.infoLabel.setText("<html>" + ParsedChordDef.toString(chords.listIterator(), true) + "</html>");
+
+    if (this.radioSet.isSelected()) {
+      updateModelSeq();
+    }
   }
 
   private void updateModelSeq()
@@ -63,6 +102,50 @@ public class SeqPicker extends javax.swing.JPanel implements PropertyChangeListe
     }
   }
 
+  public String getNoteSeq(BassBoard board, Note root, boolean waltz, boolean crossover, int row)
+  {
+    String seq = root.toString() + ", ";
+
+    Chord chord = board.getChordFor(root, board.getRow(row));
+    seq += chord.toString() + ", ";
+
+    if (waltz) {
+      seq += chord.toString() + ", ";
+    }
+
+    if (crossover) {
+      seq += root.add(NamedInterval.P5.interval).toString() + ", ";
+      seq += chord.toString() + ", ";
+
+      if (waltz) {
+        seq += chord.toString() + ", ";
+      }
+    }
+
+    return seq;
+  }
+
+  public String getBassChordSeq(Note note, Chord chord, boolean waltz)
+  {
+    return note.toString() + chord.toString() + (waltz ? chord.toString() : "");
+  }
+
+  public String getNoteSeq2(BassBoard board, Note root, boolean waltz, boolean crossover, int row)
+  {
+    String seq = root.toString() + ", ";
+    Chord chord = board.getChordFor(root, board.getRow(row));
+
+    String chordlist = chord.toString() + (waltz ? chord.toString() : "");
+    seq += chordlist;
+
+    if (crossover) {
+      seq += root.add(NamedInterval.P5.interval).toString();
+      seq += chordlist;
+    }
+
+    return seq;
+  }
+
   /** This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
@@ -72,11 +155,80 @@ public class SeqPicker extends javax.swing.JPanel implements PropertyChangeListe
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
+    jPanel1 = new javax.swing.JPanel();
+    radioMajor = new javax.swing.JRadioButton();
+    radioMinor = new javax.swing.JRadioButton();
+    radio7th = new javax.swing.JRadioButton();
+    radioOompah = new javax.swing.JRadioButton();
+    radioWaltz = new javax.swing.JRadioButton();
+    radioStraight = new javax.swing.JRadioButton();
+    radioCrossover = new javax.swing.JRadioButton();
+    buttonGroup1 = new javax.swing.ButtonGroup();
     jScrollPane2 = new javax.swing.JScrollPane();
     listSeqs = new javax.swing.JList();
     filterCombo = new javax.swing.JComboBox();
     notePickerRoot = new render.NotePicker();
     labelRoot = new javax.swing.JLabel();
+    buttonAdd = new javax.swing.JButton();
+    infoLabel = new javax.swing.JLabel();
+    radioSet = new javax.swing.JRadioButton();
+    radioAppend = new javax.swing.JRadioButton();
+
+    radioMajor.setText("Major");
+
+    radioMinor.setText("Minor");
+
+    radio7th.setText("7th");
+
+    radioOompah.setText("Oom-Pah (2)");
+
+    radioWaltz.setText("Waltz (3)");
+
+    radioStraight.setText("Straight");
+
+    radioCrossover.setText("Crossover (x2)");
+
+    javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+    jPanel1.setLayout(jPanel1Layout);
+    jPanel1Layout.setHorizontalGroup(
+      jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel1Layout.createSequentialGroup()
+        .addContainerGap()
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(radio7th)
+          .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(radioMajor)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioOompah))
+              .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(radioMinor)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(radioWaltz)))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(radioCrossover)
+              .addComponent(radioStraight))))
+        .addContainerGap(21, Short.MAX_VALUE))
+    );
+    jPanel1Layout.setVerticalGroup(
+      jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel1Layout.createSequentialGroup()
+        .addContainerGap()
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(radioMajor)
+          .addComponent(radioOompah)
+          .addComponent(radioStraight))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(radioMinor)
+          .addComponent(radioWaltz)
+          .addComponent(radioCrossover))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addComponent(radio7th)
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+    );
 
     listSeqs.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
       public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -94,42 +246,80 @@ public class SeqPicker extends javax.swing.JPanel implements PropertyChangeListe
     labelRoot.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     labelRoot.setText("Starting Note:");
 
+    buttonAdd.setText("Add at End");
+    buttonAdd.setToolTipText("Add selected sequence to the end");
+    buttonAdd.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        buttonAddActionPerformed(evt);
+      }
+    });
+
+    infoLabel.setFont(infoLabel.getFont().deriveFont(infoLabel.getFont().getStyle() | java.awt.Font.BOLD, infoLabel.getFont().getSize()+4));
+    infoLabel.setText("<html><i>No Sequence Selected</i></html>");
+    infoLabel.setBorder(javax.swing.BorderFactory.createTitledBorder("Notes:"));
+
+    buttonGroup1.add(radioSet);
+    radioSet.setSelected(true);
+    radioSet.setText("Set Entire Seq");
+    radioSet.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        radioSetActionPerformed(evt);
+      }
+    });
+
+    buttonGroup1.add(radioAppend);
+    radioAppend.setText("Append at End");
+    radioAppend.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        radioAppendActionPerformed(evt);
+      }
+    });
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-          .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(notePickerRoot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-              .addComponent(labelRoot, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE))
-          .addGroup(layout.createSequentialGroup()
-            .addGap(81, 81, 81)
-            .addComponent(filterCombo, 0, 309, Short.MAX_VALUE)))
-        .addContainerGap())
+      .addGroup(layout.createSequentialGroup()
+        .addContainerGap()
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(labelRoot, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(notePickerRoot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(buttonAdd)
+          .addComponent(radioAppend)
+          .addComponent(radioSet))
+        .addGap(6, 6, 6)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(infoLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
+          .addComponent(filterCombo, 0, 309, Short.MAX_VALUE)
+          .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addComponent(filterCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addComponent(infoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(layout.createSequentialGroup()
-            .addComponent(labelRoot)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(notePickerRoot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addContainerGap())
-          .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)))
+        .addComponent(filterCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+        .addContainerGap())
+      .addGroup(layout.createSequentialGroup()
+        .addComponent(labelRoot)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(notePickerRoot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addGap(15, 15, 15)
+        .addComponent(radioSet)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addComponent(radioAppend)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
+        .addComponent(buttonAdd)
+        .addGap(22, 22, 22))
     );
   }// </editor-fold>//GEN-END:initComponents
 
     private void filterComboItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_filterComboItemStateChanged
     {//GEN-HEADEREND:event_filterComboItemStateChanged
       int index = filterCombo.getSelectedIndex();
-      if (index >= 0) {
+      if ((index >= 0) && (index < ChordRegistry.mainRegistry().allSeqDefs.length)) {
         listSeqs.setListData(ChordRegistry.mainRegistry().allSeqDefs[index]);
       } else {
         listSeqs.setListData(new Object[0]);
@@ -138,13 +328,45 @@ public class SeqPicker extends javax.swing.JPanel implements PropertyChangeListe
 
     private void listSeqsValueChanged(javax.swing.event.ListSelectionEvent evt)//GEN-FIRST:event_listSeqsValueChanged
     {//GEN-HEADEREND:event_listSeqsValueChanged
-      updateModelSeq();
+      updateCurrSeq();
     }//GEN-LAST:event_listSeqsValueChanged
+
+    private void buttonAddActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_buttonAddActionPerformed
+    {//GEN-HEADEREND:event_buttonAddActionPerformed
+      String existing = columnModel.toString();
+      updateModelSeq();
+      if (!radioSet.isSelected()) {
+        columnModel.populateFromText(existing + "," + columnModel.toString(), false, null);
+      }
+    }//GEN-LAST:event_buttonAddActionPerformed
+
+    private void radioAppendActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_radioAppendActionPerformed
+    {//GEN-HEADEREND:event_radioAppendActionPerformed
+      this.buttonAdd.setVisible(true);
+    }//GEN-LAST:event_radioAppendActionPerformed
+
+    private void radioSetActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_radioSetActionPerformed
+    {//GEN-HEADEREND:event_radioSetActionPerformed
+      this.buttonAdd.setVisible(false);
+    }//GEN-LAST:event_radioSetActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JButton buttonAdd;
+  private javax.swing.ButtonGroup buttonGroup1;
   private javax.swing.JComboBox filterCombo;
+  private javax.swing.JLabel infoLabel;
+  private javax.swing.JPanel jPanel1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JLabel labelRoot;
   private javax.swing.JList listSeqs;
   private render.NotePicker notePickerRoot;
+  private javax.swing.JRadioButton radio7th;
+  private javax.swing.JRadioButton radioAppend;
+  private javax.swing.JRadioButton radioCrossover;
+  private javax.swing.JRadioButton radioMajor;
+  private javax.swing.JRadioButton radioMinor;
+  private javax.swing.JRadioButton radioOompah;
+  private javax.swing.JRadioButton radioSet;
+  private javax.swing.JRadioButton radioStraight;
+  private javax.swing.JRadioButton radioWaltz;
   // End of variables declaration//GEN-END:variables
 }

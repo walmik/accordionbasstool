@@ -57,14 +57,11 @@ public class SeqViewerController
   JScrollPane tableScrollPane;
   SeqColumnModel columnModel;
 
-  SeqViewerController(JTable table, JScrollPane scroll)
+  SeqViewerController(JTable table, SeqColumnModel model, JScrollPane scroll, RenderBassBoard renderBoard)
   {
     seqTable = table;
     tableScrollPane = scroll;
-
-    RenderBassBoard renderBoard = RenderBassBoard.getStaticRenderBoard();
-
-    columnModel = new SeqColumnModel(renderBoard, seqTable.getSelectionModel());
+    columnModel = model;
 
     seqTable.setAutoCreateColumnsFromModel(false);
     seqTable.setColumnModel(columnModel);
@@ -123,6 +120,7 @@ public class SeqViewerController
       @Override
       protected void selectionChanged(int index)
       {
+        seqTable.scrollRectToVisible(seqTable.getCellRect(seqTable.getSelectedRow(), index, true));
         seqTable.getTableHeader().repaint();
       }
       

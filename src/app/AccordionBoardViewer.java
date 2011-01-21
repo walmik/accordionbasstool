@@ -52,7 +52,7 @@ public class AccordionBoardViewer extends JApplet
   {
     controller = new AppletController(this);
 
-    RenderBassBoard renderBoard = RenderBassBoard.getStaticRenderBoard();
+    RenderBassBoard renderBoard = renderBoardControl.renderBassBoard;
 
     sound = new SoundController(false);
     sound.setEnabled(checkSoundEnabled.isSelected());
@@ -61,7 +61,7 @@ public class AccordionBoardViewer extends JApplet
 
     BoardMouseListener mouseListener = new BoardMouseListener(renderBoard, null, sound);
 
-    RenderBoardHeader header = this.renderBoardControl.getHeader();
+    RenderBoardHeader header = this.renderBoardControl.renderBoardHeader;
     header.initBoardHeader(renderBoard, renderBoardControl, null, allowedBoards);
     header.selectFirstBoardByBassCount(48);
 

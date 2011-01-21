@@ -41,7 +41,7 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
     //seqTable = theTable;
     columnModel.getDataModel().addTableModelListener(this);
 
-    seqPicker1.init(theModel);
+    //seqPicker1.init(theModel);
 
     //transNotePicker.addPropertyChangeListener(this);
   }
@@ -92,14 +92,13 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    seqPicker1 = new render.SeqPicker();
     jPanel1 = new javax.swing.JPanel();
     computeButton = new javax.swing.JButton();
     comboRecent = new javax.swing.JComboBox();
     buttonClearRecent = new javax.swing.JButton();
     checkAllowDups = new javax.swing.JCheckBox();
 
-    jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Chord Sequence:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
+    jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Full Chord Sequence:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
     computeButton.setText("Update Sequence");
     computeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -159,18 +158,14 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
         .addContainerGap()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-          .addComponent(seqPicker1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 448, Short.MAX_VALUE)
-          .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        .addComponent(seqPicker1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap())
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 
@@ -226,6 +221,5 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
   private javax.swing.JComboBox comboRecent;
   private javax.swing.JButton computeButton;
   private javax.swing.JPanel jPanel1;
-  private render.SeqPicker seqPicker1;
   // End of variables declaration//GEN-END:variables
 }

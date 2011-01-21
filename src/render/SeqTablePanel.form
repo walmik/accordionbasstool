@@ -82,12 +82,9 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="1">
-                      <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
-                      <Component id="seqTableScrollPane" pref="0" max="32767" attributes="0"/>
-                  </Group>
-                  <Component id="sidebar" alignment="0" min="-2" max="-2" attributes="1"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="seqTableScrollPane" min="0" pref="0" max="32767" attributes="1"/>
+                  <Component id="sidebar" alignment="1" min="-2" max="-2" attributes="1"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="statusText" min="-2" pref="38" max="-2" attributes="0"/>
@@ -140,11 +137,8 @@
                               <Component id="toolAddChord" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="toolInsert" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="toolRemove" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="toolResetAll" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                      </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="toolResetAll" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace pref="24" max="32767" attributes="0"/>
@@ -161,7 +155,7 @@
                   <Component id="volumeSlider" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="checkArpegg" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="toolAddChord" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="toolInsert" min="-2" max="-2" attributes="0"/>

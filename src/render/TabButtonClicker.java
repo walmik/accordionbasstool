@@ -88,7 +88,7 @@ public class TabButtonClicker extends ToolPanel
   private void initComponents() {
 
     noteChordSelector1 = new render.NoteChordSelector();
-    chordSelInfoPanel = new render.ChordsSelInfoPanel();
+    chordSelInfoPanel = new render.TabChordInfo();
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
@@ -106,7 +106,7 @@ public class TabButtonClicker extends ToolPanel
     );
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private render.ChordsSelInfoPanel chordSelInfoPanel;
+  private render.TabChordInfo chordSelInfoPanel;
   private render.NoteChordSelector noteChordSelector1;
   // End of variables declaration//GEN-END:variables
 }
