@@ -17,7 +17,7 @@ public abstract class ToolPanel extends JPanel
   ToolSelChangeListener colChange;
   ToolSelChangeListener rowChange;
 
-  class ToolSelChangeListener extends SeqTableEventAdapter
+  class ToolSelChangeListener extends ListSelChangeListener
   {
     boolean isColumnChanging;
 

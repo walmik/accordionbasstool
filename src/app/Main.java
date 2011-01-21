@@ -19,7 +19,7 @@ public class Main
   /**
    * @param args
    */
-  public static JFrame _rootFrame;
+  //public static JFrame _rootFrame;
 
   private static Document tryDoc(DocumentBuilderFactory dbf, String string)
   {
@@ -115,7 +115,6 @@ public class Main
 
 
     JFrame frame = new BassToolFrame();
-    _rootFrame = frame;
     frame.setVisible(true);
 
 //    initApplet(new AccordionBoardViewer());

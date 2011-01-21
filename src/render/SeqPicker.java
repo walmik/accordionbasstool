@@ -39,6 +39,15 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener
     initComponents();
 
     notePickerRoot.addPropertyChangeListener("Note", this);
+
+    listSeqs.getSelectionModel().addListSelectionListener(new ListSelChangeListener()
+    {
+      @Override
+      protected void selectionChanged(int index)
+      {
+        updateCurrSeq();
+      }
+    });
   }
 
   @Override
@@ -230,11 +239,6 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
 
-    listSeqs.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-      public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-        listSeqsValueChanged(evt);
-      }
-    });
     jScrollPane2.setViewportView(listSeqs);
 
     filterCombo.addItemListener(new java.awt.event.ItemListener() {
@@ -300,7 +304,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(filterCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
         .addContainerGap())
       .addGroup(layout.createSequentialGroup()
         .addComponent(labelRoot)
@@ -310,7 +314,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener
         .addComponent(radioSet)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
         .addComponent(radioAppend)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
         .addComponent(buttonAdd)
         .addGap(22, 22, 22))
     );
@@ -325,11 +329,6 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener
         listSeqs.setListData(new Object[0]);
       }
     }//GEN-LAST:event_filterComboItemStateChanged
-
-    private void listSeqsValueChanged(javax.swing.event.ListSelectionEvent evt)//GEN-FIRST:event_listSeqsValueChanged
-    {//GEN-HEADEREND:event_listSeqsValueChanged
-      updateCurrSeq();
-    }//GEN-LAST:event_listSeqsValueChanged
 
     private void buttonAddActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_buttonAddActionPerformed
     {//GEN-HEADEREND:event_buttonAddActionPerformed

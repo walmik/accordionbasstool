@@ -10,18 +10,22 @@
  */
 package render;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Vector;
 import javax.sound.sampled.AudioPermission;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JFrame;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import music.BoardRegistry;
+import music.BoardRegistry.BoardDef;
+import music.ParsedChordDef;
 
 /**
  *
@@ -35,9 +39,37 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   ModeSelector modeSelector;
   BoardMouseListener mouseListener;
   RenderBassBoard renderBassBoard;
- 
+  SeqColumnModel columnModel = null;
+
+  public static enum ToolMode
+  {
+
+    BoardOnly("Accordion Board Only"),
+    ChordMatch("Chord Matching"),
+    ChordPicker("Chord Picker"),
+    SeqPicker("Pattern Picker"),
+    Default("Full Tool");
+
+    ToolMode(String str)
+    {
+      title = str;
+    }
+    String title;
+
+    @Override
+    public String toString()
+    {
+      return title;
+    }
+  }
+
   /** Creates new form BassToolFrame */
   public BassToolFrame()
+  {
+    this(ToolMode.Default);
+  }
+
+  public BassToolFrame(ToolMode mode)
   {
     BoardRegistry.mainRegistry();
 
@@ -45,18 +77,190 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     renderBassBoard = renderBoardControl.renderBassBoard;
 
-    SeqColumnModel columnModel = new SeqColumnModel(renderBassBoard);
+    initModeSelector(mode);
 
-    seqTablePanel.init(columnModel, renderBassBoard);
+    init(mode);
+  }
 
-    renderBoardControl.renderBoardHeader.
-            initBoardHeader(renderBassBoard, renderBoardControl, columnModel, null);
+  private void init(ToolMode mode)
+  {
+
+    switch (mode) {
+      case Default:
+        initDefault();
+        break;
+
+      case BoardOnly:
+        initBoardOnly();
+        break;
+
+      case ChordMatch:
+        initChordMatcher();
+        break;
+
+      case ChordPicker:
+        initChordPicker();
+        break;
+
+      case SeqPicker:
+        initSeqPicker();
+        break;
+    }
+    
+    tabOptions.addPropertyChangeListener(this);
+
+    pack();
+    //setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+    if (boardSplitPane.isVisible()) {
+      boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
+    }
+  }
+
+  private void initBoardOnly()
+  {
+    columnModel = null;
+    Vector<BoardDef> allowedBoards = BoardRegistry.mainRegistry().getStandardBoards();
+
+    SoundController sound = new SoundController(false);
+    BoardMouseListener mouseListener = new BoardMouseListener(renderBassBoard, null, sound);
+
+    RenderBoardHeader header = this.renderBoardControl.renderBoardHeader;
+    header.initBoardHeader(renderBassBoard, renderBoardControl, null, allowedBoards);
+    header.selectFirstBoardByBassCount(48);
+
+//    header.getExtPanel().add(checkSoundEnabled);
+//    header.getExtPanel().add(checkVertical);
+
+    this.controlSplitPane.setVisible(false);
+    this.boardSplitPane.setVisible(false);
+    //this.boardSplitPane.setTopComponent(null);
+    this.getContentPane().add(this.renderBoardControl, BorderLayout.CENTER);
+  }
+
+  private void initChordMatcher()
+  {
+    if (columnModel == null) {
+      columnModel = new SeqColumnModel(renderBassBoard);
+    }
+
+    SoundController sound = new SoundController(false);
+    //sound.setEnabled(checkSoundEnabled.isSelected());
+
+    Vector<BoardDef> allowedBoards = BoardRegistry.mainRegistry().getStandardBoards();
+
+    mouseListener = new BoardMouseListener(renderBassBoard, columnModel, sound);
+
+    tabChordInfo.init(columnModel);
+
+    RenderBoardHeader header = this.renderBoardControl.renderBoardHeader;
+    header.initBoardHeader(renderBassBoard, renderBoardControl, columnModel, allowedBoards);
+    header.selectFirstBoardByBassCount(48);
+
+    this.controlSplitPane.setVisible(false);
+    this.setSplit(boardSplitPane, tabChordInfo, renderBoardControl);
+
+    this.getContentPane().add(boardSplitPane, BorderLayout.CENTER);
+
+    // Add Default Chord
+    if (columnModel.getColumnCount() == 0) {
+      columnModel.addColumn(ParsedChordDef.newEmptyChordDef(), 0);
+    }
+  }
+
+  private void initSeqPicker()
+  {
+    if (columnModel == null) {
+      columnModel = new SeqColumnModel(renderBassBoard);
+    }
+
+    SoundController sound = new SoundController(false);
+    //sound.setEnabled(checkSoundEnabled.isSelected());
+
+    Vector<BoardDef> allowedBoards = BoardRegistry.mainRegistry().getStandardBoards();
+
+    //mouseListener = new BoardMouseListener(renderBassBoard, columnModel, sound);
+    renderBassBoard.setMainMouseAdapter(null);
+
+    this.seqPicker.init(columnModel);
+
+    RenderBoardHeader header = this.renderBoardControl.renderBoardHeader;
+    header.initBoardHeader(renderBassBoard, renderBoardControl, columnModel, allowedBoards);
+    header.selectFirstBoardByBassCount(48);
+
+    this.controlSplitPane.setVisible(false);
+    this.setSplit(boardSplitPane, seqPicker, renderBoardControl);
+
+    this.getContentPane().add(boardSplitPane, BorderLayout.CENTER);
+
+    // Add Default Chord
+    if (columnModel.getColumnCount() == 0) {
+      columnModel.addColumn(ParsedChordDef.newEmptyChordDef(), 0);
+    }
+  }
+
+  private void initChordPicker()
+  {
+    if (columnModel == null) {
+      columnModel = new SeqColumnModel(renderBassBoard);
+
+      seqTablePanel.init(columnModel, renderBassBoard);
+      seqTablePanel.buttonHideEditor.addActionListener(this);
+      seqTablePanel.toggleSeqControls(false);
+
+      mouseListener = new BoardMouseListener(renderBassBoard, columnModel, seqTablePanel.sound);
+
+      renderBoardControl.renderBoardHeader.getExtPanel().add(this.checkHiliteRedunds);
+    }
+
+    toolTabs.setVisible(false);
+    tabChordPicker.init(columnModel);
+
+    controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
+
+    RenderBoardHeader header = this.renderBoardControl.renderBoardHeader;
+    header.initBoardHeader(renderBassBoard, renderBoardControl, columnModel, null);
+
+
+    this.setSplit(controlSplitPane, tabChordPicker, seqTablePanel);
+    this.setSplit(boardSplitPane, controlSplitPane, renderBoardControl);
+
+    this.getContentPane().add(boardSplitPane, BorderLayout.CENTER);
+
+    // Set Board to default 120
+    renderBoardControl.renderBoardHeader.selectFirstBoardByBassCount(120);
+
+    // Add Default Chord!
+    if (columnModel.getColumnCount() == 0) {
+      columnModel.addColumn(0);
+    } else if (columnModel.getSelectedChordDef().isEmptyChord()) {
+      columnModel.editSelectedColumn(ParsedChordDef.newDefaultChordDef());
+    }
+
+  }
+
+  private void initDefault()
+  {
+    if (columnModel == null) {
+      columnModel = new SeqColumnModel(renderBassBoard);
+
+      renderBoardControl.renderBoardHeader.initBoardHeader(renderBassBoard, renderBoardControl, columnModel, null);
+
+      seqTablePanel.init(columnModel, renderBassBoard);
+
+      mouseListener = new BoardMouseListener(renderBassBoard, columnModel, seqTablePanel.sound);
+
+      renderBoardControl.renderBoardHeader.getExtPanel().add(this.checkHiliteRedunds);
+
+      seqTablePanel.buttonHideEditor.addActionListener(this);
+
+      controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
+    }
 
     // Init Tabs
     for (int i = 0; i < toolTabs.getTabCount(); i++) {
       Component tab = toolTabs.getComponentAt(i);
       if (tab instanceof ToolPanel) {
-        ((ToolPanel)tab).init(columnModel);
+        ((ToolPanel) tab).init(columnModel);
       }
     }
 
@@ -64,16 +268,13 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       toolTabs.setEnabledAt(toolTabs.indexOfComponent(tabPitchDetect), false);
     }
 
-    mouseListener = new BoardMouseListener(renderBassBoard, columnModel, seqTablePanel.sound);
+    toolTabs.setVisible(true);
 
-    renderBoardControl.renderBoardHeader.getExtPanel().add(this.checkHiliteRedunds);
+    this.setSplit(controlSplitPane, toolTabs, seqTablePanel);
+    this.setSplit(boardSplitPane, controlSplitPane, renderBoardControl);
 
-    seqTablePanel.toggleChordPicker.addActionListener(this);
-
-    controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
-
-    boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
-
+    //this.getContentPane().removeAll();
+    this.getContentPane().add(boardSplitPane, BorderLayout.CENTER);
 
     // Setup intiial state
 
@@ -81,10 +282,20 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     renderBoardControl.renderBoardHeader.selectFirstBoardByBassCount(120);
 
     // Add Default Chord!
-    seqTablePanel.columnModel.addColumn(0);
+    if (columnModel.getColumnCount() == 0) {
+      columnModel.addColumn(0);
+    } else if (columnModel.getSelectedChordDef().isEmptyChord()) {
+      columnModel.editSelectedColumn(ParsedChordDef.newDefaultChordDef());
+    }
+  }
 
-    pack();
-    setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+  private void setSplit(JSplitPane pane, JComponent left, JComponent right)
+  {
+    pane.setLeftComponent(null);
+    pane.setRightComponent(null);
+    pane.setLeftComponent(left);
+    pane.setRightComponent(right);
+    pane.setVisible(true);
   }
 
   private boolean checkPitchDetectPermissions()
@@ -106,35 +317,47 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   public void propertyChange(PropertyChangeEvent evt)
   {
     if (evt.getPropertyName().equals(JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
-      int newLoc = ((Integer) evt.getNewValue()).intValue();
-
-      if (!editorLeft) {
-        this.editorVis = (newLoc <= controlSplitPane.getMaximumDividerLocation() + 10);
-      } else {
-        this.editorVis = (newLoc >= 10);
+      dividerChanged(((Integer) evt.getNewValue()).intValue());
+    } else if (evt.getSource().equals(this.tabOptions)) {
+      String prop = evt.getPropertyName();
+      if (TabOptions.TOGGLE_EDITOR_PROPERTY.equals(prop)) {
+        this.toggleEditorLeft();
+      } else if (TabOptions.TOGGLE_BOARDPOS_PROPERTY.equals(prop)) {
+        this.toggleBoardPos();
+      } else if (TabOptions.TOGGLE_ORIENT_PROPERTY.equals(prop)) {
+        this.toggleOrientation();
       }
+    }
+  }
 
-      String brakLeft = "<< ";
-      String brakRight = " >>";
+  private void dividerChanged(int newLoc)
+  {
+    if (!editorLeft) {
+      this.editorVis = (newLoc <= controlSplitPane.getMaximumDividerLocation() + 10);
+    } else {
+      this.editorVis = (newLoc >= 10);
+    }
 
-      if (!renderBassBoard.isHorizontal()) {
-        brakLeft = "^^ ";
-        brakRight = " vv";
-      }
+    String brakLeft = "<< ";
+    String brakRight = " >>";
 
-      //System.out.println("newLoc: " + newLoc + "Width: " + controlSplitPane.getWidth() + " Max: " + this.controlSplitPane.getMaximumDividerLocation());
-      if (editorVis) {
-        seqTablePanel.toggleChordPicker.setText(editorLeft ? brakLeft + "Hide Editor" : "Hide Editor" + brakRight);
-      } else {
-        seqTablePanel.toggleChordPicker.setText(editorLeft ? "Show Editor" + brakRight : brakLeft + "Show Editor");
-      }
+    if (!renderBassBoard.isHorizontal()) {
+      brakLeft = "^^ ";
+      brakRight = " vv";
+    }
+
+    //System.out.println("newLoc: " + newLoc + "Width: " + controlSplitPane.getWidth() + " Max: " + this.controlSplitPane.getMaximumDividerLocation());
+    if (editorVis) {
+      seqTablePanel.buttonHideEditor.setText(editorLeft ? brakLeft + "Hide Editor" : "Hide Editor" + brakRight);
+    } else {
+      seqTablePanel.buttonHideEditor.setText(editorLeft ? "Show Editor" + brakRight : brakLeft + "Show Editor");
     }
   }
 
   @Override
   public void actionPerformed(ActionEvent e)
   {
-    if (e.getSource() == seqTablePanel.toggleChordPicker) {
+    if (e.getSource() == seqTablePanel.buttonHideEditor) {
       if (editorVis) {
         controlSplitPane.setDividerLocation(editorLeft ? 0.0 : 1.0);
       } else {
@@ -143,7 +366,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     }
 
     if ((modeSelector != null) && (e.getSource() == modeSelector.modeCombo)) {
-      switchMode((ToolMode) modeSelector.modeCombo.getSelectedItem());
+      init((ToolMode) modeSelector.modeCombo.getSelectedItem());
     }
   }
 
@@ -238,38 +461,17 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 //    }
   }
 
- enum ToolMode
- {
-    BoardOnly("Accordion Board Only"),
-
-    BUTTON_FOR_CHORD("Single Chord Buttons"),
-    CHORD_SEQ("Chord Sequence Buttons"),
-    //CHORD_FOR_BUTTON,
-    ALL("All");
-
-    ToolMode(String str)
-    {
-      title = str;
-    }
-    String title;
-
-    @Override
-    public String toString()
-    {
-      return title;
-    }
-  }
-
- void initModeSelector()
- {
+  void initModeSelector(ToolMode startMode)
+  {
     modeSelector = new ModeSelector();
     JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
     flowPanel.add(modeSelector);
     getContentPane().add(flowPanel, java.awt.BorderLayout.NORTH);
     modeSelector.modeCombo.setModel(new DefaultComboBoxModel(ToolMode.values()));
+    modeSelector.modeCombo.setSelectedItem(startMode);
     modeSelector.modeCombo.addActionListener(this);
 
-    modeSelector.checkFingerSearch.setSelected(seqTablePanel.columnModel.optFingerSearch);
+//    modeSelector.checkFingerSearch.setSelected(seqTablePanel.columnModel.optFingerSearch);
 
     modeSelector.checkFingerSearch.addActionListener(new ActionListener()
     {
@@ -277,46 +479,14 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       @Override
       public void actionPerformed(ActionEvent e)
       {
-        if (seqTablePanel.columnModel != null) {
-          seqTablePanel.columnModel.optFingerSearch = (modeSelector.checkFingerSearch.isSelected());
-          seqTablePanel.columnModel.recomputeSeqs();
+        if (columnModel != null) {
+          columnModel.optFingerSearch = (modeSelector.checkFingerSearch.isSelected());
+          columnModel.recomputeSeqs();
         }
       }
     });
 
-    modeSelector.modeCombo.setSelectedItem(ToolMode.BUTTON_FOR_CHORD);
-  }
-
-  void switchMode(ToolMode mode)
-  {
-    switch (mode) {
-      case BUTTON_FOR_CHORD:
-        seqTablePanel.toggleSeqControls(false);
-        toolTabs.removeAll();
-        toolTabs.addTab("Chord Picker", tabChordPicker);
-        toolTabs.addTab("Options", tabOptions);
-        break;
-
-      case CHORD_SEQ:
-        seqTablePanel.toggleSeqControls(true);
-        toolTabs.removeAll();
-        toolTabs.addTab("Chord Picker", tabChordPicker);
-        toolTabs.addTab("Sequence Editor", tabSeqEditor);
-        toolTabs.addTab("Options", tabOptions);
-        break;
-
-      case ALL:
-        seqTablePanel.toggleSeqControls(true);
-        toolTabs.removeAll();
-        toolTabs.addTab("Chord Picker", tabChordPicker);
-        toolTabs.addTab("Sequence Editor", tabSeqEditor);
-        toolTabs.addTab("Options", tabOptions);
-        if (checkPitchDetectPermissions()) {
-          toolTabs.addTab("Pitch Detect", tabPitchDetect);
-        }
-        //toolTabs.addTab("Tester", tabTester);
-        break;
-    }
+    //modeSelector.modeCombo.setSelectedItem(ToolMode.BUTTON_FOR_CHORD);
   }
 
   /** This method is called from within the constructor to

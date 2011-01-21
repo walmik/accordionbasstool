@@ -23,6 +23,7 @@ import music.Chord;
 
 public class RenderBassBoard extends JPanel
 {
+
   final static long serialVersionUID = 1;
 
   public RenderBassBoard()
@@ -48,12 +49,27 @@ public class RenderBassBoard extends JPanel
     int borderMargin = RenderBoardUI.defaultUI.buttonXMargin + borderWidth / 2;
     this._borderInsets = new Insets(borderMargin, borderMargin, borderMargin, borderMargin);
   }
-
   Dimension margin = new Dimension();
   int borderWidth = 16;
   Dimension _contentDim = new Dimension(0, 0);
   Insets _borderInsets = null;
   BassBoard.Pos clickPos = null;
+  MouseAdapter mainMouseAdapter = null;
+
+  public void setMainMouseAdapter(MouseAdapter mouse)
+  {
+    if (mainMouseAdapter != null) {
+      removeMouseListener(mainMouseAdapter);
+      removeMouseMotionListener(mainMouseAdapter);
+    }
+
+    mainMouseAdapter = mouse;
+
+    if (mainMouseAdapter != null) {
+      addMouseListener(mainMouseAdapter);
+      addMouseMotionListener(mainMouseAdapter);
+    }
+  }
 
   public void toggleMouseClickHilite(boolean on)
   {
@@ -135,9 +151,8 @@ public class RenderBassBoard extends JPanel
     return _theBoard;
   }
 
-  class RepaintListener extends SeqTableEventAdapter
+  class RepaintListener extends ListSelChangeListener
   {
-
     RepaintListener()
     {
       super(true);
@@ -460,7 +475,6 @@ public class RenderBassBoard extends JPanel
       rOff += _rInc;
     }
   }
-
   private RenderBoardUI.BoardButtonImage currBoardButton;
   private String currTextStr;
   private boolean currSelected;

@@ -21,6 +21,7 @@ import javax.swing.event.TableColumnModelEvent;
 import music.ButtonCombo;
 import music.ChordRegistry;
 import music.Note;
+import render.SeqTableEventAdapter;
 
 /**
  *
@@ -28,12 +29,12 @@ import music.Note;
  */
 public class SeqTablePanel extends javax.swing.JPanel
 {
-  SeqColumnModel columnModel;
-  ChordTableAction chordTableAction;
+  private SeqColumnModel columnModel;
+  private ChordTableAction chordTableAction;
 
-  SeqViewerController seqViewer;
+  private SeqViewerController seqViewer;
   SoundController sound;
-  SeqAnimController anim;
+  private SeqAnimController anim;
 
   /** Creates new form SeqTablePanel */
   public SeqTablePanel()
@@ -135,10 +136,11 @@ public class SeqTablePanel extends javax.swing.JPanel
 
   void toggleSeqControls(boolean allowed)
   {
-    //sidebar.setVisible(allowed);
+    sidebar.setVisible(allowed);
     toolAddChord.setVisible(allowed);
     toolInsert.setVisible(allowed);
     toolRemove.setVisible(allowed);
+    toolResetAll.setVisible(allowed);
     //transposePanel1.setVisible(allowed);
     statusText.setVisible(allowed);
 
@@ -197,7 +199,7 @@ public class SeqTablePanel extends javax.swing.JPanel
     seqTableScrollPane = new javax.swing.JScrollPane();
     seqTable = new javax.swing.JTable();
     sidebar = new javax.swing.JPanel();
-    toggleChordPicker = new javax.swing.JButton();
+    buttonHideEditor = new javax.swing.JButton();
     toolAddChord = new javax.swing.JButton();
     toolInsert = new javax.swing.JButton();
     toolRemove = new javax.swing.JButton();
@@ -247,8 +249,8 @@ public class SeqTablePanel extends javax.swing.JPanel
     seqTable.setRowHeight(64);
     seqTableScrollPane.setViewportView(seqTable);
 
-    toggleChordPicker.setFont(toggleChordPicker.getFont().deriveFont(toggleChordPicker.getFont().getStyle() | java.awt.Font.BOLD));
-    toggleChordPicker.setText("Hide Editor >>");
+    buttonHideEditor.setFont(buttonHideEditor.getFont().deriveFont(buttonHideEditor.getFont().getStyle() | java.awt.Font.BOLD));
+    buttonHideEditor.setText("Hide Editor >>");
 
     toolAddChord.setAction(chordTableAction);
     toolAddChord.setText("Add Chord");
@@ -306,7 +308,7 @@ public class SeqTablePanel extends javax.swing.JPanel
       sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(sidebarLayout.createSequentialGroup()
         .addGroup(sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(toggleChordPicker)
+          .addComponent(buttonHideEditor)
           .addGroup(sidebarLayout.createSequentialGroup()
             .addContainerGap()
             .addGroup(sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -326,7 +328,7 @@ public class SeqTablePanel extends javax.swing.JPanel
     sidebarLayout.setVerticalGroup(
       sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(sidebarLayout.createSequentialGroup()
-        .addComponent(toggleChordPicker)
+        .addComponent(buttonHideEditor)
         .addGap(24, 24, 24)
         .addComponent(checkSound)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -344,7 +346,7 @@ public class SeqTablePanel extends javax.swing.JPanel
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
 
-    statusText.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+    statusText.setFont(new java.awt.Font("Tahoma", 0, 16));
     statusText.setText("Status");
     statusText.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -390,6 +392,7 @@ public class SeqTablePanel extends javax.swing.JPanel
   }//GEN-LAST:event_checkArpeggActionPerformed
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  javax.swing.JButton buttonHideEditor;
   private javax.swing.JCheckBox checkArpegg;
   private javax.swing.JCheckBox checkSound;
   private javax.swing.JPanel controlPanel;
@@ -398,7 +401,6 @@ public class SeqTablePanel extends javax.swing.JPanel
   private javax.swing.JScrollPane seqTableScrollPane;
   private javax.swing.JPanel sidebar;
   private javax.swing.JLabel statusText;
-  javax.swing.JButton toggleChordPicker;
   private javax.swing.JButton toolAddChord;
   private javax.swing.JButton toolInsert;
   private javax.swing.JButton toolPlay;

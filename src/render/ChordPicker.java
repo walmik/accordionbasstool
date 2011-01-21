@@ -17,8 +17,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.ListModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import music.Chord;
 import music.ChordRegistry;
 import music.Note;
@@ -109,10 +107,10 @@ public class ChordPicker extends javax.swing.JPanel
 
     populateFilteredList();
 
-    listChords.addListSelectionListener(new ListSelectionListener()
+    listChords.getSelectionModel().addListSelectionListener(new ListSelChangeListener()
     {
       @Override
-      public void valueChanged(ListSelectionEvent e)
+      public void selectionChanged(int index)
       {
         if (!isUpdating) {
           RegistryChordDef chordDef = (RegistryChordDef) listChords.getSelectedValue();
@@ -385,8 +383,8 @@ public class ChordPicker extends javax.swing.JPanel
           .addComponent(jLabel1)
           .addComponent(filterCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
-      .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 167, Short.MAX_VALUE)
+        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
+      .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
     );
   }// </editor-fold>//GEN-END:initComponents
 

@@ -19,7 +19,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import music.BoardSearcher;
 import music.ButtonCombo;
-import app.Main;
 
 /**
  *
@@ -27,6 +26,9 @@ import app.Main;
  */
 public class TabOptions extends ToolPanel
 {
+  public final static String TOGGLE_BOARDPOS_PROPERTY = "toggleBoardPos";
+  public final static String TOGGLE_ORIENT_PROPERTY = "toggleOrient";
+  public final static String TOGGLE_EDITOR_PROPERTY = "toggleEditor";
 
   /** Creates new form TabOptions */
   public TabOptions()
@@ -312,12 +314,14 @@ public class TabOptions extends ToolPanel
 
   private void toggleBoardLeftTopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_toggleBoardLeftTopActionPerformed
   {//GEN-HEADEREND:event_toggleBoardLeftTopActionPerformed
-    ((BassToolFrame) Main._rootFrame).toggleBoardPos();
+    //((BassToolFrame) Main._rootFrame).toggleBoardPos();
+    this.firePropertyChange(TOGGLE_BOARDPOS_PROPERTY, null, null);
   }//GEN-LAST:event_toggleBoardLeftTopActionPerformed
 
   private void toggleBoardHorizActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_toggleBoardHorizActionPerformed
   {//GEN-HEADEREND:event_toggleBoardHorizActionPerformed
-    ((BassToolFrame) Main._rootFrame).toggleOrientation();
+    //((BassToolFrame) Main._rootFrame).toggleOrientation();
+    this.firePropertyChange(TOGGLE_ORIENT_PROPERTY, null, null);
   }//GEN-LAST:event_toggleBoardHorizActionPerformed
 
   private void checkFingerSearchActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkFingerSearchActionPerformed
@@ -370,7 +374,8 @@ public class TabOptions extends ToolPanel
 
   private void toggleEditorPosActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_toggleEditorPosActionPerformed
   {//GEN-HEADEREND:event_toggleEditorPosActionPerformed
-    ((BassToolFrame) Main._rootFrame).toggleEditorLeft();
+    this.firePropertyChange(TOGGLE_EDITOR_PROPERTY, null, null);
+    //((BassToolFrame) Main._rootFrame).toggleEditorLeft();
   }//GEN-LAST:event_toggleEditorPosActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkAllowAllBass;

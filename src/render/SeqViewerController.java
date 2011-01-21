@@ -101,7 +101,7 @@ public class SeqViewerController
     seqTable.addMouseListener(headerMouse);
 
     // Row Selection
-    seqTable.getSelectionModel().addListSelectionListener(new SeqTableEventAdapter()
+    seqTable.getSelectionModel().addListSelectionListener(new ListSelChangeListener()
     {
 
       @Override
@@ -114,7 +114,7 @@ public class SeqViewerController
     });
 
     // Column Selection
-    columnModel.selComboModel.addListSelectionListener(new SeqTableEventAdapter()
+    columnModel.selComboModel.addListSelectionListener(new ListSelChangeListener()
     {
 
       @Override

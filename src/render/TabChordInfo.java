@@ -30,11 +30,23 @@ public class TabChordInfo extends ToolPanel
   public TabChordInfo()
   {
     initComponents();
+
     matchesListBox.setCellRenderer(new ChordListRender());
+
+    matchesListBox.getSelectionModel().addListSelectionListener(new ListSelChangeListener()
+    {
+
+      @Override
+      public void selectionChanged(int index)
+      {
+        selectMatchFromList();
+      }
+    });
   }
 
   @Override
   public void init(SeqColumnModel model)
+
   {
     super.init(model);
     clickedLabel.setText(columnModel.getSelectedComboStateString());
@@ -62,6 +74,18 @@ public class TabChordInfo extends ToolPanel
     listChanging = false;
 
     clickedLabel.setText(columnModel.getSelectedComboStateString());
+  }
+
+  private void selectMatchFromList()
+  {
+    if (listChanging) {
+      return;
+    }
+
+    ParsedChordDef chordDef = (ParsedChordDef) this.matchesListBox.getSelectedValue();
+    if (chordDef != null) {
+      columnModel.editSelectedColumn(chordDef, true);
+    }
   }
 
   @Override
@@ -123,11 +147,6 @@ public class TabChordInfo extends ToolPanel
     jScrollPane1.setToolTipText("<html>\nA list of other possible chords for the current button combination pressed,\nThe current chord, if listed, is selected.\n</html>");
 
     matchesListBox.setFont(new java.awt.Font("Monospaced", 1, 17));
-    matchesListBox.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-      public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-        matchesListBoxValueChanged(evt);
-      }
-    });
     jScrollPane1.setViewportView(matchesListBox);
 
     clickedLabel.setFont(new java.awt.Font("Tahoma", 0, 18));
@@ -177,18 +196,6 @@ public class TabChordInfo extends ToolPanel
             .addContainerGap())))
     );
   }// </editor-fold>//GEN-END:initComponents
-
-  private void matchesListBoxValueChanged(javax.swing.event.ListSelectionEvent evt)//GEN-FIRST:event_matchesListBoxValueChanged
-  {//GEN-HEADEREND:event_matchesListBoxValueChanged
-    if (listChanging) {
-      return;
-    }
-
-    ParsedChordDef chordDef = (ParsedChordDef) this.matchesListBox.getSelectedValue();
-    if (chordDef != null) {
-      columnModel.editSelectedColumn(chordDef, true);
-    }
-  }//GEN-LAST:event_matchesListBoxValueChanged
 
   private void checkShowUnknownChordsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkShowUnknownChordsActionPerformed
   {//GEN-HEADEREND:event_checkShowUnknownChordsActionPerformed

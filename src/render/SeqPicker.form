@@ -138,7 +138,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="filterCombo" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jScrollPane2" pref="94" max="32767" attributes="2"/>
+              <Component id="jScrollPane2" pref="123" max="32767" attributes="2"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
           <Group type="102" alignment="0" attributes="0">
@@ -149,7 +149,7 @@
               <Component id="radioSet" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="radioAppend" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="6" max="32767" attributes="0"/>
+              <EmptySpace pref="35" max="32767" attributes="0"/>
               <Component id="buttonAdd" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
           </Group>
@@ -165,9 +165,6 @@
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
         <Component class="javax.swing.JList" name="listSeqs">
-          <Events>
-            <EventHandler event="valueChanged" listener="javax.swing.event.ListSelectionListener" parameters="javax.swing.event.ListSelectionEvent" handler="listSeqsValueChanged"/>
-          </Events>
         </Component>
       </SubComponents>
     </Container>

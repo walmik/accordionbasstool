@@ -28,9 +28,9 @@ public class BoardMouseListener extends MouseAdapter
     columnModel = model;
     clickButtons = new Vector<BassBoard.Pos>();
     this.sound = sound;
+    assert(this.sound != null);
 
-    renderBoard.addMouseListener(this);
-    renderBoard.addMouseMotionListener(this);
+    renderBoard.setMainMouseAdapter(this);
   }
 
   private void updateFromClicked()

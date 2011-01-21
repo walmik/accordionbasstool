@@ -67,7 +67,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
 
     matchingChordStore = new MatchingChordStore(this);
 
-    rowSelModel.addListSelectionListener(new SeqTableEventAdapter()
+    rowSelModel.addListSelectionListener(new ListSelChangeListener()
     {
 
       @Override
@@ -194,6 +194,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
     this.tableColumns.clear();
 
     if (addFirst) {
+      this.selComboModel.setAnchorSelectionIndex(0);
       this.addColumn(0);
     } else {
       computeSeqs(-1);
@@ -307,8 +308,11 @@ public class SeqColumnModel extends DefaultTableColumnModel
 
   public ParsedChordDef getChordDef(int index)
   {
-    assert ((index >= 0) && (index < getColumnCount()));
-    return (ParsedChordDef) getColumn(index).getHeaderValue();
+    if ((index >= 0) && (index < getColumnCount())) {
+      return (ParsedChordDef) getColumn(index).getHeaderValue();
+    } else {
+      return null;
+    }
   }
 
   public ParsedChordDef getSelectedChordDef()
