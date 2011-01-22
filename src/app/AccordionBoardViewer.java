@@ -12,6 +12,7 @@ package app;
 
 import java.util.Vector;
 import javax.swing.JApplet;
+import javax.swing.JRootPane;
 import music.BoardRegistry;
 import music.BoardRegistry.BoardDef;
 import render.BoardMouseListener;
@@ -28,6 +29,7 @@ public class AccordionBoardViewer extends JApplet
 
   SoundController sound;
   AppletController controller;
+
 
   public void init()
   {

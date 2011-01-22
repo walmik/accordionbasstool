@@ -12,6 +12,7 @@ package render;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.beans.PropertyChangeListener;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
@@ -45,6 +46,16 @@ public class TabOptions extends ToolPanel
     super.init(mod);
     this.checkFingerSearch.setSelected(columnModel.optFingerSearch);
   }
+
+  @Override
+  public void addPropertyChangeListener(PropertyChangeListener listener)
+  {
+    super.addPropertyChangeListener(TOGGLE_BOARDPOS_PROPERTY, listener);
+    super.addPropertyChangeListener(TOGGLE_ORIENT_PROPERTY, listener);
+    super.addPropertyChangeListener(TOGGLE_EDITOR_PROPERTY, listener);
+  }
+
+
 
   @Override
   protected void syncUIToDataModel()

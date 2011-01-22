@@ -146,7 +146,7 @@ public class TabChordInfo extends ToolPanel
     jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Possible Chords:"));
     jScrollPane1.setToolTipText("<html>\nA list of other possible chords for the current button combination pressed,\nThe current chord, if listed, is selected.\n</html>");
 
-    matchesListBox.setFont(new java.awt.Font("Monospaced", 1, 17));
+    matchesListBox.setFont(new java.awt.Font("Monospaced", 1, 17)); // NOI18N
     jScrollPane1.setViewportView(matchesListBox);
 
     clickedLabel.setFont(new java.awt.Font("Tahoma", 0, 18));

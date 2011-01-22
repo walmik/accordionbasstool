@@ -12,16 +12,17 @@ package render;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Vector;
 import javax.sound.sampled.AudioPermission;
-import javax.swing.DefaultComboBoxModel;
+import javax.swing.AbstractAction;
+import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSplitPane;
 import music.BoardRegistry;
 import music.BoardRegistry.BoardDef;
@@ -37,9 +38,12 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   boolean editorVis = true;
   boolean editorLeft = true;
   ModeSelector modeSelector;
-  BoardMouseListener mouseListener;
   RenderBassBoard renderBassBoard;
+  BoardMouseListener mouseListener;
   SeqColumnModel columnModel = null;
+  SoundController sound;
+  SeqAnimController anim;
+  ToolPanel[] allTools;
 
   public static enum ToolMode
   {
@@ -75,11 +79,24 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     initComponents();
 
+    // Save initial full tab layout
+    allTools = new ToolPanel[toolTabs.getTabCount()];
+    for (int i = 0; i < allTools.length; i++) {
+      allTools[i] = (ToolPanel)toolTabs.getComponentAt(i);
+      allTools[i].setName(toolTabs.getTitleAt(i));
+    }
+
     renderBassBoard = renderBoardControl.renderBassBoard;
 
     initModeSelector(mode);
 
     init(mode);
+
+    initTabsMenu();
+//
+//    this.jMenuBar1.add(Box.createHorizontalStrut(100));
+//    this.jMenuBar1.add(new JCheckBox("Test"));
+//    this.jMenuBar1.add(new JSlider());
   }
 
   private void init(ToolMode mode)
@@ -106,7 +123,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
         initSeqPicker();
         break;
     }
-    
+
     tabOptions.addPropertyChangeListener(this);
 
     pack();
@@ -121,8 +138,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     columnModel = null;
     Vector<BoardDef> allowedBoards = BoardRegistry.mainRegistry().getStandardBoards();
 
-    SoundController sound = new SoundController(false);
-    BoardMouseListener mouseListener = new BoardMouseListener(renderBassBoard, null, sound);
+    sound = new SoundController(false);
+    mouseListener = new BoardMouseListener(renderBassBoard, null, sound);
 
     RenderBoardHeader header = this.renderBoardControl.renderBoardHeader;
     header.initBoardHeader(renderBassBoard, renderBoardControl, null, allowedBoards);
@@ -143,7 +160,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       columnModel = new SeqColumnModel(renderBassBoard);
     }
 
-    SoundController sound = new SoundController(false);
+    sound = new SoundController(false);
     //sound.setEnabled(checkSoundEnabled.isSelected());
 
     Vector<BoardDef> allowedBoards = BoardRegistry.mainRegistry().getStandardBoards();
@@ -173,7 +190,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       columnModel = new SeqColumnModel(renderBassBoard);
     }
 
-    SoundController sound = new SoundController(false);
+    sound = new SoundController(false);
     //sound.setEnabled(checkSoundEnabled.isSelected());
 
     Vector<BoardDef> allowedBoards = BoardRegistry.mainRegistry().getStandardBoards();
@@ -203,11 +220,13 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     if (columnModel == null) {
       columnModel = new SeqColumnModel(renderBassBoard);
 
-      seqTablePanel.init(columnModel, renderBassBoard);
+      sound = new SoundController(false);
+
+      seqTablePanel.init(columnModel, renderBassBoard, sound);
       seqTablePanel.buttonHideEditor.addActionListener(this);
       seqTablePanel.toggleSeqControls(false);
 
-      mouseListener = new BoardMouseListener(renderBassBoard, columnModel, seqTablePanel.sound);
+      mouseListener = new BoardMouseListener(renderBassBoard, columnModel, sound);
 
       renderBoardControl.renderBoardHeader.getExtPanel().add(this.checkHiliteRedunds);
     }
@@ -235,7 +254,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     } else if (columnModel.getSelectedChordDef().isEmptyChord()) {
       columnModel.editSelectedColumn(ParsedChordDef.newDefaultChordDef());
     }
-
   }
 
   private void initDefault()
@@ -245,9 +263,12 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
       renderBoardControl.renderBoardHeader.initBoardHeader(renderBassBoard, renderBoardControl, columnModel, null);
 
-      seqTablePanel.init(columnModel, renderBassBoard);
+      sound = new SoundController(false);
+      sound.initSoundMenu(menuSound);
 
-      mouseListener = new BoardMouseListener(renderBassBoard, columnModel, seqTablePanel.sound);
+      seqTablePanel.init(columnModel, renderBassBoard, sound);
+
+      mouseListener = new BoardMouseListener(renderBassBoard, columnModel, sound);
 
       renderBoardControl.renderBoardHeader.getExtPanel().add(this.checkHiliteRedunds);
 
@@ -256,12 +277,12 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
     }
 
+    toolTabs.removeAll();
+
     // Init Tabs
-    for (int i = 0; i < toolTabs.getTabCount(); i++) {
-      Component tab = toolTabs.getComponentAt(i);
-      if (tab instanceof ToolPanel) {
-        ((ToolPanel) tab).init(columnModel);
-      }
+    for (ToolPanel tab : allTools) {
+      tab.init(columnModel);
+      toolTabs.add(tab.getName(), tab);
     }
 
     if (!checkPitchDetectPermissions()) {
@@ -450,43 +471,113 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
         controlSplitPane.setDividerLocation(controlSplitPane.getMinimumDividerLocation());
       }
     }
+  }
 
-//    boardAndHeaderPanel.remove(renderBoardHeader);
-//    if (isHoriz && isTopLeft) {
-//      boardAndHeaderPanel.add(BorderLayout.SOUTH, renderBoardHeader);
-//      renderBoardHeader.flipHeader(true);
-//    } else {
-//      boardAndHeaderPanel.add(BorderLayout.NORTH, renderBoardHeader);
-//      renderBoardHeader.flipHeader(false);
-//    }
+  // Menu Actions //
+  class ModeAction extends AbstractAction
+  {
+
+    ModeAction(ToolMode mode)
+    {
+      theMode = mode;
+    }
+
+    @Override
+    public Object getValue(String key)
+    {
+      if (key.equals(NAME)) {
+        return theMode.toString();
+      } else if (key.equals(ACTION_COMMAND_KEY)) {
+        return theMode.name();
+      }
+
+      return super.getValue(key);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+      init(theMode);
+    }
+
+    @Override
+    public String toString()
+    {
+      return theMode.toString();
+    }
+    ToolMode theMode;
   }
 
   void initModeSelector(ToolMode startMode)
   {
-    modeSelector = new ModeSelector();
-    JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-    flowPanel.add(modeSelector);
-    getContentPane().add(flowPanel, java.awt.BorderLayout.NORTH);
-    modeSelector.modeCombo.setModel(new DefaultComboBoxModel(ToolMode.values()));
-    modeSelector.modeCombo.setSelectedItem(startMode);
-    modeSelector.modeCombo.addActionListener(this);
-
-//    modeSelector.checkFingerSearch.setSelected(seqTablePanel.columnModel.optFingerSearch);
-
-    modeSelector.checkFingerSearch.addActionListener(new ActionListener()
-    {
-
-      @Override
-      public void actionPerformed(ActionEvent e)
-      {
-        if (columnModel != null) {
-          columnModel.optFingerSearch = (modeSelector.checkFingerSearch.isSelected());
-          columnModel.recomputeSeqs();
-        }
+    ButtonGroup group = new ButtonGroup();
+    for (ToolMode mode : ToolMode.values()) {
+      JMenuItem item = new JRadioButtonMenuItem(new ModeAction(mode));
+      group.add(item);
+      if (mode == startMode) {
+        item.setSelected(true);
       }
-    });
+      menuMode.add(item);
+    }
+
+
+
+//    modeSelector = new ModeSelector();
+//    JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+//    flowPanel.add(modeSelector);
+//    getContentPane().add(flowPanel, java.awt.BorderLayout.NORTH);
+//    modeSelector.modeCombo.setModel(new DefaultComboBoxModel(ToolMode.values()));
+//    modeSelector.modeCombo.setSelectedItem(startMode);
+//    modeSelector.modeCombo.addActionListener(this);
+//
+////    modeSelector.checkFingerSearch.setSelected(seqTablePanel.columnModel.optFingerSearch);
+//
+//    modeSelector.checkFingerSearch.addActionListener(new ActionListener()
+//    {
+//
+//      @Override
+//      public void actionPerformed(ActionEvent e)
+//      {
+//        if (columnModel != null) {
+//          columnModel.optFingerSearch = (modeSelector.checkFingerSearch.isSelected());
+//          columnModel.recomputeSeqs();
+//        }
+//      }
+//    });
 
     //modeSelector.modeCombo.setSelectedItem(ToolMode.BUTTON_FOR_CHORD);
+  }
+
+  class TabAction extends AbstractAction
+  {
+
+    int theIndex;
+
+    public TabAction(int index)
+    {
+      theIndex = index;
+      this.putValue(NAME, toolTabs.getTitleAt(index));
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+      toolTabs.setSelectedIndex(theIndex);
+    }
+  }
+
+  private void initTabsMenu()
+  {
+    ButtonGroup group = new ButtonGroup();
+    for (int i = 0; i < toolTabs.getTabCount(); i++) {
+      JMenuItem item = new JRadioButtonMenuItem(
+              new TabAction(i));
+      group.add(item);
+      if (i == toolTabs.getSelectedIndex()) {
+        item.setSelected(true);
+      }
+      menuChords.add(item);
+    }
   }
 
   /** This method is called from within the constructor to
@@ -510,6 +601,17 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     tabOptions = new render.TabOptions();
     tabPitchDetect = new render.TabPitchDetect();
     renderBoardControl = new render.RenderBoardControl();
+    jMenuBar1 = new javax.swing.JMenuBar();
+    menuMode = new javax.swing.JMenu();
+    menuChords = new javax.swing.JMenu();
+    menuSound = new javax.swing.JMenu();
+    miSoundEnabled = new javax.swing.JCheckBoxMenuItem();
+    miArpeggiateChord = new javax.swing.JCheckBoxMenuItem();
+    menuPlayback = new javax.swing.JMenu();
+    miPlayStop = new javax.swing.JMenuItem();
+    miStop = new javax.swing.JMenuItem();
+    menuOptions = new javax.swing.JMenu();
+    miIncludeFingering = new javax.swing.JCheckBoxMenuItem();
 
     checkHiliteRedunds.setFont(new java.awt.Font("Tahoma", 1, 14));
     checkHiliteRedunds.setText("Press Redundant Buttons");
@@ -547,6 +649,45 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     boardSplitPane.setRightComponent(renderBoardControl);
 
     getContentPane().add(boardSplitPane, java.awt.BorderLayout.CENTER);
+
+    menuMode.setText("Mode");
+    jMenuBar1.add(menuMode);
+
+    menuChords.setText("Sequence");
+    jMenuBar1.add(menuChords);
+
+    menuSound.setText("Sound");
+
+    miSoundEnabled.setSelected(true);
+    miSoundEnabled.setText("Enable Sound");
+    menuSound.add(miSoundEnabled);
+
+    miArpeggiateChord.setSelected(true);
+    miArpeggiateChord.setText("Arpeggiate Chord");
+    menuSound.add(miArpeggiateChord);
+
+    jMenuBar1.add(menuSound);
+
+    menuPlayback.setText("Playback");
+
+    miPlayStop.setText("Play");
+    miPlayStop.setActionCommand("miPlay");
+    menuPlayback.add(miPlayStop);
+
+    miStop.setText("Stop");
+    menuPlayback.add(miStop);
+
+    jMenuBar1.add(menuPlayback);
+
+    menuOptions.setText("Options");
+
+    miIncludeFingering.setSelected(true);
+    miIncludeFingering.setText("Include Fingering");
+    menuOptions.add(miIncludeFingering);
+
+    jMenuBar1.add(menuOptions);
+
+    setJMenuBar(jMenuBar1);
   }// </editor-fold>//GEN-END:initComponents
 
   private void checkHiliteRedundsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkHiliteRedundsActionPerformed
@@ -558,6 +699,17 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private javax.swing.JSplitPane boardSplitPane;
   private javax.swing.JCheckBox checkHiliteRedunds;
   private javax.swing.JSplitPane controlSplitPane;
+  private javax.swing.JMenuBar jMenuBar1;
+  private javax.swing.JMenu menuChords;
+  private javax.swing.JMenu menuMode;
+  private javax.swing.JMenu menuOptions;
+  private javax.swing.JMenu menuPlayback;
+  private javax.swing.JMenu menuSound;
+  private javax.swing.JCheckBoxMenuItem miArpeggiateChord;
+  private javax.swing.JCheckBoxMenuItem miIncludeFingering;
+  private javax.swing.JMenuItem miPlayStop;
+  private javax.swing.JCheckBoxMenuItem miSoundEnabled;
+  private javax.swing.JMenuItem miStop;
   private render.RenderBoardControl renderBoardControl;
   private render.SeqPicker seqPicker;
   private render.SeqTablePanel seqTablePanel;

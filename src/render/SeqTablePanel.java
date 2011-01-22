@@ -21,7 +21,6 @@ import javax.swing.event.TableColumnModelEvent;
 import music.ButtonCombo;
 import music.ChordRegistry;
 import music.Note;
-import render.SeqTableEventAdapter;
 
 /**
  *
@@ -54,15 +53,17 @@ public class SeqTablePanel extends javax.swing.JPanel
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER, new JPanel());
   }
 
-  public void init(SeqColumnModel model, RenderBassBoard renderBoard)
+  public void init(SeqColumnModel model, 
+                   RenderBassBoard renderBoard,
+                   SoundController sound)
   {
     columnModel = model;
     seqTable.setSelectionModel(columnModel.getRowSelModel());
     seqViewer = new SeqViewerController(seqTable, columnModel, seqTableScrollPane, renderBoard);
     columnModel.addColumnModelListener(new ColumnChangeListener());
     columnModel.getRowSelModel().addListSelectionListener(new ColumnChangeListener());
+    this.sound = sound;
 
-    sound = new SoundController(true);
     anim = new SeqAnimController(renderBoard, columnModel, sound, 500, 100);
   }
 
