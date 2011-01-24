@@ -202,6 +202,24 @@ public class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
+  public void shrinkToFirst()
+  {
+    if (tableColumns.isEmpty()) {
+      addColumn(ParsedChordDef.newEmptyChordDef(), 0);
+      return;
+    }
+
+    while (tableColumns.size() > 1) {
+      tableColumns.remove(1);
+    }
+    syncModelToView(0, 0);
+  }
+
+  public void removeAllListeners()
+  {
+    //TODO:
+  }
+
   public void removeSelectedColumn()
   {
     if (getColumnCount() < 2) {

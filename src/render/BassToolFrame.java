@@ -19,14 +19,21 @@ import java.beans.PropertyChangeListener;
 import java.util.Vector;
 import javax.sound.sampled.AudioPermission;
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JRootPane;
+import javax.swing.JSeparator;
+import javax.swing.JSlider;
 import javax.swing.JSplitPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import music.BoardRegistry;
 import music.BoardRegistry.BoardDef;
 import music.ParsedChordDef;
+import render.SeqTablePanel.ChordSeqCmd;
 
 /**
  *
@@ -44,6 +51,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   SoundController sound;
   SeqAnimController anim;
   ToolPanel[] allTools;
+  JRootPane origRootPane;
 
   public static enum ToolMode
   {
@@ -79,29 +87,34 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     initComponents();
 
+    origRootPane = this.getRootPane();
+
     // Save initial full tab layout
     allTools = new ToolPanel[toolTabs.getTabCount()];
     for (int i = 0; i < allTools.length; i++) {
-      allTools[i] = (ToolPanel)toolTabs.getComponentAt(i);
+      allTools[i] = (ToolPanel) toolTabs.getComponentAt(i);
       allTools[i].setName(toolTabs.getTitleAt(i));
     }
 
     renderBassBoard = renderBoardControl.renderBassBoard;
-
-    initModeSelector(mode);
+    sound = new SoundController(false);
 
     init(mode);
 
+    initModeMenu(mode);
+
     initTabsMenu();
-//
-//    this.jMenuBar1.add(Box.createHorizontalStrut(100));
-//    this.jMenuBar1.add(new JCheckBox("Test"));
-//    this.jMenuBar1.add(new JSlider());
+
+    initOtherMenus();
   }
 
-  private void init(ToolMode mode)
+  public void restoreRootPane()
   {
+    this.setRootPane(origRootPane);
+  }
 
+  public void init(ToolMode mode)
+  {
     switch (mode) {
       case Default:
         initDefault();
@@ -128,9 +141,19 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     pack();
     //setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-    if (boardSplitPane.isVisible()) {
-      boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
+
+//    if (boardSplitPane.isVisible()) {
+//      boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
+//    }
+
+    for (int i = 0; i < menuMode.getItemCount(); i++) {
+      JMenuItem item = menuMode.getItem(i);
+      if (item.getActionCommand().equals(mode.name())) {
+        item.setSelected(true);
+      }
     }
+
+    System.gc();
   }
 
   private void initBoardOnly()
@@ -138,29 +161,38 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     columnModel = null;
     Vector<BoardDef> allowedBoards = BoardRegistry.mainRegistry().getStandardBoards();
 
-    sound = new SoundController(false);
     mouseListener = new BoardMouseListener(renderBassBoard, null, sound);
 
     RenderBoardHeader header = this.renderBoardControl.renderBoardHeader;
     header.initBoardHeader(renderBassBoard, renderBoardControl, null, allowedBoards);
     header.selectFirstBoardByBassCount(48);
 
-//    header.getExtPanel().add(checkSoundEnabled);
-//    header.getExtPanel().add(checkVertical);
-
     this.controlSplitPane.setVisible(false);
     this.boardSplitPane.setVisible(false);
     //this.boardSplitPane.setTopComponent(null);
-    this.getContentPane().add(this.renderBoardControl, BorderLayout.CENTER);
+    origRootPane.getContentPane().add(this.renderBoardControl, BorderLayout.CENTER);
+
+    // UI Hiding
+
+    this.menuTabs.setVisible(false);
+    this.menuChords.setVisible(false);
+
+    this.menuPlayback.setVisible(false);
+    this.menuSound.setVisible(true);
+    this.menuMode.setVisible(false);
+
+    this.menuOptions.setVisible(true);
+    this.menuOptions.removeAll();
+    this.menuOptions.add(this.miOptVertical);
   }
 
   private void initChordMatcher()
   {
-    if (columnModel == null) {
-      columnModel = new SeqColumnModel(renderBassBoard);
-    }
-
-    sound = new SoundController(false);
+    //if (columnModel == null) {
+    columnModel = new SeqColumnModel(renderBassBoard);
+    //} else {
+    //
+    //}
     //sound.setEnabled(checkSoundEnabled.isSelected());
 
     Vector<BoardDef> allowedBoards = BoardRegistry.mainRegistry().getStandardBoards();
@@ -176,12 +208,25 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     this.controlSplitPane.setVisible(false);
     this.setSplit(boardSplitPane, tabChordInfo, renderBoardControl);
 
-    this.getContentPane().add(boardSplitPane, BorderLayout.CENTER);
+    origRootPane.getContentPane().add(boardSplitPane, BorderLayout.CENTER);
 
     // Add Default Chord
-    if (columnModel.getColumnCount() == 0) {
-      columnModel.addColumn(ParsedChordDef.newEmptyChordDef(), 0);
-    }
+    columnModel.shrinkToFirst();
+
+    // UI Hiding
+    this.menuMode.setVisible(false);
+    this.menuTabs.setVisible(false);
+    this.menuChords.setVisible(false);
+
+    this.menuPlayback.setVisible(false);
+    this.menuSound.setVisible(true);
+
+    this.menuOptions.setVisible(true);
+    this.menuOptions.removeAll();
+    this.menuOptions.add(this.miOptRedunds);
+    this.menuOptions.add(new JSeparator());
+    this.menuOptions.add(this.miOptBoardFirst);
+    this.menuOptions.add(this.miOptVertical);
   }
 
   private void initSeqPicker()
@@ -190,7 +235,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       columnModel = new SeqColumnModel(renderBassBoard);
     }
 
-    sound = new SoundController(false);
     //sound.setEnabled(checkSoundEnabled.isSelected());
 
     Vector<BoardDef> allowedBoards = BoardRegistry.mainRegistry().getStandardBoards();
@@ -207,7 +251,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     this.controlSplitPane.setVisible(false);
     this.setSplit(boardSplitPane, seqPicker, renderBoardControl);
 
-    this.getContentPane().add(boardSplitPane, BorderLayout.CENTER);
+    origRootPane.getContentPane().add(boardSplitPane, BorderLayout.CENTER);
 
     // Add Default Chord
     if (columnModel.getColumnCount() == 0) {
@@ -220,15 +264,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     if (columnModel == null) {
       columnModel = new SeqColumnModel(renderBassBoard);
 
-      sound = new SoundController(false);
-
       seqTablePanel.init(columnModel, renderBassBoard, sound);
       seqTablePanel.buttonHideEditor.addActionListener(this);
       seqTablePanel.toggleSeqControls(false);
 
       mouseListener = new BoardMouseListener(renderBassBoard, columnModel, sound);
-
-      renderBoardControl.renderBoardHeader.getExtPanel().add(this.checkHiliteRedunds);
     }
 
     toolTabs.setVisible(false);
@@ -243,7 +283,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     this.setSplit(controlSplitPane, tabChordPicker, seqTablePanel);
     this.setSplit(boardSplitPane, controlSplitPane, renderBoardControl);
 
-    this.getContentPane().add(boardSplitPane, BorderLayout.CENTER);
+    origRootPane.getContentPane().add(boardSplitPane, BorderLayout.CENTER);
 
     // Set Board to default 120
     renderBoardControl.renderBoardHeader.selectFirstBoardByBassCount(120);
@@ -263,14 +303,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
       renderBoardControl.renderBoardHeader.initBoardHeader(renderBassBoard, renderBoardControl, columnModel, null);
 
-      sound = new SoundController(false);
-      sound.initSoundMenu(menuSound);
-
       seqTablePanel.init(columnModel, renderBassBoard, sound);
 
       mouseListener = new BoardMouseListener(renderBassBoard, columnModel, sound);
 
-      renderBoardControl.renderBoardHeader.getExtPanel().add(this.checkHiliteRedunds);
+      //renderBoardControl.renderBoardHeader.getExtPanel().add(this.checkHiliteRedunds);
 
       seqTablePanel.buttonHideEditor.addActionListener(this);
 
@@ -295,7 +332,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     this.setSplit(boardSplitPane, controlSplitPane, renderBoardControl);
 
     //this.getContentPane().removeAll();
-    this.getContentPane().add(boardSplitPane, BorderLayout.CENTER);
+    origRootPane.getContentPane().add(boardSplitPane, BorderLayout.CENTER);
 
     // Setup intiial state
 
@@ -393,14 +430,19 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
   public void toggleBoardPos()
   {
+    double weight = boardSplitPane.getResizeWeight();
     Component left = boardSplitPane.getLeftComponent();
     Component right = boardSplitPane.getRightComponent();
     boardSplitPane.setLeftComponent(null);
     boardSplitPane.setRightComponent(null);
     boardSplitPane.setLeftComponent(right);
     boardSplitPane.setRightComponent(left);
+    boardSplitPane.setResizeWeight(1.0 - weight);
 
     this.computeDividerLocation();
+    renderBoardControl.revalidate();
+
+    this.firePropertyChange("prefLayoutChange", null, origRootPane.getPreferredSize());
   }
 
   public void toggleOrientation()
@@ -415,33 +457,44 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       controlSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
     }
 
+    //boardSplitPane.setResizeWeight(1.0 - boardSplitPane.getResizeWeight());
+
     renderBoardControl.toggleOrientation(!isHoriz);
 
     this.computeDividerLocation();
+
+    renderBoardControl.revalidate();
+
+    this.firePropertyChange("prefLayoutChange", null, origRootPane.getPreferredSize());
   }
 
   public void toggleEditorLeft()
   {
     editorLeft = !editorLeft;
 
+    double weight = controlSplitPane.getResizeWeight();
     Component left = controlSplitPane.getLeftComponent();
     Component right = controlSplitPane.getRightComponent();
     controlSplitPane.setLeftComponent(null);
     controlSplitPane.setRightComponent(null);
     controlSplitPane.setLeftComponent(right);
     controlSplitPane.setRightComponent(left);
+    controlSplitPane.setResizeWeight(1.0 - weight);
 
     seqTablePanel.toggleLeftRight(editorLeft);
 
-    if (!editorLeft) {
-      controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
-    } else {
-      controlSplitPane.setDividerLocation(controlSplitPane.getMinimumDividerLocation());
-    }
+//    if (!editorLeft) {
+//      controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
+//    } else {
+//      controlSplitPane.setDividerLocation(controlSplitPane.getMinimumDividerLocation());
+//    }
   }
 
   private void computeDividerLocation()
   {
+    if (true)
+      return;
+    
     boolean isTopLeft = (boardSplitPane.getRightComponent() == controlSplitPane);
     boolean isHoriz = renderBassBoard.isHorizontal();
 
@@ -508,7 +561,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     ToolMode theMode;
   }
 
-  void initModeSelector(ToolMode startMode)
+  void initModeMenu(ToolMode startMode)
   {
     ButtonGroup group = new ButtonGroup();
     for (ToolMode mode : ToolMode.values()) {
@@ -519,33 +572,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       }
       menuMode.add(item);
     }
-
-
-
-//    modeSelector = new ModeSelector();
-//    JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-//    flowPanel.add(modeSelector);
-//    getContentPane().add(flowPanel, java.awt.BorderLayout.NORTH);
-//    modeSelector.modeCombo.setModel(new DefaultComboBoxModel(ToolMode.values()));
-//    modeSelector.modeCombo.setSelectedItem(startMode);
-//    modeSelector.modeCombo.addActionListener(this);
-//
-////    modeSelector.checkFingerSearch.setSelected(seqTablePanel.columnModel.optFingerSearch);
-//
-//    modeSelector.checkFingerSearch.addActionListener(new ActionListener()
-//    {
-//
-//      @Override
-//      public void actionPerformed(ActionEvent e)
-//      {
-//        if (columnModel != null) {
-//          columnModel.optFingerSearch = (modeSelector.checkFingerSearch.isSelected());
-//          columnModel.recomputeSeqs();
-//        }
-//      }
-//    });
-
-    //modeSelector.modeCombo.setSelectedItem(ToolMode.BUTTON_FOR_CHORD);
   }
 
   class TabAction extends AbstractAction
@@ -569,15 +595,58 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private void initTabsMenu()
   {
     ButtonGroup group = new ButtonGroup();
+
     for (int i = 0; i < toolTabs.getTabCount(); i++) {
-      JMenuItem item = new JRadioButtonMenuItem(
-              new TabAction(i));
+      JMenuItem item = new JRadioButtonMenuItem(new TabAction(i));
       group.add(item);
       if (i == toolTabs.getSelectedIndex()) {
         item.setSelected(true);
       }
-      menuChords.add(item);
+      menuTabs.add(item);
     }
+  }
+
+  class SoundToggle extends AbstractAction implements ChangeListener
+  {
+
+    JSlider volumeSlider;
+    boolean isArpeggiate;
+
+    SoundToggle(JSlider slider, boolean arpegg, String name)
+    {
+      volumeSlider = slider;
+      isArpeggiate = arpegg;
+      this.putValue(AbstractAction.NAME, name);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+      AbstractButton button = (AbstractButton) e.getSource();
+      if (!isArpeggiate) {
+        sound.setEnabled(button.isSelected());
+      } else {
+        sound.setArpeggiating(button.isSelected());
+      }
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e)
+    {
+      sound.setVolume(volumeSlider.getValue());
+    }
+  }
+
+  void initOtherMenus()
+  {
+    menuSound.removeAll();
+    SoundCtrlPanel soundCtrl = new SoundCtrlPanel();
+    soundCtrl.init(sound);
+    menuSound.add(soundCtrl);
+
+    ChordSeqCmd.populateButtons(columnModel, JMenuItem.class, menuChords, 0);
+
+    this.menuPlayback.add(seqTablePanel.actionPlay);
   }
 
   /** This method is called from within the constructor to
@@ -589,7 +658,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    checkHiliteRedunds = new javax.swing.JCheckBox();
     boardSplitPane = new javax.swing.JSplitPane();
     controlSplitPane = new javax.swing.JSplitPane();
     seqTablePanel = new render.SeqTablePanel();
@@ -605,27 +673,19 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     menuMode = new javax.swing.JMenu();
     menuChords = new javax.swing.JMenu();
     menuSound = new javax.swing.JMenu();
-    miSoundEnabled = new javax.swing.JCheckBoxMenuItem();
-    miArpeggiateChord = new javax.swing.JCheckBoxMenuItem();
     menuPlayback = new javax.swing.JMenu();
-    miPlayStop = new javax.swing.JMenuItem();
-    miStop = new javax.swing.JMenuItem();
     menuOptions = new javax.swing.JMenu();
-    miIncludeFingering = new javax.swing.JCheckBoxMenuItem();
+    miOptFingers = new javax.swing.JCheckBoxMenuItem();
+    miOptRedunds = new javax.swing.JCheckBoxMenuItem();
+    jSeparator1 = new javax.swing.JPopupMenu.Separator();
+    miOptVertical = new javax.swing.JCheckBoxMenuItem();
+    miOptBoardFirst = new javax.swing.JCheckBoxMenuItem();
+    jSeparator2 = new javax.swing.JPopupMenu.Separator();
+    miOptGoAll = new javax.swing.JMenuItem();
+    menuTabs = new javax.swing.JMenu();
 
-    checkHiliteRedunds.setFont(new java.awt.Font("Tahoma", 1, 14));
-    checkHiliteRedunds.setText("Press Redundant Buttons");
-    checkHiliteRedunds.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    checkHiliteRedunds.setMargin(new java.awt.Insets(2, 2, 2, 20));
-    checkHiliteRedunds.setOpaque(false);
-    checkHiliteRedunds.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        checkHiliteRedundsActionPerformed(evt);
-      }
-    });
-
-    setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-    setTitle("Accordion Bass Tool v0.8");
+    setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+    setTitle("Accordion Bass Tool v0.9");
 
     boardSplitPane.setDividerSize(16);
     boardSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -653,63 +713,100 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     menuMode.setText("Mode");
     jMenuBar1.add(menuMode);
 
-    menuChords.setText("Sequence");
+    menuChords.setText("Chords");
     jMenuBar1.add(menuChords);
 
     menuSound.setText("Sound");
-
-    miSoundEnabled.setSelected(true);
-    miSoundEnabled.setText("Enable Sound");
-    menuSound.add(miSoundEnabled);
-
-    miArpeggiateChord.setSelected(true);
-    miArpeggiateChord.setText("Arpeggiate Chord");
-    menuSound.add(miArpeggiateChord);
-
     jMenuBar1.add(menuSound);
 
     menuPlayback.setText("Playback");
-
-    miPlayStop.setText("Play");
-    miPlayStop.setActionCommand("miPlay");
-    menuPlayback.add(miPlayStop);
-
-    miStop.setText("Stop");
-    menuPlayback.add(miStop);
-
     jMenuBar1.add(menuPlayback);
 
     menuOptions.setText("Options");
 
-    miIncludeFingering.setSelected(true);
-    miIncludeFingering.setText("Include Fingering");
-    menuOptions.add(miIncludeFingering);
+    miOptFingers.setText("Include Fingering");
+    menuOptions.add(miOptFingers);
+
+    miOptRedunds.setText("Press Redundant Buttons");
+    miOptRedunds.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        miOptRedundsActionPerformed(evt);
+      }
+    });
+    menuOptions.add(miOptRedunds);
+    menuOptions.add(jSeparator1);
+
+    miOptVertical.setText("Board Vertical");
+    miOptVertical.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        miOptVerticalActionPerformed(evt);
+      }
+    });
+    menuOptions.add(miOptVertical);
+
+    miOptBoardFirst.setText("Board Top/Left");
+    miOptBoardFirst.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        miOptBoardFirstActionPerformed(evt);
+      }
+    });
+    menuOptions.add(miOptBoardFirst);
+    menuOptions.add(jSeparator2);
+
+    miOptGoAll.setText("Go to All Options");
+    miOptGoAll.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        miOptGoAllActionPerformed(evt);
+      }
+    });
+    menuOptions.add(miOptGoAll);
 
     jMenuBar1.add(menuOptions);
+
+    menuTabs.setText("Tabs");
+    jMenuBar1.add(menuTabs);
 
     setJMenuBar(jMenuBar1);
   }// </editor-fold>//GEN-END:initComponents
 
-  private void checkHiliteRedundsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkHiliteRedundsActionPerformed
-  {//GEN-HEADEREND:event_checkHiliteRedundsActionPerformed
-    renderBassBoard.getSelectedButtonCombo().showRedunds = checkHiliteRedunds.isSelected();
+  private void miOptRedundsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_miOptRedundsActionPerformed
+  {//GEN-HEADEREND:event_miOptRedundsActionPerformed
+    renderBassBoard.getSelectedButtonCombo().showRedunds = miOptRedunds.isSelected();
     renderBassBoard.repaint();
-}//GEN-LAST:event_checkHiliteRedundsActionPerformed
+  }//GEN-LAST:event_miOptRedundsActionPerformed
+
+  private void miOptGoAllActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_miOptGoAllActionPerformed
+  {//GEN-HEADEREND:event_miOptGoAllActionPerformed
+    toolTabs.setSelectedComponent(tabOptions);
+  }//GEN-LAST:event_miOptGoAllActionPerformed
+
+  private void miOptVerticalActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_miOptVerticalActionPerformed
+  {//GEN-HEADEREND:event_miOptVerticalActionPerformed
+    this.toggleOrientation();
+  }//GEN-LAST:event_miOptVerticalActionPerformed
+
+  private void miOptBoardFirstActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_miOptBoardFirstActionPerformed
+  {//GEN-HEADEREND:event_miOptBoardFirstActionPerformed
+    this.toggleBoardPos();
+  }//GEN-LAST:event_miOptBoardFirstActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JSplitPane boardSplitPane;
-  private javax.swing.JCheckBox checkHiliteRedunds;
   private javax.swing.JSplitPane controlSplitPane;
   private javax.swing.JMenuBar jMenuBar1;
+  private javax.swing.JPopupMenu.Separator jSeparator1;
+  private javax.swing.JPopupMenu.Separator jSeparator2;
   private javax.swing.JMenu menuChords;
   private javax.swing.JMenu menuMode;
   private javax.swing.JMenu menuOptions;
   private javax.swing.JMenu menuPlayback;
   private javax.swing.JMenu menuSound;
-  private javax.swing.JCheckBoxMenuItem miArpeggiateChord;
-  private javax.swing.JCheckBoxMenuItem miIncludeFingering;
-  private javax.swing.JMenuItem miPlayStop;
-  private javax.swing.JCheckBoxMenuItem miSoundEnabled;
-  private javax.swing.JMenuItem miStop;
+  private javax.swing.JMenu menuTabs;
+  private javax.swing.JCheckBoxMenuItem miOptBoardFirst;
+  private javax.swing.JCheckBoxMenuItem miOptFingers;
+  private javax.swing.JMenuItem miOptGoAll;
+  private javax.swing.JCheckBoxMenuItem miOptRedunds;
+  private javax.swing.JCheckBoxMenuItem miOptVertical;
   private render.RenderBoardControl renderBoardControl;
   private render.SeqPicker seqPicker;
   private render.SeqTablePanel seqTablePanel;

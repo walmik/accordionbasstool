@@ -66,16 +66,16 @@
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="sidebar" min="-2" max="-2" attributes="0"/>
+                      <Component id="sidebar" min="-2" pref="139" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="seqTableScrollPane" pref="387" max="32767" attributes="0"/>
+                      <Component id="seqTableScrollPane" pref="405" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="statusText" pref="532" max="32767" attributes="0"/>
+                      <Component id="statusText" pref="540" max="32767" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -83,8 +83,8 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="seqTableScrollPane" min="0" pref="0" max="32767" attributes="1"/>
-                  <Component id="sidebar" alignment="1" min="-2" max="-2" attributes="1"/>
+                  <Component id="seqTableScrollPane" min="0" pref="0" max="32767" attributes="2"/>
+                  <Component id="sidebar" alignment="1" max="32767" attributes="1"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="statusText" min="-2" pref="38" max="-2" attributes="0"/>
@@ -121,49 +121,19 @@
               <Group type="102" attributes="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="buttonHideEditor" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="checkSound" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
-                                  <Component id="volumeSlider" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
-                                  <Component id="checkArpegg" alignment="0" max="32767" attributes="1"/>
-                              </Group>
-                          </Group>
-                      </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="toolAddChord" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="toolInsert" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="toolRemove" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="toolResetAll" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
+                      <Component id="chordButtons" alignment="0" pref="135" max="32767" attributes="2"/>
                   </Group>
-                  <EmptySpace pref="24" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <Component id="buttonHideEditor" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
-                  <Component id="checkSound" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="volumeSlider" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="checkArpegg" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="toolAddChord" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="toolInsert" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="toolRemove" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="toolResetAll" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace min="-2" pref="102" max="-2" attributes="0"/>
+                  <Component id="chordButtons" min="-2" pref="158" max="-2" attributes="0"/>
+                  <EmptySpace pref="43" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -182,77 +152,14 @@
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
           </AuxValues>
         </Component>
-        <Component class="javax.swing.JButton" name="toolAddChord">
-          <Properties>
-            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="chordTableAction" type="code"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Add Chord"/>
-            <Property name="actionCommand" type="java.lang.String" value="AddChord"/>
-            <Property name="focusable" type="boolean" value="false"/>
-            <Property name="horizontalTextPosition" type="int" value="0"/>
-            <Property name="verticalTextPosition" type="int" value="3"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JButton" name="toolInsert">
-          <Properties>
-            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="chordTableAction" type="code"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Insert Chord"/>
-            <Property name="actionCommand" type="java.lang.String" value="InsertChord"/>
-            <Property name="focusable" type="boolean" value="false"/>
-            <Property name="horizontalTextPosition" type="int" value="0"/>
-            <Property name="verticalTextPosition" type="int" value="3"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JButton" name="toolRemove">
-          <Properties>
-            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="chordTableAction" type="code"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Remove Chord"/>
-            <Property name="actionCommand" type="java.lang.String" value="RemoveChord"/>
-            <Property name="focusable" type="boolean" value="false"/>
-            <Property name="horizontalTextPosition" type="int" value="0"/>
-            <Property name="verticalTextPosition" type="int" value="3"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="checkSound">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Sound Enabled"/>
-          </Properties>
-          <Events>
-            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="checkSoundItemStateChanged"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JSlider" name="volumeSlider">
-          <Properties>
-            <Property name="maximum" type="int" value="255"/>
-            <Property name="snapToTicks" type="boolean" value="true"/>
-            <Property name="toolTipText" type="java.lang.String" value="Sound Volume"/>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
-          <Events>
-            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="volumeSliderStateChanged"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="checkArpegg">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Arpeggiate Chords"/>
-            <Property name="actionCommand" type="java.lang.String" value="Arepggiate Chords"/>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkArpeggActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JButton" name="toolResetAll">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Clear All Chords"/>
-            <Property name="actionCommand" type="java.lang.String" value="ResetAll"/>
-          </Properties>
-        </Component>
+        <Container class="javax.swing.JPanel" name="chordButtons">
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+            <Property name="columns" type="int" value="1"/>
+            <Property name="rows" type="int" value="5"/>
+            <Property name="verticalGap" type="int" value="8"/>
+          </Layout>
+        </Container>
       </SubComponents>
     </Container>
     <Component class="javax.swing.JLabel" name="statusText">

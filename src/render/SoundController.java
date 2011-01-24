@@ -4,9 +4,6 @@
  */
 package render;
 
-import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import javax.swing.JMenu;
 import music.ButtonCombo;
 import music.Chord;
 import music.midi.Player;
@@ -38,34 +35,6 @@ public class SoundController
     if (player != null) {
       player.stopAll();
     }
-  }
-
-  class SoundAction extends AbstractAction
-  {
-    
-    String name;
-
-    public SoundAction(String name)
-    {
-      this.name = name;
-      this.putValue(NAME, name);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e)
-    {
-    }
-  }
-
-  public void initSoundMenu(JMenu menu)
-  {
-    MenuSlider slider = new MenuSlider();
-    slider.setMaximum(10);
-
-    //JMenu insert = new JMenu("Sound Volume");
-    //insert.add(slider);
-
-    menu.add(slider);
   }
 
   public void setVolume(int value)

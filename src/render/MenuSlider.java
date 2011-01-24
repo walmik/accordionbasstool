@@ -13,9 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.MenuElement;
 import javax.swing.MenuSelectionManager;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 
 /**
  *
@@ -27,9 +24,25 @@ public class MenuSlider extends JSlider implements MenuElement
 
   public MenuSlider()
   {
-    setBorder(new CompoundBorder(
-              new TitledBorder("Volume"),
-              new EmptyBorder(6, 6, 6, 6)));
+    this.setToolTipText("Sound Volume");
+    this.setUI(new javax.swing.plaf.basic.BasicSliderUI(this));
+  }
+
+  public void init()
+  {
+    //setBorder(new CompoundBorder(
+    //          new TitledBorder("Volume"),
+    //          new EmptyBorder(6, 6, 6, 6)));
+
+//  this.setUI(new javax.swing.plaf.basic.BasicSliderUI(this));
+//  this.setPreferredSize(new Dimension(100, 20));
+
+//    Dimension d = this.getUI().getPreferredSize(this);
+//    d.width = 60;
+//    Insets i = this.getInsets();
+//    d.width += i.left + i.right;
+//    d.height += i.top + i.bottom;
+//    this.setPreferredSize(d);
   }
   
   @Override

@@ -116,6 +116,7 @@ public class Main
 
     JFrame frame = new BassToolFrame();
     frame.setVisible(true);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 //    initApplet(new AccordionBoardViewer());
 //    initApplet(new ClickChordMatcher());

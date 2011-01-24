@@ -171,14 +171,13 @@ public class TabChordInfo extends ToolPanel
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addComponent(clickedLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE)
       .addGroup(layout.createSequentialGroup()
         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addComponent(checkShowUnknownChords)
-          .addComponent(checkIgnoreInversion))
-        .addGap(63, 63, 63))
-      .addComponent(clickedLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE)
+          .addComponent(checkIgnoreInversion)))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

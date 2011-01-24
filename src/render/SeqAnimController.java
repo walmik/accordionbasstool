@@ -61,6 +61,12 @@ public class SeqAnimController implements ActionListener
     }
   }
 
+  public void stop()
+  {
+    if (playTimer.isRunning())
+      toggleRun();
+  }
+
   @Override
   public void actionPerformed(ActionEvent e)
   {

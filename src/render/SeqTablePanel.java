@@ -11,10 +11,16 @@
 package render;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.TableColumnModelEvent;
@@ -28,12 +34,12 @@ import music.Note;
  */
 public class SeqTablePanel extends javax.swing.JPanel
 {
-  private SeqColumnModel columnModel;
-  private ChordTableAction chordTableAction;
 
-  private SeqViewerController seqViewer;
-  SoundController sound;
+  private SeqColumnModel columnModel;
+  private SoundController sound;
   private SeqAnimController anim;
+  ChordSeqCmd.Action actionRemove;
+  PlayStopAction actionPlay;
 
   /** Creates new form SeqTablePanel */
   public SeqTablePanel()
@@ -42,29 +48,32 @@ public class SeqTablePanel extends javax.swing.JPanel
 
     ChordRegistry.mainRegistry();
 
-    chordTableAction = new ChordTableAction();
-    toolAddChord.addActionListener(chordTableAction);
-    toolInsert.addActionListener(chordTableAction);
-    toolRemove.addActionListener(chordTableAction);
-    toolPlay.addActionListener(chordTableAction);
-    toolResetAll.addActionListener(chordTableAction);
-
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, controlPanel);
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER, new JPanel());
   }
 
-  public void init(SeqColumnModel model, 
-                   RenderBassBoard renderBoard,
-                   SoundController sound)
+  public void init(SeqColumnModel model,
+          RenderBassBoard renderBoard,
+          SoundController sound)
   {
     columnModel = model;
     seqTable.setSelectionModel(columnModel.getRowSelModel());
-    seqViewer = new SeqViewerController(seqTable, columnModel, seqTableScrollPane, renderBoard);
+    SeqViewerController seqViewer = new SeqViewerController(seqTable, columnModel, seqTableScrollPane, renderBoard);
     columnModel.addColumnModelListener(new ColumnChangeListener());
     columnModel.getRowSelModel().addListSelectionListener(new ColumnChangeListener());
     this.sound = sound;
 
+    //this.soundCtrlPanel1.init(sound);
+
+    chordButtons.setLayout(new BoxLayout(chordButtons, BoxLayout.Y_AXIS));
+    ChordSeqCmd.populateButtons(columnModel, JButton.class, chordButtons, 8);
+
+    actionRemove = ChordSeqCmd.RemoveChord.action;
+
     anim = new SeqAnimController(renderBoard, columnModel, sound, 500, 100);
+
+    actionPlay = new PlayStopAction();
+    toolPlay.setAction(actionPlay);
   }
 
   void toggleLeftRight(boolean left)
@@ -73,13 +82,6 @@ public class SeqTablePanel extends javax.swing.JPanel
     this.add(left ? BorderLayout.WEST : BorderLayout.EAST, sidebar);
     this.add(BorderLayout.CENTER, this.seqTableScrollPane);
     this.add(BorderLayout.SOUTH, this.statusText);
-  }
-
-  public void setSoundEnabled(boolean soundEnabled)
-  {
-    sound.setEnabled(soundEnabled);
-    volumeSlider.setEnabled(soundEnabled);
-    checkArpegg.setEnabled(soundEnabled);
   }
 
 
@@ -91,6 +93,14 @@ public class SeqTablePanel extends javax.swing.JPanel
     {
       int colCount = columnModel.getColumnCount();
 
+      if (toolPlay != null) {
+        toolPlay.setVisible(colCount > 1);
+      }
+      actionPlay.setEnabled(colCount > 1);
+      if (colCount <= 1) {
+        anim.stop();
+      }
+
       boolean autoResize = (colCount <= 4);
 
       if (!autoResize) {
@@ -99,16 +109,12 @@ public class SeqTablePanel extends javax.swing.JPanel
         seqTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
       }
 
-      toolRemove.setEnabled(colCount > 1);
+      actionRemove.setEnabled(colCount > 1);
     }
 
     @Override
     public void selectionChanged(int index)
     {
-      if (toolPlay != null) {
-        toolPlay.setVisible(columnModel.getColumnCount() > 1);
-      }
-
       ButtonCombo combo = columnModel.getSelectedButtonCombo();
 
       String text = "<html>";
@@ -138,11 +144,7 @@ public class SeqTablePanel extends javax.swing.JPanel
   void toggleSeqControls(boolean allowed)
   {
     sidebar.setVisible(allowed);
-    toolAddChord.setVisible(allowed);
-    toolInsert.setVisible(allowed);
-    toolRemove.setVisible(allowed);
-    toolResetAll.setVisible(allowed);
-    //transposePanel1.setVisible(allowed);
+
     statusText.setVisible(allowed);
 
     if (!allowed && (columnModel.getColumnCount() > 1)) {
@@ -156,34 +158,115 @@ public class SeqTablePanel extends javax.swing.JPanel
     }
   }
 
-  class ChordTableAction extends AbstractAction
+  enum ChordSeqCmd
   {
+
+    AddChord("Add Chord"),
+    InsertChord("Insert Chord"),
+    RemoveChord("Remove Chord"),
+    Sep1(""),
+    ResetAll("Clear All Chords");
+
+    ChordSeqCmd(String text)
+    {
+      action = new Action(text);
+    }
+    final Action action;
+
+    class Action extends AbstractAction
+    {
+
+      SeqColumnModel columnModel;
+      String name;
+
+      Action(String text)
+      {
+        name = text;
+        this.putValue(NAME, text);
+      }
+
+      @Override
+      public void actionPerformed(ActionEvent e)
+      {
+        if (columnModel == null) {
+          return;
+        }
+
+        switch (ChordSeqCmd.this) {
+          case AddChord:
+            columnModel.addColumn(columnModel.getColumnCount());
+            break;
+
+          case InsertChord:
+            int index = columnModel.getSelectedColumn();
+            if (index >= 0) {
+              columnModel.addColumn(index);
+            }
+            break;
+
+          case RemoveChord:
+            columnModel.removeSelectedColumn();
+            break;
+
+          case ResetAll:
+            columnModel.resetColumns(true);
+            break;
+        }
+      }
+    }
+
+    public static <C extends AbstractButton> void populateButtons(
+            SeqColumnModel model,
+            Class<C> uiclass,
+            JComponent panel,
+            int space)
+    {
+      for (ChordSeqCmd type : values()) {
+        Component comp;
+
+        if (type.action.name.isEmpty()) {
+          comp = new JSeparator();
+        } else {
+          try {
+            AbstractButton button = uiclass.newInstance();
+            button.setAction(type.action);
+            type.action.columnModel = model;
+            comp = button;
+          } catch (Exception inst) {
+            comp = new JSeparator();
+          }
+        }
+
+        panel.add(comp);
+        //comps[type.ordinal()] = comp;
+
+        if (space > 0) {
+          panel.add(Box.createVerticalStrut(space));
+        }
+      }
+    }
+  };
+
+  class PlayStopAction extends AbstractAction
+  {
+    @Override
+    public Object getValue(String key)
+    {
+      if (key.equals(NAME)) {
+        return anim.isRunning() ? "Stop" : "Play";
+      }
+
+      return super.getValue(key);
+    }
 
     @Override
     public void actionPerformed(ActionEvent e)
     {
-      if (e.getActionCommand().equals("AddChord")) {
-        columnModel.addColumn(columnModel.getColumnCount());
-
-      } else if (e.getActionCommand().equals("InsertChord")) {
-        int index = columnModel.getSelectedColumn();
-        if (index >= 0) {
-          columnModel.addColumn(index);
-        }
-
-      } else if (e.getActionCommand().equals("RemoveChord")) {
-        columnModel.removeSelectedColumn();
-      } else if (e.getActionCommand().equals("ResetAll")) {
-        columnModel.resetColumns(true);
-      } else if (e.getActionCommand().equals("PlaySeq")) {
-        if (anim.toggleRun()) {
-          toolPlay.setText("Stop");
-        } else {
-          toolPlay.setText("Play");
-        }
-      }
+      anim.toggleRun();
+      this.firePropertyChange(NAME, null, getValue(NAME));
     }
   }
+
 
   /** This method is called from within the constructor to
    * initialize the form.
@@ -201,13 +284,7 @@ public class SeqTablePanel extends javax.swing.JPanel
     seqTable = new javax.swing.JTable();
     sidebar = new javax.swing.JPanel();
     buttonHideEditor = new javax.swing.JButton();
-    toolAddChord = new javax.swing.JButton();
-    toolInsert = new javax.swing.JButton();
-    toolRemove = new javax.swing.JButton();
-    checkSound = new javax.swing.JCheckBox();
-    volumeSlider = new javax.swing.JSlider();
-    checkArpegg = new javax.swing.JCheckBox();
-    toolResetAll = new javax.swing.JButton();
+    chordButtons = new javax.swing.JPanel();
     statusText = new javax.swing.JLabel();
 
     toolPlay.setText("Play");
@@ -253,55 +330,7 @@ public class SeqTablePanel extends javax.swing.JPanel
     buttonHideEditor.setFont(buttonHideEditor.getFont().deriveFont(buttonHideEditor.getFont().getStyle() | java.awt.Font.BOLD));
     buttonHideEditor.setText("Hide Editor >>");
 
-    toolAddChord.setAction(chordTableAction);
-    toolAddChord.setText("Add Chord");
-    toolAddChord.setActionCommand("AddChord");
-    toolAddChord.setFocusable(false);
-    toolAddChord.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    toolAddChord.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-
-    toolInsert.setAction(chordTableAction);
-    toolInsert.setText("Insert Chord");
-    toolInsert.setActionCommand("InsertChord");
-    toolInsert.setFocusable(false);
-    toolInsert.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    toolInsert.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-
-    toolRemove.setAction(chordTableAction);
-    toolRemove.setText("Remove Chord");
-    toolRemove.setActionCommand("RemoveChord");
-    toolRemove.setFocusable(false);
-    toolRemove.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    toolRemove.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-
-    checkSound.setText("Sound Enabled");
-    checkSound.addItemListener(new java.awt.event.ItemListener() {
-      public void itemStateChanged(java.awt.event.ItemEvent evt) {
-        checkSoundItemStateChanged(evt);
-      }
-    });
-
-    volumeSlider.setMaximum(255);
-    volumeSlider.setSnapToTicks(true);
-    volumeSlider.setToolTipText("Sound Volume");
-    volumeSlider.setEnabled(false);
-    volumeSlider.addChangeListener(new javax.swing.event.ChangeListener() {
-      public void stateChanged(javax.swing.event.ChangeEvent evt) {
-        volumeSliderStateChanged(evt);
-      }
-    });
-
-    checkArpegg.setText("Arpeggiate Chords");
-    checkArpegg.setActionCommand("Arepggiate Chords");
-    checkArpegg.setEnabled(false);
-    checkArpegg.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        checkArpeggActionPerformed(evt);
-      }
-    });
-
-    toolResetAll.setText("Clear All Chords");
-    toolResetAll.setActionCommand("ResetAll");
+    chordButtons.setLayout(new java.awt.GridLayout(5, 1, 0, 8));
 
     javax.swing.GroupLayout sidebarLayout = new javax.swing.GroupLayout(sidebar);
     sidebar.setLayout(sidebarLayout);
@@ -310,41 +339,16 @@ public class SeqTablePanel extends javax.swing.JPanel
       .addGroup(sidebarLayout.createSequentialGroup()
         .addGroup(sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addComponent(buttonHideEditor)
-          .addGroup(sidebarLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(checkSound)
-              .addGroup(sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                .addComponent(volumeSlider, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-                .addComponent(checkArpegg, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-          .addGroup(sidebarLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(toolAddChord)
-              .addComponent(toolInsert)
-              .addComponent(toolRemove)
-              .addComponent(toolResetAll))))
-        .addContainerGap(24, Short.MAX_VALUE))
+          .addComponent(chordButtons, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE))
+        .addGap(4, 4, 4))
     );
     sidebarLayout.setVerticalGroup(
       sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(sidebarLayout.createSequentialGroup()
         .addComponent(buttonHideEditor)
-        .addGap(24, 24, 24)
-        .addComponent(checkSound)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(volumeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(checkArpegg)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(toolAddChord)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(toolInsert)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(toolRemove)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(toolResetAll)
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addGap(102, 102, 102)
+        .addComponent(chordButtons, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap(43, Short.MAX_VALUE))
     );
 
     statusText.setFont(new java.awt.Font("Tahoma", 0, 16));
@@ -358,12 +362,12 @@ public class SeqTablePanel extends javax.swing.JPanel
       .addGroup(layout.createSequentialGroup()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
-            .addComponent(sidebar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(sidebar, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE))
+            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE))
           .addGroup(layout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)))
+            .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -371,42 +375,21 @@ public class SeqTablePanel extends javax.swing.JPanel
       .addGroup(layout.createSequentialGroup()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
           .addComponent(seqTableScrollPane, 0, 0, Short.MAX_VALUE)
-          .addComponent(sidebar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addComponent(sidebar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(statusText, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
     );
   }// </editor-fold>//GEN-END:initComponents
 
-  private void checkSoundItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_checkSoundItemStateChanged
-  {//GEN-HEADEREND:event_checkSoundItemStateChanged
-    setSoundEnabled(evt.getStateChange() == ItemEvent.SELECTED);
-  }//GEN-LAST:event_checkSoundItemStateChanged
-
-  private void volumeSliderStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_volumeSliderStateChanged
-  {//GEN-HEADEREND:event_volumeSliderStateChanged
-    sound.setVolume(volumeSlider.getValue());
-  }//GEN-LAST:event_volumeSliderStateChanged
-
-  private void checkArpeggActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkArpeggActionPerformed
-  {//GEN-HEADEREND:event_checkArpeggActionPerformed
-    sound.setArpeggiating(checkArpegg.isSelected());
-  }//GEN-LAST:event_checkArpeggActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   javax.swing.JButton buttonHideEditor;
-  private javax.swing.JCheckBox checkArpegg;
-  private javax.swing.JCheckBox checkSound;
+  private javax.swing.JPanel chordButtons;
   private javax.swing.JPanel controlPanel;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JTable seqTable;
   private javax.swing.JScrollPane seqTableScrollPane;
   private javax.swing.JPanel sidebar;
   private javax.swing.JLabel statusText;
-  private javax.swing.JButton toolAddChord;
-  private javax.swing.JButton toolInsert;
   private javax.swing.JButton toolPlay;
-  private javax.swing.JButton toolRemove;
-  private javax.swing.JButton toolResetAll;
-  private javax.swing.JSlider volumeSlider;
   // End of variables declaration//GEN-END:variables
 }
