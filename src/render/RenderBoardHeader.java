@@ -19,7 +19,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -29,7 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import music.BassBoard;
 import music.BoardRegistry;
-import music.BoardRegistry.BoardDef;
 
 /**
  *
@@ -46,24 +44,35 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   public RenderBoardHeader()
   {
     initComponents();
-  }
-
-  public void initBoardHeader(RenderBassBoard renderBoard,
-          JScrollPane pane,
-          SeqColumnModel model,
-          Vector<BoardDef> boards)
-  {
-    this.renderBoard = renderBoard;
-    this.columnModel = model;
-    this.boardScrollPane = pane;
-
-    if (boards != null) {
-      boardCombo.setModel(new DefaultComboBoxModel(boards));
-    } else {
-      boardCombo.setModel(new DefaultComboBoxModel(BoardRegistry.mainRegistry().allBoardDefs));
-    }
 
     boardCombo.addActionListener(this);
+  }
+
+  public void init(
+          RenderBassBoard renderBoard,
+          JScrollPane pane)
+  {
+    this.renderBoard = renderBoard;
+    this.boardScrollPane = pane;
+  }
+
+  public void setBoardConfig(SeqColumnModel model, boolean useAllBoards, int defaultSize)
+  {
+    columnModel = model;
+    
+    DefaultComboBoxModel boardmodel;
+
+    if (!useAllBoards) {
+      boardmodel = new DefaultComboBoxModel(BoardRegistry.mainRegistry().getStandardBoards());
+    } else {
+      boardmodel = new DefaultComboBoxModel(BoardRegistry.mainRegistry().allBoardDefs);
+    }
+
+    boardCombo.setModel(boardmodel);
+
+    if (defaultSize > 0) {
+      selectFirstBoardByBassCount(defaultSize);
+    }
   }
 
   public boolean selectFirstBoardByBassCount(int bassCount)
@@ -76,12 +85,11 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
 
     return false;
   }
-  
+
   public JPanel getExtPanel()
   {
     return this.extPanel;
   }
-  
   Component hiddenBox;
 
   public void toggleOrientation(boolean isHoriz)
@@ -120,6 +128,7 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   {
     JPanel corner = new JPanel()
     {
+
       @Override
       public void paintComponent(Graphics g)
       {
@@ -233,7 +242,6 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     infoLabel.setToolTipText("<html>\nThe chord on the left/bottom of the bass side to<br/>\nThe chord on the right/top of the bass side.<br/>\nHigher basses have a wider ranger of chords.<br/>\n72-bass boards and up have chords for all 12 notes\n</html>");
     add(infoLabel);
   }// </editor-fold>//GEN-END:initComponents
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox boardCombo;
   private javax.swing.JPanel extPanel;

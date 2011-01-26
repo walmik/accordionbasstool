@@ -229,7 +229,9 @@ public class SeqTablePanel extends javax.swing.JPanel
         } else {
           try {
             AbstractButton button = uiclass.newInstance();
+            //button.putClientProperty("JComponent.sizeVariant", "mini");
             button.setAction(type.action);
+            //button.updateUI();
             type.action.columnModel = model;
             comp = button;
           } catch (Exception inst) {

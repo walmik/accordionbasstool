@@ -19,6 +19,7 @@ public class BoardMouseListener extends MouseAdapter
   private int clickIndex = -1;
   private Vector<BassBoard.Pos> clickButtons;
   private SoundController sound;
+  private boolean allowBlanks = false;
 
   public BoardMouseListener(RenderBassBoard renderB,
           SeqColumnModel model,
@@ -28,9 +29,15 @@ public class BoardMouseListener extends MouseAdapter
     columnModel = model;
     clickButtons = new Vector<BassBoard.Pos>();
     this.sound = sound;
-    assert(this.sound != null);
+    assert (this.sound != null);
 
     renderBoard.setMainMouseAdapter(this);
+  }
+
+  public void setColumnModel(SeqColumnModel model, boolean allow)
+  {
+    columnModel = model;
+    allowBlanks = allow;
   }
 
   private void updateFromClicked()
@@ -40,7 +47,9 @@ public class BoardMouseListener extends MouseAdapter
     }
 
     if (clickButtons.size() == 0) {
-      columnModel.editSelectedColumn(ParsedChordDef.newEmptyChordDef());
+      if (allowBlanks) {
+        columnModel.editSelectedColumn(ParsedChordDef.newEmptyChordDef());
+      }
       return;
     }
 

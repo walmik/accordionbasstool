@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import netscape.javascript.JSObject;
 import render.BassToolFrame;
-import render.BassToolFrame.ToolMode;
+import render.ToolMode;
 
 /**
  *
@@ -44,15 +44,12 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
   {
   }
 
-  private BassToolFrame.ToolMode getFrameParam()
+  private ToolMode getFrameParam()
   {
     String modeVal = this.getParameter("mode");
-    try {
-      return BassToolFrame.ToolMode.valueOf(modeVal);
-    } catch (Exception arg) {
-      return BassToolFrame.ToolMode.Default;
-    }
+    return ToolMode.findMode(modeVal);
   }
+  
   JPanel panel;
 
   @Override
@@ -63,7 +60,7 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     altRootPane = new JRootPane();
     //horizStrut = Box.createHorizontalStrut(80);
 
-    frame = new BassToolFrame(getFrameParam());
+    frame = new BassToolFrame(getFrameParam(), false);
 
     frame.addWindowListener(new WindowAdapter()
     {
@@ -105,6 +102,7 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
       //Dimension dim = this.getRootPane().getSize();
       //if (dim.width < 10 || dim.height < 10) {
       this.getRootPane().validate();
+
       Dimension dim = this.getRootPane().getPreferredSize();
       //}
 
@@ -113,12 +111,12 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
       }
 
       String evalStr = "resizeApplet(" + dim.width + ", " + dim.height + ");";
-      System.out.println(evalStr);
+      //System.out.println(evalStr);
       
       jsobj.eval(evalStr);
 
     } catch (Exception e) {
-      System.out.println(e);
+      System.err.println(e);
     }
   }
 
@@ -137,7 +135,7 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
   public boolean setMode(String string)
   {
     try {
-      ToolMode mode = ToolMode.valueOf(string);
+      ToolMode mode = ToolMode.findMode(string);
 
       frame.init(mode);
 
@@ -151,7 +149,7 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
       attemptResizeApplet();
 
       return true;
-    } catch (IllegalArgumentException arg) {
+    } catch (Exception arg) {
       return false;
     }
   }

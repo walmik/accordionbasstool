@@ -10,7 +10,12 @@
  */
 package render;
 
-import javax.swing.DefaultComboBoxModel;
+import java.awt.Component;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import javax.swing.MenuElement;
+import javax.swing.MenuSelectionManager;
+import javax.swing.SpinnerListModel;
 import music.Interval;
 import music.NamedInterval;
 
@@ -18,7 +23,7 @@ import music.NamedInterval;
  *
  * @author Ilya
  */
-public class TransposePanel extends javax.swing.JPanel
+public class TransposePanel extends javax.swing.JPanel implements MenuElement
 {
   
   SeqColumnModel columnModel;
@@ -29,8 +34,11 @@ public class TransposePanel extends javax.swing.JPanel
   {
     initComponents();
 
-    ivalCombo.setModel(new DefaultComboBoxModel(NamedInterval.values()));
-    ivalCombo.setSelectedItem(NamedInterval.P5);
+    //ivalCombo.setModel(new DefaultComboBoxModel(NamedInterval.values()));
+    //ivalCombo.setSelectedItem(NamedInterval.P5);
+    SpinnerListModel model = new SpinnerListModel(NamedInterval.values());
+    ivalSpinner.setModel(model);
+    model.setValue(NamedInterval.P5);
   }
   
   public void init(SeqColumnModel model)
@@ -40,9 +48,55 @@ public class TransposePanel extends javax.swing.JPanel
 
   public Interval getCurrInterval()
   {
-    NamedInterval entry = (NamedInterval)ivalCombo.getSelectedItem();
+    //NamedInterval entry = (NamedInterval)ivalCombo.getSelectedItem();
+    NamedInterval entry = (NamedInterval)ivalSpinner.getValue();
     return entry.interval;
   }
+
+  @Override
+  public Component getComponent()
+  {
+    return this;
+  }
+
+  @Override
+  public MenuElement[] getSubElements()
+  {
+    return new MenuElement[0];
+  }
+
+  @Override
+  public void menuSelectionChanged(boolean isIncluded)
+  {
+    
+  }
+
+  @Override
+  public void processKeyEvent(KeyEvent event, MenuElement[] path, MenuSelectionManager manager)
+  {
+    this.processKeyEvent(event);
+  }
+
+  @Override
+  public void processMouseEvent(MouseEvent event, MenuElement[] path, MenuSelectionManager manager)
+  {
+    if (event.getID() == MouseEvent.MOUSE_ENTERED) {
+      MenuElement[] newPath = new MenuElement[path.length + 1];
+      System.arraycopy(path, 0, newPath, 0, path.length);
+      newPath[path.length] = this;
+      manager.setSelectedPath(newPath);
+    }
+
+    if (event.getID() == MouseEvent.MOUSE_EXITED) {
+      MenuElement[] newPath = new MenuElement[path.length - 1];
+      System.arraycopy(path, 0, newPath, 0, path.length - 1);
+      manager.setSelectedPath(newPath);
+    }
+    
+    //this.processMouseMotionEvent(event);
+  }
+
+
 
   /** This method is called from within the constructor to
    * initialize the form.
@@ -54,14 +108,13 @@ public class TransposePanel extends javax.swing.JPanel
   private void initComponents() {
 
     jButton1 = new javax.swing.JButton();
-    ivalCombo = new javax.swing.JComboBox();
     downButton = new javax.swing.JButton();
     upButton = new javax.swing.JButton();
-    jLabel1 = new javax.swing.JLabel();
+    ivalSpinner = new javax.swing.JSpinner();
 
     jButton1.setText("jButton1");
 
-    ivalCombo.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+    setOpaque(false);
 
     downButton.setText("Down");
     downButton.setFocusable(false);
@@ -80,9 +133,6 @@ public class TransposePanel extends javax.swing.JPanel
       }
     });
 
-    jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getStyle() | java.awt.Font.BOLD));
-    jLabel1.setText("Transpose:");
-
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
@@ -90,25 +140,21 @@ public class TransposePanel extends javax.swing.JPanel
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(ivalCombo, javax.swing.GroupLayout.Alignment.CENTER, 0, 122, Short.MAX_VALUE)
-          .addComponent(jLabel1)
+          .addComponent(ivalSpinner, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
           .addGroup(layout.createSequentialGroup()
             .addComponent(downButton)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(upButton, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE)))
+            .addComponent(upButton, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)))
         .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addComponent(jLabel1)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(ivalCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(ivalSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addGap(7, 7, 7)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addComponent(downButton)
-          .addComponent(upButton))
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+          .addComponent(upButton)))
     );
   }// </editor-fold>//GEN-END:initComponents
 
@@ -124,9 +170,8 @@ public class TransposePanel extends javax.swing.JPanel
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton downButton;
-  private javax.swing.JComboBox ivalCombo;
+  private javax.swing.JSpinner ivalSpinner;
   private javax.swing.JButton jButton1;
-  private javax.swing.JLabel jLabel1;
   private javax.swing.JButton upButton;
   // End of variables declaration//GEN-END:variables
 }

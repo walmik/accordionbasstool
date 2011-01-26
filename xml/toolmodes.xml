@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <mode
+    id="BoardOnly"
+    title="Board View"
+    useModel="false"
+    useMouse="true"
+    useTable="false"
+    useAllBoards="false"
+    multiChord="false"
+    startBoardSize="48">
+  </mode>
+
+  <mode
+    id="ChordMatch"
+    title="Chord Matching"
+    useModel="true"
+    useMouse="true"
+    useTable="false"
+    useAllBoards="false"
+    useBlankChord="true"
+    multiChord="false"
+    startBoardSize="48">
+    <tab name="TabChordInfo"></tab>
+  </mode>
+
+  <mode
+    id="ChordPicker"
+    title="Chord Picker"
+    useModel="true"
+    useMouse="true"
+    useTable="true"
+    useAllBoards="false"
+    multiChord="false"
+    startBoardSize="48">
+    <tab name="TabChordPicker"></tab>
+  </mode>
+  
+  <mode
+    id="SeqPicker"
+    title="Sequence Picking"
+    useModel="true"
+    useMouse="true"
+    useTable="false"
+    useAllBoards="false"
+    multiChord="true"
+    startBoardSize="48">
+    <tab name="SeqPicker"></tab>
+  </mode>
+  
+  <mode
+    id="Default"
+    title="Full Tool"
+    useModel="true"
+    useMouse="true"
+    useTable="true"
+    useAllBoards="true"
+    multiChord="true"
+    startBoardSize="120">
+    <tab name="all"></tab>
+  </mode>
+
+</root>
+

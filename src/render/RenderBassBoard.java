@@ -37,6 +37,8 @@ public class RenderBassBoard extends JPanel
 
     _selCombo = new SelectedButtonCombo();
 
+    setBackground(new Color(240, 240, 240));
+
     buttonDrawer = RenderBoardUI.defaultUI.getButtonDrawer();
     textDrawer = RenderBoardUI.defaultUI.getTextDrawer();
 
@@ -48,13 +50,18 @@ public class RenderBassBoard extends JPanel
 
     int borderMargin = RenderBoardUI.defaultUI.buttonXMargin + borderWidth / 2;
     this._borderInsets = new Insets(borderMargin, borderMargin, borderMargin, borderMargin);
+
+    colRepainter = new RepaintListener();
+    rowRepainter = new RepaintListener();
   }
+
   Dimension margin = new Dimension();
   int borderWidth = 16;
   Dimension _contentDim = new Dimension(0, 0);
   Insets _borderInsets = null;
   BassBoard.Pos clickPos = null;
   MouseAdapter mainMouseAdapter = null;
+  RepaintListener colRepainter, rowRepainter;
 
   public void setMainMouseAdapter(MouseAdapter mouse)
   {
@@ -167,13 +174,26 @@ public class RenderBassBoard extends JPanel
 
   public void setSelListeners(SelectedButtonCombo newSel, ListSelectionModel rowSel)
   {
-    _selCombo = newSel;
+
     if (_selCombo != null) {
-      _selCombo.addListSelectionListener(new RepaintListener());
+      _selCombo.removeListSelectionListener(colRepainter);
     }
-    if (rowSel != null) {
-      rowSel.addListSelectionListener(new RepaintListener());
+
+    if (_rowSel != null) {
+      _rowSel.removeListSelectionListener(rowRepainter);
     }
+    
+    _selCombo = newSel;
+    _rowSel = rowSel;
+
+    if (_selCombo != null) {
+      _selCombo.addListSelectionListener(colRepainter);
+    }
+
+    if (_rowSel != null) {
+      _rowSel.addListSelectionListener(rowRepainter);
+    }
+
     repaint();
   }
 
@@ -633,7 +653,8 @@ public class RenderBassBoard extends JPanel
   double _slope = 0;
   int _cStart = 0;
 //	final Vector<DrawBass> drawers = new Vector<DrawBass>();
-  SelectedButtonCombo _selCombo;
+  SelectedButtonCombo _selCombo = null;
+  ListSelectionModel _rowSel = null;
   RenderBoardUI.ButtonDrawer buttonDrawer;
   RenderBoardUI.TextDrawer textDrawer;
 }

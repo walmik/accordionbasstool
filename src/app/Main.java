@@ -1,6 +1,7 @@
 package app;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import music.StringParser;
 import java.net.URL;
 import javax.swing.JApplet;
@@ -16,11 +17,11 @@ import render.BassToolFrame;
 
 public class Main
 {
+
   /**
    * @param args
    */
   //public static JFrame _rootFrame;
-
   private static Document tryDoc(DocumentBuilderFactory dbf, String string)
   {
     try {
@@ -63,7 +64,7 @@ public class Main
     if (UIManager.getLookAndFeel().getName().contains(lookandfeel)) {
       return true;
     }
-    
+
     try {
       for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
         if (info.getName().equals(lookandfeel)) {
@@ -76,6 +77,19 @@ public class Main
     }
 
     return false;
+  }
+
+//  static void themeUI()
+//  {
+//    UIManager.put("nimbusBase", getHSBColor(0, 162, 140));
+//
+//    NimbusThemeCreator.main(new String[0]);
+//  }
+
+
+  static Color getHSBColor(int h, int s, int b)
+  {
+    return new Color(Color.HSBtoRGB(h / 255.f, s / 255.f, b / 255.f));
   }
 
   static void miscTest()
@@ -97,7 +111,6 @@ public class Main
     frame.setVisible(true);
   }
 
-
   public static void main(String[] args)
   {
     miscTest();
@@ -110,10 +123,11 @@ public class Main
       }
 
     } catch (Exception exc) {
-
     }
 
 
+    //themeUI();
+    
     JFrame frame = new BassToolFrame();
     frame.setVisible(true);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

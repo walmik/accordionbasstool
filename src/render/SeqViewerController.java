@@ -259,6 +259,9 @@ public class SeqViewerController
       this.table = newTable;
 
       slider = new JSlider();
+      //slider.putClientProperty("Slider.paintThumbArrowShape", Boolean.TRUE);
+      slider.putClientProperty("JComponent.sizeVariant", "large");
+      slider.updateUI();
       slider.setOpaque(false);
       slider.setPaintTicks(true);
       slider.setPaintTrack(true);

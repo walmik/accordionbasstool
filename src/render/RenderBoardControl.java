@@ -38,5 +38,6 @@ public class RenderBoardControl extends javax.swing.JScrollPane
   {
     renderBassBoard.setIsHorizontal(isHoriz);
     renderBoardHeader.toggleOrientation(isHoriz);
+    renderBassBoard.invalidate();
   }
 }

@@ -58,8 +58,6 @@ public class SeqColumnModel extends DefaultTableColumnModel
     rowSelModel = new DefaultListSelectionModel();
     rowSelModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-    renderBoard.setSelListeners(selComboModel, rowSelModel);
-
     dataModel = new SeqDataModel();
     rowHeaderDataModel = new SeqRowHeaderData();
 
@@ -202,10 +200,11 @@ public class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
-  public void shrinkToFirst()
+  public void shrinkToFirst(boolean useBlank)
   {
     if (tableColumns.isEmpty()) {
-      addColumn(ParsedChordDef.newEmptyChordDef(), 0);
+      addColumn(useBlank ? ParsedChordDef.newEmptyChordDef()
+                         : ParsedChordDef.newDefaultChordDef(), 0);
       return;
     }
 

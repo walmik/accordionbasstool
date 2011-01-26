@@ -2,18 +2,18 @@ package music;
 
 public enum NamedInterval
 {
-  m2(1, 1, "Min 2nd"),
-  M2(2, 1, "Maj 2nd"),
-  m3(3, 2, "Min 3rd"),
-  M3(4, 2, "Maj 3rd"),
+  m2(1, 1, "Minor 2nd"),
+  M2(2, 1, "Major 2nd"),
+  m3(3, 2, "Minor 3rd"),
+  M3(4, 2, "Major 3rd"),
   P4(5, 3, "Perfect 4th"),
-  Aug4(6, 4, "Aug 4th"),
-  Dim5(6, 5, "Dim 5th"),
+  Aug4(6, 4, "Augmented 4th"),
+  Dim5(6, 5, "Diminished 5th"),
   P5(7, 4, "Perfect 5th"),
-  m6(8, 5, "Min 6th"),
-  M6(9, 5, "Maj 6th"),
-  m7(10, 6, "Min 7th"),
-  M7(11, 6, "Maj 7th");
+  m6(8, 5, "Minor 6th"),
+  M6(9, 5, "Major 6th"),
+  m7(10, 6, "Minor 7th"),
+  M7(11, 6, "Major 7th");
 
   NamedInterval(int halfStepIval, int scale, String name)
   {
