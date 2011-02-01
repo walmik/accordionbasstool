@@ -22,6 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
 import render.BassToolFrame;
 import render.ToolMode;
 
@@ -60,7 +61,7 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     Main.setNimbus();
 
     altRootPane = new JRootPane();
-    getContentPane().setLayout(new FlowLayout());
+    getContentPane().setLayout(new BorderLayout());
     getContentPane().setBackground(Color.black);
     //horizStrut = Box.createHorizontalStrut(80);
 
@@ -108,7 +109,7 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
 
   private void attemptResizeApplet()
   {
-    validate();
+    //validate();
     Dimension dim = this.getRootPane().getPreferredSize();
     attemptResizeApplet(dim);
   }
@@ -116,23 +117,6 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
   private void attemptResizeApplet(Dimension dim)
   {
     try {
-//      this.validate();
-
-//      if (true) {
-//        return;
-//      }
-
-//      Container cont = this;
-//      while (cont.getParent() != null) {
-//        cont = cont.getParent();
-//        System.out.println(cont);
-//      }
-//
-//      if (cont instanceof Window) {
-//        ((Window)cont).setSize(dim);
-//        ((Window)cont).pack();
-//      }
-
       Dimension max = Toolkit.getDefaultToolkit().getScreenSize();
       dim.width = Math.min(max.width, dim.width);
       dim.height = Math.min(max.height, dim.height);
@@ -169,25 +153,31 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     return frame.getTitle();
   }
 
-  public boolean setMode(String string)
+  public void setMode(String string)
   {
-    try {
-      ToolMode mode = ToolMode.findMode(string);
+    SwingUtilities.invokeLater(new ModeSwitcher(string));
+  }
 
-      if (!frame.isVisible()) {
-        frame.restoreRootPane();
-        frame.init(mode);
-        getContentPane().removeAll();
-        attemptResizeApplet(frame.getPreferredSize());
-        getContentPane().add(frame.getRootPane());
-      } else {
+  class ModeSwitcher implements Runnable
+  {
+    String modeString;
+
+    ModeSwitcher(String string)
+    {
+      modeString = string;
+    }
+
+    @Override
+    public void run()
+    {
+      try {
+        ToolMode mode = ToolMode.findMode(modeString);
         frame.init(mode);
         attemptResizeApplet();
-      }
 
-      return true;
-    } catch (Exception arg) {
-      return false;
+      } catch (Exception arg) {
+
+      }
     }
   }
 
@@ -226,6 +216,6 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
       this.attemptResizeApplet();
     }
 
-    this.validate();
+    //this.validate();
   }
 }

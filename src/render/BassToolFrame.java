@@ -12,8 +12,11 @@ package render;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.sound.sampled.AudioPermission;
@@ -94,6 +97,18 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
     tabOptions.addPropertyChangeListener(this);
 
+    ComponentAdapter dividerFixer = new ComponentAdapter()
+    {
+      @Override
+      public void componentResized(ComponentEvent e)
+      {
+        computeDividerLocation();
+      }
+    };
+
+    boardSplitPane.addComponentListener(dividerFixer);
+    controlSplitPane.addComponentListener(dividerFixer);
+
 //    boardSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
 //            new PropertyChangeListener()
 //            {
@@ -110,6 +125,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     init(mode);
 
     initOtherMenus();
+
+    pack();
   }
 
   public void init(ToolMode tool)
@@ -219,9 +236,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       table.setVisible(true);
     }
 
-    pack();
-
-    computeDividerLocation();
+//    pack();
+    Dimension newSize = getPreferredSize();
+    setSize(newSize.width, newSize.height);
 
 //    setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
@@ -419,10 +436,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     renderBoardControl.toggleOrientation(!isHoriz);
 
+    //pack();
+    Dimension newSize = getPreferredSize();
+    setSize(newSize.width, newSize.height);
     //origRootPane.revalidate();
-    pack();
-
-    this.computeDividerLocation();
 
     this.firePropertyChange("prefLayoutChange", null, origRootPane.getPreferredSize());
   }
@@ -449,38 +466,39 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
   private void computeDividerLocation()
   {
-    //boolean isTopLeft = (boardSplitPane.getLeftComponent() == renderBoardControl);
-    //boolean isHoriz = renderBassBoard.isHorizontal();
+    if (boardSplitPane.isVisible()) {
+      boardSplitPane.validate();
 
-    if (!renderBassBoard.isHorizontal() && boardSplitPane.isVisible()) {
-      fixPrefWidth(boardSplitPane, renderBassBoard, boardIsTopLeft);
-    } else {
-      if (boardIsTopLeft) {
-        boardSplitPane.setDividerLocation(boardSplitPane.getMaximumDividerLocation());
+      if (!renderBassBoard.isHorizontal()) {
+        fixPrefWidth(boardSplitPane, renderBassBoard, boardIsTopLeft);
       } else {
-        boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
+        if (boardIsTopLeft) {
+          boardSplitPane.setDividerLocation(boardSplitPane.getMaximumDividerLocation());
+        } else {
+          boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
+        }
       }
     }
 
-    // Must readjust editors as well..
-    if (!controlSplitPane.isVisible()) {
-      return;
-    }
 
-    if (renderBassBoard.isHorizontal() && controlSplitPane.isVisible()) {
-      fixPrefWidth(controlSplitPane, editor, editorLeft);
-    } else {
-      if (!editorLeft) {
-        controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
+    if (controlSplitPane.isVisible()) {
+      controlSplitPane.validate();
+
+      if (renderBassBoard.isHorizontal()) {
+        fixPrefWidth(controlSplitPane, editor, editorLeft);
       } else {
-        controlSplitPane.setDividerLocation(controlSplitPane.getMinimumDividerLocation());
+        if (!editorLeft) {
+          controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
+        } else {
+          controlSplitPane.setDividerLocation(controlSplitPane.getMinimumDividerLocation());
+        }
       }
     }
   }
 
   private static void fixPrefWidth(JSplitPane split, JComponent comp, boolean isTopLeft)
   {
-    split.validate();
+//    split.revalidate();
     int prefWidth = comp.getPreferredSize().width;
 //    int loc = split.getDividerLocation();
 //    int div = split.getDividerSize();
@@ -497,6 +515,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 // Menu Actions //
   class ModeAction extends AbstractAction
   {
+
+    ToolMode theMode;
 
     ModeAction(ToolMode mode)
     {
@@ -526,7 +546,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     {
       return theMode.toString();
     }
-    ToolMode theMode;
   }
 
   void initModeMenu(ToolMode startMode)
@@ -541,11 +560,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       JMenuItem item = new JRadioButtonMenuItem(new ModeAction(mode));
       group.add(item);
 
-
       if (mode == startMode) {
         item.setSelected(true);
-
-
       }
       menuMode.add(item);
     }
