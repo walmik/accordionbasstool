@@ -40,6 +40,11 @@ public class BoardMouseListener extends MouseAdapter
     allowBlanks = allow;
   }
 
+  public void setShiftClickMode(boolean shiftClick)
+  {
+    this.isClickShiftMode = shiftClick;
+  }
+
   private void updateFromClicked()
   {
     if (columnModel == null) {

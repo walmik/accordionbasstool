@@ -7,22 +7,15 @@ import javax.swing.event.TableColumnModelListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-public abstract class SeqTableEventAdapter extends ListSelChangeListener implements TableColumnModelListener, TableModelListener
+public class SeqTableEventAdapter implements TableColumnModelListener, TableModelListener
 {
-
   public SeqTableEventAdapter()
   {
-  }
-
-  public SeqTableEventAdapter(boolean noneSel)
-  {
-    super(noneSel);
   }
 
   @Override
   public void columnAdded(TableColumnModelEvent e)
   {
-    //clearLastIndex();
     columnCountChanged(e);
   }
 
@@ -47,7 +40,7 @@ public abstract class SeqTableEventAdapter extends ListSelChangeListener impleme
   @Override
   public final void columnSelectionChanged(ListSelectionEvent e)
   {
-    super.valueChanged(e);
+
   }
 
   public void columnCountChanged(TableColumnModelEvent e)

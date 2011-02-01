@@ -18,6 +18,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.sound.sampled.AudioPermission;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
@@ -36,6 +37,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
   boolean editorVis = true;
   boolean editorLeft = true;
+  boolean boardIsTopLeft = false;
   RenderBassBoard renderBassBoard;
   BoardMouseListener mouseListener;
   SeqColumnModel columnModel = null;
@@ -43,6 +45,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   SeqAnimController anim;
   ToolPanel[] allTools;
   JRootPane origRootPane;
+  JComponent editor;
   boolean modeMenuEnabled;
 
   /** Creates new form BassToolFrame */
@@ -66,31 +69,45 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     origRootPane = this.getRootPane();
 
-    // Save initial full tab layout
-    allTools = new ToolPanel[toolTabs.getTabCount()];
-    for (int i = 0; i < allTools.length; i++) {
-      allTools[i] = (ToolPanel) toolTabs.getComponentAt(i);
-      allTools[i].setName(toolTabs.getTitleAt(i));
-    }
-
     renderBassBoard = renderBoardControl.renderBassBoard;
     renderBoardControl.renderBoardHeader.init(renderBassBoard, renderBoardControl);
 
     columnModel = new SeqColumnModel(renderBassBoard);
     sound = new SoundController(false);
+    anim = new SeqAnimController(renderBassBoard, columnModel, sound, 500, 100);
     mouseListener = new BoardMouseListener(renderBassBoard, columnModel, sound);
 
-    seqTablePanel.init(columnModel, renderBassBoard, sound);
+    seqTablePanel.init(columnModel, renderBassBoard, anim, sound);
     seqTablePanel.buttonHideEditor.addActionListener(this);
+
+    // Save and init initial full tab layout
+    allTools = new ToolPanel[toolTabs.getTabCount()];
+    for (int i = 0; i < allTools.length; i++) {
+      allTools[i] = (ToolPanel) toolTabs.getComponentAt(i);
+      allTools[i].setName(toolTabs.getTitleAt(i));
+      allTools[i].init(columnModel);
+    }
+
+    boardSplitPane.setBorder(BorderFactory.createEmptyBorder());
+    controlSplitPane.setBorder(BorderFactory.createEmptyBorder());
 
     controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
     tabOptions.addPropertyChangeListener(this);
 
+//    boardSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
+//            new PropertyChangeListener()
+//            {
+//
+//              @Override
+//              public void propertyChange(PropertyChangeEvent evt)
+//              {
+//                System.out.println("Divider Loc: " + boardSplitPane.getDividerLocation());
+//              }
+//            });
+
     initModeMenu(mode);
 
     init(mode);
-
-    initTabsMenu();
 
     initOtherMenus();
   }
@@ -107,9 +124,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       renderBassBoard.setSelListeners(null, null);
     }
 
-    renderBoardControl.renderBoardHeader.setBoardConfig(currColModel, tool.useAllBoards, tool.startBoardSize);
-
     JComponent table;
+
+    seqTablePanel.setVisible(false);
 
     if (tool.useTable) {
       table = seqTablePanel;
@@ -117,6 +134,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     } else {
       table = null;
     }
+
+    renderBoardControl.renderBoardHeader.setBoardConfig(currColModel, tool.useAllBoards, tool.startBoardSize);
 
     if (tool.useMouse) {
       mouseListener.setColumnModel(currColModel, tool.useBlankChord);
@@ -128,14 +147,13 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     // Init Tabs
     toolTabs.removeAll();
 
-    JComponent editor = null;
+    editor = null;
 
     if (tool.tabs.length == 0) {
       editor = null;
     } else if ((tool.tabs.length == 1) && (tool.tabs[0].equalsIgnoreCase("all"))) {
       // If special name "all" add all tabs
       for (ToolPanel tab : allTools) {
-        tab.init(currColModel);
         toolTabs.add(tab.getName(), tab);
       }
       editor = toolTabs;
@@ -143,7 +161,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       // If only one tab, use tool directly
       for (ToolPanel tab : allTools) {
         if (tab.getClass().getSimpleName().equals(tool.tabs[0])) {
-          tab.init(currColModel);
           editor = tab;
           break;
         }
@@ -153,7 +170,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       for (String tabName : tool.tabs) {
         for (ToolPanel tab : allTools) {
           if (tab.getClass().getSimpleName().equals(tabName)) {
-            tab.init(currColModel);
             toolTabs.add(tabName, tab);
             break;
           }
@@ -169,14 +185,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       toolTabs.setEnabledAt(toolTabs.indexOfComponent(tabPitchDetect), false);
     }
 
-    if (currColModel != null) {
-      currColModel.shrinkToFirst(tool.useBlankChord);
-    }
-
     JComponent top = null;
 
     if ((editor != null) && (table != null)) {
-      this.setSplit(controlSplitPane, editor, table);
+      this.setSplit(controlSplitPane, editor, table, !editorLeft);
       top = controlSplitPane;
     } else {
       controlSplitPane.setVisible(false);
@@ -190,7 +202,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     JComponent center;
 
     if (top != null) {
-      this.setSplit(boardSplitPane, top, renderBoardControl);
+      this.setSplit(boardSplitPane, top, renderBoardControl, boardIsTopLeft);
       center = boardSplitPane;
     } else {
       boardSplitPane.setVisible(false);
@@ -198,13 +210,21 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     }
 
     origRootPane.getContentPane().add(center, BorderLayout.CENTER);
+
+    if (currColModel != null) {
+      currColModel.shrinkToFirst(tool.useBlankChord);
+    }
+
+    if (table != null) {
+      table.setVisible(true);
+    }
+
     pack();
+
+    computeDividerLocation();
 
 //    setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
-//    if (boardSplitPane.isVisible()) {
-//      boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
-//    }
 
 //    boolean showAllMenus = ((tool.menus.length == 1) && tool.menus[0].equalsIgnoreCase("all"));
 //
@@ -226,14 +246,17 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     menuSound.setVisible(true);
 
-    menuChords.setVisible(tool.multiChord);
+    menuChords.setVisible(tool.multiChord && tool.useTable);
     menuPlayback.setVisible(tool.multiChord);
     menuTranspose.setVisible(tool.multiChord);
 
     menuOptions.removeAll();
 
-    if (currColModel != null) {
+    if (tool.useTable) {
       menuOptions.add(this.miOptFingers);
+    }
+
+    if (currColModel != null) {
       menuOptions.add(this.miOptRedunds);
     }
 
@@ -253,8 +276,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       menuOptions.add(this.miOptGoAll);
     }
 
-    menuTabs.setVisible(toolTabs.isVisible());
-
     menuMode.setVisible(modeMenuEnabled);
 
     if (modeMenuEnabled) {
@@ -265,6 +286,26 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
         }
       }
     }
+
+    menuTabs.setVisible(false);
+
+    if (menuTabs.isVisible()) {
+
+      ButtonGroup group = new ButtonGroup();
+
+      menuTabs.removeAll();
+
+      for (int i = 0; i < toolTabs.getTabCount(); i++) {
+        JMenuItem item = new JRadioButtonMenuItem(new TabAction(i));
+        group.add(item);
+
+        if (i == toolTabs.getSelectedIndex()) {
+          item.setSelected(true);
+        }
+
+        menuTabs.add(item);
+      }
+    }
   }
 
   public void restoreRootPane()
@@ -272,12 +313,12 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     this.setRootPane(origRootPane);
   }
 
-  private void setSplit(JSplitPane pane, JComponent left, JComponent right)
+  private void setSplit(JSplitPane pane, Component left, Component right, boolean flip)
   {
     pane.setLeftComponent(null);
     pane.setRightComponent(null);
-    pane.setLeftComponent(left);
-    pane.setRightComponent(right);
+    pane.setLeftComponent(!flip ? left : right);
+    pane.setRightComponent(!flip ? right : left);
     pane.setVisible(true);
   }
 
@@ -351,13 +392,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
   public void toggleBoardPos()
   {
+    boardIsTopLeft = !boardIsTopLeft;
     //double weight = boardSplitPane.getResizeWeight();
-    Component left = boardSplitPane.getLeftComponent();
-    Component right = boardSplitPane.getRightComponent();
-    boardSplitPane.setLeftComponent(null);
-    boardSplitPane.setRightComponent(null);
-    boardSplitPane.setLeftComponent(right);
-    boardSplitPane.setRightComponent(left);
+    setSplit(boardSplitPane,
+            boardSplitPane.getLeftComponent(),
+            boardSplitPane.getRightComponent(), true);
     //boardSplitPane.setResizeWeight(1.0 - weight);
     origRootPane.revalidate();
 
@@ -378,8 +417,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       controlSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
     }
 
-    //boardSplitPane.setResizeWeight(1.0 - boardSplitPane.getResizeWeight());
-
     renderBoardControl.toggleOrientation(!isHoriz);
 
     //origRootPane.revalidate();
@@ -395,12 +432,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     editorLeft = !editorLeft;
 
     double weight = controlSplitPane.getResizeWeight();
-    Component left = controlSplitPane.getLeftComponent();
-    Component right = controlSplitPane.getRightComponent();
-    controlSplitPane.setLeftComponent(null);
-    controlSplitPane.setRightComponent(null);
-    controlSplitPane.setLeftComponent(right);
-    controlSplitPane.setRightComponent(left);
+    setSplit(controlSplitPane,
+            controlSplitPane.getLeftComponent(),
+            controlSplitPane.getRightComponent(),
+            true);
     controlSplitPane.setResizeWeight(1.0 - weight);
 
     seqTablePanel.toggleLeftRight(editorLeft);
@@ -414,13 +449,17 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
   private void computeDividerLocation()
   {
-    boolean isTopLeft = (boardSplitPane.getLeftComponent() == renderBoardControl);
+    //boolean isTopLeft = (boardSplitPane.getLeftComponent() == renderBoardControl);
     //boolean isHoriz = renderBassBoard.isHorizontal();
 
-    if (isTopLeft) {
-      boardSplitPane.setDividerLocation(boardSplitPane.getMaximumDividerLocation());
+    if (!renderBassBoard.isHorizontal() && boardSplitPane.isVisible()) {
+      fixPrefWidth(boardSplitPane, renderBassBoard, boardIsTopLeft);
     } else {
-      boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
+      if (boardIsTopLeft) {
+        boardSplitPane.setDividerLocation(boardSplitPane.getMaximumDividerLocation());
+      } else {
+        boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
+      }
     }
 
     // Must readjust editors as well..
@@ -428,11 +467,31 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       return;
     }
 
-    if (!editorLeft) {
-      controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
+    if (renderBassBoard.isHorizontal() && controlSplitPane.isVisible()) {
+      fixPrefWidth(controlSplitPane, editor, editorLeft);
     } else {
-      controlSplitPane.setDividerLocation(controlSplitPane.getMinimumDividerLocation());
+      if (!editorLeft) {
+        controlSplitPane.setDividerLocation(controlSplitPane.getMaximumDividerLocation());
+      } else {
+        controlSplitPane.setDividerLocation(controlSplitPane.getMinimumDividerLocation());
+      }
     }
+  }
+
+  private static void fixPrefWidth(JSplitPane split, JComponent comp, boolean isTopLeft)
+  {
+    split.validate();
+    int prefWidth = comp.getPreferredSize().width;
+//    int loc = split.getDividerLocation();
+//    int div = split.getDividerSize();
+    //int assignedWidth = (isTopLeft ? loc : split.getWidth() - div - loc);
+    //if (assignedWidth != prefWidth) {
+    if (isTopLeft) {
+      split.setDividerLocation(prefWidth);
+    } else {
+      split.setDividerLocation(split.getWidth() - prefWidth);
+    }
+    //}
   }
 
 // Menu Actions //
@@ -510,23 +569,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     }
   }
 
-  private void initTabsMenu()
-  {
-    ButtonGroup group = new ButtonGroup();
-
-    for (int i = 0; i
-            < toolTabs.getTabCount(); i++) {
-      JMenuItem item = new JRadioButtonMenuItem(new TabAction(i));
-      group.add(item);
-
-
-      if (i == toolTabs.getSelectedIndex()) {
-        item.setSelected(true);
-      }
-      menuTabs.add(item);
-    }
-  }
-
   void initOtherMenus()
   {
     // Sound Menu
@@ -538,7 +580,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     ChordSeqCmd.populateButtons(columnModel, JMenuItem.class, menuChords, 0);
 
     // Playback Menu
-    this.menuPlayback.add(seqTablePanel.actionPlay);
+    this.menuPlayback.add(anim.getPlayStopAction());
 
     // Transpose Menu
     TransposePanel trans = new TransposePanel();

@@ -56,6 +56,7 @@ public class SeqViewerController
   JTable seqTable;
   JScrollPane tableScrollPane;
   SeqColumnModel columnModel;
+  JList rowHeader;
 
   SeqViewerController(JTable table, SeqColumnModel model, JScrollPane scroll, RenderBassBoard renderBoard)
   {
@@ -84,7 +85,7 @@ public class SeqViewerController
     final int DEFAULT_ROW_HEADER_WIDTH = 96;
 
     //Create row header table
-    JList rowHeader = new JList(columnModel.getRowHeaderDataModel());
+    rowHeader = new JList(columnModel.getRowHeaderDataModel());
     rowHeader.setCellRenderer(new RowHeaderRenderer(header));
     rowHeader.setSelectionModel(seqTable.getSelectionModel());
     //rowHeader.setFixedCellWidth(DEFAULT_ROW_HEADER_WIDTH);
@@ -126,49 +127,24 @@ public class SeqViewerController
       
     });
 
+//    columnModel.getDataModel().addTableModelListener(new TableModelListener()
+//    {
+//      @Override
+//      public void tableChanged(TableModelEvent e)
+//      {
+//        seqTable.repaint();
+//        seqTable.getTableHeader().repaint();
+//      }
+//    });
+  }
 
+  void updateTable()
+  {
+    seqTable.revalidate();
+    seqTable.repaint();
 
-    // Row Selection Change
-//    seqTable.getSelectionModel().addListSelectionListener(
-//            new javax.swing.event.ListSelectionListener()
-//            {
-//
-//              int lastIndex = -1;
-//
-//              @Override
-//              public void valueChanged(ListSelectionEvent e)
-//              {
-//                int index = seqTable.getSelectedRow();
-//                if (index == lastIndex) {
-//                  return;
-//                }
-//                lastIndex = index;
-//
-//                if (columnModel.setSelectedSeq(index)) {
-//                  seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
-//                }
-//              }
-//            });
-//
-//    //Column Selection Change
-//    columnModel.getSelectionModel().addListSelectionListener(
-//            new javax.swing.event.ListSelectionListener()
-//            {
-//
-//              int lastSel = -1;
-//
-//              @Override
-//              public void valueChanged(ListSelectionEvent e)
-//              {
-//                int newSel = seqTable.getSelectedColumn();
-//                if (lastSel == newSel) {
-//                  return;
-//                }
-//
-//                lastSel = newSel;
-//                seqTable.getTableHeader().repaint();
-//              }
-//            });
+    seqTable.getTableHeader().resizeAndRepaint();
+    rowHeader.repaint();
   }
 
   static class SliderTableHeaderUI extends TableHeaderUI

@@ -5,3 +5,5 @@
 \.conflict\~$
 glob:*.class
 ^src/app/NimbusThemeCreator\.java$
+^src/render/SimpleListSelModel\.java$
+^src/app/NimbusThemeCreator\.java\.txt$

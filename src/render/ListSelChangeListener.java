@@ -5,13 +5,8 @@
 package render;
 
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableColumnModelEvent;
-import javax.swing.event.TableColumnModelListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 
 /**
  *
@@ -22,6 +17,7 @@ public abstract class ListSelChangeListener implements ListSelectionListener
 
   boolean acceptNoneSel;
   boolean isAlreadyAdjusting = false;
+  //short lastIndex = -1;
 
   public ListSelChangeListener()
   {
@@ -32,14 +28,16 @@ public abstract class ListSelChangeListener implements ListSelectionListener
   {
     acceptNoneSel = noneSel;
   }
+  static boolean isClearing = false;
+
+  public static void setIsClearing(boolean clearing)
+  {
+    isClearing = clearing;
+  }
 
   @Override
   public final void valueChanged(ListSelectionEvent e)
   {
-    //if (this.getClass().equals(NoDupSingleSelListener.class)) {
-
-    //}
-
     if (!e.getValueIsAdjusting() && this.isAlreadyAdjusting) {
       this.isAlreadyAdjusting = false;
       return;
@@ -47,13 +45,21 @@ public abstract class ListSelChangeListener implements ListSelectionListener
 
     this.isAlreadyAdjusting = e.getValueIsAdjusting();
 
-    int index = ((ListSelectionModel) e.getSource()).getAnchorSelectionIndex();
+    ListSelectionModel model = ((ListSelectionModel) e.getSource());
+
+    int index = model.getAnchorSelectionIndex();
+    
+    if (isClearing) {
+      index = -1;
+    }
+
+    //System.out.println(e.getSource());
 
     //if (index != lastIndex) {
     if (acceptNoneSel || (index >= 0)) {
       selectionChanged(index);
     }
-    //lastIndex = index;
+    //lastIndex = (short)index;
     //}
   }
 

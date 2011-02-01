@@ -4,21 +4,24 @@
  */
 package app;
 
+import java.applet.Applet;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Method;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
-import netscape.javascript.JSObject;
 import render.BassToolFrame;
 import render.ToolMode;
 
@@ -49,7 +52,6 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     String modeVal = this.getParameter("mode");
     return ToolMode.findMode(modeVal);
   }
-  
   JPanel panel;
 
   @Override
@@ -58,6 +60,8 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     Main.setNimbus();
 
     altRootPane = new JRootPane();
+    getContentPane().setLayout(new FlowLayout());
+    getContentPane().setBackground(Color.black);
     //horizStrut = Box.createHorizontalStrut(80);
 
     frame = new BassToolFrame(getFrameParam(), false);
@@ -85,38 +89,71 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     toggleFrame(false);
   }
 
+//  @Override
+//  public void setRootPane(JRootPane root)
+//  {
+//    rootPane = root;
+//    this.setLayout(new FlowLayout(FlowLayout.CENTER));
+//    this.add(root);
+//  }
   @Override
   public void propertyChange(PropertyChangeEvent evt)
   {
     if (evt.getPropertyName().equals("prefLayoutChange")) {
-      //Dimension dim = (Dimension) evt.getNewValue();
       attemptResizeApplet();
     }
   }
-
-  JSObject jsobj = null;
+  Object jsobj = null;
+  Method jsEval = null;
 
   private void attemptResizeApplet()
   {
-    try {
-      //Dimension dim = this.getRootPane().getSize();
-      //if (dim.width < 10 || dim.height < 10) {
-      this.getRootPane().validate();
+    validate();
+    Dimension dim = this.getRootPane().getPreferredSize();
+    attemptResizeApplet(dim);
+  }
 
-      Dimension dim = this.getRootPane().getPreferredSize();
-      //}
+  private void attemptResizeApplet(Dimension dim)
+  {
+    try {
+//      this.validate();
+
+//      if (true) {
+//        return;
+//      }
+
+//      Container cont = this;
+//      while (cont.getParent() != null) {
+//        cont = cont.getParent();
+//        System.out.println(cont);
+//      }
+//
+//      if (cont instanceof Window) {
+//        ((Window)cont).setSize(dim);
+//        ((Window)cont).pack();
+//      }
+
+      Dimension max = Toolkit.getDefaultToolkit().getScreenSize();
+      dim.width = Math.min(max.width, dim.width);
+      dim.height = Math.min(max.height, dim.height);
 
       if (jsobj == null) {
-        jsobj = netscape.javascript.JSObject.getWindow(this);
+        Class jsClass = Class.forName("netscape.javascript.JSObject");
+        Method meth = jsClass.getMethod("getWindow", Applet.class);
+
+        jsobj = meth.invoke(null, (Applet) this);
+
+        jsEval = jsClass.getMethod("eval", String.class);
       }
 
       String evalStr = "resizeApplet(" + dim.width + ", " + dim.height + ");";
-      //System.out.println(evalStr);
-      
-      jsobj.eval(evalStr);
+
+      if ((jsEval != null) && (jsobj != null)) {
+        jsEval.invoke(jsobj, evalStr);
+      }
 
     } catch (Exception e) {
-      System.err.println(e);
+      System.err.println("JavaScript Resizing Probably Failed: " + e);
     }
   }
 
@@ -137,16 +174,16 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     try {
       ToolMode mode = ToolMode.findMode(string);
 
-      frame.init(mode);
-
-      if (frame.isVisible()) {
-        frame.validate();
+      if (!frame.isVisible()) {
+        frame.restoreRootPane();
+        frame.init(mode);
+        getContentPane().removeAll();
+        attemptResizeApplet(frame.getPreferredSize());
+        getContentPane().add(frame.getRootPane());
       } else {
-        this.getContentPane().validate();
-        this.validate();
+        frame.init(mode);
+        attemptResizeApplet();
       }
-
-      attemptResizeApplet();
 
       return true;
     } catch (Exception arg) {
@@ -163,11 +200,12 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
       frame.pack();
       frame.setVisible(true);
 
-      altRootPane.getContentPane().add(BorderLayout.CENTER, panel);
-      this.setRootPane(altRootPane);
+      getContentPane().removeAll();
+      getContentPane().add(panel);
+      //this.setRootPane(altRootPane);
 
       this.attemptResizeApplet();
-      
+
     } else {
       toggleFrameButton.setText("Show In Separate Window");
 
@@ -175,14 +213,14 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
 
       frame.setVisible(false);
 
-      this.setRootPane(frameRoot);
+      //this.setRootPane(frameRoot);
+      getContentPane().removeAll();
+      getContentPane().add(frameRoot);
 
       JMenuBar bar = frameRoot.getJMenuBar();
 
       if (bar != null) {
         bar.add(panel);
-      } else {
-        getContentPane().add(BorderLayout.NORTH, panel);
       }
 
       this.attemptResizeApplet();

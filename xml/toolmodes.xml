@@ -40,7 +40,7 @@
     id="SeqPicker"
     title="Sequence Picking"
     useModel="true"
-    useMouse="true"
+    useMouse="false"
     useTable="false"
     useAllBoards="false"
     multiChord="true"

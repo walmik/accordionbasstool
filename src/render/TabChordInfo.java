@@ -26,6 +26,11 @@ public class TabChordInfo extends ToolPanel
   boolean displayUnknown = false;
   boolean listChanging = false;
 
+  String toolTip = "<html><b>Click</b> on the board to select button(s).<br/>" +
+                   "<b>Hold Shift + Click</b> to select multiple buttons.<br/>" +
+                   "(<b>Alt + Click</b> to just play a button when sound is enabled<br/>" +
+                   "Possible chords will that match buttons pressed will be listed here.</html>";
+
   /** Creates new form TabChordInfo */
   public TabChordInfo()
   {
@@ -143,15 +148,18 @@ public class TabChordInfo extends ToolPanel
     checkShowUnknownChords = new javax.swing.JCheckBox();
     checkIgnoreInversion = new javax.swing.JCheckBox();
 
-    jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Possible Chords:"));
-    jScrollPane1.setToolTipText("<html>\nA list of other possible chords for the current button combination pressed,\nThe current chord, if listed, is selected.\n</html>");
+    setToolTipText(toolTip);
+
+    jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Possible Matching Chords:"));
+    jScrollPane1.setToolTipText("");
 
     matchesListBox.setFont(new java.awt.Font("Monospaced", 1, 17)); // NOI18N
+    matchesListBox.setToolTipText(toolTip);
     jScrollPane1.setViewportView(matchesListBox);
 
     clickedLabel.setFont(new java.awt.Font("Tahoma", 0, 18));
     clickedLabel.setText("Info");
-    clickedLabel.setBorder(javax.swing.BorderFactory.createTitledBorder("Selected On Board:"));
+    clickedLabel.setBorder(javax.swing.BorderFactory.createTitledBorder("Currently Selected On Board:"));
 
     checkShowUnknownChords.setText("List Unknown Chords");
     checkShowUnknownChords.addActionListener(new java.awt.event.ActionListener() {
@@ -160,7 +168,7 @@ public class TabChordInfo extends ToolPanel
       }
     });
 
-    checkIgnoreInversion.setText("Don't Show Chord Inversion");
+    checkIgnoreInversion.setText("Don't Show Inversion Bass");
     checkIgnoreInversion.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         checkIgnoreInversionActionPerformed(evt);
@@ -171,29 +179,28 @@ public class TabChordInfo extends ToolPanel
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(clickedLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
+      .addComponent(clickedLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
       .addGroup(layout.createSequentialGroup()
         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
           .addComponent(checkShowUnknownChords)
-          .addComponent(checkIgnoreInversion))
-        .addGap(15, 15, 15))
+          .addComponent(checkIgnoreInversion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addContainerGap(53, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addComponent(clickedLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addGroup(layout.createSequentialGroup()
+            .addGap(50, 50, 50)
             .addComponent(checkShowUnknownChords)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(checkIgnoreInversion)
-            .addGap(97, 97, 97))
-          .addGroup(layout.createSequentialGroup()
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addContainerGap())))
+            .addComponent(checkIgnoreInversion))))
     );
   }// </editor-fold>//GEN-END:initComponents
 
@@ -207,6 +214,7 @@ public class TabChordInfo extends ToolPanel
     // Reselect the same chord in the list, may however be with an inversion
     this.setDisplayInversion(this.checkIgnoreInversion.isSelected());
 }//GEN-LAST:event_checkIgnoreInversionActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkIgnoreInversion;
   private javax.swing.JCheckBox checkShowUnknownChords;

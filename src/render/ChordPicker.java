@@ -294,7 +294,6 @@ public class ChordPicker extends javax.swing.JPanel
     jScrollPane2 = new javax.swing.JScrollPane();
     listChords = new javax.swing.JList();
     filterCombo = new javax.swing.JComboBox();
-    jLabel1 = new javax.swing.JLabel();
     jPanel2 = new javax.swing.JPanel();
     chordGridPanel = new javax.swing.JPanel();
     combo3 = new javax.swing.JComboBox();
@@ -323,8 +322,6 @@ public class ChordPicker extends javax.swing.JPanel
         filterComboActionPerformed(evt);
       }
     });
-
-    jLabel1.setText("Select Chord");
 
     jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
     jPanel2.setLayout(new java.awt.BorderLayout());
@@ -367,24 +364,22 @@ public class ChordPicker extends javax.swing.JPanel
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-          .addGroup(layout.createSequentialGroup()
-            .addGap(2, 2, 2)
-            .addComponent(jLabel1)
-            .addGap(18, 18, 18)
-            .addComponent(filterCombo, 0, 127, Short.MAX_VALUE))
+          .addComponent(filterCombo, 0, 205, Short.MAX_VALUE)
           .addComponent(jScrollPane2))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE))
+        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
+        .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(jLabel1)
-          .addComponent(filterCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
-      .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+            .addComponent(filterCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)))
+        .addContainerGap())
     );
   }// </editor-fold>//GEN-END:initComponents
 
@@ -407,7 +402,6 @@ public class ChordPicker extends javax.swing.JPanel
   private javax.swing.JComboBox combo7;
   private javax.swing.JComboBox combo9;
   private javax.swing.JComboBox filterCombo;
-  private javax.swing.JLabel jLabel1;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel2;
   private javax.swing.JScrollPane jScrollPane2;

@@ -14,25 +14,27 @@ public abstract class ToolPanel extends JPanel
 {
 
   protected SeqColumnModel columnModel;
-  ToolSelChangeListener colChange;
-  ToolSelChangeListener rowChange;
+  ListSelChangeListener colChange;
+  ListSelChangeListener rowChange;
 
   class ToolSelChangeListener extends ListSelChangeListener
   {
-    boolean isColumnChanging;
+
+    boolean isColumn;
 
     ToolSelChangeListener(boolean columnChanging)
     {
-      isColumnChanging = columnChanging;
+      isColumn = columnChanging;
     }
 
     @Override
     public void selectionChanged(int index)
     {
-      if (isColumnChanging)
+      if (isColumn) {
         ToolPanel.this.columnSelectionChanged(index);
-      else
+      } else {
         ToolPanel.this.rowSelectionChanged(index);
+      }
     }
   }
 
@@ -42,12 +44,17 @@ public abstract class ToolPanel extends JPanel
 
     columnModel = model;
 
-    this.colChange = (listenToCols() ? new ToolSelChangeListener(true) : null);
-    this.rowChange = (listenToRows() ? new ToolSelChangeListener(false) : null);
+    this.colChange = (listenToCols() ? newListener(true) : null);
+    this.rowChange = (listenToRows() ? newListener(false) : null);
 
     if (isVisible()) {
       toggleListeners(true);
     }
+  }
+
+  protected ListSelChangeListener newListener(boolean isColumn)
+  {
+    return new ToolSelChangeListener(isColumn);
   }
 
   private void toggleListeners(boolean attach)
@@ -94,7 +101,7 @@ public abstract class ToolPanel extends JPanel
 
   protected boolean listenToCols()
   {
-    return true;
+    return false;
   }
 
   protected boolean listenToRows()

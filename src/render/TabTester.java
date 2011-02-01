@@ -10,13 +10,11 @@
  */
 package render;
 
-import music.BassBoard;
-
 /**
  *
  * @author Ilya
  */
-public class TabTester extends javax.swing.JPanel
+public class TabTester extends ToolPanel
 {
 
   /** Creates new form TabTester */
@@ -24,6 +22,14 @@ public class TabTester extends javax.swing.JPanel
   {
     initComponents();
   }
+
+  @Override
+  protected void syncUIToDataModel()
+  {
+    
+  }
+
+
 
   /** This method is called from within the constructor to
    * initialize the form.
@@ -48,16 +54,16 @@ public class TabTester extends javax.swing.JPanel
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addGap(83, 83, 83)
+        .addGap(48, 48, 48)
         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(163, Short.MAX_VALUE))
+        .addContainerGap(198, Short.MAX_VALUE))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addGap(75, 75, 75)
+        .addGap(29, 29, 29)
         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(131, Short.MAX_VALUE))
+        .addContainerGap(177, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 
@@ -66,7 +72,6 @@ public class TabTester extends javax.swing.JPanel
 //    RenderBassBoard.getStaticRenderBoard().
 //            drawPos(new BassBoard.Pos(0, 1), RenderBoardUI.BoardButtonImage.SELECTED);
   }//GEN-LAST:event_jButton1ActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton jButton1;
   // End of variables declaration//GEN-END:variables

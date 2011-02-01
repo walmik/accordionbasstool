@@ -11,6 +11,7 @@
 package render;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
@@ -30,16 +31,15 @@ import music.Note;
 
 /**
  *
- * @author Ilya
+ * @authonr Ilya
  */
-public class SeqTablePanel extends javax.swing.JPanel
+public class SeqTablePanel extends ToolPanel
 {
 
-  private SeqColumnModel columnModel;
   private SoundController sound;
   private SeqAnimController anim;
   ChordSeqCmd.Action actionRemove;
-  PlayStopAction actionPlay;
+  ColumnCountListener colListener;
 
   /** Creates new form SeqTablePanel */
   public SeqTablePanel()
@@ -50,18 +50,24 @@ public class SeqTablePanel extends javax.swing.JPanel
 
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, controlPanel);
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER, new JPanel());
+
+    statusText.setBackground(new Color(0, 0, 0, 0));
   }
 
   public void init(SeqColumnModel model,
           RenderBassBoard renderBoard,
+          SeqAnimController anim,
           SoundController sound)
   {
-    columnModel = model;
+    super.init(model);
     seqTable.setSelectionModel(columnModel.getRowSelModel());
     SeqViewerController seqViewer = new SeqViewerController(seqTable, columnModel, seqTableScrollPane, renderBoard);
-    columnModel.addColumnModelListener(new ColumnChangeListener());
-    columnModel.getRowSelModel().addListSelectionListener(new ColumnChangeListener());
+
+    colListener = new ColumnCountListener();
+    columnModel.addColumnModelListener(colListener);
+
     this.sound = sound;
+    this.anim = anim;
 
     //this.soundCtrlPanel1.init(sound);
 
@@ -70,10 +76,7 @@ public class SeqTablePanel extends javax.swing.JPanel
 
     actionRemove = ChordSeqCmd.RemoveChord.action;
 
-    anim = new SeqAnimController(renderBoard, columnModel, sound, 500, 100);
-
-    actionPlay = new PlayStopAction();
-    toolPlay.setAction(actionPlay);
+    toolPlay.setAction(anim.getPlayStopAction());
   }
 
   void toggleLeftRight(boolean left)
@@ -81,71 +84,115 @@ public class SeqTablePanel extends javax.swing.JPanel
     this.setLayout(new BorderLayout());
     this.add(left ? BorderLayout.WEST : BorderLayout.EAST, sidebar);
     this.add(BorderLayout.CENTER, this.seqTableScrollPane);
-    this.add(BorderLayout.SOUTH, this.statusText);
+    this.add(BorderLayout.SOUTH, this.statusScrollPane);
   }
 
-
-  private class ColumnChangeListener extends SeqTableEventAdapter
+  private class ColumnCountListener extends SeqTableEventAdapter
   {
 
     @Override
     public void columnCountChanged(TableColumnModelEvent e)
     {
-      int colCount = columnModel.getColumnCount();
+      updateColumnChange();
+    }
+  }
 
-      if (toolPlay != null) {
-        toolPlay.setVisible(colCount > 1);
-      }
-      actionPlay.setEnabled(colCount > 1);
-      if (colCount <= 1) {
-        anim.stop();
-      }
+  private void updateColumnChange()
+  {
+    int colCount = columnModel.getColumnCount();
 
-      boolean autoResize = (colCount <= 4);
+    if (toolPlay != null) {
+      toolPlay.setVisible(colCount > 1);
+    }
+    anim.getPlayStopAction().setEnabled(colCount > 1);
 
-      if (!autoResize) {
-        seqTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-      } else {
-        seqTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-      }
+//    if (colCount <= 1) {
+//      doStop();
+//    }
 
-      actionRemove.setEnabled(colCount > 1);
+    boolean autoResize = (colCount <= 4);
+
+    if (!autoResize) {
+      seqTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    } else {
+      seqTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
     }
 
-    @Override
-    public void selectionChanged(int index)
-    {
-      ButtonCombo combo = columnModel.getSelectedButtonCombo();
+    actionRemove.setEnabled(colCount > 1);
 
-      String text = "<html>";
+//    seqTable.getTableHeader().resizeAndRepaint();
+  }
 
-      if ((combo != null) && (combo.getLength() > 0)) {
-        //****
-        sound.play(combo, anim.isRunning());
-        //****
-
-        Note lowest = combo.getLowestNote();
-
-        text += "Low Note: " + "<b>" + (lowest.isBassNote() ? "Bass " : "Chord ") + lowest.toString() + "</b>";
-        text += " Buttons: " + "<b>" + combo.toButtonListingString(true) + "</b>";
-        //text += " (" + combo.toSortedNoteString(true) + ") ";
-        //text += "</b>";
+  @Override
+  public void setVisible(boolean visible)
+  {
+    if (columnModel != null) {
+      if (visible) {
+        columnModel.addColumnModelListener(colListener);
+        updateColumnChange();
       } else {
-        text += "Not Possible on this board ";
+        columnModel.removeColumnModelListener(colListener);
       }
-      text += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Complete Sequence: ";
+    }
+
+    if (anim != null) {
+      anim.stop();
+    }
+
+    super.setVisible(visible);
+  }
+
+  @Override
+  protected boolean listenToCols()
+  {
+    return true;
+  }
+
+  @Override
+  protected boolean listenToRows()
+  {
+    return true;
+  }
+
+  @Override
+  public void syncUIToDataModel()
+  {
+    ButtonCombo combo = columnModel.getSelectedButtonCombo();
+
+    String text = "<html>";
+    String space = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+
+    if ((combo != null) && (combo.getLength() > 0)) {
+      //****
+      sound.play(combo, anim.isRunning());
+      //****
+
+      Note lowest = combo.getLowestNote();
+
+      text += "Low Note: " + "<b>" + (lowest.isBassNote() ? "Bass " : "Chord ") + lowest.toString() + "</b>";
+      text += (sidebar.isVisible() ? space : "<br/>");
+      text += "Buttons: " + "<b>" + combo.toButtonListingString(true) + "</b>";
+      //text += " (" + combo.toSortedNoteString(true) + ") ";
+      //text += "</b>";
+    } else {
+      text += "Not Possible on this board ";
+    }
+
+    if (sidebar.isVisible()) {
+      text += space + "Complete Sequence: ";
       text += columnModel.toHtmlString(true);
-      text += "</html>";
-
-      statusText.setText(text);
     }
+
+    text += "</html>";
+
+    statusText.setText(text);
   }
 
   void toggleSeqControls(boolean allowed)
   {
     sidebar.setVisible(allowed);
 
-    statusText.setVisible(allowed);
+    //statusText.setVisible(allowed);
 
     if (!allowed && (columnModel.getColumnCount() > 1)) {
       columnModel.resetColumns(true);
@@ -247,28 +294,7 @@ public class SeqTablePanel extends javax.swing.JPanel
         }
       }
     }
-  };
-
-  class PlayStopAction extends AbstractAction
-  {
-    @Override
-    public Object getValue(String key)
-    {
-      if (key.equals(NAME)) {
-        return anim.isRunning() ? "Stop" : "Play";
-      }
-
-      return super.getValue(key);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e)
-    {
-      anim.toggleRun();
-      this.firePropertyChange(NAME, null, getValue(NAME));
-    }
   }
-
 
   /** This method is called from within the constructor to
    * initialize the form.
@@ -287,7 +313,8 @@ public class SeqTablePanel extends javax.swing.JPanel
     sidebar = new javax.swing.JPanel();
     buttonHideEditor = new javax.swing.JButton();
     chordButtons = new javax.swing.JPanel();
-    statusText = new javax.swing.JLabel();
+    statusScrollPane = new javax.swing.JScrollPane();
+    statusText = new javax.swing.JTextPane();
 
     toolPlay.setText("Play");
     toolPlay.setActionCommand("PlaySeq");
@@ -342,7 +369,7 @@ public class SeqTablePanel extends javax.swing.JPanel
         .addGroup(sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addComponent(buttonHideEditor)
           .addComponent(chordButtons, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE))
-        .addGap(4, 4, 4))
+        .addGap(10, 10, 10))
     );
     sidebarLayout.setVerticalGroup(
       sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -350,39 +377,47 @@ public class SeqTablePanel extends javax.swing.JPanel
         .addComponent(buttonHideEditor)
         .addGap(102, 102, 102)
         .addComponent(chordButtons, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(43, Short.MAX_VALUE))
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
 
-    statusText.setFont(new java.awt.Font("Tahoma", 0, 16));
+    statusScrollPane.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+    statusScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    statusScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+    statusScrollPane.setOpaque(false);
+
+    statusText.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+    statusText.setContentType("text/html");
+    statusText.setEditable(false);
+    statusText.setFont(statusText.getFont().deriveFont(statusText.getFont().getSize()+7f));
     statusText.setText("Status");
-    statusText.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+    statusText.setOpaque(false);
+    statusScrollPane.setViewportView(statusText);
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
           .addGroup(layout.createSequentialGroup()
-            .addComponent(sidebar, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGap(10, 10, 10)
+            .addComponent(statusScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 477, Short.MAX_VALUE))
+          .addGroup(layout.createSequentialGroup()
+            .addComponent(sidebar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE))
-          .addGroup(layout.createSequentialGroup()
-            .addContainerGap()
-            .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)))
+            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)))
         .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-          .addComponent(seqTableScrollPane, 0, 0, Short.MAX_VALUE)
-          .addComponent(sidebar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(sidebar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(statusText, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addComponent(statusScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
     );
   }// </editor-fold>//GEN-END:initComponents
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   javax.swing.JButton buttonHideEditor;
   private javax.swing.JPanel chordButtons;
@@ -391,7 +426,8 @@ public class SeqTablePanel extends javax.swing.JPanel
   private javax.swing.JTable seqTable;
   private javax.swing.JScrollPane seqTableScrollPane;
   private javax.swing.JPanel sidebar;
-  private javax.swing.JLabel statusText;
+  private javax.swing.JScrollPane statusScrollPane;
+  private javax.swing.JTextPane statusText;
   private javax.swing.JButton toolPlay;
   // End of variables declaration//GEN-END:variables
 }

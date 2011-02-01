@@ -34,10 +34,11 @@ public class SeqColumnModel extends DefaultTableColumnModel
   private CollSequence[] currSeqArray;
   private SeqRowHeaderData rowHeaderDataModel;
   private SeqDataModel dataModel;
-  private ListSelectionModel rowSelModel;
+  private DefaultListSelectionModel rowSelModel;
   private ChordIterator chordSeqIter;
   public boolean optFingerSearch = false;
   final static int DEFAULT_COL_WIDTH = 120;
+  //SeqViewerController control;
 
   public SeqColumnModel(RenderBassBoard rBoard)
   {
@@ -109,13 +110,15 @@ public class SeqColumnModel extends DefaultTableColumnModel
     }
   }
 
+  @Override
+  public int getSelectedColumnCount()
+  {
+    return (this.selComboModel.getAnchorSelectionIndex() == -1 ? 0 : 1);
+  }
+
   public int getSelectedColumn()
   {
-    if (this.getSelectedColumnCount() > 0) {
-      return this.getSelectedColumns()[0];
-    } else {
-      return -1;
-    }
+    return this.selComboModel.getAnchorSelectionIndex();
   }
 
   public ButtonCombo getSelectedButtonCombo()
@@ -204,19 +207,20 @@ public class SeqColumnModel extends DefaultTableColumnModel
   {
     if (tableColumns.isEmpty()) {
       addColumn(useBlank ? ParsedChordDef.newEmptyChordDef()
-                         : ParsedChordDef.newDefaultChordDef(), 0);
+              : ParsedChordDef.newDefaultChordDef(), 0);
       return;
     }
 
     while (tableColumns.size() > 1) {
       tableColumns.remove(1);
     }
-    syncModelToView(0, 0);
-  }
 
-  public void removeAllListeners()
-  {
-    //TODO:
+    if (!useBlank && getChordDef(0).isEmptyChord()) {
+      getColumn(0).setModelIndex(0);
+      this.editColumn(0, ParsedChordDef.newDefaultChordDef());
+    } else {
+      syncModelToView(0, 0);
+    }
   }
 
   public void removeSelectedColumn()
@@ -353,12 +357,11 @@ public class SeqColumnModel extends DefaultTableColumnModel
     return this.rowSelModel;
   }
 
-  public void addTableAndColumnListener(SeqTableEventAdapter listener)
-  {
-    this.addColumnModelListener(listener);
-    this.getDataModel().addTableModelListener(listener);
-  }
-
+//  public void addTableAndColumnListener(SeqTableEventAdapter listener)
+//  {
+//    this.addColumnModelListener(listener);
+//    this.getDataModel().addTableModelListener(listener);
+//  }
   boolean setSelectedSeq(int index)
   {
     if (index < 0) {
@@ -445,19 +448,18 @@ public class SeqColumnModel extends DefaultTableColumnModel
     // ...
     this.matchingChordStore.resetIfNotValid();
 
+    ListSelChangeListener.setIsClearing(true);
+    
     rowHeaderDataModel.fireListDataChanged();
-    dataModel.fireTableStructureChanged();
+    dataModel.fireTableDataChanged();
 
-    // Insure selection is cleared as we reset it here
-    selComboModel.setAnchorSelectionIndex(-1);
-    rowSelModel.setAnchorSelectionIndex(-1);
+    ListSelChangeListener.setIsClearing(false);
 
-    // Set Col Selection
-    if (colSel < currSeqArray.length) {
-      selComboModel.setSelectionInterval(colSel, colSel);
-    } else {
-      selComboModel.setSelectionInterval(0, 0);
+    if ((colSel < 0) || (colSel >= getColumnCount())) {
+      colSel = 0;
     }
+
+    selComboModel.setSelectionInterval(colSel, colSel);
 
     // Set Row Selection
     rowSel = updateRowSel(rowSel);

@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import music.ChordParser;
 import org.w3c.dom.Document;
 import render.BassToolFrame;
+import render.ToolMode;
 
 public class Main
 {
@@ -128,7 +129,7 @@ public class Main
 
     //themeUI();
     
-    JFrame frame = new BassToolFrame();
+    JFrame frame = new BassToolFrame(ToolMode.findMode("BoardOnly"));
     frame.setVisible(true);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

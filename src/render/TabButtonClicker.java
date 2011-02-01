@@ -12,7 +12,6 @@ package render;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import music.ButtonCombo;
 import music.Chord;
 import music.ParsedChordDef;
 

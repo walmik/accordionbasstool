@@ -6,6 +6,7 @@ package render;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.AbstractAction;
 import javax.swing.Timer;
 import music.BassBoard.Pos;
 import music.ButtonCombo;
@@ -21,6 +22,7 @@ public class SeqAnimController implements ActionListener
   SeqColumnModel columnModel;
   SoundController sound;
   RenderBassBoard renderBoard;
+  PlayStopAction actionPlay;
 
   public SeqAnimController(RenderBassBoard board,
           SeqColumnModel model,
@@ -39,6 +41,8 @@ public class SeqAnimController implements ActionListener
     playStopTimer.setActionCommand("TimerStop");
     playStopTimer.setRepeats(false);
     playStopTimer.stop();
+
+    actionPlay = new PlayStopAction();
   }
 
   public boolean isRunning()
@@ -63,8 +67,15 @@ public class SeqAnimController implements ActionListener
 
   public void stop()
   {
-    if (playTimer.isRunning())
+    if (playTimer.isRunning()) {
       toggleRun();
+      actionPlay.updateName();
+    }
+  }
+
+  PlayStopAction getPlayStopAction()
+  {
+    return actionPlay;
   }
 
   @Override
@@ -94,6 +105,32 @@ public class SeqAnimController implements ActionListener
         renderBoard.drawPos(pos, RenderBoardUI.BoardButtonImage.SELECTED);
       }
       sound.stop();
+    }
+  }
+
+  class PlayStopAction extends AbstractAction
+  {
+
+    @Override
+    public Object getValue(String key)
+    {
+      if (key.equals(NAME)) {
+        return isRunning() ? "Stop" : "Play";
+      }
+
+      return super.getValue(key);
+    }
+
+    void updateName()
+    {
+      this.firePropertyChange(NAME, null, getValue(NAME));
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+      toggleRun();
+      updateName();
     }
   }
 }

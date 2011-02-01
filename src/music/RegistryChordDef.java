@@ -14,7 +14,7 @@ final public class RegistryChordDef
   RegistryChordDef(String _name, String _abb, String _notes, String _group)
   {
     name = _name;
-    abbrevHtml = _abb.replace("[", "<sup>").replace("]", "</sup>");
+    abbrevHtml = _abb.replace("[", "<sup><font size='+1'>").replace("]", "</font></sup>");
     abbrevPlain = _abb.replace("[", "").replace("]", "");
     chord = music.ChordParser.parseNoteList(new StringParser(_notes));
     group = _group;

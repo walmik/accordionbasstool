@@ -14,8 +14,7 @@
 <jar eager="true" href="AccordionBassTool.jar" main="true"/>
 
 
-    <jar href="lib/plugin.jar"/>
-</resources>
+    </resources>
     <update check="always" policy="always"/>
     <application-desc main-class="app.Main">
 
