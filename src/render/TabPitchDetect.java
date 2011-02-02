@@ -12,6 +12,7 @@ package render;
 
 import java.awt.BorderLayout;
 import java.awt.Graphics;
+import java.awt.event.ComponentEvent;
 import javax.swing.AbstractSpinnerModel;
 import javax.swing.JPanel;
 import music.Note;
@@ -39,8 +40,8 @@ public class TabPitchDetect extends ToolPanel implements PitchDetect.PitchUpdate
     graphPanel.setBackground(jPanel1.getBackground());
     this.jPanel1.add(BorderLayout.CENTER, graphPanel);
 
-    this.sampleSize.setModel(new ExpSpinnerModel(pitchDetector.getSampleSize(), 2, 1<<9, 1<<13));
-    this.samplingRate.setModel(new ExpSpinnerModel(pitchDetector.getSamplingRate(), 2, 44100/8, 44100*2));
+    this.sampleSize.setModel(new ExpSpinnerModel(pitchDetector.getSampleSize(), 2, 1 << 9, 1 << 13));
+    this.samplingRate.setModel(new ExpSpinnerModel(pitchDetector.getSamplingRate(), 2, 44100 / 8, 44100 * 2));
   }
 
   @Override
@@ -62,14 +63,13 @@ public class TabPitchDetect extends ToolPanel implements PitchDetect.PitchUpdate
   @Override
   protected void syncUIToDataModel()
   {
-
   }
 
   @Override
   public synchronized void paint(Graphics g)
   {
     super.paint(g);
-    
+
     if ((newNote != null) && !newNote.equals(lastNote)) {
       columnModel.editSelectedColumn(new ParsedChordDef(newNote));
       lastNote = newNote;
@@ -77,16 +77,18 @@ public class TabPitchDetect extends ToolPanel implements PitchDetect.PitchUpdate
   }
 
   @Override
-  public void setVisible(boolean visible)
+  public void componentShown(ComponentEvent e)
   {
-    super.setVisible(visible);
+    super.componentShown(e);
+    detectedText.setText("Current Note: Too Noisy");
+  }
 
-    if (visible) {
-      detectedText.setText("Current Note: Too Noisy");
-    } else {
-      if (pitchDetector.isRunning()) {
-        togglePitchDetect();
-      }
+  @Override
+  public void componentHidden(ComponentEvent e)
+  {
+    super.componentShown(e);
+    if (pitchDetector.isRunning()) {
+      togglePitchDetect();
     }
   }
 
@@ -106,6 +108,7 @@ public class TabPitchDetect extends ToolPanel implements PitchDetect.PitchUpdate
 
   class ExpSpinnerModel extends AbstractSpinnerModel
   {
+
     int sMin;
     int sMax;
     Integer value;
@@ -148,13 +151,10 @@ public class TabPitchDetect extends ToolPanel implements PitchDetect.PitchUpdate
     @Override
     public void setValue(Object value)
     {
-      this.value = (Integer)value;
+      this.value = (Integer) value;
       this.fireStateChanged();
     }
-
   }
-
-
 
   /** This method is called from within the constructor to
    * initialize the form.
@@ -256,14 +256,13 @@ public class TabPitchDetect extends ToolPanel implements PitchDetect.PitchUpdate
 
   private void samplingRateStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_samplingRateStateChanged
   {//GEN-HEADEREND:event_samplingRateStateChanged
-    pitchDetector.setSamplingRate(((Integer)samplingRate.getValue()).intValue());
+    pitchDetector.setSamplingRate(((Integer) samplingRate.getValue()).intValue());
   }//GEN-LAST:event_samplingRateStateChanged
 
   private void sampleSizeStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_sampleSizeStateChanged
   {//GEN-HEADEREND:event_sampleSizeStateChanged
-    pitchDetector.setSamplingSize(((Integer)sampleSize.getValue()).intValue());
+    pitchDetector.setSamplingSize(((Integer) sampleSize.getValue()).intValue());
   }//GEN-LAST:event_sampleSizeStateChanged
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JLabel detectedText;
   private javax.swing.JLabel jLabel1;

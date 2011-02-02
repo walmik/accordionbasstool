@@ -42,7 +42,7 @@ public class BoardRow
     return desc;
   }
 
-  Chord getChord(Note rootNote)
+  public Chord getChord(Note rootNote)
   {
     if (isSingleNote) {
       return new Chord(rootNote.add(firstNoteOffset), true);
@@ -51,14 +51,14 @@ public class BoardRow
     }
   }
 
-  String getChordName(Note rootNote, boolean html)
+  public String getChordName(Note rootNote, boolean html)
   {
     return rootNote.add(firstNoteOffset).toString(html) + shortname;
   }
   
-  static BoardRow[] allRows;
+  private static BoardRow[] allRows;
 
-  public static void loadRows(Element root)
+  static void loadRows(Element root)
   {
     NodeList nodes = root.getElementsByTagName("rows");
 

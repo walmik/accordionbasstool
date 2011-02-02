@@ -4,13 +4,15 @@
  */
 package render;
 
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import javax.swing.JPanel;
 
 /**
  *
  * @author Ilya
  */
-public abstract class ToolPanel extends JPanel
+public abstract class ToolPanel extends JPanel implements ComponentListener
 {
 
   protected SeqColumnModel columnModel;
@@ -40,6 +42,8 @@ public abstract class ToolPanel extends JPanel
 
   public void init(SeqColumnModel model)
   {
+    this.addComponentListener(this);
+
     toggleListeners(false);
 
     columnModel = model;
@@ -57,7 +61,7 @@ public abstract class ToolPanel extends JPanel
     return new ToolSelChangeListener(isColumn);
   }
 
-  private void toggleListeners(boolean attach)
+  protected void toggleListeners(boolean attach)
   {
     if (columnModel == null) {
       return;
@@ -86,14 +90,32 @@ public abstract class ToolPanel extends JPanel
   }
 
   @Override
-  public void setVisible(boolean visible)
+  public void componentHidden(ComponentEvent e)
   {
-    toggleListeners(visible);
+  }
 
-    if (visible && (columnModel != null)) {
+  @Override
+  public void componentMoved(ComponentEvent e)
+  {
+  }
+
+  @Override
+  public void componentResized(ComponentEvent e)
+  {
+  }
+
+  @Override
+  public void componentShown(ComponentEvent e)
+  {
+    if (columnModel != null) {
       syncUIToDataModel();
     }
+  }
 
+  @Override
+  public final void setVisible(boolean visible)
+  {
+    toggleListeners(visible);
     super.setVisible(visible);
   }
 

@@ -161,8 +161,8 @@
                 <Component class="render.TabChordInfo" name="tabChordInfo">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="Chord Info">
-                        <Property name="tabTitle" type="java.lang.String" value="Chord Info"/>
+                      <JTabbedPaneConstraints tabName="Match Chord">
+                        <Property name="tabTitle" type="java.lang.String" value="Match Chord"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>
@@ -185,15 +185,6 @@
                     </Constraint>
                   </Constraints>
                 </Component>
-                <Component class="render.SeqPicker" name="seqPicker">
-                  <Constraints>
-                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="Pick Scale/Pattern">
-                        <Property name="tabTitle" type="java.lang.String" value="Pick Scale/Pattern"/>
-                      </JTabbedPaneConstraints>
-                    </Constraint>
-                  </Constraints>
-                </Component>
                 <Component class="render.TabOptions" name="tabOptions">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
@@ -208,6 +199,15 @@
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                       <JTabbedPaneConstraints tabName="Pitch Detector">
                         <Property name="tabTitle" type="java.lang.String" value="Pitch Detector"/>
+                      </JTabbedPaneConstraints>
+                    </Constraint>
+                  </Constraints>
+                </Component>
+                <Component class="render.SeqPicker" name="seqPicker1">
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                      <JTabbedPaneConstraints tabName="Pick Sequence">
+                        <Property name="tabTitle" type="java.lang.String" value="Pick Sequence"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>

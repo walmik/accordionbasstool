@@ -53,7 +53,7 @@ public class SeqAnimController implements ActionListener
   public boolean toggleRun()
   {
     if (!playTimer.isRunning()) {
-      sound.play(columnModel.getSelectedButtonCombo(), false);
+      sound.play(columnModel.getSelectedButtonCombo(), true);
       playTimer.restart();
       return true;
     } else {
@@ -90,6 +90,7 @@ public class SeqAnimController implements ActionListener
       }
 
       columnModel.selComboModel.setSelectionInterval(index, index);
+      sound.play(columnModel.getSelectedButtonCombo(), true);
       //seqTable.scrollRectToVisible(seqTable.getCellRect(seqTable.getSelectedRow(), index, true));
 
       playStopTimer.setRepeats(false);

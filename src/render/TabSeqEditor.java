@@ -42,8 +42,6 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
     columnModel.getDataModel().addTableModelListener(this);
 
     //seqPicker1.init(theModel);
-
-    //transNotePicker.addPropertyChangeListener(this);
   }
 
   @Override
@@ -75,12 +73,7 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
       isUpdating = false;
     }
 
-//    int selColumn = columnModel.getSelectedColumn();
-//    if ((selColumn >= 0) && (selColumn < columnModel.getColumnCount())) {
-//      //isUpdating = true;
-//      //this.transNotePicker.setNote(columnModel.getChordDef(selColumn).rootNote);
-//      isUpdating = false;
-//    }
+    //this.seqPicker1.syncUIToDataModel();
   }
 
   /** This method is called from within the constructor to
@@ -156,7 +149,7 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+      .addGroup(layout.createSequentialGroup()
         .addContainerGap()
         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         .addContainerGap())

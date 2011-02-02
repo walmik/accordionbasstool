@@ -45,6 +45,12 @@
     <chord name="Dominant 9th, Sus 4" notes="C G Bb D F" abbrev="9sus4"></chord>
     <chord name="Dominant 9th (no 5th), Sus 4" notes="C Bb D F" abbrev="11no3"></chord>
   </chords>
+  <seqs name="Scales">
+    <seq name="Major" notes="C, D, E, F, G, A, B"/>
+    <seq name="Hijaz/Freygish" notes="D, Eb, F#, G, A, Bb, C"/>
+    <seq name="Minor" notes="A, B, C, D, E, F, G"/>
+    <seq name="Uke Minor" notes="D, E, F, G#, A, B, C"/>
+  </seqs>
   <seqs name="Common Bass Patterns">
     <seq name="Major Oom-Pah" notes="C, CM"/>
     <seq name="Major Oom-Pah Cross-Over" notes="C, CM, G, CM"/>
@@ -60,11 +66,5 @@
     <seq name="7th Oom-Pah Cross-Over" notes="C, C7, G, C7"/>
     <seq name="7th Waltz" notes="C, C7, C7"/>
     <seq name="7th Waltz Cross-Over" notes="C, C7, C7, G, C7, C7"/>
-  </seqs>
-
-  <seqs name="Scales">
-    <seq name="Major" notes="C, D, E, F, G, A, B"/>
-    <seq name="Hijaz/Freygish" notes="D, Eb, F#, G, A, Bb, C"/>
-    <seq name="Minor" notes="A, B, C, D, E, F, G"/>
   </seqs>
 </root>

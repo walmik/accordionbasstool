@@ -27,12 +27,17 @@ public class NotePicker extends javax.swing.JPanel {
         currNote = Note.fromString(noteCombo.getSelectedItem().toString());
     }
 
-    Note currNote;
+    private Note currNote;
 
     public void setNote(Note newNote)
     {
       currNote = newNote;
       noteCombo.setSelectedItem(currNote.toString());
+    }
+
+    public Note getNote()
+    {
+      return currNote;
     }
 
     @Override

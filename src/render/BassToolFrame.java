@@ -50,6 +50,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   JRootPane origRootPane;
   JComponent editor;
   boolean modeMenuEnabled;
+  boolean updateDividers = false;
 
   /** Creates new form BassToolFrame */
   public BassToolFrame()
@@ -102,7 +103,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       @Override
       public void componentResized(ComponentEvent e)
       {
-        computeDividerLocation();
+        if (updateDividers) {
+          computeDividerLocation();
+          updateDividers = false;
+        }
       }
     };
 
@@ -238,6 +242,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
 //    pack();
     Dimension newSize = getPreferredSize();
+    updateDividers = true;
     setSize(newSize.width, newSize.height);
 
 //    setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
@@ -438,6 +443,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     //pack();
     Dimension newSize = getPreferredSize();
+    updateDividers = true;
     setSize(newSize.width, newSize.height);
     //origRootPane.revalidate();
 
@@ -620,9 +626,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     tabChordInfo = new render.TabChordInfo();
     tabChordPicker = new render.TabChordPicker();
     tabSeqEditor = new render.TabSeqEditor();
-    seqPicker = new render.SeqPicker();
     tabOptions = new render.TabOptions();
     tabPitchDetect = new render.TabPitchDetect();
+    seqPicker1 = new render.SeqPicker();
     renderBoardControl = new render.RenderBoardControl();
     theMenuBar = new javax.swing.JMenuBar();
     menuMode = new javax.swing.JMenu();
@@ -652,12 +658,12 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     controlSplitPane.setOneTouchExpandable(true);
     controlSplitPane.setRightComponent(seqTablePanel);
 
-    toolTabs.addTab("Chord Info", tabChordInfo);
+    toolTabs.addTab("Match Chord", tabChordInfo);
     toolTabs.addTab("Pick Chord", tabChordPicker);
     toolTabs.addTab("Edit Sequence", tabSeqEditor);
-    toolTabs.addTab("Pick Scale/Pattern", seqPicker);
     toolTabs.addTab("Options", tabOptions);
     toolTabs.addTab("Pitch Detector", tabPitchDetect);
+    toolTabs.addTab("Pick Sequence", seqPicker1);
 
     controlSplitPane.setLeftComponent(toolTabs);
 
@@ -769,7 +775,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   private javax.swing.JCheckBoxMenuItem miOptRedunds;
   private javax.swing.JCheckBoxMenuItem miOptVertical;
   private render.RenderBoardControl renderBoardControl;
-  private render.SeqPicker seqPicker;
+  private render.SeqPicker seqPicker1;
   private render.SeqTablePanel seqTablePanel;
   private render.TabChordInfo tabChordInfo;
   private render.TabChordPicker tabChordPicker;

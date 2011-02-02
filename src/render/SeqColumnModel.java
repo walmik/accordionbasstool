@@ -241,7 +241,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
   }
   boolean isPopulating = false;
 
-  public void populateFromText(String text, boolean removeDupNotes, Note rootNote)
+  public void populateFromText(String text, boolean removeDupNotes, Note transposeRoot)
   {
     StringParser parser = new StringParser(text);
     Vector<ParsedChordDef> chords = ChordParser.parseChords(parser, removeDupNotes);
@@ -256,8 +256,8 @@ public class SeqColumnModel extends DefaultTableColumnModel
       this.addColumn(chords.elementAt(i), i);
     }
 
-    if (rootNote != null) {
-      transposeAllFromFirstColumn(rootNote);
+    if (transposeRoot != null) {
+      transposeAllFromFirstColumn(transposeRoot);
     }
     isPopulating = false;
 

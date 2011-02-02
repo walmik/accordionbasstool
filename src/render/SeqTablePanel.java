@@ -14,6 +14,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Box;
@@ -99,6 +100,10 @@ public class SeqTablePanel extends ToolPanel
 
   private void updateColumnChange()
   {
+    if (columnModel == null) {
+      return;
+    }
+
     int colCount = columnModel.getColumnCount();
 
     if (toolPlay != null) {
@@ -124,22 +129,35 @@ public class SeqTablePanel extends ToolPanel
   }
 
   @Override
-  public void setVisible(boolean visible)
+  public void componentShown(ComponentEvent e)
   {
-    if (columnModel != null) {
-      if (visible) {
-        columnModel.addColumnModelListener(colListener);
-        updateColumnChange();
-      } else {
-        columnModel.removeColumnModelListener(colListener);
-      }
-    }
+    super.componentShown(e);
+    updateColumnChange();
+  }
 
+  @Override
+  public void componentHidden(ComponentEvent e)
+  {
+    super.componentHidden(e);
     if (anim != null) {
       anim.stop();
     }
+  }
 
-    super.setVisible(visible);
+  @Override
+  public void toggleListeners(boolean attach)
+  {
+    if (columnModel == null) {
+      return;
+    }
+
+    super.toggleListeners(attach);
+
+    if (attach) {
+      columnModel.addColumnModelListener(colListener);
+    } else {
+      columnModel.removeColumnModelListener(colListener);
+    }
   }
 
   @Override
@@ -163,9 +181,10 @@ public class SeqTablePanel extends ToolPanel
     String space = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 
     if ((combo != null) && (combo.getLength() > 0)) {
-      //****
-      sound.play(combo, anim.isRunning());
-      //****
+
+      if (!anim.isRunning()) {
+        sound.play(combo, false);
+      }
 
       Note lowest = combo.getLowestNote();
 
@@ -179,7 +198,7 @@ public class SeqTablePanel extends ToolPanel
     }
 
     if (sidebar.isVisible()) {
-      text += space + "Complete Sequence: ";
+      text += "<br/>" + "Complete Sequence: ";
       text += columnModel.toHtmlString(true);
     }
 

@@ -10,6 +10,8 @@
  */
 package render;
 
+import javax.swing.JToggleButton;
+
 /**
  *
  * @author Ilya
