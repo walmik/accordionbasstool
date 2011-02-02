@@ -115,6 +115,10 @@ public class FingerSearcher
       buildFingerPerms();
     }
 
+    if (fingerPerms.length == 0) {
+      return fingerCombos;
+    }
+
     byte[] fingerComboArray = fingerPerms[pos.length - 1];
 
     // Arrange positions by fingers

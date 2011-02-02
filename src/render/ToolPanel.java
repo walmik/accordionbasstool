@@ -12,7 +12,7 @@ import javax.swing.JPanel;
  *
  * @author Ilya
  */
-public abstract class ToolPanel extends JPanel implements ComponentListener
+public abstract class ToolPanel extends JPanel
 {
 
   protected SeqColumnModel columnModel;
@@ -42,7 +42,7 @@ public abstract class ToolPanel extends JPanel implements ComponentListener
 
   public void init(SeqColumnModel model)
   {
-    this.addComponentListener(this);
+    //this.addComponentListener(this);
 
     toggleListeners(false);
 
@@ -89,34 +89,47 @@ public abstract class ToolPanel extends JPanel implements ComponentListener
     }
   }
 
-  @Override
-  public void componentHidden(ComponentEvent e)
-  {
-  }
+//  @Override
+//  public void componentHidden(ComponentEvent e)
+//  {
+//  }
+//
+//  @Override
+//  public void componentMoved(ComponentEvent e)
+//  {
+//  }
+//
+//  @Override
+//  public void componentResized(ComponentEvent e)
+//  {
+//  }
+//
+//  @Override
+//  public void componentShown(ComponentEvent e)
+//  {
+//
+//  }
 
-  @Override
-  public void componentMoved(ComponentEvent e)
+  protected void shown()
   {
+     if (columnModel != null) {
+       syncUIToDataModel();
+     }
   }
-
-  @Override
-  public void componentResized(ComponentEvent e)
-  {
-  }
-
-  @Override
-  public void componentShown(ComponentEvent e)
-  {
-    if (columnModel != null) {
-      syncUIToDataModel();
-    }
-  }
+  
+  protected void hidden() {}
 
   @Override
   public final void setVisible(boolean visible)
   {
     toggleListeners(visible);
     super.setVisible(visible);
+
+    if (visible) {
+      shown();
+    } else {
+      hidden();
+    }
   }
 
   abstract protected void syncUIToDataModel();

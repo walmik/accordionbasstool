@@ -86,9 +86,9 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
   }
 
   @Override
-  public void componentShown(ComponentEvent e)
+  public void shown()
   {
-    super.componentShown(e);
+    super.shown();
 //    if (isAutoReplace) {
 //      updateCurrSeq();
 //    }

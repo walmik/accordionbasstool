@@ -5,6 +5,7 @@
  */
 package render;
 
+import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 
@@ -39,5 +40,13 @@ public class RenderBoardControl extends javax.swing.JScrollPane
     renderBassBoard.setIsHorizontal(isHoriz);
     renderBoardHeader.toggleOrientation(isHoriz);
     renderBassBoard.invalidate();
+  }
+
+  @Override
+  public Dimension getMinimumSize()
+  {
+    Dimension dimy = renderBassBoard.getPreferredSize();
+    dimy.height += renderBoardHeader.getPreferredSize().height;
+    return dimy;
   }
 }

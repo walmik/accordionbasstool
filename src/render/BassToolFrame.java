@@ -15,8 +15,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.sound.sampled.AudioPermission;
@@ -98,20 +96,20 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
     tabOptions.addPropertyChangeListener(this);
 
-    ComponentAdapter dividerFixer = new ComponentAdapter()
-    {
-      @Override
-      public void componentResized(ComponentEvent e)
-      {
-        if (updateDividers) {
-          computeDividerLocation();
-          updateDividers = false;
-        }
-      }
-    };
+//    ComponentAdapter dividerFixer = new ComponentAdapter()
+//    {
+//      @Override
+//      public void componentResized(ComponentEvent e)
+//      {
+//        if (updateDividers) {
+//          computeDividerLocation();
+//          updateDividers = false;
+//        }
+//      }
+//    };
 
-    boardSplitPane.addComponentListener(dividerFixer);
-    controlSplitPane.addComponentListener(dividerFixer);
+//    boardSplitPane.addComponentListener(dividerFixer);
+//    controlSplitPane.addComponentListener(dividerFixer);
 
 //    boardSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
 //            new PropertyChangeListener()
@@ -242,8 +240,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
 //    pack();
     Dimension newSize = getPreferredSize();
-    updateDividers = true;
     setSize(newSize.width, newSize.height);
+
+    this.computeDividerLocation();
 
 //    setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
@@ -420,11 +419,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
             boardSplitPane.getLeftComponent(),
             boardSplitPane.getRightComponent(), true);
     //boardSplitPane.setResizeWeight(1.0 - weight);
-    origRootPane.revalidate();
+    //origRootPane.revalidate();
+    this.firePropertyChange("prefLayoutChange", null, origRootPane.getPreferredSize());
 
     this.computeDividerLocation();
-
-    this.firePropertyChange("prefLayoutChange", null, origRootPane.getPreferredSize());
   }
 
   public void toggleOrientation()
@@ -443,11 +441,13 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     //pack();
     Dimension newSize = getPreferredSize();
-    updateDividers = true;
+    //updateDividers = true;
     setSize(newSize.width, newSize.height);
     //origRootPane.revalidate();
 
     this.firePropertyChange("prefLayoutChange", null, origRootPane.getPreferredSize());
+
+    this.computeDividerLocation();
   }
 
   public void toggleEditorLeft()
@@ -475,15 +475,15 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     if (boardSplitPane.isVisible()) {
       boardSplitPane.validate();
 
-      if (!renderBassBoard.isHorizontal()) {
-        fixPrefWidth(boardSplitPane, renderBassBoard, boardIsTopLeft);
-      } else {
-        if (boardIsTopLeft) {
+      //if (!renderBassBoard.isHorizontal()) {
+      //  fixPrefWidth(boardSplitPane, renderBassBoard, boardIsTopLeft);
+      //} else {
+        if (!boardIsTopLeft) {
           boardSplitPane.setDividerLocation(boardSplitPane.getMaximumDividerLocation());
         } else {
           boardSplitPane.setDividerLocation(boardSplitPane.getMinimumDividerLocation());
         }
-      }
+      //}
     }
 
 

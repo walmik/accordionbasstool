@@ -76,17 +76,15 @@ public class TabPitchDetect extends ToolPanel implements PitchDetect.PitchUpdate
     }
   }
 
-  @Override
-  public void componentShown(ComponentEvent e)
+  public void shown()
   {
-    super.componentShown(e);
+    super.shown();
     detectedText.setText("Current Note: Too Noisy");
   }
 
-  @Override
-  public void componentHidden(ComponentEvent e)
+  public void hidden()
   {
-    super.componentShown(e);
+    super.hidden();
     if (pitchDetector.isRunning()) {
       togglePitchDetect();
     }

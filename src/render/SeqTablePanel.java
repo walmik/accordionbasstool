@@ -129,16 +129,16 @@ public class SeqTablePanel extends ToolPanel
   }
 
   @Override
-  public void componentShown(ComponentEvent e)
+  public void shown()
   {
-    super.componentShown(e);
+    super.shown();
     updateColumnChange();
   }
 
   @Override
-  public void componentHidden(ComponentEvent e)
+  public void hidden()
   {
-    super.componentHidden(e);
+    super.hidden();
     if (anim != null) {
       anim.stop();
     }

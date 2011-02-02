@@ -7,8 +7,12 @@ package app;
 import java.applet.Applet;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Insets;
+import java.awt.LayoutManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -61,7 +65,7 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     Main.setNimbus();
 
     altRootPane = new JRootPane();
-    getContentPane().setLayout(new BorderLayout());
+    getContentPane().setLayout(new CenterLayout());
     getContentPane().setBackground(Color.black);
     //horizStrut = Box.createHorizontalStrut(80);
 
@@ -90,13 +94,88 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     toggleFrame(false);
   }
 
-//  @Override
-//  public void setRootPane(JRootPane root)
-//  {
-//    rootPane = root;
-//    this.setLayout(new FlowLayout(FlowLayout.CENTER));
-//    this.add(root);
-//  }
+  static class CenterLayout implements LayoutManager
+  {
+
+    Component content;
+
+    @Override
+    public void addLayoutComponent(String name, Component comp)
+    {
+      content = comp;
+    }
+
+    @Override
+    public void layoutContainer(Container parent)
+    {
+      synchronized (parent.getTreeLock()) {
+        if (content == null) {
+          if (parent.getComponentCount() > 0) {
+            content = parent.getComponent(0);
+          } else {
+            return;
+          }
+        }
+
+        Dimension dim = content.getPreferredSize();
+        Dimension max = parent.getSize();
+        Insets insets = parent.getInsets();
+        max.width -= insets.left + insets.right;
+        max.height -= insets.top + insets.bottom;
+
+        int x, y;
+
+        if (dim.width > max.width) {
+          x = 0;
+          dim.width = max.width;
+        } else {
+          x = (max.width - dim.width) / 2;
+        }
+
+
+        if (dim.height > max.height) {
+          y = 0;
+          dim.height = max.height;
+        } else {
+          //y = (max.height - dim.height) / 2;
+          y = 0;
+        }
+
+        content.setBounds(x, y, dim.width, dim.height);
+      }
+    }
+
+    @Override
+    public Dimension minimumLayoutSize(Container parent)
+    {
+      synchronized (parent.getTreeLock()) {
+        Dimension dim = (content != null) ? content.getMinimumSize() : new Dimension(20, 20);
+        Insets insets = parent.getInsets();
+        dim.width += insets.left + insets.right;
+        dim.height += insets.top + insets.bottom;
+        return dim;
+      }
+    }
+
+    @Override
+    public Dimension preferredLayoutSize(Container parent)
+    {
+      synchronized (parent.getTreeLock()) {
+        Dimension dim = (content != null) ? content.getPreferredSize() : new Dimension(20, 20);
+        Insets insets = parent.getInsets();
+        dim.width += insets.left + insets.right;
+        dim.height += insets.top + insets.bottom;
+        return dim;
+      }
+    }
+
+    @Override
+    public void removeLayoutComponent(Component comp)
+    {
+      content = null;
+    }
+  }
+
   @Override
   public void propertyChange(PropertyChangeEvent evt)
   {
@@ -104,19 +183,25 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
       attemptResizeApplet();
     }
   }
+
   Object jsobj = null;
   Method jsEval = null;
 
   private void attemptResizeApplet()
   {
-    //validate();
-    Dimension dim = this.getRootPane().getPreferredSize();
-    attemptResizeApplet(dim);
+//    Dimension dim = this.getRootPane().getPreferredSize();
+//    System.out.println(dim);
+//    attemptResizeApplet(dim);
+    validate();
   }
 
   private void attemptResizeApplet(Dimension dim)
   {
     try {
+      if (true) {
+        return;
+      }
+
       Dimension max = Toolkit.getDefaultToolkit().getScreenSize();
       dim.width = Math.min(max.width, dim.width);
       dim.height = Math.min(max.height, dim.height);
@@ -160,6 +245,7 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
 
   class ModeSwitcher implements Runnable
   {
+
     String modeString;
 
     ModeSwitcher(String string)
@@ -176,7 +262,6 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
         attemptResizeApplet();
 
       } catch (Exception arg) {
-
       }
     }
   }
@@ -194,8 +279,6 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
       getContentPane().add(panel);
       //this.setRootPane(altRootPane);
 
-      this.attemptResizeApplet();
-
     } else {
       toggleFrameButton.setText("Show In Separate Window");
 
@@ -212,10 +295,8 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
       if (bar != null) {
         bar.add(panel);
       }
-
-      this.attemptResizeApplet();
     }
 
-    //this.validate();
+    attemptResizeApplet();
   }
 }
