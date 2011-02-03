@@ -14,7 +14,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentEvent;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Box;
@@ -53,6 +52,8 @@ public class SeqTablePanel extends ToolPanel
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER, new JPanel());
 
     statusText.setBackground(new Color(0, 0, 0, 0));
+
+    colListener = new ColumnCountListener();
   }
 
   public void init(SeqColumnModel model,
@@ -63,9 +64,6 @@ public class SeqTablePanel extends ToolPanel
     super.init(model);
     seqTable.setSelectionModel(columnModel.getRowSelModel());
     SeqViewerController seqViewer = new SeqViewerController(seqTable, columnModel, seqTableScrollPane, renderBoard);
-
-    colListener = new ColumnCountListener();
-    columnModel.addColumnModelListener(colListener);
 
     this.sound = sound;
     this.anim = anim;

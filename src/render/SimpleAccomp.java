@@ -67,12 +67,15 @@ public class SimpleAccomp extends JPanel implements ActionListener, ListSelectio
 
   private Note root = new Note();
   private String seq = "";
+  private BassBoard.RowType rowType = null;
+
+  private boolean isUpdating = false;
 
   /** Creates new form TabSimpleAccomp */
   public SimpleAccomp()
   {
     initComponents();
-    
+
     checkAlt3rd.addActionListener(this);
     checkAlt5th.addActionListener(this);
     radio7th.addActionListener(this);
@@ -104,7 +107,11 @@ public class SimpleAccomp extends JPanel implements ActionListener, ListSelectio
 
   public void updateSeq()
   {
-    BassBoard.RowType rowType = BassBoard.RowType.BassRoot;
+    if (isUpdating) {
+      return;
+    }
+
+    rowType = BassBoard.RowType.BassRoot;
 
     if (radioMajor.isSelected()) {
       rowType = BassBoard.RowType.ChordMajor;
@@ -155,6 +162,81 @@ public class SimpleAccomp extends JPanel implements ActionListener, ListSelectio
     return seq;
   }
 
+  class AccompState extends SeqPicker.SubSeq
+  {
+    RhythmType rhythm;
+    BassBoard.RowType row;
+    boolean cross5th;
+    boolean cross3rd;
+
+    AccompState()
+    {
+      super(SimpleAccomp.this.root,
+            SimpleAccomp.this.seq);
+      
+      this.rhythm = (RhythmType) SimpleAccomp.this.listRhythms.getSelectedValue();
+      this.row = SimpleAccomp.this.rowType;
+      this.cross5th = SimpleAccomp.this.checkAlt5th.isSelected();
+      this.cross3rd = SimpleAccomp.this.checkAlt3rd.isSelected();
+    }
+  }
+
+  AccompState getState()
+  {
+    return new AccompState();
+  }
+
+  void setState(AccompState state)
+  {
+    isUpdating = true;
+
+    this.listRhythms.setSelectedValue(state.rhythm, true);
+    this.rowType = state.row;
+
+    switch (rowType)
+    {
+      case ChordMajor:
+        radioMajor.setSelected(true);
+        break;
+
+      case ChordMinor:
+        radioMinor.setSelected(true);
+        break;
+
+      case Chord7th:
+        radio7th.setSelected(true);
+        break;
+    }
+    this.checkAlt5th.setSelected(state.cross5th);
+    this.checkAlt3rd.setSelected(state.cross3rd);
+    this.root = state.getRoot();
+    
+    isUpdating = false;
+
+    updateSeq();
+  }
+
+  @Override
+  public String toString()
+  {
+    String string = "Accomp-";
+    string = (rowType != null ? rowType.toString() : "null");
+    string += "-";
+
+    RhythmType rhythm = (RhythmType) listRhythms.getSelectedValue();
+    string += (rhythm != null ? rhythm.toString() : "null");
+
+    if (checkAlt5th.isSelected()) {
+      string += "5";
+    }
+
+    if (checkAlt3rd.isSelected()) {
+      string += "3";
+    }
+
+    return string;
+  }
+
   /** This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
@@ -178,7 +260,7 @@ public class SimpleAccomp extends JPanel implements ActionListener, ListSelectio
     setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Chord Button:"));
-    jPanel1.setPreferredSize(new java.awt.Dimension(111, 120));
+    jPanel1.setPreferredSize(new java.awt.Dimension(100, 120));
 
     groupChordType.add(radioMajor);
     radioMajor.setSelected(true);
@@ -200,7 +282,7 @@ public class SimpleAccomp extends JPanel implements ActionListener, ListSelectio
           .addComponent(radio7th)
           .addComponent(radioMajor)
           .addComponent(radioMinor))
-        .addContainerGap(40, Short.MAX_VALUE))
+        .addContainerGap(29, Short.MAX_VALUE))
     );
     jPanel1Layout.setVerticalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -215,12 +297,12 @@ public class SimpleAccomp extends JPanel implements ActionListener, ListSelectio
     add(jPanel1);
 
     jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Rhythm:"));
-    jScrollPane1.setPreferredSize(new java.awt.Dimension(150, 120));
+    jScrollPane1.setPreferredSize(new java.awt.Dimension(100, 120));
     jScrollPane1.setViewportView(listRhythms);
 
     add(jScrollPane1);
 
-    jPanel2.setPreferredSize(new java.awt.Dimension(111, 60));
+    jPanel2.setPreferredSize(new java.awt.Dimension(100, 60));
 
     checkAlt3rd.setText("Alternate 3rd");
 

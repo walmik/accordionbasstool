@@ -4,20 +4,23 @@
  */
 package render;
 
-import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import javax.swing.JPanel;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 /**
  *
  * @author Ilya
  */
-public abstract class ToolPanel extends JPanel
+public abstract class ToolPanel extends JPanel implements AncestorListener
 {
 
   protected SeqColumnModel columnModel;
   ListSelChangeListener colChange;
   ListSelChangeListener rowChange;
+  final static String RESET_TO_PREF_SIZE = "toolResetToPrefSize";
+  private boolean visibleState = false;
 
   class ToolSelChangeListener extends ListSelChangeListener
   {
@@ -42,7 +45,7 @@ public abstract class ToolPanel extends JPanel
 
   public void init(SeqColumnModel model)
   {
-    //this.addComponentListener(this);
+    this.addAncestorListener(this);
 
     toggleListeners(false);
 
@@ -89,47 +92,40 @@ public abstract class ToolPanel extends JPanel
     }
   }
 
-//  @Override
-//  public void componentHidden(ComponentEvent e)
-//  {
-//  }
-//
-//  @Override
-//  public void componentMoved(ComponentEvent e)
-//  {
-//  }
-//
-//  @Override
-//  public void componentResized(ComponentEvent e)
-//  {
-//  }
-//
-//  @Override
-//  public void componentShown(ComponentEvent e)
-//  {
-//
-//  }
+  @Override
+  public void ancestorAdded(AncestorEvent event)
+  {
+    shown();
+  }
+
+  @Override
+  public void ancestorMoved(AncestorEvent event)
+  {
+  }
+
+  @Override
+  public void ancestorRemoved(AncestorEvent event)
+  {
+    hidden();
+  }
 
   protected void shown()
   {
-     if (columnModel != null) {
-       syncUIToDataModel();
-     }
+    toggleListeners(true);
+    if (columnModel != null) {
+      syncUIToDataModel();
+    }
   }
-  
-  protected void hidden() {}
+
+  protected void hidden()
+  {
+    toggleListeners(false);
+  }
 
   @Override
   public final void setVisible(boolean visible)
   {
-    toggleListeners(visible);
     super.setVisible(visible);
-
-    if (visible) {
-      shown();
-    } else {
-      hidden();
-    }
   }
 
   abstract protected void syncUIToDataModel();

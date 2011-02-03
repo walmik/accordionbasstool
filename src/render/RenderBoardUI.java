@@ -310,13 +310,19 @@ public class RenderBoardUI
     private FontMetrics _fm;
     private int _tX, _tY;
     //private int _textHeight;
-    private Font _font = new Font("Default", Font.BOLD, 14);
+    private Font _origFont = new Font("Default", Font.BOLD, 14);
+    private Font _font = _origFont;
 
     void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
     {
       // Text Set up
+      Font orig = graphics.getFont();
+      int fontHeight = graphics.getFontMetrics(orig).getHeight();
+      _font = orig.deriveFont(orig.getSize2D() * (diamY * 2.f/3) / fontHeight);
+
       graphics.setFont(_font);
       _fm = graphics.getFontMetrics();
+
       int textDescent = _fm.getDescent() + 1;
       //_textHeight = _fm.getHeight() - 4;
 
@@ -332,7 +338,7 @@ public class RenderBoardUI
     void draw(Graphics2D graphics, int col, int row, BoardButtonImage buttonImage, String chordStr)
     {      
       if (buttonImage.pressed) {
-        graphics.setColor(SystemColor.textText);
+        graphics.setColor(Color.white);
       } else {
         graphics.setColor(SystemColor.textText);
       }

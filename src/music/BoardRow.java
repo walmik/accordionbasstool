@@ -78,6 +78,10 @@ public class BoardRow
 
   public static BoardRow findFromString(String name)
   {
+    if (allRows == null) {
+      return null;
+    }
+    
     for (int i = 0; i < allRows.length; i++) {
       if (allRows[i].name.equals(name)) {
         return allRows[i];

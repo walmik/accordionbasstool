@@ -104,10 +104,12 @@ public class SeqColumnModel extends DefaultTableColumnModel
   @Override
   public void moveColumn(int columnIndex, int newIndex)
   {
+//    isPopulating = true;
     super.moveColumn(columnIndex, newIndex);
     if (columnIndex != newIndex) {
       syncModelToView(Math.min(columnIndex, newIndex), newIndex);
     }
+//    isPopulating = false;
   }
 
   @Override
@@ -212,7 +214,7 @@ public class SeqColumnModel extends DefaultTableColumnModel
     }
 
     while (tableColumns.size() > 1) {
-      tableColumns.remove(1);
+      tableColumns.remove(tableColumns.size() - 1);
     }
 
     if (!useBlank && getChordDef(0).isEmptyChord()) {
@@ -243,14 +245,17 @@ public class SeqColumnModel extends DefaultTableColumnModel
 
   public void populateFromText(String text, boolean removeDupNotes, Note transposeRoot)
   {
+    if (isPopulating)
+      return;
+
+    isPopulating = true;
+
     StringParser parser = new StringParser(text);
     Vector<ParsedChordDef> chords = ChordParser.parseChords(parser, removeDupNotes);
 
     int colSel = this.getSelectedColumn();
 
     this.tableColumns.clear();
-
-    isPopulating = true;
 
     for (int i = 0; i < chords.size(); i++) {
       this.addColumn(chords.elementAt(i), i);
@@ -431,6 +436,8 @@ public class SeqColumnModel extends DefaultTableColumnModel
       return;
     }
 
+    isPopulating = true;
+
     int rowSel = rowSelModel.getAnchorSelectionIndex();
 
     chordSeqIter.reset();
@@ -464,6 +471,8 @@ public class SeqColumnModel extends DefaultTableColumnModel
     // Set Row Selection
     rowSel = updateRowSel(rowSel);
     rowSelModel.setSelectionInterval(rowSel, rowSel);
+
+    isPopulating = false;
   }
 
   public void recomputeSeqs()

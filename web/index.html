@@ -15,7 +15,7 @@
         $('#tabs').bind('tabsselect', function(event, ui){
           document.the_applet.setMode(ui.panel.id);
         });
-        $("#applet_div").resizable({});
+        $("#applet_div").resizable({alsoResize: "#extra_div"});
       });
     </script>
 
@@ -36,18 +36,21 @@
       }
 
       #applet_div {
-        height: 100%;
         width: 100%;
-        border: 2px;
-        margin: 0px 16px 16px 0px;
-        text-align: center;
-        vertical-align: middle;
-		display: block;
+        height: 100%;
+        display: block;
+
+        background-color: #333;
       }
 
-      #the_applet {
-        margin: 0px 16px 16px 0px;
+      #extra_div {
+        width: 100%;
+        height: 900px;
+        display: block;
+
+        margin: 8px -8px;
       }
+
     </style>
   </head>
   <body>
@@ -98,9 +101,11 @@
     </div>
 
     <div id="applet_div">
+      <div id="extra_div">
       <applet code="app.AppletMain" name="the_applet" mayscript="true" archive="./AccordTools.jar" width="100%" height="100%">
         <param name="mode" value="BoardOnly"/>
       </applet>
+      </div>
     </div>
   </body>
 </html>

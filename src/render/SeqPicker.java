@@ -11,11 +11,11 @@
 package render;
 
 import java.awt.Color;
-import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -38,7 +38,45 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
 
   String newNoteSeq = "";
   boolean isUpdating = false;
-  boolean isAutoReplace = false;
+  boolean isMultiSeq = false;
+  DefaultListModel seqListData;
+
+  static class SubSeq
+  {
+
+    String notes;
+    Vector<ParsedChordDef> chords;
+
+    SubSeq(Note newRoot, String notes)
+    {
+      this.notes = notes;
+
+      StringParser parser = new StringParser(notes);
+      chords = ChordParser.parseChords(parser, false);
+
+      Interval ival = newRoot.diff(getRoot());
+      transpose(ival);
+    }
+
+    void transpose(Interval ival)
+    {
+      if (ival.interval != 0) {
+        ParsedChordDef.transposeAllByInterval(chords.listIterator(), ival);
+        this.notes = ParsedChordDef.toString(chords.listIterator(), false);
+      }
+    }
+
+    Note getRoot()
+    {
+      return (chords.isEmpty() ? new Note() : chords.firstElement().rootNote);
+    }
+
+    @Override
+    public String toString()
+    {
+      return notes;
+    }
+  }
 
   /** Creates new form SeqPicker */
   public SeqPicker()
@@ -48,11 +86,9 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     tabby.addChangeListener(this);
     notePickerRoot.addPropertyChangeListener("Note", this);
     simpleAccomp1.addPropertyChangeListener("Seq", this);
-    listSeqs.addListSelectionListener(this);
+    listScales.addListSelectionListener(this);
 
     statusText.setBackground(new Color(0, 0, 0, 0));
-
-    toggleAutoReplace(true);
   }
 
   @Override
@@ -63,10 +99,21 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     filterCombo.setModel(new DefaultComboBoxModel(ChordRegistry.mainRegistry().allSeqGroupNames));
 
     if (ChordRegistry.mainRegistry().allSeqDefs.length > 0) {
-      listSeqs.setListData(ChordRegistry.mainRegistry().allSeqDefs[0]);
+      listScales.setListData(ChordRegistry.mainRegistry().allSeqDefs[0]);
     }
 
-    columnModel.getDataModel().addTableModelListener(this);
+    seqListData = new DefaultListModel();
+    seqListData.addElement(simpleAccomp1.getState());
+    listAllSeqs.setModel(seqListData);
+    listAllSeqs.setSelectedIndex(0);
+    listAllSeqs.addListSelectionListener(this);
+
+    toggleAllowMultiSeq(false);
+  }
+
+  void setAnim(SeqAnimController anim)
+  {
+    this.buttonPlay.setAction(anim.getPlayStopAction());
   }
 
   @Override
@@ -86,15 +133,6 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
   }
 
   @Override
-  public void shown()
-  {
-    super.shown();
-//    if (isAutoReplace) {
-//      updateCurrSeq();
-//    }
-  }
-
-  @Override
   protected void syncUIToDataModel()
   {
     if ((columnModel != null) && !isUpdating) {
@@ -104,22 +142,48 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
         return;
       }
 
-      notePickerRoot.setNote(def.rootNote);
+      if (seqListData.isEmpty()) {
+        return;
+      }
+
+      SubSeq first = (SubSeq) seqListData.get(0);
+
+      Interval ival = def.rootNote.diff(first.getRoot());
+
+      for (int i = 0; i < seqListData.size(); i++) {
+        SubSeq seq = (SubSeq) seqListData.get(i);
+        seq.transpose(ival);
+      }
+
+      selectCurrSeq();
+      listAllSeqs.repaint();
     }
   }
 
   @Override
   public void tableChanged(TableModelEvent e)
   {
-    if (isVisible()) {
+    if (!isUpdating) {
       syncUIToDataModel();
     }
   }
+  boolean isAlreadyAdjusting = false;
 
   @Override
   public void valueChanged(ListSelectionEvent e)
   {
-    updateCurrSeq();
+    if (!e.getValueIsAdjusting() && this.isAlreadyAdjusting) {
+      this.isAlreadyAdjusting = false;
+      return;
+    }
+
+    this.isAlreadyAdjusting = e.getValueIsAdjusting();
+
+    if (e.getSource() == listAllSeqs) {
+      selectCurrSeq();
+    } else if (e.getSource() == listScales) {
+      updateCurrSeq();
+    }
   }
 
   @Override
@@ -144,126 +208,170 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     }
   }
 
+  private void selectCurrSeq()
+  {
+    Object obj = listAllSeqs.getSelectedValue();
+    if (obj == null) {
+      return;
+    }
+
+    isUpdating = true;
+
+    if (obj instanceof SimpleAccomp.AccompState) {
+      SimpleAccomp.AccompState state = (SimpleAccomp.AccompState) obj;
+
+      notePickerRoot.setNote(state.getRoot());
+      simpleAccomp1.setState(state);
+      tabby.setSelectedComponent(simpleAccomp1);
+
+      newNoteSeq = state.notes;
+
+    } else if (obj instanceof SubSeq) {
+      SubSeq state = (SubSeq) obj;
+
+      notePickerRoot.setNote(state.getRoot());
+      listScales.setSelectedValue(state.notes, true);
+      tabby.setSelectedComponent(panScales);
+
+      newNoteSeq = state.notes;
+    }
+
+    isUpdating = false;
+
+    updateStatus();
+  }
+
   private void updateCurrSeq()
   {
+    if (isUpdating) {
+      return;
+    }
+
     if (this.simpleAccomp1.isVisible()) {
       newNoteSeq = simpleAccomp1.getCurrSeq();
+      seqListData.set(listAllSeqs.getSelectedIndex(), simpleAccomp1.getState());
     } else {
-      ChordRegistry.SeqDef seqDef = (ChordRegistry.SeqDef) listSeqs.getSelectedValue();
+      ChordRegistry.SeqDef seqDef = (ChordRegistry.SeqDef) listScales.getSelectedValue();
 
       if (seqDef == null) {
         return;
       }
 
-      StringParser parser = new StringParser(seqDef.noteSeq);
-      Vector<ParsedChordDef> chords = ChordParser.parseChords(parser, false);
+      SubSeq subSeq = new SubSeq(notePickerRoot.getNote(), seqDef.noteSeq);
+
+      Vector<ParsedChordDef> chords = subSeq.chords;
 
       if (chords.isEmpty()) {
         return;
       }
 
-      Note rootNote = notePickerRoot.getNote();
-
-      Interval ival = rootNote.diff(chords.firstElement().rootNote);
-
-      ParsedChordDef.transposeAllByInterval(chords.listIterator(), ival);
-
-      newNoteSeq = ParsedChordDef.toString(chords.listIterator(), false);
+      seqListData.set(listAllSeqs.getSelectedIndex(), subSeq);
+      newNoteSeq = subSeq.notes;
     }
 
-    if (isAutoReplace) {
-      replaceSeq();
-    } else {
-      updateStatus();
-    }
+    updateStatus();
   }
 
   private void updateStatus()
   {
+    String fullSeq = buildFullSeq();
 
     String text = "<html>";
-    text += "Selected Sequence: <b>";
-    text += newNoteSeq;
-    if (!isAutoReplace) {
-      text += "<br/>";
-      text += "</b>Full Progression: <b>";
-      if (columnModel != null) {
-        text += columnModel.toHtmlString(false);
-      }
-      text += "</b>";
-    }
-    text += "</html>";
-
+    text += "Full Progression: <b>";
+    text += fullSeq;
+    text += "</b></html>";
     statusText.setText(text);
+
+    updateTableModel(fullSeq);
   }
 
-  public void toggleAutoReplace(boolean auto)
+  public void toggleAllowMultiSeq(boolean multi)
   {
-    isAutoReplace = auto;
-    buttonAdd.setVisible(!auto);
-    buttonInsert.setVisible(!auto);
-    buttonReplace.setVisible(!auto);
+    isMultiSeq = multi;
+    multiSeqPanel.setVisible(multi);
 
-    if (isAutoReplace) {
-      replaceSeq();
-    } else {
-      updateStatus();
-    }
-  }
+    if (!multi) {
 
-  private void replaceSeq()
-  {
-    if ((columnModel != null) && isVisible()) {
+      // If none-multi seq, erase all except first seq
+
       isUpdating = true;
-      columnModel.populateFromText(newNoteSeq, false, null);
-      updateStatus();
+
+      Object currSel = listAllSeqs.getSelectedValue();
+      seqListData.clear();
+      seqListData.addElement(currSel);
+
       isUpdating = false;
+      listAllSeqs.setSelectedIndex(0);
     }
+
+    //updateStatus();
+    this.firePropertyChange(ToolPanel.RESET_TO_PREF_SIZE, null, null);
   }
 
-  private void insertSeq()
+  private String buildFullSeq()
+  {
+    String fullSeq = "";
+
+    for (int i = 0; i < seqListData.getSize(); i++) {
+      SubSeq seq = (SubSeq) seqListData.get(i);
+      if (!fullSeq.isEmpty()) {
+        fullSeq += ", ";
+      }
+      fullSeq += seq.notes;
+    }
+
+    return fullSeq;
+  }
+
+  private void updateTableModel(String fullSeq)
   {
     if (columnModel == null) {
       return;
     }
 
-    int selCol = columnModel.getSelectedColumn();
+    isUpdating = true;
+    this.columnModel.populateFromText(fullSeq, false, null);
+    isUpdating = false;
+  }
 
-    String prevSeq = columnModel.toString();
-
-    int index = 0;
-
-    while (selCol > 0) {
-      index = prevSeq.indexOf(',', index + 1);
-      selCol--;
-    }
-
-    assert (index >= 0);
-
-    String start, end;
-
-    if (index == 0) {
-      start = "";
-      end = ", " + prevSeq;
-    } else {
-      start = prevSeq.substring(0, index) + ", ";
-      end = prevSeq.substring(index);
-    }
+  private void insertSeq()
+  {
+    Object currSel = listAllSeqs.getSelectedValue();
+    int index = listAllSeqs.getSelectedIndex();
 
     isUpdating = true;
-    columnModel.populateFromText(start + newNoteSeq + end, false, null);
-    updateStatus();
+    seqListData.add(index, currSel);
     isUpdating = false;
+
+    listAllSeqs.setSelectedIndex(index);
   }
 
   private void addSeq()
   {
-    String existing = columnModel.toString();
+    Object currSel = listAllSeqs.getSelectedValue();
+    int index = listAllSeqs.getSelectedIndex();
+
     isUpdating = true;
-    columnModel.populateFromText(existing + "," + newNoteSeq, false, null);
-    updateStatus();
+    seqListData.addElement(currSel);
     isUpdating = false;
 
+    listAllSeqs.setSelectedIndex(index + 1);
+  }
+
+  private void removeSeq()
+  {
+    if (seqListData.size() <= 1) {
+      return;
+    }
+
+    isUpdating = true;
+    int index = listAllSeqs.getSelectedIndex();
+    seqListData.remove(index);
+    if (index >= seqListData.size()) {
+      index--;
+    }
+    isUpdating = false;
+    listAllSeqs.setSelectedIndex(index);
   }
 
   /** This method is called from within the constructor to
@@ -280,15 +388,19 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     simpleAccomp1 = new render.SimpleAccomp();
     panScales = new javax.swing.JPanel();
     listScrollPane = new javax.swing.JScrollPane();
-    listSeqs = new javax.swing.JList();
+    listScales = new javax.swing.JList();
     statusTextPane = new javax.swing.JScrollPane();
     statusText = new javax.swing.JTextPane();
-    jPanel1 = new javax.swing.JPanel();
+    multiSeqPanel = new javax.swing.JPanel();
+    seqListScroller = new javax.swing.JScrollPane();
+    listAllSeqs = new javax.swing.JList();
     buttonAdd = new javax.swing.JButton();
     buttonInsert = new javax.swing.JButton();
-    buttonReplace = new javax.swing.JButton();
+    buttonRemove = new javax.swing.JButton();
+    jPanel1 = new javax.swing.JPanel();
+    buttonPlay = new javax.swing.JButton();
     notePickerRoot = new render.NotePicker();
-    checkAuto = new javax.swing.JCheckBox();
+    allowMulti = new javax.swing.JCheckBox();
 
     filterCombo.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -300,21 +412,25 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
 
     tabby.addTab("Common Accomp", simpleAccomp1);
 
-    listSeqs.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-    listScrollPane.setViewportView(listSeqs);
+    listScales.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+    listScrollPane.setViewportView(listScales);
 
     javax.swing.GroupLayout panScalesLayout = new javax.swing.GroupLayout(panScales);
     panScales.setLayout(panScalesLayout);
     panScalesLayout.setHorizontalGroup(
       panScalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(listScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
+      .addComponent(listScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
     );
     panScalesLayout.setVerticalGroup(
       panScalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(listScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+      .addComponent(listScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
     );
 
     tabby.addTab("Scales", panScales);
+
+    statusTextPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    statusTextPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+    statusTextPane.setMinimumSize(new java.awt.Dimension(5, 56));
 
     statusText.setContentType("text/html");
     statusText.setEditable(false);
@@ -322,6 +438,17 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     statusText.setText("[No Sequence Selected]");
     statusText.setOpaque(false);
     statusTextPane.setViewportView(statusText);
+
+    multiSeqPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("All Sequences:"));
+
+    seqListScroller.setBorder(null);
+
+    listAllSeqs.setModel(new javax.swing.AbstractListModel() {
+      String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+      public int getSize() { return strings.length; }
+      public Object getElementAt(int i) { return strings[i]; }
+    });
+    seqListScroller.setViewportView(listAllSeqs);
 
     buttonAdd.setText("Add Seq");
     buttonAdd.setToolTipText("Add selected sequence to the end");
@@ -339,21 +466,53 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
       }
     });
 
-    buttonReplace.setText("Set Seq");
-    buttonReplace.setToolTipText("");
-    buttonReplace.addActionListener(new java.awt.event.ActionListener() {
+    buttonRemove.setText("Remove");
+    buttonRemove.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
-        buttonReplaceActionPerformed(evt);
+        buttonRemoveActionPerformed(evt);
+      }
+    });
+
+    javax.swing.GroupLayout multiSeqPanelLayout = new javax.swing.GroupLayout(multiSeqPanel);
+    multiSeqPanel.setLayout(multiSeqPanelLayout);
+    multiSeqPanelLayout.setHorizontalGroup(
+      multiSeqPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(multiSeqPanelLayout.createSequentialGroup()
+        .addGroup(multiSeqPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(buttonAdd)
+          .addComponent(buttonInsert)
+          .addComponent(buttonRemove))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addComponent(seqListScroller, javax.swing.GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE))
+    );
+    multiSeqPanelLayout.setVerticalGroup(
+      multiSeqPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(multiSeqPanelLayout.createSequentialGroup()
+        .addComponent(buttonAdd)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(buttonInsert)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(buttonRemove)
+        .addContainerGap())
+      .addComponent(seqListScroller, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+    );
+
+    buttonPlay.setFont(buttonPlay.getFont().deriveFont(buttonPlay.getFont().getStyle() | java.awt.Font.BOLD, buttonPlay.getFont().getSize()+3));
+    buttonPlay.setText("<html> Play</html>");
+    buttonPlay.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+    buttonPlay.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        buttonPlayActionPerformed(evt);
       }
     });
 
     notePickerRoot.setBorder(javax.swing.BorderFactory.createTitledBorder("Starting Note:"));
 
-    checkAuto.setText("<html>Custom Bass<br/ Progression</html>");
-    checkAuto.setToolTipText("<html>When checked, allows you to <br/>\ninsert, replace, and add sequences and scales<br/>\nto build a custom bass progression.\n</html>");
-    checkAuto.addActionListener(new java.awt.event.ActionListener() {
+    allowMulti.setText("<html>Allow Multiple Sequences</html>");
+    allowMulti.setToolTipText("<html>When checked, allows you to <br/>\ninsert, replace, and add sequences and scales<br/>\nto build a custom bass progression.\n</html>");
+    allowMulti.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
-        checkAutoActionPerformed(evt);
+        allowMultiActionPerformed(evt);
       }
     });
 
@@ -363,28 +522,24 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(jPanel1Layout.createSequentialGroup()
         .addContainerGap()
-        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-          .addComponent(notePickerRoot, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-          .addComponent(buttonReplace)
-          .addComponent(buttonInsert)
-          .addComponent(buttonAdd)
-          .addComponent(checkAuto, 0, 0, Short.MAX_VALUE))
-        .addContainerGap(11, Short.MAX_VALUE))
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(buttonPlay, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
+              .addComponent(notePickerRoot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addContainerGap())
+          .addComponent(allowMulti, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
     );
     jPanel1Layout.setVerticalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+      .addGroup(jPanel1Layout.createSequentialGroup()
         .addContainerGap()
-        .addComponent(checkAuto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addComponent(buttonPlay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(buttonReplace)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(buttonInsert)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(buttonAdd)
-        .addGap(18, 18, 18)
         .addComponent(notePickerRoot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(25, Short.MAX_VALUE))
+        .addGap(20, 20, 20)
+        .addComponent(allowMulti, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addContainerGap())
     );
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -392,20 +547,25 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-          .addComponent(statusTextPane, javax.swing.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
-          .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE))
+          .addComponent(statusTextPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
+          .addComponent(multiSeqPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addGroup(layout.createSequentialGroup()
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)))
         .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addComponent(statusTextPane, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+          .addComponent(jPanel1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE))
-      .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addComponent(multiSeqPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(statusTextPane, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE))
     );
 
     tabby.getAccessibleContext().setAccessibleName("Scales");
@@ -415,9 +575,9 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     {//GEN-HEADEREND:event_filterComboItemStateChanged
       int index = filterCombo.getSelectedIndex();
       if ((index >= 0) && (index < ChordRegistry.mainRegistry().allSeqDefs.length)) {
-        listSeqs.setListData(ChordRegistry.mainRegistry().allSeqDefs[index]);
+        listScales.setListData(ChordRegistry.mainRegistry().allSeqDefs[index]);
       } else {
-        listSeqs.setListData(new Object[0]);
+        listScales.setListData(new Object[0]);
       }
     }//GEN-LAST:event_filterComboItemStateChanged
 
@@ -431,26 +591,35 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
       insertSeq();
     }//GEN-LAST:event_buttonInsertActionPerformed
 
-    private void buttonReplaceActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_buttonReplaceActionPerformed
-    {//GEN-HEADEREND:event_buttonReplaceActionPerformed
-      replaceSeq();
-    }//GEN-LAST:event_buttonReplaceActionPerformed
+    private void buttonRemoveActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_buttonRemoveActionPerformed
+    {//GEN-HEADEREND:event_buttonRemoveActionPerformed
+      removeSeq();
+    }//GEN-LAST:event_buttonRemoveActionPerformed
 
-    private void checkAutoActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_checkAutoActionPerformed
-    {//GEN-HEADEREND:event_checkAutoActionPerformed
-      toggleAutoReplace(!checkAuto.isSelected());
-    }//GEN-LAST:event_checkAutoActionPerformed
+    private void allowMultiActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_allowMultiActionPerformed
+    {//GEN-HEADEREND:event_allowMultiActionPerformed
+      toggleAllowMultiSeq(allowMulti.isSelected());
+    }//GEN-LAST:event_allowMultiActionPerformed
+
+    private void buttonPlayActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_buttonPlayActionPerformed
+    {//GEN-HEADEREND:event_buttonPlayActionPerformed
+      updateTableModel(buildFullSeq());
+    }//GEN-LAST:event_buttonPlayActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JCheckBox allowMulti;
   private javax.swing.JButton buttonAdd;
   private javax.swing.JButton buttonInsert;
-  private javax.swing.JButton buttonReplace;
-  private javax.swing.JCheckBox checkAuto;
+  private javax.swing.JButton buttonPlay;
+  private javax.swing.JButton buttonRemove;
   private javax.swing.JComboBox filterCombo;
   private javax.swing.JPanel jPanel1;
+  private javax.swing.JList listAllSeqs;
+  private javax.swing.JList listScales;
   private javax.swing.JScrollPane listScrollPane;
-  private javax.swing.JList listSeqs;
+  private javax.swing.JPanel multiSeqPanel;
   private render.NotePicker notePickerRoot;
   private javax.swing.JPanel panScales;
+  private javax.swing.JScrollPane seqListScroller;
   private render.SimpleAccomp simpleAccomp1;
   private javax.swing.JTextPane statusText;
   private javax.swing.JScrollPane statusTextPane;

@@ -3,6 +3,7 @@ package render;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -10,7 +11,9 @@ import java.awt.RenderingHints;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
 
@@ -54,7 +57,6 @@ public class RenderBassBoard extends JPanel
     colRepainter = new RepaintListener();
     rowRepainter = new RepaintListener();
   }
-
   Dimension margin = new Dimension();
   int borderWidth = 16;
   Dimension _contentDim = new Dimension(0, 0);
@@ -160,6 +162,7 @@ public class RenderBassBoard extends JPanel
 
   class RepaintListener extends ListSelChangeListener
   {
+
     RepaintListener()
     {
       super(true);
@@ -182,7 +185,7 @@ public class RenderBassBoard extends JPanel
     if (_rowSel != null) {
       _rowSel.removeListSelectionListener(rowRepainter);
     }
-    
+
     _selCombo = newSel;
     _rowSel = rowSel;
 
@@ -248,7 +251,10 @@ public class RenderBassBoard extends JPanel
 
       if (clickPos != null) {
         this.drawPos(clickPos, RenderBoardUI.BoardButtonImage.FAST_CLICK);
+        //this.paintBassRowHeader((Graphics2D)getGraphics());
       }
+
+      //repaint();
     }
   }
 
@@ -393,15 +399,13 @@ public class RenderBassBoard extends JPanel
     graphics2D.fillRect(0, 0, getWidth(), getHeight());
 
 
-    //if (_isHoriz) {
     if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
       graphics2D.translate((getWidth() - _contentDim.width - margin.width) / 2, 0);
     }
-    //} else {
-    //   if (this.getAlignmentY() == JComponent.CENTER_ALIGNMENT) {
-    //     graphics2D.translate(0, (getHeight() - _contentDim.height - margin.height) / 2);
-    //   }
-    //}
+    
+//    if (this.getAlignmentY() == JComponent.CENTER_ALIGNMENT) {
+//      graphics2D.translate(0, (getHeight() - _contentDim.height - margin.height) / 2);
+//    }
 
     // Paint Border & Background
     RoundRectangle2D roundRect =
@@ -422,6 +426,8 @@ public class RenderBassBoard extends JPanel
       yW = _rInc;
       xW = _cInc;
     }
+
+    //paintBassRowHeader(graphics2D);
 
     double ellipseRatio = RenderBoardUI.defaultUI.ellipseRatio;
 
@@ -615,7 +621,6 @@ public class RenderBassBoard extends JPanel
     g.setColor(Color.black);
     g.fillRect(0, 0, comp.getWidth(), comp.getHeight());
 
-    computeRenderOffsets();
     g.setColor(Color.white);
     g.setFont(this.getFont());
 
@@ -625,22 +630,66 @@ public class RenderBassBoard extends JPanel
     }
   }
 
-  private void paintBassRowHeader(JComponent comp, Graphics g)
+  private void paintBassRowHeader(Graphics2D g)
   {
+    g.setFont(g.getFont().deriveFont(Font.BOLD, 18.f));
+    int stringHeight = g.getFontMetrics().getHeight();
+
     int x = RenderBoardUI.defaultUI.buttonXMargin;
-    int y = RenderBoardUI.defaultUI.buttonXMargin + _rInc / 2 + g.getFontMetrics().getHeight() / 2;
+    int y = RenderBoardUI.defaultUI.buttonXMargin + (_rInc / 2) + stringHeight;
+    //y += g.getFontMetrics().getDescent();
 
-    g.setColor(Color.black);
-    g.fillRect(0, 0, comp.getWidth(), comp.getHeight());
+    //g.setColor(Color.black);
+    //g.fillRect(0, 0, comp.getWidth(), comp.getHeight());
 
-    computeRenderOffsets();
-    g.setColor(Color.white);
-    g.setFont(this.getFont());
+    //computeRenderOffsets();
+    //g.setColor(Color.white);
+    //g.setFont(this.getFont());
+    AffineTransform origTransform = g.getTransform();
+
+    int scale = 1;
+    
+    if (!this._isHoriz) {
+      g.rotate(Math.PI / 2);
+      x += 50;
+      y -= 300;
+      scale = -1;
+    }
 
     for (int r = 0; r < _rows; r++) {
-      g.drawString(_theBoard.getRow(r).toString(), x, y);
+      String string = _theBoard.getRow(r).toString();
+
+      TextLayout lay = new TextLayout(string, g.getFont(), g.getFontRenderContext());
+
+      //int stringWidth = g.getFontMetrics().stringWidth(string);
+
+      g.setPaint(new Color(0, 0, 0, 0xaf));
+      //g.fillRect(x - stringWidth, y - stringHeight / 2, stringWidth, stringHeight);
+
+      Rectangle2D bounds = lay.getBounds();
+      g.translate(x - bounds.getWidth(), y);
+      int off = 4;
+      g.fillRoundRect(
+              (int) bounds.getX() - off,
+              (int) bounds.getY() - off,
+              (int) bounds.getWidth() + 2 * off,
+              (int) bounds.getHeight() + 2 * off,
+              off * 2, off * 2);
+
+      if ((clickPos != null) && (clickPos.row == r)) {
+        g.setColor(Color.magenta);
+      } else {
+        g.setColor(Color.cyan);
+      }
+
+      lay.draw(g, 0, 0);
+      g.translate(-x + bounds.getWidth(), -y);
+
       y += _rInc;
+      x += _slope * scale;
     }
+
+    g.setTransform(origTransform);
   }
   //Member Vars
   //================================================================================
