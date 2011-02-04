@@ -51,8 +51,6 @@ public class SeqTablePanel extends ToolPanel
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, controlPanel);
     this.seqTableScrollPane.setCorner(ScrollPaneConstants.UPPER_RIGHT_CORNER, new JPanel());
 
-    statusText.setBackground(new Color(0, 0, 0, 0));
-
     colListener = new ColumnCountListener();
   }
 
@@ -83,7 +81,7 @@ public class SeqTablePanel extends ToolPanel
     this.setLayout(new BorderLayout());
     this.add(left ? BorderLayout.WEST : BorderLayout.EAST, sidebar);
     this.add(BorderLayout.CENTER, this.seqTableScrollPane);
-    this.add(BorderLayout.SOUTH, this.statusScrollPane);
+    this.add(BorderLayout.SOUTH, this.statusText);
   }
 
   private class ColumnCountListener extends SeqTableEventAdapter
@@ -330,8 +328,7 @@ public class SeqTablePanel extends ToolPanel
     sidebar = new javax.swing.JPanel();
     buttonHideEditor = new javax.swing.JButton();
     chordButtons = new javax.swing.JPanel();
-    statusScrollPane = new javax.swing.JScrollPane();
-    statusText = new javax.swing.JTextPane();
+    statusText = new render.TransparentTextPane();
 
     toolPlay.setText("Play");
     toolPlay.setActionCommand("PlaySeq");
@@ -397,33 +394,22 @@ public class SeqTablePanel extends ToolPanel
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
 
-    statusScrollPane.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-    statusScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    statusScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-    statusScrollPane.setOpaque(false);
-
-    statusText.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-    statusText.setContentType("text/html");
-    statusText.setEditable(false);
-    statusText.setFont(statusText.getFont().deriveFont(statusText.getFont().getSize()+7f));
-    statusText.setText("Status");
-    statusText.setOpaque(false);
-    statusScrollPane.setViewportView(statusText);
+    statusText.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-          .addGroup(layout.createSequentialGroup()
-            .addGap(10, 10, 10)
-            .addComponent(statusScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 477, Short.MAX_VALUE))
-          .addGroup(layout.createSequentialGroup()
-            .addComponent(sidebar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)))
+        .addComponent(sidebar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
         .addContainerGap())
+      .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        .addGroup(layout.createSequentialGroup()
+          .addContainerGap()
+          .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 477, Short.MAX_VALUE)
+          .addContainerGap()))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -431,8 +417,11 @@ public class SeqTablePanel extends ToolPanel
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addComponent(sidebar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
           .addComponent(seqTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(statusScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(69, 69, 69))
+      .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        .addGroup(layout.createSequentialGroup()
+          .addContainerGap(298, Short.MAX_VALUE)
+          .addComponent(statusText, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)))
     );
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -443,8 +432,7 @@ public class SeqTablePanel extends ToolPanel
   private javax.swing.JTable seqTable;
   private javax.swing.JScrollPane seqTableScrollPane;
   private javax.swing.JPanel sidebar;
-  private javax.swing.JScrollPane statusScrollPane;
-  private javax.swing.JTextPane statusText;
+  private render.TransparentTextPane statusText;
   private javax.swing.JButton toolPlay;
   // End of variables declaration//GEN-END:variables
 }

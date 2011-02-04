@@ -28,18 +28,18 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="statusTextPane" alignment="0" pref="449" max="32767" attributes="2"/>
+          <Group type="102" attributes="0">
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="multiSeqPanel" alignment="1" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="tabby" pref="324" max="32767" attributes="2"/>
+                      <Component id="tabby" pref="331" max="32767" attributes="2"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
+          <Component id="statusText" alignment="0" pref="466" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -49,10 +49,11 @@
                   <Component id="jPanel1" alignment="0" min="0" max="32767" attributes="1"/>
                   <Component id="tabby" alignment="0" pref="191" max="32767" attributes="1"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="multiSeqPanel" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="statusTextPane" pref="56" max="32767" attributes="2"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="statusText" pref="58" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -86,7 +87,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="listScrollPane" alignment="0" pref="319" max="32767" attributes="1"/>
+                  <Component id="listScrollPane" alignment="0" pref="326" max="32767" attributes="1"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -114,35 +115,6 @@
         </Container>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JScrollPane" name="statusTextPane">
-      <Properties>
-        <Property name="horizontalScrollBarPolicy" type="int" value="31"/>
-        <Property name="verticalScrollBarPolicy" type="int" value="21"/>
-        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[5, 56]"/>
-        </Property>
-      </Properties>
-      <AuxValues>
-        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-      </AuxValues>
-
-      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
-      <SubComponents>
-        <Component class="javax.swing.JTextPane" name="statusText">
-          <Properties>
-            <Property name="contentType" type="java.lang.String" value="text/html"/>
-            <Property name="editable" type="boolean" value="false"/>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
-              <FontInfo relative="true">
-                <Font component="statusText" property="font" relativeSize="true" size="3"/>
-              </FontInfo>
-            </Property>
-            <Property name="text" type="java.lang.String" value="[No Sequence Selected]"/>
-            <Property name="opaque" type="boolean" value="false"/>
-          </Properties>
-        </Component>
-      </SubComponents>
-    </Container>
     <Container class="javax.swing.JPanel" name="multiSeqPanel">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -162,7 +134,7 @@
                       <Component id="buttonRemove" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="seqListScroller" pref="344" max="32767" attributes="2"/>
+                  <Component id="seqListScroller" pref="351" max="32767" attributes="2"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -307,5 +279,13 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="render.TransparentTextPane" name="statusText">
+      <Properties>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[5, 56]"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="[No Sequence Selected]"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>

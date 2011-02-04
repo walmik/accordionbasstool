@@ -10,6 +10,7 @@
  */
 package render;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.util.Vector;
 import javax.swing.DefaultListCellRenderer;
@@ -54,7 +55,7 @@ public class TabChordInfo extends ToolPanel
 
   {
     super.init(model);
-    clickedLabel.setText(columnModel.getSelectedComboStateString());
+    clickTextPane.setText(columnModel.getSelectedComboStateString());
   }
 
   @Override
@@ -78,7 +79,7 @@ public class TabChordInfo extends ToolPanel
 
     listChanging = false;
 
-    clickedLabel.setText(columnModel.getSelectedComboStateString());
+    clickTextPane.setText(columnModel.getSelectedComboStateString());
   }
 
   private void selectMatchFromList()
@@ -144,9 +145,9 @@ public class TabChordInfo extends ToolPanel
 
     jScrollPane1 = new javax.swing.JScrollPane();
     matchesListBox = new javax.swing.JList();
-    clickedLabel = new javax.swing.JLabel();
     checkShowUnknownChords = new javax.swing.JCheckBox();
     checkIgnoreInversion = new javax.swing.JCheckBox();
+    clickTextPane = new render.TransparentTextPane();
 
     setToolTipText(toolTip);
 
@@ -156,10 +157,6 @@ public class TabChordInfo extends ToolPanel
     matchesListBox.setFont(new java.awt.Font("Monospaced", 1, 17)); // NOI18N
     matchesListBox.setToolTipText(toolTip);
     jScrollPane1.setViewportView(matchesListBox);
-
-    clickedLabel.setFont(new java.awt.Font("Tahoma", 0, 18));
-    clickedLabel.setText("Info");
-    clickedLabel.setBorder(javax.swing.BorderFactory.createTitledBorder("Currently Selected On Board:"));
 
     checkShowUnknownChords.setText("List Unknown Chords");
     checkShowUnknownChords.addActionListener(new java.awt.event.ActionListener() {
@@ -175,11 +172,13 @@ public class TabChordInfo extends ToolPanel
       }
     });
 
+    clickTextPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Currently Selected On Board:"));
+    clickTextPane.setText("Info");
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(clickedLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
       .addGroup(layout.createSequentialGroup()
         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -187,11 +186,13 @@ public class TabChordInfo extends ToolPanel
           .addComponent(checkShowUnknownChords)
           .addComponent(checkIgnoreInversion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         .addContainerGap(53, Short.MAX_VALUE))
+      .addComponent(clickTextPane, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addComponent(clickedLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addComponent(clickTextPane, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(layout.createSequentialGroup()
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -218,7 +219,7 @@ public class TabChordInfo extends ToolPanel
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkIgnoreInversion;
   private javax.swing.JCheckBox checkShowUnknownChords;
-  private javax.swing.JLabel clickedLabel;
+  private render.TransparentTextPane clickTextPane;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JList matchesListBox;
   // End of variables declaration//GEN-END:variables

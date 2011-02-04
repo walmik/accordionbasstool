@@ -87,8 +87,6 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     notePickerRoot.addPropertyChangeListener("Note", this);
     simpleAccomp1.addPropertyChangeListener("Seq", this);
     listScales.addListSelectionListener(this);
-
-    statusText.setBackground(new Color(0, 0, 0, 0));
   }
 
   @Override
@@ -389,8 +387,6 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     panScales = new javax.swing.JPanel();
     listScrollPane = new javax.swing.JScrollPane();
     listScales = new javax.swing.JList();
-    statusTextPane = new javax.swing.JScrollPane();
-    statusText = new javax.swing.JTextPane();
     multiSeqPanel = new javax.swing.JPanel();
     seqListScroller = new javax.swing.JScrollPane();
     listAllSeqs = new javax.swing.JList();
@@ -401,6 +397,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     buttonPlay = new javax.swing.JButton();
     notePickerRoot = new render.NotePicker();
     allowMulti = new javax.swing.JCheckBox();
+    statusText = new render.TransparentTextPane();
 
     filterCombo.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -419,7 +416,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     panScales.setLayout(panScalesLayout);
     panScalesLayout.setHorizontalGroup(
       panScalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(listScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+      .addComponent(listScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
     );
     panScalesLayout.setVerticalGroup(
       panScalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -427,17 +424,6 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     );
 
     tabby.addTab("Scales", panScales);
-
-    statusTextPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    statusTextPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-    statusTextPane.setMinimumSize(new java.awt.Dimension(5, 56));
-
-    statusText.setContentType("text/html");
-    statusText.setEditable(false);
-    statusText.setFont(statusText.getFont().deriveFont(statusText.getFont().getSize()+3f));
-    statusText.setText("[No Sequence Selected]");
-    statusText.setOpaque(false);
-    statusTextPane.setViewportView(statusText);
 
     multiSeqPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("All Sequences:"));
 
@@ -483,7 +469,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
           .addComponent(buttonInsert)
           .addComponent(buttonRemove))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(seqListScroller, javax.swing.GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE))
+        .addComponent(seqListScroller, javax.swing.GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE))
     );
     multiSeqPanelLayout.setVerticalGroup(
       multiSeqPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -542,19 +528,22 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
         .addContainerGap())
     );
 
+    statusText.setMinimumSize(new java.awt.Dimension(5, 56));
+    statusText.setText("[No Sequence Selected]");
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-          .addComponent(statusTextPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
-          .addComponent(multiSeqPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-          .addGroup(layout.createSequentialGroup()
+      .addGroup(layout.createSequentialGroup()
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(multiSeqPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
             .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)))
+            .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)))
         .addContainerGap())
+      .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 466, Short.MAX_VALUE)
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -565,7 +554,8 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(multiSeqPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(statusTextPane, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE))
+        .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
+        .addContainerGap())
     );
 
     tabby.getAccessibleContext().setAccessibleName("Scales");
@@ -621,8 +611,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
   private javax.swing.JPanel panScales;
   private javax.swing.JScrollPane seqListScroller;
   private render.SimpleAccomp simpleAccomp1;
-  private javax.swing.JTextPane statusText;
-  private javax.swing.JScrollPane statusTextPane;
+  private render.TransparentTextPane statusText;
   private javax.swing.JTabbedPane tabby;
   // End of variables declaration//GEN-END:variables
 }

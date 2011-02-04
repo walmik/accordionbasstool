@@ -360,7 +360,7 @@ public class TabChordPicker extends ToolPanel
     labelInversion = new javax.swing.JLabel();
     labelAddBass = new javax.swing.JLabel();
     labelSlash = new javax.swing.JLabel();
-    statusLabel = new javax.swing.JLabel();
+    statusLabel = new render.TransparentTextPane();
 
     mustBeLowestCheck.setSelected(true);
     mustBeLowestCheck.setText("Must be in Bass");
@@ -427,10 +427,9 @@ public class TabChordPicker extends ToolPanel
         .addContainerGap(24, Short.MAX_VALUE))
     );
 
-    statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getSize()+3f));
-    statusLabel.setText("Info");
-    statusLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
     statusLabel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+    statusLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+    statusLabel.setText("Info");
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
@@ -438,15 +437,15 @@ public class TabChordPicker extends ToolPanel
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addComponent(controlGrid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
         .addContainerGap())
       .addComponent(chordPicker1, javax.swing.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
           .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
           .addComponent(controlGrid, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -469,6 +468,6 @@ public class TabChordPicker extends ToolPanel
   private javax.swing.JCheckBox mustBeLowestCheck;
   private render.NotePicker notePickerAdd;
   private render.NotePicker notePickerRoot;
-  private javax.swing.JLabel statusLabel;
+  private render.TransparentTextPane statusLabel;
   // End of variables declaration//GEN-END:variables
 }
