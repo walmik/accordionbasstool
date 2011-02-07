@@ -21,6 +21,7 @@ import javax.swing.event.TableModelListener;
  */
 public class TabSeqEditor extends ToolPanel implements TableModelListener
 {
+
   JTable seqTable;
   boolean isUpdating = false;
   DefaultComboBoxModel recentSeqs;
@@ -38,10 +39,22 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
   public void init(SeqColumnModel theModel)
   {
     super.init(theModel);
-    //seqTable = theTable;
-    columnModel.getDataModel().addTableModelListener(this);
+  }
 
-    //seqPicker1.init(theModel);
+  @Override
+  protected void toggleListeners(boolean attach)
+  {
+    super.toggleListeners(attach);
+    
+    if (columnModel == null) {
+      return;
+    }
+
+    if (attach) {
+      columnModel.getDataModel().addTableModelListener(this);
+    } else {
+      columnModel.getDataModel().removeTableModelListener(this);
+    }
   }
 
   @Override
@@ -207,7 +220,6 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
 
       isUpdating = false;
     }//GEN-LAST:event_buttonClearRecentActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton buttonClearRecent;
   private javax.swing.JCheckBox checkAllowDups;

@@ -10,7 +10,6 @@
  */
 package render;
 
-import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Vector;
@@ -20,8 +19,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import music.ChordParser;
 import music.ChordRegistry;
 import music.Interval;
@@ -33,7 +30,7 @@ import music.StringParser;
  *
  * @author Ilya
  */
-public class SeqPicker extends ToolPanel implements PropertyChangeListener, ChangeListener, TableModelListener, ListSelectionListener
+public class SeqPicker extends ToolPanel implements PropertyChangeListener, ChangeListener, ListSelectionListener
 {
 
   String newNoteSeq = "";
@@ -41,7 +38,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
   boolean isMultiSeq = false;
   DefaultListModel seqListData;
 
-  static class SubSeq
+  static class SubSeq implements Cloneable
   {
 
     String notes;
@@ -75,6 +72,12 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     public String toString()
     {
       return notes;
+    }
+
+    @Override
+    protected Object clone()
+    {
+      return new SubSeq(getRoot(), notes);
     }
   }
 
@@ -115,22 +118,6 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
   }
 
   @Override
-  protected void toggleListeners(boolean attach)
-  {
-    super.toggleListeners(attach);
-
-    if (columnModel == null) {
-      return;
-    }
-
-    if (attach) {
-      columnModel.getDataModel().addTableModelListener(this);
-    } else {
-      columnModel.getDataModel().removeTableModelListener(this);
-    }
-  }
-
-  @Override
   protected void syncUIToDataModel()
   {
     if ((columnModel != null) && !isUpdating) {
@@ -140,31 +127,35 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
         return;
       }
 
-      if (seqListData.isEmpty()) {
-        return;
-      }
+      updateCurrSeq();
 
-      SubSeq first = (SubSeq) seqListData.get(0);
-
-      Interval ival = def.rootNote.diff(first.getRoot());
-
-      for (int i = 0; i < seqListData.size(); i++) {
-        SubSeq seq = (SubSeq) seqListData.get(i);
-        seq.transpose(ival);
-      }
-
-      selectCurrSeq();
-      listAllSeqs.repaint();
+//      if (seqListData.isEmpty()) {
+//        return;
+//      }
+//
+//      SubSeq first = (SubSeq) seqListData.get(0);
+//
+//      Interval ival = def.rootNote.diff(first.getRoot());
+//
+//      transposeAllSeqs(ival);
     }
   }
 
-  @Override
-  public void tableChanged(TableModelEvent e)
+  private void transposeAllSeqs(Interval ival)
   {
-    if (!isUpdating) {
-      syncUIToDataModel();
+    if (!isVisible() || seqListData.isEmpty()) {
+      return;
     }
+
+    for (int i = 0; i < seqListData.size(); i++) {
+      SubSeq seq = (SubSeq) seqListData.get(i);
+      seq.transpose(ival);
+    }
+
+    selectCurrSeq();
+    listAllSeqs.repaint();
   }
+
   boolean isAlreadyAdjusting = false;
 
   @Override
@@ -193,8 +184,10 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
 
     if (evt.getSource() == notePickerRoot) {
       this.simpleAccomp1.setRoot(notePickerRoot.getNote());
-    } else {
+    } else if (evt.getSource() == simpleAccomp1) {
       updateCurrSeq();
+    } else if (evt.getPropertyName().equals(TransposePanel.TRANSPOSE_PROP)) {
+      transposeAllSeqs((Interval)evt.getNewValue());
     }
   }
 
@@ -334,11 +327,11 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
 
   private void insertSeq()
   {
-    Object currSel = listAllSeqs.getSelectedValue();
+    SubSeq subSeq = (SubSeq)listAllSeqs.getSelectedValue();
     int index = listAllSeqs.getSelectedIndex();
 
     isUpdating = true;
-    seqListData.add(index, currSel);
+    seqListData.add(index, subSeq.clone());
     isUpdating = false;
 
     listAllSeqs.setSelectedIndex(index);
@@ -346,11 +339,11 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
 
   private void addSeq()
   {
-    Object currSel = listAllSeqs.getSelectedValue();
+    SubSeq subSeq = (SubSeq)listAllSeqs.getSelectedValue();
     int index = listAllSeqs.getSelectedIndex();
 
     isUpdating = true;
-    seqListData.addElement(currSel);
+    seqListData.addElement(subSeq.clone());
     isUpdating = false;
 
     listAllSeqs.setSelectedIndex(index + 1);
@@ -416,7 +409,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     panScales.setLayout(panScalesLayout);
     panScalesLayout.setHorizontalGroup(
       panScalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(listScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+      .addComponent(listScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
     );
     panScalesLayout.setVerticalGroup(
       panScalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -469,7 +462,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
           .addComponent(buttonInsert)
           .addComponent(buttonRemove))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(seqListScroller, javax.swing.GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE))
+        .addComponent(seqListScroller, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE))
     );
     multiSeqPanelLayout.setVerticalGroup(
       multiSeqPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -541,9 +534,9 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
           .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
             .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)))
+            .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)))
         .addContainerGap())
-      .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 466, Short.MAX_VALUE)
+      .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -554,7 +547,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(multiSeqPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
+        .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
         .addContainerGap())
     );
 

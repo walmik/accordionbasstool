@@ -34,12 +34,12 @@
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="tabby" pref="331" max="32767" attributes="2"/>
+                      <Component id="tabby" pref="339" max="32767" attributes="2"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="statusText" alignment="0" pref="466" max="32767" attributes="0"/>
+          <Component id="statusText" alignment="0" pref="474" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -52,7 +52,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="multiSeqPanel" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="statusText" pref="58" max="32767" attributes="0"/>
+              <Component id="statusText" pref="56" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -87,7 +87,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="listScrollPane" alignment="0" pref="326" max="32767" attributes="1"/>
+                  <Component id="listScrollPane" alignment="0" pref="334" max="32767" attributes="1"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -134,7 +134,7 @@
                       <Component id="buttonRemove" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="seqListScroller" pref="351" max="32767" attributes="2"/>
+                  <Component id="seqListScroller" pref="359" max="32767" attributes="2"/>
               </Group>
           </Group>
         </DimensionLayout>

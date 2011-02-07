@@ -4,7 +4,8 @@
  */
 package render;
 
-import java.awt.event.ComponentListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
@@ -13,14 +14,13 @@ import javax.swing.event.AncestorListener;
  *
  * @author Ilya
  */
-public abstract class ToolPanel extends JPanel implements AncestorListener
+public abstract class ToolPanel extends JPanel implements AncestorListener, PropertyChangeListener
 {
 
   protected SeqColumnModel columnModel;
   ListSelChangeListener colChange;
   ListSelChangeListener rowChange;
   final static String RESET_TO_PREF_SIZE = "toolResetToPrefSize";
-  private boolean visibleState = false;
 
   class ToolSelChangeListener extends ListSelChangeListener
   {
@@ -120,6 +120,11 @@ public abstract class ToolPanel extends JPanel implements AncestorListener
   protected void hidden()
   {
     toggleListeners(false);
+  }
+
+  @Override
+  public void propertyChange(PropertyChangeEvent evt)
+  {
   }
 
   @Override

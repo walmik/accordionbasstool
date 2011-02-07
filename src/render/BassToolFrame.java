@@ -49,6 +49,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   JComponent editor;
   boolean modeMenuEnabled;
   boolean updateDividers = false;
+  TransposePanel transposePanel;
 
   /** Creates new form BassToolFrame */
   public BassToolFrame()
@@ -96,6 +97,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     controlSplitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
     tabOptions.addPropertyChangeListener(this);
+
+    transposePanel = new TransposePanel();
+    transposePanel.addPropertyChangeListener(TransposePanel.TRANSPOSE_PROP, seqPicker1);
 
     seqPicker1.setAnim(anim);
 
@@ -563,9 +567,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     this.menuPlayback.add(anim.getPlayStopAction());
 
     // Transpose Menu
-    TransposePanel trans = new TransposePanel();
-    trans.init(columnModel);
-    menuTranspose.add(trans);
+    transposePanel.init(columnModel);
+    menuTranspose.add(transposePanel);
   }
 
   /** This method is called from within the constructor to

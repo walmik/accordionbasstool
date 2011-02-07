@@ -25,6 +25,7 @@ import music.NamedInterval;
  */
 public class TransposePanel extends javax.swing.JPanel implements MenuElement
 {
+  final static String TRANSPOSE_PROP = "TransposedIval";
   
   SeqColumnModel columnModel;
 
@@ -160,12 +161,16 @@ public class TransposePanel extends javax.swing.JPanel implements MenuElement
 
   private void downButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_downButtonActionPerformed
   {//GEN-HEADEREND:event_downButtonActionPerformed
-    columnModel.transposeAllByInterval(getCurrInterval().scale(-1));
+    Interval ival = getCurrInterval().scale(-1);
+    columnModel.transposeAllByInterval(ival);
+    this.firePropertyChange(TRANSPOSE_PROP, null, ival);
   }//GEN-LAST:event_downButtonActionPerformed
 
   private void upButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_upButtonActionPerformed
   {//GEN-HEADEREND:event_upButtonActionPerformed
-    columnModel.transposeAllByInterval(getCurrInterval());
+    Interval ival = getCurrInterval();
+    columnModel.transposeAllByInterval(ival);
+    this.firePropertyChange(TRANSPOSE_PROP, null, ival);
   }//GEN-LAST:event_upButtonActionPerformed
 
   // Variables declaration - do not modify//GEN-BEGIN:variables

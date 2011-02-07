@@ -11,7 +11,6 @@
 package render;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
@@ -330,6 +329,8 @@ public class SeqTablePanel extends ToolPanel
     chordButtons = new javax.swing.JPanel();
     statusText = new render.TransparentTextPane();
 
+    controlPanel.setMinimumSize(new java.awt.Dimension(90, 5));
+
     toolPlay.setText("Play");
     toolPlay.setActionCommand("PlaySeq");
 
@@ -340,11 +341,11 @@ public class SeqTablePanel extends ToolPanel
     controlPanel.setLayout(controlPanelLayout);
     controlPanelLayout.setHorizontalGroup(
       controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(controlPanelLayout.createSequentialGroup()
+      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, controlPanelLayout.createSequentialGroup()
         .addContainerGap()
-        .addGroup(controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(jLabel1)
-          .addComponent(toolPlay))
+        .addGroup(controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
+          .addComponent(toolPlay, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE))
         .addContainerGap())
     );
     controlPanelLayout.setVerticalGroup(

@@ -4,10 +4,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 
-public class SeqTableEventAdapter implements TableColumnModelListener, TableModelListener
+public class SeqTableEventAdapter implements TableColumnModelListener
 {
   public SeqTableEventAdapter()
   {
@@ -45,11 +43,5 @@ public class SeqTableEventAdapter implements TableColumnModelListener, TableMode
 
   public void columnCountChanged(TableColumnModelEvent e)
   {
-  }
-
-  @Override
-  public void tableChanged(TableModelEvent e)
-  {
-    //clearLastIndex();
   }
 }

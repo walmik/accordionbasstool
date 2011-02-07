@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -88,9 +89,14 @@ public class SeqViewerController
     rowHeader = new JList(columnModel.getRowHeaderDataModel());
     rowHeader.setCellRenderer(new RowHeaderRenderer(header));
     rowHeader.setSelectionModel(seqTable.getSelectionModel());
-    //rowHeader.setFixedCellWidth(DEFAULT_ROW_HEADER_WIDTH);
     rowHeader.setFixedCellHeight(seqTable.getRowHeight());
     rowHeader.setOpaque(false);
+
+    Component controlPanel = this.tableScrollPane.getCorner(ScrollPaneConstants.UPPER_LEFT_CORNER);
+    if (controlPanel != null) {
+      rowHeader.setFixedCellWidth(controlPanel.getPreferredSize().width);
+    }
+
     //rowHeader.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
     rowHeader.setToolTipText("Button Combinations, Best to Worse");
 
@@ -109,7 +115,7 @@ public class SeqViewerController
       protected void selectionChanged(int index)
       {
         //if (columnModel.setSelectedSeq(index)) {
-          seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
+        seqTable.scrollRectToVisible(seqTable.getCellRect(index, seqTable.getSelectedColumn(), true));
         //}
       }
     });
@@ -124,18 +130,7 @@ public class SeqViewerController
         seqTable.scrollRectToVisible(seqTable.getCellRect(seqTable.getSelectedRow(), index, true));
         seqTable.getTableHeader().repaint();
       }
-      
     });
-
-//    columnModel.getDataModel().addTableModelListener(new TableModelListener()
-//    {
-//      @Override
-//      public void tableChanged(TableModelEvent e)
-//      {
-//        seqTable.repaint();
-//        seqTable.getTableHeader().repaint();
-//      }
-//    });
   }
 
   void updateTable()
@@ -421,8 +416,8 @@ public class SeqViewerController
       defColor = header.getBackground();
       selColor = defColor.darker();
       //selColor = SystemColor.textHighlight;
-      //lowered = BorderFactory.createLoweredBevelBorder();
-      //raised = BorderFactory.createRaisedBevelBorder();
+//      lowered = new SoftBevelBorder(BevelBorder.LOWERED);
+//      raised = new SoftBevelBorder(BevelBorder.RAISED);
       raised = noFocusBorder;
       lowered = noFocusBorder;
 
@@ -438,6 +433,18 @@ public class SeqViewerController
       this.setHorizontalAlignment(CENTER);
       this.setHorizontalTextPosition(LEFT);
       this.setVerticalTextPosition(CENTER);
+    }
+
+    @Override
+    public void paintComponent(Graphics g)
+    {
+      g.setColor(getBackground());
+      int off = 8;
+      int height = getHeight() - 2 * off;
+      g.fillRoundRect(8, off, getWidth(), height, off, off);
+      setOpaque(false);
+      super.paintComponent(g);
+      setOpaque(true);
     }
 
     @Override
@@ -475,7 +482,7 @@ public class SeqViewerController
         } else {
           this.setForeground(Color.black);
         }
-        
+
       } else {
         this.setIcon(RenderBoardUI.defaultUI.optimalityIcons[RenderBoardUI.defaultUI.optimalityIcons.length - 1]);
         this.setText("None");
@@ -623,7 +630,7 @@ public class SeqViewerController
       if (table == null) {
         return;
       }
-      
+
       highliteBorder = new CompoundBorder(
               new LineBorder(Color.black, 2),
               new EmptyBorder(2, 2, 2, 2));

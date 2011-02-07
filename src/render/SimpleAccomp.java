@@ -179,6 +179,22 @@ public class SimpleAccomp extends JPanel implements ActionListener, ListSelectio
       this.cross5th = SimpleAccomp.this.checkAlt5th.isSelected();
       this.cross3rd = SimpleAccomp.this.checkAlt3rd.isSelected();
     }
+    
+    AccompState(AccompState other)
+    {
+      super(other.getRoot(), other.notes);
+      
+      this.rhythm = other.rhythm;
+      this.row = other.row;
+      this.cross5th = other.cross5th;
+      this.cross3rd = other.cross3rd;
+    }
+
+    @Override
+    protected Object clone()
+    {
+      return new AccompState(this);
+    }
   }
 
   AccompState getState()
