@@ -15,16 +15,16 @@
         $('#tabs').bind('tabsselect', function(event, ui){
           document.the_applet.setMode(ui.panel.id);
         });
-        $("#applet_div").resizable({alsoResize: "#extra_div"});
+        $("#applet_div").resizable(/*{alsoResize: "#the_applet"}*/);
       });
     </script>
 
     <script type="text/javascript">
       function resizeApplet(width, height)
       {
-	  	//document.the_applet.setSize(width, height);
-        document.the_applet.height = height;
-        document.the_applet.width = width;		
+        var elem = document.getElementById("applet_div");
+        elem.style.height = height + "px";
+        elem.style.width = width + "px";
       }
     </script>
 
@@ -39,16 +39,10 @@
         width: 100%;
         height: 100%;
         display: block;
-
-        background-color: #333;
-      }
-
-      #extra_div {
-        width: 100%;
-        height: 900px;
-        display: block;
-
-        margin: 8px -8px;
+        padding: 0px 12px 12px 0;
+        margin: 0px 12px 12px 0;
+        background-color: #888;
+        margin-top: 12px;
       }
 
     </style>
@@ -58,54 +52,44 @@
       <div id="tabs">
         <ul>
           <li>
-            <a href="#BoardOnly">Exploring the Bass Board</a>
+            <a href="#BoardOnly">Explore Bass Board</a>
           </li>
           <li>
-            <a href="#ChordMatch">Chord Matching</a>
+            <a href="#ChordMatch">Best Chord for Buttons</a>
           </li>
           <li>
-            <a href="#SeqPicker">Common Chord Sequences</a>
+            <a href="#SeqPicker">Progressions & Scales</a>
           </li>		  
           <li>
-            <a href="#ChordPicker">How to Play This Chord?</a>
+            <a href="#ChordPicker">Best Buttons for Chord</a>
           </li>
           <li>
             <a href="#Default">Full Tool</a>
           </li>
-		  </ul>
+        </ul>
         <div id="BoardOnly">
-        	The standard or piano accordion bass, known as the Stradella system, is presented below.
-			The board can have as few as 8 and as many as 120 buttons.
-			The columns are increment in 5th, starting from C in the middle.
-			The rows correspond to notes and chords.
-			The root row is either the second from top. The rows underneath are chord rows,
-			and are usually major, minor, 7th and diminished chords.
-			The top row, if not the root, is the "counter-bass" row, a major 3rd up from the root.
-			You can select all the common board types below.
-			If sound is enabled, clicking will play the corresponding button.
-			The board may also be viewed vertically.
+          Board Explanation
         </div>
         <div id="ChordMatch">
-          Tab 2 Chord Match Text
+          Match Chord for Buttons
         </div>
         <div id="ChordPicker">
-          TODO: Chord Picker Text
+          Match Buttons for Chord
         </div>
         <div id="SeqPicker">
-          TODO: Seq Picker Text
+          Common Progressions
         </div>
         <div id="Default">
-          TODO: Default Text
+          Everything Else
         </div>		
       </div>
     </div>
 
     <div id="applet_div">
-      <div id="extra_div">
-      <applet code="app.AppletMain" name="the_applet" mayscript="true" archive="./AccordTools.jar" width="100%" height="100%">
+      <applet code="app.AppletMain" name="the_applet" mayscript="true" archive="../dist/AccordionBassTool.jar" width="100%" height="100%">
         <param name="mode" value="BoardOnly"/>
+        <param name="resizeFunc" value="resizeApplet"/>
       </applet>
-      </div>
     </div>
   </body>
 </html>

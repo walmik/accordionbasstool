@@ -103,7 +103,7 @@ public class SeqAnimController implements ActionListener
       }
 
       for (Pos pos : combo.getAllPos()) {
-        renderBoard.drawPos(pos, RenderBoardUI.BoardButtonImage.SELECTED);
+        renderBoard.repaintPos(pos, RenderBoardUI.BoardButtonImage.SELECTED, false);
       }
       sound.stop();
     }

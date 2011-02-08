@@ -57,10 +57,22 @@ public class Main
 
   public static boolean setNimbus()
   {
-    return setLookAndFeel("Nimbus");
+    return findLookAndFeel("Nimbus");
   }
 
-  public static boolean setLookAndFeel(String lookandfeel)
+  public static void setLookAndFeel(String string)
+  {
+    try
+    {
+      UIManager.setLookAndFeel(string);
+    }
+    catch (Exception exc)
+    {
+      System.err.println(exc);
+    }
+  }
+
+  public static boolean findLookAndFeel(String lookandfeel)
   {
     if (UIManager.getLookAndFeel().getName().contains(lookandfeel)) {
       return true;

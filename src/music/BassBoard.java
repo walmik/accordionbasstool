@@ -42,6 +42,12 @@ public class BassBoard
     {
       return (row == r) && (col == c);
     }
+
+    @Override
+    public String toString()
+    {
+      return "row: " + row + " col: " + col;
+    }
   }
 
   public static boolean posEquals(Pos p1, Pos p2)

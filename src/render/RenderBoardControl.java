@@ -5,6 +5,7 @@
  */
 package render;
 
+import java.awt.BorderLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 
@@ -12,10 +13,11 @@ import javax.swing.JScrollPane;
  *
  * @author Ilya
  */
-public class RenderBoardControl extends javax.swing.JScrollPane
+public class RenderBoardControl extends javax.swing.JPanel
 {
   public final RenderBassBoard renderBassBoard;
   public final RenderBoardHeader renderBoardHeader;
+  public final JScrollPane scrollPane;
 
   /** Creates new form RenderBoardControl */
   public RenderBoardControl()
@@ -24,14 +26,20 @@ public class RenderBoardControl extends javax.swing.JScrollPane
     renderBassBoard = new RenderBassBoard();
     renderBassBoard.setDoubleBuffered(true);
 
-    setColumnHeaderView(renderBoardHeader);
-    setViewportView(renderBassBoard);
+    this.setLayout(new BorderLayout());
 
-    setCorner(JScrollPane.UPPER_RIGHT_CORNER, renderBoardHeader.getCornerComp());
+    scrollPane = new JScrollPane();
 
-    setViewportBorder(BorderFactory.createEmptyBorder());
-    setBorder(BorderFactory.createEmptyBorder());
+    //scrollPane.setColumnHeaderView(renderBoardHeader);
+    scrollPane.setViewportView(renderBassBoard);
 
+    scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, renderBoardHeader.getCornerComp());
+
+    scrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
+    scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+    this.add(scrollPane, BorderLayout.CENTER);
+    this.add(renderBoardHeader, BorderLayout.NORTH);
   }
 
   public void toggleOrientation(boolean isHoriz)

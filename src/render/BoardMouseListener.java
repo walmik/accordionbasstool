@@ -21,7 +21,8 @@ public class BoardMouseListener extends MouseAdapter
   private SoundController sound;
   private boolean allowBlanks = false;
 
-  public BoardMouseListener(RenderBassBoard renderB,
+  public BoardMouseListener(
+          RenderBassBoard renderB,
           SeqColumnModel model,
           SoundController sound)
   {
@@ -88,6 +89,26 @@ public class BoardMouseListener extends MouseAdapter
   }
 
   @Override
+  public void mouseEntered(MouseEvent e)
+  {
+    renderBoard.setClickPos(e, false);
+    renderBoard.setDrawLabels(true);
+  }
+
+  @Override
+  public void mouseExited(MouseEvent e)
+  {
+    renderBoard.setClickPos((BassBoard.Pos)null, false);
+    renderBoard.setDrawLabels(false);
+  }
+
+  @Override
+  public void mouseMoved(MouseEvent e)
+  {
+    renderBoard.setClickPos(e, false);
+  }
+
+  @Override
   public void mousePressed(MouseEvent e)
   {
     BassBoard.Pos clickPos = renderBoard.hitTest(e);
@@ -95,9 +116,11 @@ public class BoardMouseListener extends MouseAdapter
     if (e.isAltDown() || (columnModel == null)) {
       isInstaClick = true;
       sound.play(renderBoard.getBassBoard().getChordAt(clickPos), true);
-      renderBoard.setClickPos(clickPos);
+      renderBoard.setClickPos(clickPos, true);
       return;
     }
+
+    renderBoard.setClickPos((BassBoard.Pos)null, true);
 
     if (isClickShiftMode) {
       if (!e.isShiftDown()) {
@@ -146,7 +169,7 @@ public class BoardMouseListener extends MouseAdapter
     lastClickPos = clickPos;
 
     if (isInstaClick) {
-      renderBoard.setClickPos(clickPos);
+      renderBoard.setClickPos(clickPos, true);
     } else if (clickIndex >= 0) {
       if ((clickPos != null) && (clickIndex < clickButtons.size()) && !clickButtons.contains(clickPos)) {
         clickButtons.setElementAt(clickPos, clickIndex);
@@ -159,7 +182,7 @@ public class BoardMouseListener extends MouseAdapter
   public void mouseReleased(MouseEvent e)
   {
     if (isInstaClick) {
-      renderBoard.clearClickPos();
+      renderBoard.setClickPos(e, false);
       isInstaClick = false;
       sound.stop();
     }

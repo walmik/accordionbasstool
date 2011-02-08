@@ -7,6 +7,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 
 import java.awt.event.MouseAdapter;
@@ -16,18 +18,35 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 import javax.swing.JPanel;
+import javax.swing.JToolTip;
 import javax.swing.ListSelectionModel;
 import javax.swing.ToolTipManager;
 import music.BassBoard;
 import music.ButtonComboSequence;
 import music.Chord;
+import render.RenderBoardUI.BoardButtonImage;
 
 public class RenderBassBoard extends JPanel
 {
 
   final static long serialVersionUID = 1;
+  Dimension margin = new Dimension();
+  int borderWidth = 16;
+  int boardRoundCornerLength = 40;
+  Dimension _contentDim = new Dimension(0, 0);
+  Insets _borderInsets = null;
+  BassBoard.Pos clickPos = null;
+  boolean isDragging = false;
+  BassBoard.Pos tooltipPos = null;
+  MouseAdapter mainMouseAdapter = null;
+  RepaintListener colRepainter, rowRepainter;
+  String lastToolTip = null;
+  //Labels
+  boolean isDrawLabels = false;
+  int labelRowWidth = 40;
 
   public RenderBassBoard()
   {
@@ -36,8 +55,6 @@ public class RenderBassBoard extends JPanel
 
   public RenderBassBoard(BassBoard newBoard)
   {
-    setBassBoard(newBoard);
-
     _selCombo = new SelectedButtonCombo();
 
     setBackground(new Color(240, 240, 240));
@@ -53,17 +70,13 @@ public class RenderBassBoard extends JPanel
 
     int borderMargin = RenderBoardUI.defaultUI.buttonXMargin + borderWidth / 2;
     this._borderInsets = new Insets(borderMargin, borderMargin, borderMargin, borderMargin);
+    this._borderInsets.left += labelRowWidth;
 
     colRepainter = new RepaintListener();
     rowRepainter = new RepaintListener();
+
+    setBassBoard(newBoard);
   }
-  Dimension margin = new Dimension();
-  int borderWidth = 16;
-  Dimension _contentDim = new Dimension(0, 0);
-  Insets _borderInsets = null;
-  BassBoard.Pos clickPos = null;
-  MouseAdapter mainMouseAdapter = null;
-  RepaintListener colRepainter, rowRepainter;
 
   public void setMainMouseAdapter(MouseAdapter mouse)
   {
@@ -80,51 +93,12 @@ public class RenderBassBoard extends JPanel
     }
   }
 
-  public void toggleMouseClickHilite(boolean on)
+  @Override
+  public JToolTip createToolTip()
   {
-    if (on) {
-      this.addMouseListener(new MouseHandler(this));
-      this.addMouseMotionListener(new MouseHandler(this));
-    } else {
-      this.removeMouseListener(new MouseHandler(this));
-      this.removeMouseMotionListener(new MouseHandler(this));
-    }
-  }
-
-  public static class MouseHandler extends MouseAdapter
-  {
-
-    RenderBassBoard renderBoard;
-
-    MouseHandler(RenderBassBoard board)
-    {
-      this.renderBoard = board;
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e)
-    {
-      // TODO Auto-generated method stub
-      renderBoard.setClickPos(e);
-
-      // Debug Stuff
-      //int value = _theBoard.getChordAt(clickPos).getChordMask().getValue();
-      //int lowestBit = Integer.numberOfTrailingZeros(value);
-      //int abc = ((1 << (Note.NUM_HALFSTEPS - lowestBit)) - 1) << lowestBit;
-      //System.out.println(Integer.toBinaryString(abc));
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e)
-    {
-      renderBoard.setClickPos(e);
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e)
-    {
-      renderBoard.clearClickPos();
-    }
+    JToolTip tooltip = super.createToolTip();
+    tooltip.setFont(tooltip.getFont().deriveFont(16.f));
+    return tooltip;
   }
 
   @Override
@@ -132,12 +106,19 @@ public class RenderBassBoard extends JPanel
   {
     BassBoard.Pos mouseOverPos = hitTest(event.getX(), event.getY());
 
+    if (BassBoard.posEquals(mouseOverPos, tooltipPos)) {
+      return lastToolTip;
+    }
+
+    tooltipPos = mouseOverPos;
+
     if (mouseOverPos != null) {
       String string = "<html>";
       string += "<b>" + _theBoard.getChordName(mouseOverPos, true) + "</b>";
       string += " - (";
       string += _theBoard.getChordAt(mouseOverPos).toHtmlString();
       string += ")</html>";
+      lastToolTip = string;
       return string;
     }
 
@@ -148,6 +129,7 @@ public class RenderBassBoard extends JPanel
   {
     BassBoard oldBoard = _theBoard;
     _theBoard = newBoard;
+    labelRecomputeNeeded = true;
     if (_theBoard != null) {
       _rows = _theBoard.getNumRows();
       _cols = _theBoard.getNumCols();
@@ -234,33 +216,33 @@ public class RenderBassBoard extends JPanel
     return _isHoriz;
   }
 
-  public void setClickPos(MouseEvent e)
+  public void setClickPos(MouseEvent e, boolean dragging)
   {
     BassBoard.Pos newClickPos = hitTest(e);
-    setClickPos(newClickPos);
+    setClickPos(newClickPos, dragging);
   }
 
-  public void setClickPos(BassBoard.Pos newClickPos)
+  public void setClickPos(BassBoard.Pos newClickPos, boolean dragging)
   {
-    if (!BassBoard.posEquals(clickPos, newClickPos)) {
+    if (!BassBoard.posEquals(clickPos, newClickPos) || (dragging != isDragging)) {
       if (clickPos != null) {
-        this.drawPos(clickPos, null);
+        //System.out.println("Off: " + clickPos);
+        BassBoard.Pos oldPos = clickPos;
+        clickPos = null;
+        this.repaintPos(oldPos, null, true);
       }
-      //repaint();
+
+      isDragging = dragging;
       clickPos = newClickPos;
 
       if (clickPos != null) {
-        this.drawPos(clickPos, RenderBoardUI.BoardButtonImage.FAST_CLICK);
+        //System.out.println("On: " + clickPos);
+        this.repaintPos(clickPos,
+                (isDragging ? BoardButtonImage.FAST_CLICK
+                : BoardButtonImage.HOVER), true);
         //this.paintBassRowHeader((Graphics2D)getGraphics());
       }
-
-      //repaint();
     }
-  }
-
-  public void clearClickPos()
-  {
-    setClickPos((BassBoard.Pos) null);
   }
 
   public Chord getClickedChord()
@@ -282,7 +264,7 @@ public class RenderBassBoard extends JPanel
     int row, col;
     int cPos, rPos;
 
-    computeRenderOffsets();
+    //computeRenderOffsets();
 
     x -= _borderInsets.left;
     y -= _borderInsets.top;
@@ -380,15 +362,45 @@ public class RenderBassBoard extends JPanel
       _contentDim.height = (_cInc * _cols) - (int) (_slope * _rows);
     }
 
+    initialOff.x = 0;
+
+    if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
+      initialOff.x += (getWidth() - _contentDim.width - margin.width) / 2;
+    }
+
+    initialOff.y = 0;
+
+    pad.x = _borderInsets.left + margin.width / 2;
+    pad.y = _borderInsets.top + margin.height / 2;
   }
 
   @Override
-  public void paint(Graphics graphics)
+  public void paintComponent(Graphics graphics)
   {
-
     Graphics2D graphics2D = (Graphics2D) graphics;
 
+    switch (repaintInfo.type) {
+      case NONE:
+        break;
+
+      case BUTTON:
+        if (paintedSingleButton(graphics2D)) {
+          return;
+        } else {
+          break;
+        }
+
+      case ROW_LABEL:
+        this.paintBassRowHeader(graphics2D, repaintInfo.row);
+        return;
+    }
+
     computeRenderOffsets();
+
+    if (labelRecomputeNeeded) {
+      this.computeBassRowRects(graphics2D);
+      //labelRecomputeNeeded = false;
+    }
 
     Color outer = Color.black;
     Color inner = Color.gray;
@@ -398,53 +410,35 @@ public class RenderBassBoard extends JPanel
     graphics2D.setPaint(outer);
     graphics2D.fillRect(0, 0, getWidth(), getHeight());
 
-
-    if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
-      graphics2D.translate((getWidth() - _contentDim.width - margin.width) / 2, 0);
-    }
-    
-//    if (this.getAlignmentY() == JComponent.CENTER_ALIGNMENT) {
-//      graphics2D.translate(0, (getHeight() - _contentDim.height - margin.height) / 2);
-//    }
+    graphics2D.translate(initialOff.x, initialOff.y);
 
     // Paint Border & Background
     RoundRectangle2D roundRect =
             new RoundRectangle2D.Float(_borderInsets.left, _borderInsets.top,
-            _contentDim.width, _contentDim.height, 40, 40);
+            _contentDim.width, _contentDim.height, boardRoundCornerLength, boardRoundCornerLength);
 
     RenderBoardUI.paintBorderShadow(graphics2D, roundRect, borderWidth, outer, inner);
 
     graphics2D.setPaint(getBackground());
     graphics2D.fill(roundRect);
 
-    int xW, yW;
-
-    if (_isHoriz) {
-      xW = _cInc;
-      yW = _rInc;
-    } else {
-      yW = _rInc;
-      xW = _cInc;
-    }
-
-    //paintBassRowHeader(graphics2D);
-
+//    graphics2D.translate(-initialOff.x, -initialOff.y);
+//    paintBassRowHeader(graphics2D);
+//    graphics2D.translate(initialOff.x, initialOff.y);
+//    
     double ellipseRatio = RenderBoardUI.defaultUI.ellipseRatio;
 
-    int diamX = Math.min(xW, yW) - margin.width / 3;
+    int diamX = Math.min(_cInc, _rInc) - RenderBoardUI.defaultUI.buttonXMargin;
     int diamY = (int) (diamX * ellipseRatio);
 
-    int xP, yP;
+    graphics2D.translate(pad.x, pad.y);
+//    int xP, yP;
 
-//    if (boardAlign == JComponent.CENTER_ALIGNMENT) {
-//      xP = (getWidth() - _contentDim.width) / 2 + margin;
-//    } else {
-//      xP = _borderInsets.left + margin;
-//    }
+//    xP = _borderInsets.left + margin.width / 2;
+//    yP = _borderInsets.top + margin.height / 2;
+//    graphics2D.translate(xP, yP);
 
-
-    xP = _borderInsets.left + margin.width / 2;
-    yP = _borderInsets.top + margin.height / 2;
+//    paintNoteHeader(graphics2D);
 
     //********* TEMP ************
 //    if (_selCombo._comboSeq != null) {
@@ -457,17 +451,16 @@ public class RenderBassBoard extends JPanel
 //    buttonDrawer = RenderBoardUI.defaultUI.getButtonDrawer();
     //***************************
 
-    buttonDrawer.setup(graphics2D, xW, yW, diamX, diamY);
-    textDrawer.setup(graphics2D, xW, yW, diamX, diamY);
+    buttonDrawer.setup(graphics2D, _cInc, _rInc, diamX, diamY);
+    textDrawer.setup(graphics2D, _cInc, _rInc, diamX, diamY);
 
     AffineTransform orig = graphics2D.getTransform();
-    orig.translate(xP, yP);
 
     AffineTransform offset = new AffineTransform();
     int rOff = 0;
 
     for (int r = 0; r < _rows; r++) {
-      double cOff = _cStart + r * _slope;
+      int cOff = (int) (_cStart + r * _slope);
 
       for (int c = 0; c < _cols; c++) {
         offset.setTransform(orig);
@@ -488,20 +481,21 @@ public class RenderBassBoard extends JPanel
           realRow = _rows - r - 1;
         }
 
-        //graphics2D.translate(xP, yP);
-
         getStateBoardButton(realCol, realRow);
-        {
-          buttonDrawer.draw(graphics2D, realCol, realRow, currSelected, currBoardButton);
-          textDrawer.draw(graphics2D, realCol, realRow, currBoardButton, currTextStr);
+
+        if ((currBoardButton == BoardButtonImage.UNSELECTED) && (clickPos != null) && clickPos.equals(realRow, realCol) && (repaintInfo.button != null)) {
+          currBoardButton = repaintInfo.button;
         }
+
+        buttonDrawer.draw(graphics2D, realCol, realRow, currSelected, currBoardButton);
+        textDrawer.draw(graphics2D, realCol, realRow, currBoardButton, currTextStr);
 
         cOff += _cInc;
       }
       rOff += _rInc;
     }
   }
-  private RenderBoardUI.BoardButtonImage currBoardButton;
+  private BoardButtonImage currBoardButton;
   private String currTextStr;
   private boolean currSelected;
 
@@ -531,18 +525,43 @@ public class RenderBassBoard extends JPanel
       currTextStr = _theBoard.getChordName(realRow, realCol, false);
     }
 
-    boolean fastClick = false;
-
-//    if (!pressed && (clickPos != null) && clickPos.equals(realRow, realCol)) {
-//      fastClick = true;
-//    }
-
     currBoardButton =
-            RenderBoardUI.defaultUI.getBoardButtonImage(pressed, selected, redundant, fastClick, finger);
+            RenderBoardUI.defaultUI.getBoardButtonImage(pressed, selected, redundant, finger);
 
   }
 
-  public void drawPos(BassBoard.Pos pos, RenderBoardUI.BoardButtonImage boardButton)
+  enum RepaintType
+  {
+
+    NONE,
+    BUTTON,
+    ROW_LABEL,
+    COL_LABEL,
+  };
+
+  private class RepaintButtonInfo
+  {
+
+    BoardButtonImage button;
+    RepaintType type = RepaintType.NONE;
+    int row, col;
+    double px, py;
+    int width, height;
+
+    void translate(double dx, double dy)
+    {
+      px += dx;
+      py += dy;
+    }
+
+    boolean matchesRect(Rectangle rect)
+    {
+      return (width == rect.width) && (height == rect.height);
+    }
+  }
+  private final RepaintButtonInfo repaintInfo = new RepaintButtonInfo();
+
+  public void repaintPos(BassBoard.Pos pos, BoardButtonImage boardButton, boolean unselOnly)
   {
     int col, row;
 
@@ -554,40 +573,74 @@ public class RenderBassBoard extends JPanel
       row = pos.row;
     }
 
-    double cOff = _cStart + (row * _slope);
+    int cOff = (int) (_cStart + (row * _slope));
     cOff += (col * _cInc);
-    double rOff = row * _rInc;
+    int rOff = row * _rInc;
 
     getStateBoardButton(pos.col, pos.row);
+
+    // if unselOnly, render only over unselected buttons
+    if (unselOnly && (currBoardButton != BoardButtonImage.UNSELECTED)) {
+      return;
+    }
+
     if (boardButton == null) {
-      boardButton = currBoardButton;
+      repaintInfo.button = currBoardButton;
+    } else {
+      repaintInfo.button = boardButton;
     }
 
-    Graphics2D graphics2D = (Graphics2D) this.getGraphics();
-
-    if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
-      graphics2D.translate((getWidth() - _contentDim.width - margin.width) / 2, 0);
-    }
-
-    int xP = _borderInsets.left + margin.width / 2;
-    int yP = _borderInsets.top + margin.height / 2;
-    graphics2D.translate(xP, yP);
+    repaintInfo.px = (initialOff.x + pad.x);
+    repaintInfo.py = (initialOff.y + pad.y);
+    repaintInfo.width = buttonDrawer.imWidth;
+    repaintInfo.height = buttonDrawer.imHeight;
 
     if (_isHoriz) {
-      graphics2D.translate(cOff, rOff);
+      repaintInfo.translate((int) cOff, (int) rOff);
     } else {
-      graphics2D.translate(rOff, cOff);
+      repaintInfo.translate((int) rOff, (int) cOff);
     }
 
-    graphics2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-    graphics2D.setPaint(getBackground());
-    graphics2D.setClip(0, 0, _cInc, _rInc);
-    graphics2D.fillRect(0, 0, boardButton.image.getWidth(), boardButton.image.getHeight());
+    repaintInfo.col = col;
+    repaintInfo.row = row;
 
-    buttonDrawer.draw(graphics2D, col, row, true, boardButton);
+    repaintInfo.type = RepaintType.BUTTON;
+    this.paintImmediately((int) repaintInfo.px, (int) repaintInfo.py, repaintInfo.width, repaintInfo.height);
+
+    if (bassRowRects != null) {
+      repaintInfo.type = RepaintType.ROW_LABEL;
+      this.paintImmediately(this.bassRowRects[row]);
+    }
+
+    repaintInfo.type = RepaintType.NONE;
+  }
+
+  private boolean paintedSingleButton(Graphics2D graphics2D)
+  {
+//    if (!repaintInfo.isActive) {
+//      return false;
+//    }
+//
+//    Rectangle clipBounds = graphics2D.getClipBounds();
+//
+//    if (!repaintInfo.matchesRect(clipBounds)) {
+//      repaintInfo.isActive = false;
+//      return false;
+//    }
+
+    graphics2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.f));
+    graphics2D.setPaint(getBackground());
+    graphics2D.translate(repaintInfo.px, repaintInfo.py);
+    graphics2D.fillRect(0, 0, repaintInfo.width, repaintInfo.height);
+
+    buttonDrawer.draw(graphics2D, repaintInfo.col, repaintInfo.row, true, repaintInfo.button);
 
     textDrawer.setFont(graphics2D);
-    textDrawer.draw(graphics2D, col, row, boardButton, currTextStr);
+    textDrawer.draw(graphics2D, repaintInfo.col, repaintInfo.row, repaintInfo.button, currTextStr);
+
+    repaintInfo.type = RepaintType.NONE;
+
+    return true;
   }
 
   @Override
@@ -600,68 +653,148 @@ public class RenderBassBoard extends JPanel
 
     r = (int) (_theBoard.getNumCols() * _colToRow * prefSize) + (_borderInsets.left + _borderInsets.right);
     c = (int) (_theBoard.getNumRows() * prefSize) + (_borderInsets.top + _borderInsets.bottom);
+    r += this.labelRowWidth;
 
     if (_isHoriz) {
       dim = new Dimension(r, c);
     } else {
       dim = new Dimension(c, r);
-      //Dimension parentDim = this.getParent().getSize();
-      //dim = new Dimension(parentDim.width, parentDim.height * r / c);
     }
 
     return dim;
   }
+  private Rectangle[] bassRowRects;
+  private TextLayout[] bassRowLayouts;
+  boolean labelRecomputeNeeded = true;
 
-  private void paintNoteHeader(JComponent comp, Graphics g)
+  void setDrawLabels(boolean draw)
   {
-    //double cOff = _cStart + r * _slope;
-    int x = RenderBoardUI.defaultUI.buttonXMargin + (int) _slope;
-    int y = RenderBoardUI.defaultUI.buttonXMargin;
-
-    g.setColor(Color.black);
-    g.fillRect(0, 0, comp.getWidth(), comp.getHeight());
-
-    g.setColor(Color.white);
-    g.setFont(this.getFont());
-
-    for (int c = 0; c < _cols; c++) {
-      g.drawString(_theBoard.getNoteAt(c).toString(), x, y);
-      x += _cInc;
-    }
+    isDrawLabels = draw;
+    repaint();
   }
+  Font labelFont;
 
-  private void paintBassRowHeader(Graphics2D g)
+  private void computeBassRowRects(Graphics2D g)
   {
-    g.setFont(g.getFont().deriveFont(Font.BOLD, 18.f));
-    int stringHeight = g.getFontMetrics().getHeight();
+    if (!isDrawLabels) {
+      return;
+    }
 
-    int x = RenderBoardUI.defaultUI.buttonXMargin;
-    int y = RenderBoardUI.defaultUI.buttonXMargin + (_rInc / 2) + stringHeight;
-    //y += g.getFontMetrics().getDescent();
+    this.setLayout(null);
 
-    //g.setColor(Color.black);
-    //g.fillRect(0, 0, comp.getWidth(), comp.getHeight());
+    bassRowRects = new Rectangle[_rows];
+    bassRowLayouts = new TextLayout[_rows];
 
-    //computeRenderOffsets();
-    //g.setColor(Color.white);
-    //g.setFont(this.getFont());
-    AffineTransform origTransform = g.getTransform();
+    labelFont = g.getFont().deriveFont(Font.BOLD, 18.f);
+    g.setFont(labelFont);
+
+    int x = RenderBoardUI.defaultUI.buttonXMargin - labelRowWidth;
+    int y = RenderBoardUI.defaultUI.buttonXMargin + (_rInc / 2);
+    x += pad.x + initialOff.x + margin.width/2;
+    y += pad.y + initialOff.y;
 
     int scale = 1;
-    
-    if (!this._isHoriz) {
-      g.rotate(Math.PI / 2);
-      x += 50;
-      y -= 300;
-      scale = -1;
-    }
 
     for (int r = 0; r < _rows; r++) {
       String string = _theBoard.getRow(r).toString();
 
       TextLayout lay = new TextLayout(string, g.getFont(), g.getFontRenderContext());
 
-      //int stringWidth = g.getFontMetrics().stringWidth(string);
+      bassRowRects[r] = lay.getBounds().getBounds();
+      bassRowRects[r].x += x - bassRowRects[r].width;
+      bassRowRects[r].y += y;
+      bassRowRects[r].grow(4, 4);
+      bassRowLayouts[r] = lay;
+
+      y += _rInc;
+      x += _slope * scale;
+    }
+  }
+
+  private void paintBassRowHeader(Graphics2D g, int row)
+  {
+    if ((row < 0) || (row >= _rows)) {
+      return;
+    }
+
+    String string = _theBoard.getRow(row).toString();
+
+    g.setPaint(new Color(0, 0, 0, 0xff));
+
+    Rectangle bounds = bassRowRects[row];
+
+    g.setComposite(AlphaComposite.Src);
+    g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+
+//    int off = 6;
+//    g.fillRoundRect(
+//            (int) bounds.getX() - off,
+//            (int) bounds.getY() - off,
+//            (int) bounds.getWidth() + 2 * off,
+//            (int) bounds.getHeight() + 2 * off,
+//            off * 2, off * 2);
+
+    //System.out.println(bassRowRects[row]);
+    //g.translate(bounds.getMinX(), bounds.getMinY());
+
+    if ((clickPos != null) && (clickPos.row == row)) {
+      g.setColor(BoardButtonImage.FAST_CLICK.color);
+    } else {
+      g.setColor(Color.white);
+    }
+
+    g.setFont(labelFont);
+    //bassRowLayouts[row].draw(g, (int)bounds.getMinX(), (int)bounds.getMinY());
+    g.drawString(string, (float) bounds.getMinX() + 2, (float) bounds.getMaxY() - 2);// + (float) bounds.getHeight() / 2.f);
+  }
+
+  private void paintBassRowHeader(Graphics2D g)
+  {
+    if (!isDrawLabels) {
+      return;
+    }
+
+    g.setFont(g.getFont().deriveFont(Font.BOLD, 18.f));
+
+//    int scale = 1;
+//
+//    if (!this._isHoriz) {
+//      g.rotate(Math.PI / 2);
+//      x += 50;
+//      y -= 300;
+//      scale = -1;
+//    }
+    AffineTransform trans = g.getTransform();
+
+    for (int r = 0; r < _rows; r++) {
+      this.paintBassRowHeader(g, r);
+
+      g.setTransform(trans);
+    }
+  }
+
+  private void paintNoteHeader(Graphics2D g)
+  {
+    if (!isDrawLabels) {
+      return;
+    }
+
+    g.setFont(g.getFont().deriveFont(Font.BOLD, 18.f));
+
+    int x = _cInc - RenderBoardUI.defaultUI.buttonXMargin;
+    x /= 2;
+    x -= _slope;
+
+    int y = RenderBoardUI.defaultUI.buttonXMargin - 30;
+
+    AffineTransform origTransform = g.getTransform();
+
+    for (int c = 0; c < _cols; c++) {
+      String string = _theBoard.getNoteAt(c).toString();
+
+      TextLayout lay = new TextLayout(string, g.getFont(), g.getFontRenderContext());
+
+      int stringWidth = g.getFontMetrics().stringWidth(string);
 
       g.setPaint(new Color(0, 0, 0, 0xaf));
       //g.fillRect(x - stringWidth, y - stringHeight / 2, stringWidth, stringHeight);
@@ -676,7 +809,7 @@ public class RenderBassBoard extends JPanel
               (int) bounds.getHeight() + 2 * off,
               off * 2, off * 2);
 
-      if ((clickPos != null) && (clickPos.row == r)) {
+      if (!isDragging && (clickPos != null) && (clickPos.col == c)) {
         g.setColor(Color.magenta);
       } else {
         g.setColor(Color.cyan);
@@ -685,8 +818,7 @@ public class RenderBassBoard extends JPanel
       lay.draw(g, 0, 0);
       g.translate(-x + bounds.getWidth(), -y);
 
-      y += _rInc;
-      x += _slope * scale;
+      x += _cInc;
     }
 
     g.setTransform(origTransform);
@@ -699,11 +831,12 @@ public class RenderBassBoard extends JPanel
   double _slantAngle = 0;
   int _rows = 0, _cols = 0;
   int _rInc = 0, _cInc = 0;
+  final Point initialOff = new Point();
+  final Point pad = new Point();
   double _slope = 0;
   int _cStart = 0;
-//	final Vector<DrawBass> drawers = new Vector<DrawBass>();
   SelectedButtonCombo _selCombo = null;
   ListSelectionModel _rowSel = null;
-  RenderBoardUI.ButtonDrawer buttonDrawer;
+  RenderBoardUI.IconButtonDrawer buttonDrawer;
   RenderBoardUI.TextDrawer textDrawer;
 }

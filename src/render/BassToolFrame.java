@@ -73,7 +73,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     origRootPane = this.getRootPane();
 
     renderBassBoard = renderBoardControl.renderBassBoard;
-    renderBoardControl.renderBoardHeader.init(renderBassBoard, renderBoardControl);
+    renderBoardControl.renderBoardHeader.init(renderBassBoard, renderBoardControl.scrollPane);
 
     columnModel = new SeqColumnModel(renderBassBoard);
     sound = new SoundController(false);
@@ -299,9 +299,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       menuOptions.add(this.miOptBoardFirst);
     }
 
-    menuOptions.add(this.jSeparator2);
-
     if (toolTabs.isVisible() && (tabOptions.getParent() == toolTabs)) {
+      menuOptions.add(this.jSeparator2);
       menuOptions.add(this.miOptGoAll);
     }
 
@@ -382,6 +381,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       }
     } else if (evt.getPropertyName().equals(ToolPanel.RESET_TO_PREF_SIZE)) {
       resetPrefDividers();
+      this.firePropertyChange("prefLayoutChange", null, origRootPane.getPreferredSize());
     }
   }
 
@@ -608,7 +608,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     menuTranspose = new javax.swing.JMenu();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-    setTitle("Accordion Bass Tool v0.9");
+    setTitle("Accordion Bass Tool v0.94");
 
     boardSplitPane.setDividerSize(16);
     boardSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);

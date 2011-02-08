@@ -36,8 +36,8 @@ public class RenderBoardUI
   private Path2D unpressedCyl, pressedCyl;
   private Ellipse2D _buttonTop, _shadowFloor;
   float shadowScale = 1.1f;
-  int defaultDiamX = 36;
-  int defaultDiamY = 27;
+  int defaultDiamX = 25;
+  int defaultDiamY = 20;
   int defaultCylHeight = 16;
   float pressedRatio = 0.333f;
   final int buttonXMargin = 10;
@@ -55,14 +55,17 @@ public class RenderBoardUI
   public static enum BoardButtonImage
   {
 
-    UNSELECTED(Color.black, 1.f, false),
+    UNSELECTED(Color.black, 0.75f, false),
     SELECTED(Color.blue, false),
-    FAST_CLICK(Color.black, 1.f, true),
+    FAST_CLICK(Color.green, 1.f, true),
+    HOVER(Color.green, 0.75f, false),
     REDUNDS(Color.gray, 0.75f, true),
+    //Press - Fingers
     PRESSED_2(Color.green, 1.f, true),
     PRESSED_3(Color.cyan, 1.f, true),
     PRESSED_4(Color.orange, 1.f, true),
     PRESSED_5(Color.red, 1.f, true),
+    //Pressed - No Fingers
     PRESSED_ANY(Color.magenta, true);
 
     BoardButtonImage(Color bcol, boolean press)
@@ -83,7 +86,6 @@ public class RenderBoardUI
     {
       return image;
     }
-    
     Color color;
     BufferedImage image;
     float alpha;
@@ -116,8 +118,8 @@ public class RenderBoardUI
     _shadowFloor = new Ellipse2D.Float(0, 0, diamX * shadowScale, diamY * shadowScale);
     //_pressedShadowFloor = new Ellipse2D.Float(0, 0, diamX * shadowScale * .5f, diamY * shadowScale * .5f);
 
-    currImageWidth = (int) (diamX * shadowScale);
-    currImageHeight = (int) (diamY * shadowScale) + cylHeight;
+    currImageWidth = Math.round(diamX * shadowScale);
+    currImageHeight = Math.round(diamY * shadowScale) + cylHeight;
 
     for (BoardButtonImage boardButton : BoardButtonImage.values()) {
       boardButton.image = new BufferedImage(currImageWidth, currImageHeight, BufferedImage.TYPE_INT_ARGB);
@@ -138,13 +140,8 @@ public class RenderBoardUI
           boolean pressed,
           boolean selected,
           boolean redundant,
-          boolean fastClick,
           int finger)
   {
-    if (fastClick) {
-      return BoardButtonImage.FAST_CLICK;
-    }
-    
     if (!selected && !pressed && !redundant) {
       return BoardButtonImage.UNSELECTED;
     }
@@ -168,18 +165,25 @@ public class RenderBoardUI
     return BoardButtonImage.PRESSED_ANY;
   }
 
-  ButtonDrawer getButtonDrawer()
+  IconButtonDrawer iconDrawer;
+  TextDrawer textDrawer;
+
+  IconButtonDrawer getButtonDrawer()
   {
-    if (use3DDrawer) {
-      return new IconButtonDrawer();
-    } else {
-      return new FlatButtonDrawer();
+    if (iconDrawer == null) {
+      iconDrawer = new IconButtonDrawer();
     }
+
+    return iconDrawer;
   }
 
   TextDrawer getTextDrawer()
   {
-    return new TextDrawer();
+    if (textDrawer == null) {
+      textDrawer = new TextDrawer();
+    }
+
+    return textDrawer;
   }
 
   abstract class ButtonDrawer
@@ -313,20 +317,25 @@ public class RenderBoardUI
     private Font _origFont = new Font("Default", Font.BOLD, 14);
     private Font _font = _origFont;
 
+    float minSize = 10.f;
+
     void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
     {
       // Text Set up
-      Font orig = graphics.getFont();
-      int fontHeight = graphics.getFontMetrics(orig).getHeight();
-      _font = orig.deriveFont(orig.getSize2D() * (diamY * 2.f/3) / fontHeight);
+      int fontHeight = graphics.getFontMetrics(_origFont).getHeight();
+      _font = _origFont.deriveFont(_origFont.getSize2D() * (diamY * .5f) / fontHeight);
+
+      if (_font.getSize() < minSize) {
+        return;
+      }
 
       graphics.setFont(_font);
       _fm = graphics.getFontMetrics();
 
-      int textDescent = _fm.getDescent() + 1;
+      int textDescent = 3;
       //_textHeight = _fm.getHeight() - 4;
 
-      _tX = diamX / 2;
+      _tX = RenderBoardUI.defaultUI.getButtonDrawer().imWidth / 2 - 2;
       _tY = diamY / 2 + textDescent;
     }
 
@@ -336,9 +345,13 @@ public class RenderBoardUI
     }
 
     void draw(Graphics2D graphics, int col, int row, BoardButtonImage buttonImage, String chordStr)
-    {      
+    {
+      if (_font.getSize() < minSize) {
+        return;
+      }
+
       if (buttonImage.pressed) {
-        graphics.setColor(Color.white);
+        graphics.setColor(SystemColor.textText);
       } else {
         graphics.setColor(SystemColor.textText);
       }
@@ -461,7 +474,6 @@ public class RenderBoardUI
   }
 
   // Optimality Icons
-
   public void renderOptimalityImage()
   {
     int imageDim = 32;
@@ -502,7 +514,7 @@ public class RenderBoardUI
   {
     return optimalityIcons.length;
   }
-  
+
   ///Border Stuff
 //  private void drawShearBorder(Graphics2D g)
 //  {

@@ -5,7 +5,6 @@
 package app;
 
 import java.applet.Applet;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -43,9 +42,12 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
    */
   BassToolFrame frame;
   JButton toggleFrameButton;
-  BorderLayout frameLayout, appletLayout;
-  JRootPane altRootPane;
-  //Component horizStrut;
+  JPanel panel;
+  Dimension initialSize;
+
+  // For JavaScript comm
+  Object jsobj = null;
+  Method jsEval = null;
 
   /** Initializes the applet AccordApplet */
   public AppletMain()
@@ -57,14 +59,15 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     String modeVal = this.getParameter("mode");
     return ToolMode.findMode(modeVal);
   }
-  JPanel panel;
 
   @Override
   public void init()
   {
-    Main.setNimbus();
+    initialSize = this.getSize();
 
-    altRootPane = new JRootPane();
+    Main.setNimbus();
+    //Main.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
     getContentPane().setLayout(new CenterLayout());
     getContentPane().setBackground(Color.black);
     //horizStrut = Box.createHorizontalStrut(80);
@@ -184,27 +187,32 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     }
   }
 
-  Object jsobj = null;
-  Method jsEval = null;
-
   private void attemptResizeApplet()
   {
-//    Dimension dim = this.getRootPane().getPreferredSize();
-//    System.out.println(dim);
-//    attemptResizeApplet(dim);
-    validate();
+    if (!isValid()) {
+      validate();
+    }
+
+    Dimension dim = getPreferredSize();
+    attemptResizeApplet(dim);
   }
 
   private void attemptResizeApplet(Dimension dim)
   {
     try {
-      if (true) {
+      Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+      dim.width = Math.max(initialSize.width, dim.width);
+      dim.height = Math.max(initialSize.height, dim.height);
+
+      if (dim.equals(initialSize)) {
         return;
       }
 
-      Dimension max = Toolkit.getDefaultToolkit().getScreenSize();
-      dim.width = Math.min(max.width, dim.width);
-      dim.height = Math.min(max.height, dim.height);
+      String resizeFunc = getParameter("resizeFunc");
+
+      if ((resizeFunc == null) || resizeFunc.isEmpty()) {
+        return;
+      }
 
       if (jsobj == null) {
         Class jsClass = Class.forName("netscape.javascript.JSObject");
@@ -215,7 +223,7 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
         jsEval = jsClass.getMethod("eval", String.class);
       }
 
-      String evalStr = "resizeApplet(" + dim.width + ", " + dim.height + ");";
+      String evalStr = resizeFunc + "(" + dim.width + ", " + dim.height + ");";
 
       if ((jsEval != null) && (jsobj != null)) {
         jsEval.invoke(jsobj, evalStr);
