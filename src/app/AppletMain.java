@@ -5,6 +5,7 @@
 package app;
 
 import java.applet.Applet;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -12,7 +13,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.LayoutManager;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -69,6 +69,7 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     //Main.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
     getContentPane().setLayout(new CenterLayout());
+    //getContentPane().setLayout(new BorderLayout());
     getContentPane().setBackground(Color.black);
     //horizStrut = Box.createHorizontalStrut(80);
 

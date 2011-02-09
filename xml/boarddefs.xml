@@ -2,7 +2,7 @@
 <root>
   <rows>
     <rowdef name="BassRoot" desc="Bass Root" chord="C" />
-    <rowdef name="BassMaj3" desc="Bass +M3" chord="E" />
+    <rowdef name="BassMaj3" desc="Counter-Bass" chord="E" />
     <rowdef name="BassMin3" desc="Bass +min3" chord="Eb"/>
     <rowdef name="ChordMajor" desc="Major Chord" shortname="M" chord="C E G"/>
     <rowdef name="ChordMinor" desc="Minor Chord" shortname="m" chord="C Eb G"/>

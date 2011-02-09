@@ -26,6 +26,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JRootPane;
 import javax.swing.JSplitPane;
+import javax.swing.ToolTipManager;
 import music.BoardRegistry;
 import render.SeqTablePanel.ChordSeqCmd;
 
@@ -103,6 +104,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     seqPicker1.setAnim(anim);
 
+    ToolTipManager.sharedInstance().setInitialDelay(50);
+
 //    boardSplitPane.setResizeWeight(1.0);
 //    controlSplitPane.setResizeWeight(1.0);
 
@@ -169,6 +172,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     } else {
       table = null;
     }
+
+    anim.getPlayStopAction().setEnabled(tool.multiChord);
 
     renderBoardControl.renderBoardHeader.setBoardConfig(currColModel, tool.useAllBoards, tool.startBoardSize);
 

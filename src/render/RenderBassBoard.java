@@ -115,14 +115,22 @@ public class RenderBassBoard extends JPanel
     if (mouseOverPos != null) {
       String string = "<html>";
       string += "<b>" + _theBoard.getChordName(mouseOverPos, true) + "</b>";
-      string += " - (";
-      string += _theBoard.getChordAt(mouseOverPos).toHtmlString();
-      string += ")</html>";
+      if (!_theBoard.isSingleBassRow(mouseOverPos.row)) {
+        string += " - (";
+        string += _theBoard.getChordAt(mouseOverPos).toHtmlString();
+        string += ")";
+      }
+      string += "<br/>";
+      string += "Row: " + "<b>" + _theBoard.getRow(mouseOverPos.row).toString() + "</b>";
+      string += "<br/>";
+      string += "Column: " + "<b>" + _theBoard.getNoteAt(mouseOverPos.col) + "</b>";
+      string += "</html>";
       lastToolTip = string;
-      return string;
+    } else {
+      lastToolTip = null;
     }
 
-    return null;
+    return lastToolTip;
   }
 
   public void setBassBoard(BassBoard newBoard)
@@ -690,7 +698,7 @@ public class RenderBassBoard extends JPanel
 
     int x = RenderBoardUI.defaultUI.buttonXMargin - labelRowWidth;
     int y = RenderBoardUI.defaultUI.buttonXMargin + (_rInc / 2);
-    x += pad.x + initialOff.x + margin.width/2;
+    x += pad.x + initialOff.x + margin.width / 2;
     y += pad.y + initialOff.y;
 
     int scale = 1;

@@ -20,6 +20,8 @@
       function resizeApplet(prefWidth, prefHeight)
       {
         var elem = document.getElementById("applet_div");
+        prefWidth += elem.style.paddingRight;
+        prefHeight += elem.style.paddingBottom;
 
         if (document.body.clientWidth > prefWidth) {
           elem.style.width = "100%";
@@ -64,7 +66,7 @@
         $("#applet_div").resizable({
           stop: function(event, ui)
           {
-            snapToSize(event, ui);
+            //snapToSize(event, ui);
           }
         });
       });
