@@ -344,8 +344,6 @@ public class ChordPicker extends javax.swing.JPanel
     jPanel2.add(chordGridPanel, java.awt.BorderLayout.CENTER);
 
     jPanel1.setLayout(new java.awt.GridLayout(6, 1, 0, 4));
-
-    check3.setLabel("3rd:");
     jPanel1.add(check3);
 
     check5.setText("5th:");

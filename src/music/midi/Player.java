@@ -21,7 +21,7 @@ public class Player implements ActionListener
   Synthesizer synth;
   //Timer audioTimer;
   LinkedList<AudioTask> cancelTasks;
-  int velocity = 50;
+  int velocity = 64;
 
   public boolean init()
   {
@@ -70,7 +70,6 @@ public class Player implements ActionListener
     return bit + 48;// + 24 * (bit / Note.NUM_HALFSTEPS);
   }
   int chanUsed = 0;
-
 
   public boolean playChords(int[] chordMasks, int delay)
   {
@@ -144,6 +143,15 @@ public class Player implements ActionListener
   public void setVelocity(int vel)
   {
     velocity = vel;
+  }
+
+  public void setVolume(int volume)
+  {
+    MidiChannel[] channels = synth.getChannels();
+
+    for (int i = 0; i < channels.length; i++) {
+      channels[i].controlChange(7, volume);
+    }
   }
 
   public void cancelAllTasks()

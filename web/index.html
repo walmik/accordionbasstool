@@ -8,28 +8,72 @@
     </script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js">
     </script>
+
     <script type="text/javascript">
+      function percentStr(frac, total)
+      {
+        value = Math.round(100 * frac / total);
+        //alert("frac: " + frac + " total: " + total);
+        return value + "%";
+      }
+
+      function resizeApplet(prefWidth, prefHeight)
+      {
+        var elem = document.getElementById("applet_div");
+
+        if (document.body.clientWidth > prefWidth) {
+          elem.style.width = "100%";
+        } else {
+          elem.style.width = prefWidth + "px";
+        }
+
+        if (document.body.clientHeight > prefHeight) {
+          elem.style.height = "100%";
+        } else {
+          elem.style.height = prefHeight + "px";
+        }
+      }
+
+      function snapToSize(event, ui)
+      {
+        var elem = document.getElementById("applet_div");
+
+        var threshX = 32;
+        var threshY = 32 + 16 + 12;
+
+        if ((window.innerWidth - ui.size.width) < threshX) {
+          elem.style.width = "100%";
+        }
+
+        //        diff = (window.innerHeight - elem.offsetTop) - ui.size.height;
+        //        if (diff < threshY) {
+        //          elem.style.height = "100%";
+        //          alert(aut)
+        //        }
+      }
+
+      /* JQuery Inits Below */
+
       $(document).ready(function()
       {
         $("#tabs").tabs();
+        //$(window).resize(function () { /* do something */ });
         $('#tabs').bind('tabsselect', function(event, ui){
           document.the_applet.setMode(ui.panel.id);
         });
-        $("#applet_div").resizable(/*{alsoResize: "#the_applet"}*/);
+        $("#applet_div").resizable({
+          stop: function(event, ui)
+          {
+            snapToSize(event, ui);
+          }
+        });
       });
     </script>
 
-    <script type="text/javascript">
-      function resizeApplet(width, height)
-      {
-        var elem = document.getElementById("applet_div");
-        elem.style.height = height + "px";
-        elem.style.width = width + "px";
-      }
-    </script>
 
     <style type="text/css" media="screen">
       body {
+        padding: 0px 16px 16px 0px;
         background-color: #000;
         font: 16px Helvetica, Arial;
         color: #fff;
@@ -39,8 +83,7 @@
         width: 100%;
         height: 100%;
         display: block;
-        padding: 0px 12px 12px 0;
-        margin: 0px 12px 12px 0;
+        padding: 0px 12px 12px 0px;
         background-color: #888;
         margin-top: 12px;
       }

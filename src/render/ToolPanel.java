@@ -54,7 +54,7 @@ public abstract class ToolPanel extends JPanel implements AncestorListener, Prop
     this.colChange = (listenToCols() ? newListener(true) : null);
     this.rowChange = (listenToRows() ? newListener(false) : null);
 
-    if (isVisible()) {
+    if (isDisplayable()) {
       toggleListeners(true);
     }
   }

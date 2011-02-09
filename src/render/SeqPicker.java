@@ -155,7 +155,6 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     selectCurrSeq();
     listAllSeqs.repaint();
   }
-
   boolean isAlreadyAdjusting = false;
 
   @Override
@@ -167,6 +166,10 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     }
 
     this.isAlreadyAdjusting = e.getValueIsAdjusting();
+
+//    if (!isVisible()) {
+//      return;
+//    }
 
     if (e.getSource() == listAllSeqs) {
       selectCurrSeq();
@@ -187,7 +190,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     } else if (evt.getSource() == simpleAccomp1) {
       updateCurrSeq();
     } else if (evt.getPropertyName().equals(TransposePanel.TRANSPOSE_PROP)) {
-      transposeAllSeqs((Interval)evt.getNewValue());
+      transposeAllSeqs((Interval) evt.getNewValue());
     }
   }
 
@@ -327,7 +330,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
 
   private void insertSeq()
   {
-    SubSeq subSeq = (SubSeq)listAllSeqs.getSelectedValue();
+    SubSeq subSeq = (SubSeq) listAllSeqs.getSelectedValue();
     int index = listAllSeqs.getSelectedIndex();
 
     isUpdating = true;
@@ -339,7 +342,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
 
   private void addSeq()
   {
-    SubSeq subSeq = (SubSeq)listAllSeqs.getSelectedValue();
+    SubSeq subSeq = (SubSeq) listAllSeqs.getSelectedValue();
     int index = listAllSeqs.getSelectedIndex();
 
     isUpdating = true;
@@ -397,8 +400,6 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
         filterComboItemStateChanged(evt);
       }
     });
-
-    setPreferredSize(new java.awt.Dimension(410, 217));
 
     tabby.addTab("Common Accomp", simpleAccomp1);
 

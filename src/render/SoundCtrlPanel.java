@@ -35,6 +35,8 @@ public class SoundCtrlPanel extends javax.swing.JPanel implements MenuElement
   public void init(SoundController sound)
   {
     this.sound = sound;
+    this.checkSound.setSelected(sound.soundEnabled);
+    this.checkArpegg.setSelected(sound.arpeggiating);
   }
 
   @Override
@@ -101,8 +103,9 @@ public class SoundCtrlPanel extends javax.swing.JPanel implements MenuElement
       }
     });
 
-    volumeSlider.setMaximum(255);
+    volumeSlider.setMaximum(127);
     volumeSlider.setToolTipText("Sound Volume");
+    volumeSlider.setValue(64);
     volumeSlider.addChangeListener(new javax.swing.event.ChangeListener() {
       public void stateChanged(javax.swing.event.ChangeEvent evt) {
         volumeSliderStateChanged(evt);
@@ -122,7 +125,6 @@ public class SoundCtrlPanel extends javax.swing.JPanel implements MenuElement
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGap(0, 135, Short.MAX_VALUE)
-      .addGap(0, 135, Short.MAX_VALUE)
       .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
         .addGroup(layout.createSequentialGroup()
           .addContainerGap()
@@ -135,7 +137,6 @@ public class SoundCtrlPanel extends javax.swing.JPanel implements MenuElement
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 85, Short.MAX_VALUE)
       .addGap(0, 85, Short.MAX_VALUE)
       .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
         .addGroup(layout.createSequentialGroup()

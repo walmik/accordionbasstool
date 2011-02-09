@@ -200,13 +200,13 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
   private void attemptResizeApplet(Dimension dim)
   {
     try {
-      Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-      dim.width = Math.max(initialSize.width, dim.width);
-      dim.height = Math.max(initialSize.height, dim.height);
-
-      if (dim.equals(initialSize)) {
-        return;
-      }
+//      Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+//      dim.width = Math.max(initialSize.width, dim.width);
+//      dim.height = Math.max(initialSize.height, dim.height);
+//
+//      if (dim.equals(initialSize)) {
+//        return;
+//      }
 
       String resizeFunc = getParameter("resizeFunc");
 

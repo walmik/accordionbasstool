@@ -16,7 +16,7 @@ public class SoundController
 {
 
   Player player;
-  boolean soundEnabled = false;
+  boolean soundEnabled = true;
   boolean arpeggiating = false;
   int playDuration = 500;
   int arpegStepDuration = 200;
@@ -40,7 +40,7 @@ public class SoundController
   public void setVolume(int value)
   {
     if (player != null) {
-      player.setVelocity(value);
+      player.setVolume(value);
     }
   }
 

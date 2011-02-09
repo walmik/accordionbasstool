@@ -6,6 +6,7 @@
 package render;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 

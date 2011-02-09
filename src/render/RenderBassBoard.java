@@ -46,7 +46,7 @@ public class RenderBassBoard extends JPanel
   String lastToolTip = null;
   //Labels
   boolean isDrawLabels = false;
-  int labelRowWidth = 40;
+  int labelRowWidth = 30;
 
   public RenderBassBoard()
   {
@@ -365,7 +365,7 @@ public class RenderBassBoard extends JPanel
     initialOff.x = 0;
 
     if (this.getAlignmentX() == JComponent.CENTER_ALIGNMENT) {
-      initialOff.x += (getWidth() - _contentDim.width - margin.width) / 2;
+      initialOff.x += (getWidth() - labelRowWidth - _contentDim.width - margin.width) / 2;
     }
 
     initialOff.y = 0;
@@ -607,7 +607,7 @@ public class RenderBassBoard extends JPanel
     repaintInfo.type = RepaintType.BUTTON;
     this.paintImmediately((int) repaintInfo.px, (int) repaintInfo.py, repaintInfo.width, repaintInfo.height);
 
-    if (bassRowRects != null) {
+    if ((bassRowRects != null) && unselOnly) {
       repaintInfo.type = RepaintType.ROW_LABEL;
       this.paintImmediately(this.bassRowRects[row]);
     }
