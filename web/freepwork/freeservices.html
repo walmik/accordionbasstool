@@ -1,0 +1,406 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?libraries=geometry&sensor=false">
+    </script>
+    <script type="text/javascript" src="http://code.google.com/apis/gears/gears_init.js">
+    </script>
+
+    <script type="text/javascript" src="geolib.js"></script>
+    <script type="text/javascript" src="services.json"></script>
+
+    <style type="text/css">
+      .datalist ol { border: 0; margin: 12; padding: 12; }
+      .datalist ol li a { padding: 10px; text-decoration: none; display: block; overflow: hidden; }
+      .datalist ol li a:hover { background-color: #DBF1F9;/* light blue */ }
+      .itemPlain a { background-color: inherit}
+      .itemSel a { background-color: #007F00}
+    </style>
+
+    <script type="text/javascript">
+
+      var SFBounds;
+      var theInfoWin = null;
+      var markersLoaded = false;
+      var rootUL;
+
+      function init()
+      {
+        // Init SF Bounds
+        var sw = new google.maps.LatLng(37.70567075998761, -122.51793249606325);
+        var ne = new google.maps.LatLng(37.83051256186211, -122.361377320282);
+        SFBounds = new google.maps.LatLngBounds(sw, ne);
+
+        geolib.init(
+        {mapDivName: 'map_canvas',
+          formAddressName: 'address',
+          formPosName: 'posLatlng',
+          alwaysLookUpUserAddress: true,
+          acceptPosChange: acceptPosChange,
+          markerPosChanged: onMarkerPosChanged,
+		  errorDivName: "addressError"});
+
+        theInfoWin = new google.maps.InfoWindow();
+        /*      google.maps.event.addListener(theInfoWin, "closeclick", function()
+        {
+          if ((selectedMarker != undefined) && (selectedMarker.place != null)) {
+            selectedMarker.place.theLI.setAttribute("class", "itemPlain");
+          }
+          selectedMarker = undefined;
+        });
+         */
+
+        google.maps.event.addListener(geolib.getMap(), "bounds_changed", buildVisiblePlaceList);
+
+        geolib.getMarker().setZIndex(1000);
+
+        loadAllMarkers();
+
+        //var root = document.getElementById("data_list");
+        //rootUL = document.createElement("ul");
+        //root.appendChild(rootUL);
+      }
+
+      function acceptPosChange(pos)
+      {
+        var acceptable = SFBounds.contains(pos);
+		var statusText = (acceptable ? "" : "This is not a valid San Francisco address. Please try again");
+
+		document.getElementById("addressError").innerHTML = statusText;
+		
+		return acceptable;		
+      }
+
+      function onMarkerPosChanged(pos)
+      {
+        if (markersLoaded) {
+          computeMarkerDist();
+        }
+      }
+
+      var imageUrls = {"Pantry": "http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|0000FF|13|b|P",
+        "Eats" : "http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|FF0000|13|b|E",
+        "Shelter" : "http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|FFFF00|13|b|S"};
+
+      function addFilterCheck(index, folder)
+      {
+        var root = document.getElementById("markerFilters");
+        
+        //root.appendChild(document.createElement("br"));
+
+        var img = document.createElement("img");
+        img.src = imageUrls[folder.name];
+        root.appendChild(img);
+
+        var input = document.createElement("input");
+        input.type = "checkbox";
+        input.name = "checkbox" + folder.name;
+        input.id = input.name;
+        input.onclick = function()
+        {
+          toggleFilterCheck(folder.name, this.checked);
+        };
+
+        
+        root.appendChild(input);
+        input.checked = "checked";
+        
+        var label = document.createElement("label");
+        root.appendChild(label);
+        label.setAttribute("for", input.id);
+        label.appendChild(document.createTextNode("Show " + folder.name));
+      }
+
+      function computeMarkerDist()
+      {
+        var orig = geolib.getPos();
+        
+        for (i = 0; i < DATA.Markers.Folder.length; i++)
+        {
+          var folder = DATA.Markers.Folder[i];
+
+          for (j = 0; j < folder.Placemark.length; j++)
+          {
+            var place = folder.Placemark[j];
+            
+            var pos = place.marker.getPosition();
+            place.dist = google.maps.geometry.spherical.computeDistanceBetween(orig, pos);
+
+            var feet = place.dist * 3.2808399;
+            var units = "";
+            if (feet < 1024) {
+              place.distDesc = String(feet);
+              units = " ft.";
+            } else {
+              place.distDesc = String(feet / 1024);
+              units = " mi.";
+            }
+            if (place.distDesc.length > 7) {
+              place.distDesc = place.distDesc.substr(0, 7);
+            }
+            place.distDesc += units;
+			place.distDesc += " Away";
+          }
+        }
+      }
+
+
+      function toggleFilterCheck(name, state)
+      {
+        theInfoWin.close();
+        
+        for (i = 0; i < DATA.Markers.Folder.length; i++)
+        {
+          var folder = DATA.Markers.Folder[i];
+
+          if (folder.name == name) {
+            for (j = 0; j < folder.Placemark.length; j++)
+            {
+              var place = folder.Placemark[j];
+              place.marker.setVisible(state);
+            }
+          }
+        }
+
+        buildVisiblePlaceList();
+
+      }
+
+      function selectMarker(i, j, elem)
+      {
+        var marker = DATA.Markers.Folder[i].Placemark[j].marker;
+        google.maps.event.trigger(marker, "click");
+        geolib.getMap().setCenter(marker.getPosition());
+      }
+
+      /*
+      function addToData(marker)
+      {
+        marker.place.theLI = createLI(marker.place, marker.place.ith, marker.place.jth);
+      }
+
+      function removeFromData(marker)
+      {
+        if (marker.place.theLI != undefined) {
+          marker.place.theLI.parentNode.remove(marker.place.theLI);
+          marker.place.theLI = undefined;
+        }
+      }
+
+       */
+
+      function getPlaceHtml(place, i)
+	  {
+	    var descText;
+        descText = "<img border='0' src=\"" + imageUrls[DATA.Markers.Folder[i].name] + "\"/>";
+		if (place.distDesc != undefined) {
+		  descText += "<span style='float: right'>" + place.distDesc + "</span>";
+		}
+        descText += "<b>" + place.name + "</b>";
+        if (place.address != undefined) {
+          descText += "<br/><h1><i>" + place.address + "</i></h1>";
+        }
+        descText += "<br/>" + place.description;
+		return descText;
+	  }
+
+      function createLI(place, i, j)
+      {
+        var newLI = document.createElement("li");
+        newLI.setAttribute("id", place.index);
+
+        //    if (selectedMarker == place.marker) {
+        //      newLI.setAttribute("class", "itemSel");
+        //    }
+        
+        var onclickSelectMarker = "onclick=" + "\"selectMarker(";
+        onclickSelectMarker += i + ", ";
+        onclickSelectMarker += j + ", this)\"";
+		
+		var descText = getPlaceHtml(place, i);
+
+        newLI.innerHTML = "<a " + onclickSelectMarker + "href='#'>" + descText + "</a>";
+
+        place.theLI = newLI;
+        
+        if (place.dist == undefined) {
+          rootUL.appendChild(newLI);
+          return;
+        }
+
+        var newDist = place.dist;
+
+        for (c = 0; c < rootUL.childNodes.length; c++)
+        {
+          id = Number(rootUL.childNodes[c].id);
+          //alert(newDist + " < " + allMarkers[id].place.dist);
+          if (newDist < allPlaces[id].dist) {
+            rootUL.insertBefore(newLI, rootUL.childNodes[c]);
+            return;
+          }
+        }
+
+        rootUL.appendChild(newLI);
+      }
+
+      function buildVisiblePlaceList()
+      {
+        var root = document.getElementById("data_list");
+        if (root.childNodes.length > 0) {
+          root.removeChild(root.childNodes[0]);
+        }
+        rootUL = document.createElement("ol");
+        root.appendChild(rootUL);
+
+        var bounds = geolib.getMap().getBounds();
+
+        var count = 0;
+
+        for (i = 0; i < DATA.Markers.Folder.length; i++)
+        {
+          var folder = DATA.Markers.Folder[i];
+
+          if (!document.getElementById("checkbox" + folder.name).checked) {
+            continue;
+          }
+
+          for (j = 0; j < folder.Placemark.length; j++)
+          {
+
+            var place = folder.Placemark[j];
+
+            if (!place.marker.getVisible()) {
+              continue;
+            }
+
+            if (!bounds.contains(place.marker.getPosition())) {
+              continue;
+            }
+
+            count++;
+            createLI(place, i, j);
+          }
+        }
+
+		statusText = "<b>Showing " + count + " Free Services on this map.";
+		statusText += "<br/>Services are listed Nearest to Farthest from \"" + geolib.getMarker().getTitle() + "\"</b>";
+		
+        document.getElementById("statusFound").innerHTML = statusText;
+      }
+
+      var allPlaces;
+
+      function loadAllMarkers()
+      {
+        var map = geolib.getMap();
+
+        allPlaces = new Array();
+        var count = 0;
+
+        for (i = 0; i < DATA.Markers.Folder.length; i++)
+        {
+          var folder = DATA.Markers.Folder[i];
+          
+          addFilterCheck(i, folder);
+
+          for (j = 0; j < folder.Placemark.length; j++)
+          {
+            var place = folder.Placemark[j];
+            
+            place.marker = new google.maps.Marker(
+            {
+              map: map,
+              position: geolib.parseLatLong(place.Point.coordinates, true),
+              draggable: false,
+              title: place.name,
+              icon: new google.maps.MarkerImage(imageUrls[folder.name])
+            });
+
+            place.index = count++;
+            allPlaces.push(place);
+            
+            function doOpen(win, place, i)
+            {
+              return function()
+              {
+                win.setContent(getPlaceHtml(place, i));
+                //selectedMarker = place.marker;
+                win.open(map, place.marker);
+              }
+            }
+
+            //descText = getPlaceHtml(place, i);
+            //descText += "<a href='#zoom'>Zoom</a>";
+
+            google.maps.event.addListener(place.marker, "click", doOpen(theInfoWin, place, i));
+
+            //google.maps.event.addListener(place.marker, "visible_changed", doToggleData(place));
+          }
+        }
+
+        markersLoaded = true;
+        computeMarkerDist();
+
+/*
+        function onLookupAddress(currPlace)
+        {
+          return function(responses)
+          {
+            if (responses && responses.length > 0) {
+              currPlace.address = responses[0].formatted_address;
+            }
+            
+            if ((currPlace.index + 1) < allPlaces.length) {
+              alert(currPlace.index + " " + currPlace.address);
+              geolib.getGeoCoder().geocode({latLng: allPlaces[currPlace.index + 1].marker.getPosition()},
+              onLookupAddress(allPlaces[currPlace.index + 1]));
+            }
+          }
+        }
+
+        geolib.getGeoCoder().geocode({latLng: allPlaces[0].marker.getPosition()},
+        onLookupAddress(allPlaces[0]));
+
+        */
+
+      }
+	  
+	  function showClicked()
+	  {
+		if (!geolib.syncToEnteredAddress()) {
+			geolib.getMap().setCenter(geolib.getPos());
+		}
+		geolib.getMap().setZoom(15);
+	  }
+
+    </script>
+  </head>
+  <body onload="init()">
+    <h1>San Francisco Free Services Locator</h1>
+    <div id="inputs">Enter your address:
+    <input type="text" name="address" id="address" style="width: 500px" value="San Francisco, CA"/>
+    <input type="hidden" name="posLatlng" id="posLatlng" value="37.7749295, -122.4194155"/>
+    <input type="button" name="centerMe" id="centerMe" value="Show Services Near This Address" onclick="showClicked()"/>
+	
+	<input type="button" name="zoomIn" id="zoomIn" value="Zoom In" onclick="geolib.getMap().setZoom(geolib.getMap().getZoom() + 1)"/>
+    <input type="button" name="zoomIn" id="zoomOut" value="Zoom Out" onclick="geolib.getMap().setZoom(geolib.getMap().getZoom() - 1)"/>
+	</div>
+	<div id="addressError" style="color: red"></div>
+	<br/>
+	<div id="statusFound"></div><br/>
+    <div id="data_list" class="datalist" style="display: block; width: 40%; height: 100%; float: left; overflow: scroll"></div>
+    <div id="map_panel" style="width: 60%; height: 100%; float: left;">
+	<div id="markerFilters"></div>
+	<br/>
+	<div id="map_canvas" style="width: 100%; height: 100%">
+	</div>
+    </div>
+  </body>
+</html>
