@@ -10,64 +10,41 @@
     </script>
 
     <script type="text/javascript">
-      function percentStr(frac, total)
-      {
-        value = Math.round(100 * frac / total);
-        //alert("frac: " + frac + " total: " + total);
-        return value + "%";
-      }
+      var appletPrefWidth = 0;
+      var appletPrefHeight = 0;
 
-      function resizeApplet(prefWidth, prefHeight)
+      function onAppletPrefSizeChanged(prefWidth, prefHeight)
       {
+        appletPrefWidth = prefWidth;
+        appletPrefHeight = prefHeight;
+        
+        //if ($('input[id=resizeCheck]').is(':checked')) {
+        //  return;
+        //}
+
         var elem = document.getElementById("applet_div");
+        
         prefWidth += elem.style.paddingRight;
         prefHeight += elem.style.paddingBottom;
 
-        if ((prefWidth < document.body.clientWidth) &&
-          (prefHeight < document.body.clientHeight))
+        var maxWidth = $(window).width();
+        var maxHeight = $(window).height();
+
+        if ((prefWidth < maxWidth) && (prefHeight < maxHeight))
         {
-          if (prefWidth > prefHeight) {
-            prefWidth = "100%";
-            prefHeight = (document.body.clientHeight / document.body.clientWidth) * prefWidth;
+          if (prefWidth < prefHeight) {
+            prefHeight *= (maxWidth / prefWidth);
+            prefWidth = maxWidth;
           } else {
-            prefHeight = "100%";
-            prefWidth = (document.body.clientWidth / document.body.clientHeight) * prefHeight;
+            prefWidth *= (maxHeight / prefHeight);
+            prefHeight = maxHeight;
           }
         }
 
-        var allowFill = false;
-
-        if (allowFill && (document.body.clientWidth > prefWidth)) {
-          elem.style.width = "100%";
-        } else {
-          elem.style.width = prefWidth + "px";
-        }
-
-        if (allowFill && (document.body.clientHeight > prefHeight)) {
-          elem.style.height = "100%";
-        } else {
-          elem.style.height = prefHeight + "px";
-        }
+        elem.style.width = prefWidth + "px";
+        elem.style.height = prefHeight + "px";
       }
-
-      function snapToSize(event, ui)
-      {
-        var elem = document.getElementById("applet_div");
-
-        var threshX = 32;
-        var threshY = 32 + 16 + 12;
-
-        if ((window.innerWidth - ui.size.width) < threshX) {
-          elem.style.width = "100%";
-        }
-
-        //        diff = (window.innerHeight - elem.offsetTop) - ui.size.height;
-        //        if (diff < threshY) {
-        //          elem.style.height = "100%";
-        //          alert(aut)
-        //        }
-      }
-
+   
       /* JQuery Inits Below */
 
       $(document).ready(function()
@@ -93,6 +70,8 @@
         background-color: #000;
         font: 16px Helvetica, Arial;
         color: #fff;
+        height: 500px;
+        width: 100%
       }
 
       #applet_div {
@@ -143,11 +122,15 @@
         </div>		
       </div>
     </div>
+    <!--    <div id="appletControl" style="visibility: hidden">
+        <input type="checkbox" id="resizeCheck" onclick="toggleResizeCheck()"/>
+        <label for="resizeCheck">Auto-Resize Accordion Tool</label>
+        </div>-->
 
     <div id="applet_div">
       <applet code="app.AppletMain" name="the_applet" mayscript="true" archive="../dist/AccordionBassTool.jar" width="100%" height="100%">
         <param name="mode" value="BoardOnly"/>
-        <param name="resizeFunc" value="resizeApplet"/>
+        <param name="resizeFunc" value="onAppletPrefSizeChanged"/>
       </applet>
     </div>
   </body>
