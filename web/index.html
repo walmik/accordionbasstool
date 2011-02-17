@@ -23,13 +23,27 @@
         prefWidth += elem.style.paddingRight;
         prefHeight += elem.style.paddingBottom;
 
-        if (document.body.clientWidth > prefWidth) {
+        if ((prefWidth < document.body.clientWidth) &&
+          (prefHeight < document.body.clientHeight))
+        {
+          if (prefWidth > prefHeight) {
+            prefWidth = "100%";
+            prefHeight = (document.body.clientHeight / document.body.clientWidth) * prefWidth;
+          } else {
+            prefHeight = "100%";
+            prefWidth = (document.body.clientWidth / document.body.clientHeight) * prefHeight;
+          }
+        }
+
+        var allowFill = false;
+
+        if (allowFill && (document.body.clientWidth > prefWidth)) {
           elem.style.width = "100%";
         } else {
           elem.style.width = prefWidth + "px";
         }
 
-        if (document.body.clientHeight > prefHeight) {
+        if (allowFill && (document.body.clientHeight > prefHeight)) {
           elem.style.height = "100%";
         } else {
           elem.style.height = prefHeight + "px";
@@ -75,7 +89,7 @@
 
     <style type="text/css" media="screen">
       body {
-        padding: 0px 16px 16px 0px;
+        padding: 0px 48px 48px 0px;
         background-color: #000;
         font: 16px Helvetica, Arial;
         color: #fff;

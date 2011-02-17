@@ -10,15 +10,14 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 
 import javax.swing.JPanel;
 import javax.swing.JToolTip;
@@ -33,20 +32,44 @@ public class RenderBassBoard extends JPanel
 {
 
   final static long serialVersionUID = 1;
+  BassBoard _theBoard;
+  // Margins & Borders
   Dimension margin = new Dimension();
   int borderWidth = 16;
   int boardRoundCornerLength = 40;
   Dimension _contentDim = new Dimension(0, 0);
   Insets _borderInsets = null;
+  final Point initialOff = new Point();
+  final Point pad = new Point();
+  // Draw Controls
+  private boolean _isHoriz = false;
+  double _colToRow = 0;
+  double _slantAngle = 0;
+  int _rows = 0, _cols = 0;
+  int _rInc = 0, _cInc = 0;
+  double _slope = 0;
+  int _cStart = 0;
+  // Selectors and Drawers
+  SelectedButtonCombo _selCombo = null;
+  ListSelectionModel _rowSel = null;
+  RenderBoardUI.IconButtonDrawer buttonDrawer;
+  RenderBoardUI.TextDrawer textDrawer;
+  // Mouse
   BassBoard.Pos clickPos = null;
   boolean isDragging = false;
-  BassBoard.Pos tooltipPos = null;
   MouseAdapter mainMouseAdapter = null;
+  // Repainting
   RepaintListener colRepainter, rowRepainter;
+  boolean computeNeeded = true;
+  // Tooltip
+  BassBoard.Pos tooltipPos = null;
   String lastToolTip = null;
   //Labels
-  boolean isDrawLabels = false;
+  boolean isDrawHilites = true;
   int labelRowWidth = 30;
+  int labelColHeight = 20;
+  int labelFontHeight = 0;
+  Color labelBg = new Color(0, 0, 0, 0xaf);
 
   public RenderBassBoard()
   {
@@ -69,11 +92,24 @@ public class RenderBassBoard extends JPanel
     ToolTipManager.sharedInstance().registerComponent(this);
 
     int borderMargin = RenderBoardUI.defaultUI.buttonXMargin + borderWidth / 2;
+    borderMargin += labelRowWidth;
     this._borderInsets = new Insets(borderMargin, borderMargin, borderMargin, borderMargin);
-    this._borderInsets.left += labelRowWidth;
+//    this._borderInsets.left += labelRowWidth;
+//    this._borderInsets.top += labelColHeight;
 
     colRepainter = new RepaintListener();
     rowRepainter = new RepaintListener();
+
+    this.addComponentListener(new ComponentAdapter()
+    {
+
+      @Override
+      public void componentResized(ComponentEvent e)
+      {
+        computeNeeded = true;
+        repaint();
+      }
+    });
 
     setBassBoard(newBoard);
   }
@@ -121,9 +157,11 @@ public class RenderBassBoard extends JPanel
         string += ")";
       }
       string += "<br/>";
-      string += "Row: " + "<b>" + _theBoard.getRow(mouseOverPos.row).toString() + "</b>";
-      string += "<br/>";
-      string += "Column: " + "<b>" + _theBoard.getNoteAt(mouseOverPos.col) + "</b>";
+//      string += "Row: " + "<b>" + _theBoard.getRow(mouseOverPos.row).toString() + "</b>";
+//      string += "<br/>";
+//      string += "Column: " + "<b>" + _theBoard.getNoteAt(mouseOverPos.col) + "</b>";
+      string += "<i>" + _theBoard.getNoteAt(mouseOverPos.col) + " ";
+      string += _theBoard.getRow(mouseOverPos.row).toString() + "</i>";
       string += "</html>";
       lastToolTip = string;
     } else {
@@ -137,11 +175,11 @@ public class RenderBassBoard extends JPanel
   {
     BassBoard oldBoard = _theBoard;
     _theBoard = newBoard;
-    labelRecomputeNeeded = true;
     if (_theBoard != null) {
       _rows = _theBoard.getNumRows();
       _cols = _theBoard.getNumCols();
     }
+    computeNeeded = true;
     this.firePropertyChange(BassBoard.class.getSimpleName(), oldBoard, newBoard);
   }
 
@@ -216,6 +254,7 @@ public class RenderBassBoard extends JPanel
     }
     _slantAngle = -_slantAngle;
     _isHoriz = horiz;
+    computeNeeded = true;
     repaint();
   }
 
@@ -232,25 +271,49 @@ public class RenderBassBoard extends JPanel
 
   public void setClickPos(BassBoard.Pos newClickPos, boolean dragging)
   {
-    if (!BassBoard.posEquals(clickPos, newClickPos) || (dragging != isDragging)) {
-      if (clickPos != null) {
-        //System.out.println("Off: " + clickPos);
-        BassBoard.Pos oldPos = clickPos;
-        clickPos = null;
-        this.repaintPos(oldPos, null, true);
+    boolean changedPos = !BassBoard.posEquals(clickPos, newClickPos);
+
+    if (changedPos) {
+      if (isDrawHilites) {
+        isDragging = dragging;
+        clickPos = newClickPos;
+        repaint();
+      } else {
+
+        if (clickPos != null) {
+          BassBoard.Pos oldPos = clickPos;
+          clickPos = null;
+          this.repaintPos(oldPos, null, true);
+        }
+
+        isDragging = dragging;
+        clickPos = newClickPos;
+
+        if (clickPos != null) {
+          this.repaintPos(clickPos,
+                  (isDragging ? BoardButtonImage.FAST_CLICK
+                  : BoardButtonImage.HOVER), true);
+        }
       }
 
+    } else if ((dragging != isDragging) && (clickPos != null)) {
       isDragging = dragging;
-      clickPos = newClickPos;
-
-      if (clickPos != null) {
-        //System.out.println("On: " + clickPos);
-        this.repaintPos(clickPos,
-                (isDragging ? BoardButtonImage.FAST_CLICK
-                : BoardButtonImage.HOVER), true);
-        //this.paintBassRowHeader((Graphics2D)getGraphics());
-      }
+      this.repaintPos(clickPos,
+              (isDragging ? BoardButtonImage.FAST_CLICK
+              : BoardButtonImage.HOVER), true);
     }
+  }
+
+  public void clearClickPos(boolean erase)
+  {
+    if (erase && (clickPos != null)) {
+      BassBoard.Pos oldPos = clickPos;
+      clickPos = null;
+      this.repaintPos(oldPos, null, true);
+    }
+
+    isDragging = false;
+    clickPos = null;
   }
 
   public Chord getClickedChord()
@@ -272,7 +335,7 @@ public class RenderBassBoard extends JPanel
     int row, col;
     int cPos, rPos;
 
-    //computeRenderOffsets();
+    computeRenderOffsets();
 
     x -= _borderInsets.left;
     y -= _borderInsets.top;
@@ -314,6 +377,12 @@ public class RenderBassBoard extends JPanel
 
   private void computeRenderOffsets()
   {
+    if (!computeNeeded) {
+      return;
+    }
+
+    computeNeeded = false;
+
     _rInc = 0;
     _cInc = 0;
 
@@ -398,17 +467,17 @@ public class RenderBassBoard extends JPanel
           break;
         }
 
-      case ROW_LABEL:
-        this.paintBassRowHeader(graphics2D, repaintInfo.row);
-        return;
+//      case ROW_LABEL:
+//        this.paintBassRowHeader(graphics2D, repaintInfo.row);
+//        return;
     }
 
     computeRenderOffsets();
 
-    if (labelRecomputeNeeded) {
-      this.computeBassRowRects(graphics2D);
-      //labelRecomputeNeeded = false;
-    }
+    //if (labelRecomputeNeeded) {
+    //this.computeBassRowRects(graphics2D);
+    //labelRecomputeNeeded = false;
+    //}
 
     Color outer = Color.black;
     Color inner = Color.gray;
@@ -430,10 +499,6 @@ public class RenderBassBoard extends JPanel
     graphics2D.setPaint(getBackground());
     graphics2D.fill(roundRect);
 
-//    graphics2D.translate(-initialOff.x, -initialOff.y);
-//    paintBassRowHeader(graphics2D);
-//    graphics2D.translate(initialOff.x, initialOff.y);
-//    
     double ellipseRatio = RenderBoardUI.defaultUI.ellipseRatio;
 
     int diamX = Math.min(_cInc, _rInc) - RenderBoardUI.defaultUI.buttonXMargin;
@@ -445,8 +510,6 @@ public class RenderBassBoard extends JPanel
 //    xP = _borderInsets.left + margin.width / 2;
 //    yP = _borderInsets.top + margin.height / 2;
 //    graphics2D.translate(xP, yP);
-
-//    paintNoteHeader(graphics2D);
 
     //********* TEMP ************
 //    if (_selCombo._comboSeq != null) {
@@ -491,8 +554,18 @@ public class RenderBassBoard extends JPanel
 
         getStateBoardButton(realCol, realRow);
 
-        if ((currBoardButton == BoardButtonImage.UNSELECTED) && (clickPos != null) && clickPos.equals(realRow, realCol) && (repaintInfo.button != null)) {
-          currBoardButton = repaintInfo.button;
+        if ((clickPos != null)) {
+          if (clickPos.equals(realRow, realCol)) {
+//            if (repaintInfo.button != null) {
+//              currBoardButton = repaintInfo.button;
+//            } else {
+              currBoardButton = (isDragging ? BoardButtonImage.FAST_CLICK : BoardButtonImage.HOVER);
+//            }
+          } else if (isDrawHilites && (currBoardButton == BoardButtonImage.UNSELECTED) && (realRow == clickPos.row)) {
+            currBoardButton = BoardButtonImage.HOVER_ROW;
+          } else if (isDrawHilites && (currBoardButton == BoardButtonImage.UNSELECTED) && (realCol == clickPos.col)) {
+            currBoardButton = BoardButtonImage.HOVER_COLUMN;
+          }
         }
 
         buttonDrawer.draw(graphics2D, realCol, realRow, currSelected, currBoardButton);
@@ -501,6 +574,21 @@ public class RenderBassBoard extends JPanel
         cOff += _cInc;
       }
       rOff += _rInc;
+    }
+
+    // Draw Labels Last    
+    if (isDrawHilites && (clickPos != null)) {
+      Font font = graphics2D.getFont();
+      float fontSize = font.getSize2D() + 4.f;
+      if (fontSize < 18.f) {
+        fontSize = 18.f;
+      }
+   
+      graphics2D.setFont(font.deriveFont(Font.BOLD, fontSize));
+      graphics2D.setTransform(orig);
+
+      paintBassRowHeader(graphics2D, clickPos.row);
+      paintNoteHeader(graphics2D, clickPos.col);
     }
   }
   private BoardButtonImage currBoardButton;
@@ -615,10 +703,10 @@ public class RenderBassBoard extends JPanel
     repaintInfo.type = RepaintType.BUTTON;
     this.paintImmediately((int) repaintInfo.px, (int) repaintInfo.py, repaintInfo.width, repaintInfo.height);
 
-    if ((bassRowRects != null) && unselOnly) {
-      repaintInfo.type = RepaintType.ROW_LABEL;
-      this.paintImmediately(this.bassRowRects[row]);
-    }
+//    if ((bassRowRects != null) && unselOnly) {
+//      repaintInfo.type = RepaintType.ROW_LABEL;
+//      this.paintImmediately(this.bassRowRects[row]);
+//    }
 
     repaintInfo.type = RepaintType.NONE;
   }
@@ -662,6 +750,7 @@ public class RenderBassBoard extends JPanel
     r = (int) (_theBoard.getNumCols() * _colToRow * prefSize) + (_borderInsets.left + _borderInsets.right);
     c = (int) (_theBoard.getNumRows() * prefSize) + (_borderInsets.top + _borderInsets.bottom);
     r += this.labelRowWidth;
+    c += this.labelColHeight;
 
     if (_isHoriz) {
       dim = new Dimension(r, c);
@@ -671,52 +760,15 @@ public class RenderBassBoard extends JPanel
 
     return dim;
   }
-  private Rectangle[] bassRowRects;
-  private TextLayout[] bassRowLayouts;
-  boolean labelRecomputeNeeded = true;
+//  private Rectangle[] bassRowRects;
+//  private TextLayout[] bassRowLayouts;
+//  boolean labelRecomputeNeeded = false;
 
-  void setDrawLabels(boolean draw)
+  void setDrawHilites(boolean draw)
   {
-    isDrawLabels = draw;
+    isDrawHilites = draw;
+    repaintInfo.button = null;
     repaint();
-  }
-  Font labelFont;
-
-  private void computeBassRowRects(Graphics2D g)
-  {
-    if (!isDrawLabels) {
-      return;
-    }
-
-    this.setLayout(null);
-
-    bassRowRects = new Rectangle[_rows];
-    bassRowLayouts = new TextLayout[_rows];
-
-    labelFont = g.getFont().deriveFont(Font.BOLD, 18.f);
-    g.setFont(labelFont);
-
-    int x = RenderBoardUI.defaultUI.buttonXMargin - labelRowWidth;
-    int y = RenderBoardUI.defaultUI.buttonXMargin + (_rInc / 2);
-    x += pad.x + initialOff.x + margin.width / 2;
-    y += pad.y + initialOff.y;
-
-    int scale = 1;
-
-    for (int r = 0; r < _rows; r++) {
-      String string = _theBoard.getRow(r).toString();
-
-      TextLayout lay = new TextLayout(string, g.getFont(), g.getFontRenderContext());
-
-      bassRowRects[r] = lay.getBounds().getBounds();
-      bassRowRects[r].x += x - bassRowRects[r].width;
-      bassRowRects[r].y += y;
-      bassRowRects[r].grow(4, 4);
-      bassRowLayouts[r] = lay;
-
-      y += _rInc;
-      x += _slope * scale;
-    }
   }
 
   private void paintBassRowHeader(Graphics2D g, int row)
@@ -727,124 +779,86 @@ public class RenderBassBoard extends JPanel
 
     String string = _theBoard.getRow(row).toString();
 
-    g.setPaint(new Color(0, 0, 0, 0xff));
+    int tWidth = g.getFontMetrics().stringWidth(string);
+    int tHeight = g.getFontMetrics().getHeight();
+    int off = 4;
 
-    Rectangle bounds = bassRowRects[row];
+    int x, y;
+    int inc = 0;
 
-    g.setComposite(AlphaComposite.Src);
-    g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+    if (_isHoriz) {
+      x = (int) (_slope * row);
+      y = _rInc * row;
+      x -= tWidth + this.labelRowWidth;
+      inc = (_cInc * _cols) + tWidth + RenderBoardUI.defaultUI.buttonXMargin;
+    } else {
+      x = _rInc * (_rows - row - 1);
+      x -= (tWidth) / 2;
+      x += off;
+      //y = (int) ((1.f / _slope) * (_rows - row - 1)) + this.labelColHeight;
+      y = -labelColHeight + (int) (-_slope * row);
+      inc = (_cInc * _cols) + tHeight + RenderBoardUI.defaultUI.buttonXMargin;
+    }
 
-//    int off = 6;
-//    g.fillRoundRect(
-//            (int) bounds.getX() - off,
-//            (int) bounds.getY() - off,
-//            (int) bounds.getWidth() + 2 * off,
-//            (int) bounds.getHeight() + 2 * off,
-//            off * 2, off * 2);
+    for (int t = 0; t < 2; t++) {
+      g.setComposite(AlphaComposite.SrcOver);
+      g.setPaint(labelBg);
+      g.fillRect(x - off, y - off, tWidth + 2 * off, tHeight + 2 * off);
 
-    //System.out.println(bassRowRects[row]);
-    //g.translate(bounds.getMinX(), bounds.getMinY());
+      if ((clickPos != null) && (clickPos.row == row)) {
+        g.setColor(BoardButtonImage.HOVER_ROW.color);
+      } else {
+        g.setColor(Color.white);
+      }
 
-    if ((clickPos != null) && (clickPos.row == row)) {
-      g.setColor(BoardButtonImage.FAST_CLICK.color);
+      g.drawString(string, x, y + tHeight);// + (float) bounds.getHeight() / 2.f);
+      if (_isHoriz) {
+        x += inc;
+      } else {
+        y += inc;
+      }
+    }
+  }
+
+  private void paintNoteHeader(Graphics2D g, int col)
+  {
+    if ((col < 0) || (col >= _cols)) {
+      return;
+    }
+
+    String string = _theBoard.getNoteAt(col).toString();
+
+    int x, y;
+    int tWidth = g.getFontMetrics().stringWidth(string);
+
+    if (_isHoriz) {
+      x = _cInc - RenderBoardUI.defaultUI.buttonXMargin;
+      x /= 2;
+      //x = _borderInsets.left;
+      x -= _slope;
+      x += col * _cInc;
+      y = -labelColHeight;
+    } else {
+      x = -labelRowWidth - 10;
+      y = ((_cols - col - 1) * _cInc);
+      y += -_slope * (_rows + 1) + RenderBoardUI.defaultUI.buttonXMargin * 2;
+    }
+
+    if ((clickPos != null) && (clickPos.col == col)) {
+      g.setColor(BoardButtonImage.HOVER_COLUMN.color);
     } else {
       g.setColor(Color.white);
     }
 
-    g.setFont(labelFont);
-    //bassRowLayouts[row].draw(g, (int)bounds.getMinX(), (int)bounds.getMinY());
-    g.drawString(string, (float) bounds.getMinX() + 2, (float) bounds.getMaxY() - 2);// + (float) bounds.getHeight() / 2.f);
-  }
+    x -= tWidth / 2;
 
-  private void paintBassRowHeader(Graphics2D g)
-  {
-    if (!isDrawLabels) {
-      return;
-    }
-
-    g.setFont(g.getFont().deriveFont(Font.BOLD, 18.f));
-
-//    int scale = 1;
-//
-//    if (!this._isHoriz) {
-//      g.rotate(Math.PI / 2);
-//      x += 50;
-//      y -= 300;
-//      scale = -1;
-//    }
-    AffineTransform trans = g.getTransform();
-
-    for (int r = 0; r < _rows; r++) {
-      this.paintBassRowHeader(g, r);
-
-      g.setTransform(trans);
+    g.drawString(string, x, y);
+    int inc = (_rInc * (_rows + 1)) + RenderBoardUI.defaultUI.buttonXMargin * 2;
+    int mInc = (int) (_slope * (_rows + 1));
+    if (_isHoriz) {
+      g.drawString(string, x + mInc, y + inc);
+    } else {
+      g.drawString(string, x + inc, y + mInc);
     }
   }
-
-  private void paintNoteHeader(Graphics2D g)
-  {
-    if (!isDrawLabels) {
-      return;
-    }
-
-    g.setFont(g.getFont().deriveFont(Font.BOLD, 18.f));
-
-    int x = _cInc - RenderBoardUI.defaultUI.buttonXMargin;
-    x /= 2;
-    x -= _slope;
-
-    int y = RenderBoardUI.defaultUI.buttonXMargin - 30;
-
-    AffineTransform origTransform = g.getTransform();
-
-    for (int c = 0; c < _cols; c++) {
-      String string = _theBoard.getNoteAt(c).toString();
-
-      TextLayout lay = new TextLayout(string, g.getFont(), g.getFontRenderContext());
-
-      int stringWidth = g.getFontMetrics().stringWidth(string);
-
-      g.setPaint(new Color(0, 0, 0, 0xaf));
-      //g.fillRect(x - stringWidth, y - stringHeight / 2, stringWidth, stringHeight);
-
-      Rectangle2D bounds = lay.getBounds();
-      g.translate(x - bounds.getWidth(), y);
-      int off = 4;
-      g.fillRoundRect(
-              (int) bounds.getX() - off,
-              (int) bounds.getY() - off,
-              (int) bounds.getWidth() + 2 * off,
-              (int) bounds.getHeight() + 2 * off,
-              off * 2, off * 2);
-
-      if (!isDragging && (clickPos != null) && (clickPos.col == c)) {
-        g.setColor(Color.magenta);
-      } else {
-        g.setColor(Color.cyan);
-      }
-
-      lay.draw(g, 0, 0);
-      g.translate(-x + bounds.getWidth(), -y);
-
-      x += _cInc;
-    }
-
-    g.setTransform(origTransform);
-  }
-  //Member Vars
-  //================================================================================
-  BassBoard _theBoard;
-  private boolean _isHoriz = false;
-  double _colToRow = 0;
-  double _slantAngle = 0;
-  int _rows = 0, _cols = 0;
-  int _rInc = 0, _cInc = 0;
-  final Point initialOff = new Point();
-  final Point pad = new Point();
-  double _slope = 0;
-  int _cStart = 0;
-  SelectedButtonCombo _selCombo = null;
-  ListSelectionModel _rowSel = null;
-  RenderBoardUI.IconButtonDrawer buttonDrawer;
-  RenderBoardUI.TextDrawer textDrawer;
 }

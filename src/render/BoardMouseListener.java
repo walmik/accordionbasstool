@@ -92,14 +92,12 @@ public class BoardMouseListener extends MouseAdapter
   public void mouseEntered(MouseEvent e)
   {
     renderBoard.setClickPos(e, false);
-    renderBoard.setDrawLabels(true);
   }
 
   @Override
   public void mouseExited(MouseEvent e)
   {
     renderBoard.setClickPos((BassBoard.Pos)null, false);
-    renderBoard.setDrawLabels(false);
   }
 
   @Override
@@ -120,7 +118,7 @@ public class BoardMouseListener extends MouseAdapter
       return;
     }
 
-    renderBoard.setClickPos((BassBoard.Pos)null, true);
+    renderBoard.clearClickPos((columnModel == null));
 
     if (isClickShiftMode) {
       if (!e.isShiftDown()) {

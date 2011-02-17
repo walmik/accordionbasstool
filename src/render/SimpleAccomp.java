@@ -263,17 +263,18 @@ public class SimpleAccomp extends JPanel implements ActionListener, ListSelectio
   private void initComponents() {
 
     groupChordType = new javax.swing.ButtonGroup();
+    checkAlt3rd = new javax.swing.JCheckBox();
+    checkAlt5th = new javax.swing.JCheckBox();
     jPanel1 = new javax.swing.JPanel();
     radioMajor = new javax.swing.JRadioButton();
     radioMinor = new javax.swing.JRadioButton();
     radio7th = new javax.swing.JRadioButton();
     jScrollPane1 = new javax.swing.JScrollPane();
     listRhythms = new javax.swing.JList();
-    jPanel2 = new javax.swing.JPanel();
-    checkAlt3rd = new javax.swing.JCheckBox();
-    checkAlt5th = new javax.swing.JCheckBox();
 
-    setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+    checkAlt3rd.setText("Alternate 3rd");
+
+    checkAlt5th.setText("Alternate 5th");
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Chord Button:"));
     jPanel1.setPreferredSize(new java.awt.Dimension(100, 120));
@@ -310,49 +311,41 @@ public class SimpleAccomp extends JPanel implements ActionListener, ListSelectio
         .addComponent(radio7th))
     );
 
-    add(jPanel1);
-
     jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Rhythm:"));
     jScrollPane1.setPreferredSize(new java.awt.Dimension(100, 120));
     jScrollPane1.setViewportView(listRhythms);
 
-    add(jScrollPane1);
-
-    jPanel2.setPreferredSize(new java.awt.Dimension(100, 60));
-
-    checkAlt3rd.setText("Alternate 3rd");
-
-    checkAlt5th.setText("Alternate 5th");
-
-    javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-    jPanel2.setLayout(jPanel2Layout);
-    jPanel2Layout.setHorizontalGroup(
-      jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(jPanel2Layout.createSequentialGroup()
-        .addContainerGap()
-        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+    javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+    this.setLayout(layout);
+    layout.setHorizontalGroup(
+      layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(layout.createSequentialGroup()
+        .addGap(5, 5, 5)
+        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addGap(5, 5, 5)
+        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
           .addComponent(checkAlt3rd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
           .addComponent(checkAlt5th))
         .addContainerGap())
     );
-    jPanel2Layout.setVerticalGroup(
-      jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(jPanel2Layout.createSequentialGroup()
-        .addContainerGap()
+    layout.setVerticalGroup(
+      layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+      .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+      .addGroup(layout.createSequentialGroup()
+        .addGap(32, 32, 32)
         .addComponent(checkAlt5th)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(checkAlt3rd)
-        .addContainerGap())
+        .addComponent(checkAlt3rd))
     );
-
-    add(jPanel2);
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkAlt3rd;
   private javax.swing.JCheckBox checkAlt5th;
   private javax.swing.ButtonGroup groupChordType;
   private javax.swing.JPanel jPanel1;
-  private javax.swing.JPanel jPanel2;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JList listRhythms;
   private javax.swing.JRadioButton radio7th;

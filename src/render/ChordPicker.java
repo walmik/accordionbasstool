@@ -156,6 +156,7 @@ public class ChordPicker extends javax.swing.JPanel
 
       combo.setModel(new DefaultComboBoxModel(NoteDegreeType.values()));
       combo.setSelectedItem(NoteDegreeType.Normal);
+      combo.setVisible(check.isSelected());
 
       combo.addActionListener(this);
       check.addActionListener(this);
@@ -344,6 +345,8 @@ public class ChordPicker extends javax.swing.JPanel
     jPanel2.add(chordGridPanel, java.awt.BorderLayout.CENTER);
 
     jPanel1.setLayout(new java.awt.GridLayout(6, 1, 0, 4));
+
+    check3.setText("3rd:");
     jPanel1.add(check3);
 
     check5.setText("5th:");

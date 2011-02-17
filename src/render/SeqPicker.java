@@ -118,6 +118,29 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
   }
 
   @Override
+  protected void shown()
+  {
+    if (isMultiSeq) {
+      this.multiSeqPanel.setVisible(true);
+    }
+
+    super.shown();
+  }
+
+  @Override
+  protected void hidden()
+  {
+    if (isMultiSeq) {
+      this.multiSeqPanel.setVisible(false);
+    }
+
+    super.hidden();
+
+    this.firePropertyChange(ToolPanel.RESET_TO_PREF_SIZE, null, null);
+  }
+
+
+  @Override
   protected void syncUIToDataModel()
   {
     if ((columnModel != null) && !isUpdating) {
@@ -392,8 +415,8 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     jPanel1 = new javax.swing.JPanel();
     buttonPlay = new javax.swing.JButton();
     notePickerRoot = new render.NotePicker();
-    allowMulti = new javax.swing.JCheckBox();
     statusText = new render.TransparentTextPane();
+    allowMulti = new javax.swing.JToggleButton();
 
     filterCombo.addItemListener(new java.awt.event.ItemListener() {
       public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -410,11 +433,11 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     panScales.setLayout(panScalesLayout);
     panScalesLayout.setHorizontalGroup(
       panScalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(listScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
+      .addComponent(listScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
     );
     panScalesLayout.setVerticalGroup(
       panScalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(listScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
+      .addComponent(listScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
     );
 
     tabby.addTab("Scales", panScales);
@@ -463,7 +486,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
           .addComponent(buttonInsert)
           .addComponent(buttonRemove))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(seqListScroller, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE))
+        .addComponent(seqListScroller, javax.swing.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE))
     );
     multiSeqPanelLayout.setVerticalGroup(
       multiSeqPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -488,14 +511,6 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
 
     notePickerRoot.setBorder(javax.swing.BorderFactory.createTitledBorder("Starting Note:"));
 
-    allowMulti.setText("<html>Allow Multiple Sequences</html>");
-    allowMulti.setToolTipText("<html>When checked, allows you to <br/>\ninsert, replace, and add sequences and scales<br/>\nto build a custom bass progression.\n</html>");
-    allowMulti.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        allowMultiActionPerformed(evt);
-      }
-    });
-
     javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
     jPanel1.setLayout(jPanel1Layout);
     jPanel1Layout.setHorizontalGroup(
@@ -503,12 +518,9 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
       .addGroup(jPanel1Layout.createSequentialGroup()
         .addContainerGap()
         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(jPanel1Layout.createSequentialGroup()
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(buttonPlay, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
-              .addComponent(notePickerRoot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addContainerGap())
-          .addComponent(allowMulti, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
+          .addComponent(buttonPlay, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
+          .addComponent(notePickerRoot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addContainerGap())
     );
     jPanel1Layout.setVerticalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -517,13 +529,21 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
         .addComponent(buttonPlay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
         .addComponent(notePickerRoot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addGap(20, 20, 20)
-        .addComponent(allowMulti, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap())
+        .addGap(27, 27, 27))
     );
 
     statusText.setMinimumSize(new java.awt.Dimension(5, 56));
     statusText.setText("[No Sequence Selected]");
+
+    allowMulti.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+    allowMulti.setText("<html>Combine <br/>Seqs</html>");
+    allowMulti.setAlignmentX(0.5F);
+    allowMulti.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    allowMulti.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        allowMultiActionPerformed(evt);
+      }
+    });
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
@@ -531,25 +551,34 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(multiSeqPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)))
+          .addGroup(layout.createSequentialGroup()
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+              .addGroup(layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(allowMulti, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
+              .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)))
+          .addGroup(layout.createSequentialGroup()
+            .addContainerGap()
+            .addComponent(multiSeqPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         .addContainerGap())
-      .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(tabby, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-          .addComponent(jPanel1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-          .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE))
+          .addComponent(allowMulti, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(multiSeqPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
-        .addContainerGap())
+        .addGap(12, 12, 12))
     );
 
     tabby.getAccessibleContext().setAccessibleName("Scales");
@@ -580,17 +609,18 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
       removeSeq();
     }//GEN-LAST:event_buttonRemoveActionPerformed
 
+    private void buttonPlayActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_buttonPlayActionPerformed
+    {//GEN-HEADEREND:event_buttonPlayActionPerformed
+      updateTableModel(buildFullSeq());
+    }//GEN-LAST:event_buttonPlayActionPerformed
+
     private void allowMultiActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_allowMultiActionPerformed
     {//GEN-HEADEREND:event_allowMultiActionPerformed
       toggleAllowMultiSeq(allowMulti.isSelected());
     }//GEN-LAST:event_allowMultiActionPerformed
 
-    private void buttonPlayActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_buttonPlayActionPerformed
-    {//GEN-HEADEREND:event_buttonPlayActionPerformed
-      updateTableModel(buildFullSeq());
-    }//GEN-LAST:event_buttonPlayActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JCheckBox allowMulti;
+  private javax.swing.JToggleButton allowMulti;
   private javax.swing.JButton buttonAdd;
   private javax.swing.JButton buttonInsert;
   private javax.swing.JButton buttonPlay;

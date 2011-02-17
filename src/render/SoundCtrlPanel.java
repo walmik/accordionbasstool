@@ -65,18 +65,18 @@ public class SoundCtrlPanel extends javax.swing.JPanel implements MenuElement
   @Override
   public void processMouseEvent(MouseEvent event, MenuElement[] path, MenuSelectionManager manager)
   {
-    if (event.getID() == MouseEvent.MOUSE_ENTERED) {
-      MenuElement[] newPath = new MenuElement[path.length + 1];
-      System.arraycopy(path, 0, newPath, 0, path.length);
-      newPath[path.length] = this;
-      manager.setSelectedPath(newPath);
-    }
-
-    if (event.getID() == MouseEvent.MOUSE_EXITED) {
-      MenuElement[] newPath = new MenuElement[path.length - 1];
-      System.arraycopy(path, 0, newPath, 0, path.length - 1);
-      manager.setSelectedPath(newPath);
-    }
+//    if (event.getID() == MouseEvent.MOUSE_ENTERED) {
+//      MenuElement[] newPath = new MenuElement[path.length + 1];
+//      System.arraycopy(path, 0, newPath, 0, path.length);
+//      newPath[path.length] = this;
+//      manager.setSelectedPath(newPath);
+//    }
+//
+//    if (event.getID() == MouseEvent.MOUSE_EXITED) {
+//      MenuElement[] newPath = new MenuElement[path.length - 1];
+//      System.arraycopy(path, 0, newPath, 0, path.length - 1);
+//      manager.setSelectedPath(newPath);
+//    }
 
 //    this.processMouseMotionEvent(event);
   }

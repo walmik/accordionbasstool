@@ -45,7 +45,7 @@ public class RenderBoardUI
   final double _colToRow = 4.0 / 3.0;
   boolean _isHoriz = true;
   double _defaultSlantAngle = (20.0) * Math.PI / 180;
-  final static int _prefSize = 48;
+  final static int _prefSize = 52;
   //BufferedImage selectedIM, unselectedIM, pressedIM;
   boolean use3DDrawer = true;
   int lastIMScale = 0;
@@ -57,8 +57,12 @@ public class RenderBoardUI
 
     UNSELECTED(Color.black, 0.75f, false),
     SELECTED(Color.blue, false),
-    FAST_CLICK(Color.green, 1.f, true),
-    HOVER(Color.green, 0.75f, false),
+    // Hovers
+    FAST_CLICK(Color.orange, 1.f, true),
+    HOVER(Color.orange, 1.f, false),
+    HOVER_COLUMN(Color.red, 1.f, false),
+    HOVER_ROW(Color.green, 1.f, false),
+
     REDUNDS(Color.gray, 0.75f, true),
     //Press - Fingers
     PRESSED_2(Color.green, 1.f, true),
@@ -317,13 +321,14 @@ public class RenderBoardUI
     private Font _origFont = new Font("Default", Font.BOLD, 14);
     private Font _font = _origFont;
 
-    float minSize = 10.f;
+    final float minSize = 10.f;
+    final float fontHeightSizeRatio = .66f;
 
     void setup(Graphics2D graphics, int xW, int yW, int diamX, int diamY)
     {
       // Text Set up
       int fontHeight = graphics.getFontMetrics(_origFont).getHeight();
-      _font = _origFont.deriveFont(_origFont.getSize2D() * (diamY * .5f) / fontHeight);
+      _font = _origFont.deriveFont(_origFont.getSize2D() * (diamY * fontHeightSizeRatio) / fontHeight);
 
       if (_font.getSize() < minSize) {
         return;

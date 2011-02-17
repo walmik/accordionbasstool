@@ -25,30 +25,44 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="multiSeqPanel" alignment="1" max="32767" attributes="0"/>
-                  <Group type="102" alignment="1" attributes="0">
-                      <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="tabby" pref="339" max="32767" attributes="2"/>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <EmptySpace min="10" pref="10" max="10" attributes="0"/>
+                              <Component id="allowMulti" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="statusText" pref="337" max="32767" attributes="0"/>
+                          <Component id="tabby" alignment="0" pref="337" max="32767" attributes="2"/>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="multiSeqPanel" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="statusText" alignment="0" pref="474" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="jPanel1" alignment="0" min="0" max="32767" attributes="1"/>
-                  <Component id="tabby" alignment="0" pref="191" max="32767" attributes="1"/>
+          <Group type="102" alignment="0" max="-2" attributes="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="tabby" alignment="0" min="-2" max="-2" attributes="1"/>
+                  <Component id="jPanel1" alignment="0" min="-2" pref="154" max="-2" attributes="1"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="allowMulti" min="-2" pref="56" max="-2" attributes="0"/>
+                  <Component id="statusText" alignment="0" pref="56" max="32767" attributes="1"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="multiSeqPanel" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="statusText" pref="56" max="32767" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -82,12 +96,12 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="listScrollPane" alignment="0" pref="334" max="32767" attributes="1"/>
+                  <Component id="listScrollPane" alignment="0" pref="332" max="32767" attributes="1"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="listScrollPane" alignment="1" pref="163" max="32767" attributes="1"/>
+                  <Component id="listScrollPane" alignment="0" pref="130" max="32767" attributes="1"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -129,7 +143,7 @@
                       <Component id="buttonRemove" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="seqListScroller" pref="359" max="32767" attributes="2"/>
+                  <Component id="seqListScroller" pref="349" max="32767" attributes="2"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -211,15 +225,10 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="buttonPlay" alignment="0" pref="95" max="32767" attributes="0"/>
-                              <Component id="notePickerRoot" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                      </Group>
-                      <Component id="allowMulti" alignment="1" min="-2" pref="105" max="-2" attributes="0"/>
+                      <Component id="buttonPlay" alignment="0" pref="95" max="32767" attributes="0"/>
+                      <Component id="notePickerRoot" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -230,9 +239,7 @@
                   <Component id="buttonPlay" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="notePickerRoot" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
-                  <Component id="allowMulti" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -263,15 +270,6 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="allowMulti">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="&lt;html&gt;Allow Multiple Sequences&lt;/html&gt;"/>
-            <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;When checked, allows you to &lt;br/&gt;&#xa;insert, replace, and add sequences and scales&lt;br/&gt;&#xa;to build a custom bass progression.&#xa;&lt;/html&gt;"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="allowMultiActionPerformed"/>
-          </Events>
-        </Component>
       </SubComponents>
     </Container>
     <Component class="render.TransparentTextPane" name="statusText">
@@ -281,6 +279,19 @@
         </Property>
         <Property name="text" type="java.lang.String" value="[No Sequence Selected]"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JToggleButton" name="allowMulti">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="18" style="1"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;Combine &lt;br/&gt;Seqs&lt;/html&gt;"/>
+        <Property name="alignmentX" type="float" value="0.5"/>
+        <Property name="horizontalTextPosition" type="int" value="0"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="allowMultiActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

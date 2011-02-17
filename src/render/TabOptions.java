@@ -12,7 +12,10 @@ package render;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
+import javax.sound.midi.Instrument;
+import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
@@ -20,6 +23,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import music.BoardSearcher;
 import music.ButtonCombo;
+import music.midi.Player;
 
 /**
  *
@@ -27,6 +31,7 @@ import music.ButtonCombo;
  */
 public class TabOptions extends ToolPanel
 {
+
   public final static String TOGGLE_BOARDPOS_PROPERTY = "toggleBoardPos";
   public final static String TOGGLE_ORIENT_PROPERTY = "toggleOrient";
   public final static String TOGGLE_EDITOR_PROPERTY = "toggleEditor";
@@ -47,6 +52,54 @@ public class TabOptions extends ToolPanel
     this.checkFingerSearch.setSelected(columnModel.optFingerSearch);
   }
 
+  Player player;
+
+  class InstruComboRenderer extends DefaultListCellRenderer
+  {
+
+    @Override
+    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
+    {
+      Instrument instru = (Instrument) value;
+      return super.getListCellRendererComponent(list, instru.getName(), index, isSelected, cellHasFocus);
+    }
+  }
+
+  class ResetToAccordionAction extends AbstractAction
+  {
+    ResetToAccordionAction()
+    {
+      this.putValue(NAME, "Reset To Accordion");
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+      comboBassInstru.setSelectedItem(player.findInstrument("Accordion"));
+      comboChordInstru.setSelectedItem(player.findInstrument("Tango Accordion"));
+    }
+  }
+
+  ResetToAccordionAction getResetInstrumentsAction()
+  {
+    return new ResetToAccordionAction();
+  }
+
+  public void initSound(Player player)
+  {
+    this.player = player;
+
+    this.comboBassInstru.setModel(new DefaultComboBoxModel(player.getSynth().getAvailableInstruments()));
+    this.comboChordInstru.setModel(new DefaultComboBoxModel(player.getSynth().getAvailableInstruments()));
+
+    this.comboBassInstru.setSelectedItem(player.getInstrument(false));
+    this.comboChordInstru.setSelectedItem(player.getInstrument(true));
+
+    InstruComboRenderer render = new InstruComboRenderer();
+    this.comboBassInstru.setRenderer(render);
+    this.comboChordInstru.setRenderer(render);
+  }
+
   @Override
   public void addPropertyChangeListener(PropertyChangeListener listener)
   {
@@ -55,8 +108,6 @@ public class TabOptions extends ToolPanel
     super.addPropertyChangeListener(TOGGLE_EDITOR_PROPERTY, listener);
   }
 
-
-
   @Override
   protected void syncUIToDataModel()
   {
@@ -64,6 +115,11 @@ public class TabOptions extends ToolPanel
     this.maxComboLenSpin.setValue(new Integer(BoardSearcher.optMaxComboLength));
     if (columnModel != null) {
       this.checkFingerSearch.setSelected(columnModel.optFingerSearch);
+    }
+
+    if (player != null) {
+      this.comboBassInstru.setSelectedItem(player.getInstrument(false));
+      this.comboChordInstru.setSelectedItem(player.getInstrument(true));
     }
   }
 
@@ -143,6 +199,10 @@ public class TabOptions extends ToolPanel
     toggleBoardLeftTop = new javax.swing.JCheckBox();
     toggleBoardHoriz = new javax.swing.JCheckBox();
     toggleEditorPos = new javax.swing.JCheckBox();
+    jPanel3 = new javax.swing.JPanel();
+    comboBassInstru = new javax.swing.JComboBox();
+    comboChordInstru = new javax.swing.JComboBox();
+    resetInstruments = new javax.swing.JButton();
 
     jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Sequence Search Options:"));
 
@@ -215,7 +275,7 @@ public class TabOptions extends ToolPanel
             .addComponent(jLabel2)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addComponent(maxComboLenSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-        .addContainerGap(80, Short.MAX_VALUE))
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
     jPanel1Layout.setVerticalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -230,8 +290,7 @@ public class TabOptions extends ToolPanel
           .addComponent(jLabel2)
           .addComponent(maxComboLenSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(checkAllowAllBass)
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addComponent(checkAllowAllBass))
     );
 
     jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Appearence:"));
@@ -270,41 +329,90 @@ public class TabOptions extends ToolPanel
     jPanel2Layout.setHorizontalGroup(
       jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(jPanel2Layout.createSequentialGroup()
-        .addContainerGap()
-        .addComponent(jLabel1)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(lnfCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addGap(18, 18, 18)
         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(toggleBoardLeftTop)
           .addGroup(jPanel2Layout.createSequentialGroup()
-            .addComponent(toggleBoardHoriz)
-            .addGap(18, 18, 18)
-            .addComponent(toggleEditorPos)))
-        .addContainerGap(31, Short.MAX_VALUE))
+            .addContainerGap()
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(toggleEditorPos)
+              .addComponent(toggleBoardLeftTop)
+              .addComponent(toggleBoardHoriz)))
+          .addGroup(jPanel2Layout.createSequentialGroup()
+            .addGap(10, 10, 10)
+            .addComponent(jLabel1)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addComponent(lnfCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        .addContainerGap(10, Short.MAX_VALUE))
     );
     jPanel2Layout.setVerticalGroup(
       jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(jPanel2Layout.createSequentialGroup()
         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(jLabel1)
-          .addComponent(lnfCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addComponent(toggleBoardHoriz)
-          .addComponent(toggleEditorPos))
+          .addComponent(lnfCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addComponent(toggleBoardHoriz)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(toggleBoardLeftTop)
-        .addContainerGap(16, Short.MAX_VALUE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(toggleEditorPos)
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+    );
+
+    jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Sound"));
+
+    comboBassInstru.setToolTipText("Bass Instrument");
+    comboBassInstru.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        comboBassInstruActionPerformed(evt);
+      }
+    });
+
+    comboChordInstru.setToolTipText("Chord Instrument");
+    comboChordInstru.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        comboChordInstruActionPerformed(evt);
+      }
+    });
+
+    resetInstruments.setAction(new ResetToAccordionAction());
+
+    javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+    jPanel3.setLayout(jPanel3Layout);
+    jPanel3Layout.setHorizontalGroup(
+      jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel3Layout.createSequentialGroup()
+        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(comboBassInstru, 0, 155, Short.MAX_VALUE)
+          .addComponent(comboChordInstru, javax.swing.GroupLayout.Alignment.TRAILING, 0, 155, Short.MAX_VALUE))
+        .addContainerGap())
+      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+        .addGap(22, 22, 22)
+        .addComponent(resetInstruments)
+        .addContainerGap(110, Short.MAX_VALUE))
+    );
+    jPanel3Layout.setVerticalGroup(
+      jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel3Layout.createSequentialGroup()
+        .addComponent(comboBassInstru, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addComponent(comboChordInstru, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(resetInstruments)
+        .addContainerGap(37, Short.MAX_VALUE))
     );
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+      .addGroup(layout.createSequentialGroup()
         .addContainerGap()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-          .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-          .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addGroup(layout.createSequentialGroup()
+            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -312,9 +420,11 @@ public class TabOptions extends ToolPanel
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addGap(7, 7, 7)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addContainerGap())
     );
   }// </editor-fold>//GEN-END:initComponents
 
@@ -388,18 +498,33 @@ public class TabOptions extends ToolPanel
     this.firePropertyChange(TOGGLE_EDITOR_PROPERTY, null, null);
     //((BassToolFrame) Main._rootFrame).toggleEditorLeft();
   }//GEN-LAST:event_toggleEditorPosActionPerformed
+
+  private void comboBassInstruActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_comboBassInstruActionPerformed
+  {//GEN-HEADEREND:event_comboBassInstruActionPerformed
+    player.setInstrument(false, (Instrument) comboBassInstru.getSelectedItem());
+  }//GEN-LAST:event_comboBassInstruActionPerformed
+
+  private void comboChordInstruActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_comboChordInstruActionPerformed
+  {//GEN-HEADEREND:event_comboChordInstruActionPerformed
+    player.setInstrument(true, (Instrument) comboChordInstru.getSelectedItem());
+  }//GEN-LAST:event_comboChordInstruActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkAllowAllBass;
   private javax.swing.JCheckBox checkFingerSearch;
   private javax.swing.JCheckBox checkIgnoreAllBass;
   private javax.swing.JCheckBox checkIgnoreMaxThres;
+  private javax.swing.JComboBox comboBassInstru;
+  private javax.swing.JComboBox comboChordInstru;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel2;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel2;
+  private javax.swing.JPanel jPanel3;
   private javax.swing.JComboBox lnfCombo;
   private javax.swing.JSpinner maxComboLenSpin;
   private javax.swing.JSpinner maxComboThreshSpin;
+  private javax.swing.JButton resetInstruments;
   private javax.swing.JCheckBox toggleBoardHoriz;
   private javax.swing.JCheckBox toggleBoardLeftTop;
   private javax.swing.JCheckBox toggleEditorPos;

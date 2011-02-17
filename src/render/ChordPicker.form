@@ -123,6 +123,9 @@
           </Layout>
           <SubComponents>
             <Component class="javax.swing.JCheckBox" name="check3">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="3rd:"/>
+              </Properties>
             </Component>
             <Component class="javax.swing.JCheckBox" name="check5">
               <Properties>

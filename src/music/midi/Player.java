@@ -18,10 +18,11 @@ import music.Note;
 public class Player implements ActionListener
 {
 
-  Synthesizer synth;
-  //Timer audioTimer;
+  private Synthesizer synth;
   LinkedList<AudioTask> cancelTasks;
   int velocity = 64;
+  Instrument bassInstrument;
+  Instrument chordInstrument;
 
   public boolean init()
   {
@@ -30,17 +31,13 @@ public class Player implements ActionListener
       synth = MidiSystem.getSynthesizer();
       synth.open();
 
-      Instrument instru = findInstrument("Accordion");
+//      Soundbank bank = synth.getDefaultSoundbank();
+//      if (bank != null) {
+//        System.out.println("Using Soundback: " + bank.getName() + " - " + bank.getDescription());
+//      }
 
-      if (instru != null) {
-        synth.getChannels()[chanUsed].programChange(instru.getPatch().getBank(), instru.getPatch().getProgram());
-      }
-
-      instru = findInstrument("Tango Accordion");
-
-      if (instru != null) {
-        synth.getChannels()[chanUsed + 1].programChange(instru.getPatch().getBank(), instru.getPatch().getProgram());
-      }
+      this.setInstrument(false, findInstrument("Accordion"));
+      this.setInstrument(true, findInstrument("Tango Accordion"));
 
       //audioTimer = new Timer(true);
 
@@ -51,7 +48,42 @@ public class Player implements ActionListener
     }
   }
 
-  private Instrument findInstrument(String name)
+  public Synthesizer getSynth()
+  {
+    return synth;
+  }
+
+  public Instrument getInstrument(boolean chord)
+  {
+    return (chord ? chordInstrument : bassInstrument);
+  }
+
+  public void setInstrument(boolean chord, Instrument instru)
+  {
+    if (instru == null) {
+      return;
+    }
+
+    int chan;
+
+    if (chord) {
+      if (instru == chordInstrument) {
+        return;
+      }
+      chordInstrument = instru;
+      chan = chanUsed + 1;
+    } else {
+      if (instru == bassInstrument) {
+        return;
+      }
+      bassInstrument = instru;
+      chan = chanUsed;
+    }
+
+    synth.getChannels()[chan].programChange(instru.getPatch().getBank(), instru.getPatch().getProgram());
+  }
+
+  public Instrument findInstrument(String name)
   {
     Instrument[] ins = synth.getAvailableInstruments();
 

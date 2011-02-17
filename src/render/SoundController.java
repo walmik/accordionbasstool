@@ -15,7 +15,7 @@ import music.midi.Player;
 public class SoundController
 {
 
-  Player player;
+  private Player player;
   boolean soundEnabled = true;
   boolean arpeggiating = false;
   int playDuration = 500;
@@ -47,6 +47,16 @@ public class SoundController
   public void setArpeggiating(boolean arp)
   {
     arpeggiating = arp;
+  }
+
+  public Player getPlayer()
+  {
+    if (player == null) {
+      player = new music.midi.Player();
+      player.init();
+    }
+
+    return player;
   }
 
   public void stop()

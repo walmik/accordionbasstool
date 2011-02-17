@@ -68,8 +68,8 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     Main.setNimbus();
     //Main.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-    getContentPane().setLayout(new CenterLayout());
-    //getContentPane().setLayout(new BorderLayout());
+    //getContentPane().setLayout(new CenterLayout());
+    getContentPane().setLayout(new BorderLayout());
     getContentPane().setBackground(Color.black);
     //horizStrut = Box.createHorizontalStrut(80);
 
