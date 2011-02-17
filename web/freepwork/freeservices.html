@@ -93,6 +93,7 @@ and open the template in the editor.
         if (markersLoaded) {
           computeMarkerDist();
         }
+        buildVisiblePlaceList();
       }
 
       function onMarkerAddrChanged(text)
@@ -351,14 +352,7 @@ and open the template in the editor.
               }
             }
 
-            //descText = getPlaceHtml(place, i);
-            //descText += "<a href='#zoom'>Zoom</a>";
-
             google.maps.event.addListener(place.marker, "click", doOpen(theInfoWin, place, i));
-			
-			
-
-            //google.maps.event.addListener(place.marker, "visible_changed", doToggleData(place));
           }
         }
 
