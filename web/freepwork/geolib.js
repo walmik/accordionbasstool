@@ -29,6 +29,7 @@ var geolib = (function() {
   }
 
   var markerPosChanged = function() {}
+  var markerAddrChanged = function() {}
 
 
   function LocAddr(pos, address)
@@ -48,6 +49,7 @@ var geolib = (function() {
 
     acceptPosChange = options.acceptPosChange;
     markerPosChanged = options.markerPosChanged;
+    markerAddrChanged = options.markerAddrChanged;
 
     if (options.formAddressName != undefined) {
       formAddress = document.getElementById(options.formAddressName);
@@ -344,6 +346,9 @@ var geolib = (function() {
     if (formAddress != undefined) {
       formAddress.value = text;
     }
+
+    markerAddrChanged(text);
+    
     mapMarker.setTitle(text);
   }
 

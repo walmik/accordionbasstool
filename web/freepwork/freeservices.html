@@ -22,6 +22,7 @@ and open the template in the editor.
       .datalist ol li a:hover { background-color: #DBF1F9;/* light blue */ }
       .itemPlain a { background-color: inherit}
       .itemSel a { background-color: #007F00}
+      .contentInfo { float: none }
     </style>
 
     <script type="text/javascript">
@@ -45,10 +46,19 @@ and open the template in the editor.
           alwaysLookUpUserAddress: true,
           acceptPosChange: acceptPosChange,
           markerPosChanged: onMarkerPosChanged,
-		  errorDivName: "addressError"});
+          markerAddrChanged: onMarkerAddrChanged,
+          errorDivName: "addressError"});
 
         theInfoWin = new google.maps.InfoWindow();
-        /*      google.maps.event.addListener(theInfoWin, "closeclick", function()
+
+
+        /*
+        google.maps.event.addListener(theInfoWin, "domready", function()
+        {
+
+        }
+		
+        google.maps.event.addListener(theInfoWin, "closeclick", function()
         {
           if ((selectedMarker != undefined) && (selectedMarker.place != null)) {
             selectedMarker.place.theLI.setAttribute("class", "itemPlain");
@@ -71,11 +81,11 @@ and open the template in the editor.
       function acceptPosChange(pos)
       {
         var acceptable = SFBounds.contains(pos);
-		var statusText = (acceptable ? "" : "This is not a valid San Francisco address. Please try again");
+        var statusText = (acceptable ? "" : "This is not a valid San Francisco address. Please try again");
 
-		document.getElementById("addressError").innerHTML = statusText;
+        document.getElementById("addressError").innerHTML = statusText;
 		
-		return acceptable;		
+        return acceptable;
       }
 
       function onMarkerPosChanged(pos)
@@ -83,6 +93,11 @@ and open the template in the editor.
         if (markersLoaded) {
           computeMarkerDist();
         }
+      }
+
+      function onMarkerAddrChanged(text)
+      {
+        document.getElementById("statusAddr").innerHTML = "<b>Below are the services, Nearest to Farthest from \"" + text + "\"</b>";
       }
 
       var imageUrls = {"Pantry": "http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|0000FF|13|b|P",
@@ -146,7 +161,7 @@ and open the template in the editor.
               place.distDesc = place.distDesc.substr(0, 7);
             }
             place.distDesc += units;
-			place.distDesc += " Away";
+            place.distDesc += " Away";
           }
         }
       }
@@ -196,20 +211,23 @@ and open the template in the editor.
 
        */
 
-      function getPlaceHtml(place, i)
-	  {
-	    var descText;
-        descText = "<img border='0' src=\"" + imageUrls[DATA.Markers.Folder[i].name] + "\"/>";
-		if (place.distDesc != undefined) {
-		  descText += "<span style='float: right'>" + place.distDesc + "</span>";
-		}
+      function getPlaceHtml(place, i, noImage)
+      {
+        var descText = "";
+        if (!noImage) {
+          descText += "<img border='0' src=\"" + imageUrls[DATA.Markers.Folder[i].name] + "\"/>";
+        }
+		
+        if (place.distDesc != undefined) {
+          descText += "<span style='float: right'>" + place.distDesc + "</span>";
+        }
         descText += "<b>" + place.name + "</b>";
         if (place.address != undefined) {
-          descText += "<br/><h1><i>" + place.address + "</i></h1>";
+          descText += "<br/><h2><i>" + place.address + "</i></h2>";
         }
         descText += "<br/>" + place.description;
-		return descText;
-	  }
+        return descText;
+      }
 
       function createLI(place, i, j)
       {
@@ -224,7 +242,7 @@ and open the template in the editor.
         onclickSelectMarker += i + ", ";
         onclickSelectMarker += j + ", this)\"";
 		
-		var descText = getPlaceHtml(place, i);
+        var descText = getPlaceHtml(place, i, false);
 
         newLI.innerHTML = "<a " + onclickSelectMarker + "href='#'>" + descText + "</a>";
 
@@ -288,11 +306,8 @@ and open the template in the editor.
             createLI(place, i, j);
           }
         }
-
-		statusText = "<b>Showing " + count + " Free Services on this map.";
-		statusText += "<br/>Services are listed Nearest to Farthest from \"" + geolib.getMarker().getTitle() + "\"</b>";
 		
-        document.getElementById("statusFound").innerHTML = statusText;
+        document.getElementById("statusFound").innerHTML = "<b>Showing " + count + " Free Services on this map.</b>";
       }
 
       var allPlaces;
@@ -330,9 +345,9 @@ and open the template in the editor.
             {
               return function()
               {
-                win.setContent(getPlaceHtml(place, i));
-                //selectedMarker = place.marker;
-                win.open(map, place.marker);
+                var divWrap = "<div class='contentInfo'>" + getPlaceHtml(place, i, false) + "</div>";
+                win.setContent(divWrap);
+                win.open(map, place.marker);				
               }
             }
 
@@ -340,6 +355,8 @@ and open the template in the editor.
             //descText += "<a href='#zoom'>Zoom</a>";
 
             google.maps.event.addListener(place.marker, "click", doOpen(theInfoWin, place, i));
+			
+			
 
             //google.maps.event.addListener(place.marker, "visible_changed", doToggleData(place));
           }
@@ -348,7 +365,7 @@ and open the template in the editor.
         markersLoaded = true;
         computeMarkerDist();
 
-/*
+        /*
         function onLookupAddress(currPlace)
         {
           return function(responses)
@@ -368,39 +385,40 @@ and open the template in the editor.
         geolib.getGeoCoder().geocode({latLng: allPlaces[0].marker.getPosition()},
         onLookupAddress(allPlaces[0]));
 
-        */
+         */
 
       }
 	  
-	  function showClicked()
-	  {
-		if (!geolib.syncToEnteredAddress()) {
-			geolib.getMap().setCenter(geolib.getPos());
-		}
-		geolib.getMap().setZoom(15);
-	  }
+      function showClicked()
+      {
+        if (!geolib.syncToEnteredAddress()) {
+          geolib.getMap().setCenter(geolib.getPos());
+        }
+        geolib.getMap().setZoom(15);
+      }
 
     </script>
   </head>
   <body onload="init()">
     <h1>San Francisco Free Services Locator</h1>
     <div id="inputs">Enter your address:
-    <input type="text" name="address" id="address" style="width: 500px" value="San Francisco, CA"/>
-    <input type="hidden" name="posLatlng" id="posLatlng" value="37.7749295, -122.4194155"/>
-    <input type="button" name="centerMe" id="centerMe" value="Show Services Near This Address" onclick="showClicked()"/>
-	
-	<input type="button" name="zoomIn" id="zoomIn" value="Zoom In" onclick="geolib.getMap().setZoom(geolib.getMap().getZoom() + 1)"/>
-    <input type="button" name="zoomIn" id="zoomOut" value="Zoom Out" onclick="geolib.getMap().setZoom(geolib.getMap().getZoom() - 1)"/>
-	</div>
-	<div id="addressError" style="color: red"></div>
-	<br/>
-	<div id="statusFound"></div><br/>
-    <div id="data_list" class="datalist" style="display: block; width: 40%; height: 100%; float: left; overflow: scroll"></div>
-    <div id="map_panel" style="width: 60%; height: 100%; float: left;">
-	<div id="markerFilters"></div>
-	<br/>
-	<div id="map_canvas" style="width: 100%; height: 100%">
-	</div>
+      <input type="text" name="address" id="address" style="width: 500px" value="San Francisco, CA"/>
+      <input type="hidden" name="posLatlng" id="posLatlng" value="37.7749295, -122.4194155"/>
+      <input type="button" name="centerMe" id="centerMe" value="Show Services Near This Address" onclick="showClicked()"/>
+
+      <input type="button" name="zoomIn" id="zoomIn" value="Zoom In" onclick="geolib.getMap().setZoom(geolib.getMap().getZoom() + 1)"/>
+      <input type="button" name="zoomIn" id="zoomOut" value="Zoom Out" onclick="geolib.getMap().setZoom(geolib.getMap().getZoom() - 1)"/>
     </div>
+    <div id="addressError" style="color: red"></div>
+    <br/>
+    <div id="statusFound"></div><div id="statusAddr"></div><br/>
+    <div id="markerFilters"></div>
+    <br/>
+
+    <div id="data_list" class="datalist" style="float: left; display: block; width: 40%; height: 100%; overflow: scroll"></div>
+    <div id="floater" stlye="width: 60%; height: 100%">
+      <div id="map_canvas" style="height: 100%;"></div>
+    </div>
+
   </body>
 </html>
