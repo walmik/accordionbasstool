@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" content="text/html"/>
-    <title>All About Accordion Bass</title>
+    <title>Accordion Bass Analyzer (Beta)</title>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/themes/ui-darkness/jquery-ui.css" type="text/css" />
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js">
     </script>
@@ -54,7 +54,7 @@
         $('#tabs').bind('tabsselect', function(event, ui){
           document.the_applet.setMode(ui.panel.id);
         });
-        $("#applet_div").draggable({containment: "#drag_div", axis: "x", scroll: false });
+        $("#applet_div").draggable({/*containment: "#drag_div",*/ axis: "x", scroll: false });
         $("#applet_div").resizable({
           stop: function(event, ui)
           {
@@ -89,6 +89,10 @@
         text-align: center;
       }
 
+      .tabContent {
+        margin-bottom: 24px;
+      }
+
     </style>
   </head>
   <body>
@@ -108,10 +112,10 @@
             <a href="#SeqPicker">Progressions & Scales</a>
           </li>		  
           <li>
-            <a href="#Default">Full Tool</a>
+            <a href="#Default">Full Analyzer</a>
           </li>
         </ul>
-        <div id="BoardOnly">
+        <div class="tabContent" id="BoardOnly">
           <h2>Exploring the Board</h2>
           Below you can see a typical accordion bass board.
           Moving around the board will show the corresponding row and column.
@@ -119,7 +123,7 @@
           Each column is different note, with adjacent columns being a 5th apart.
           (You can also view the board vertically and turn off the highliting in the Options menu.)
         </div>
-        <div id="ChordMatch">
+        <div class="tabContent" id="ChordMatch">
           <h2>Button Combining</h2>
           Combining multiple bass and chord, a more advanced technqiue, allows
           for almost any chord to be played.<br/>
@@ -132,26 +136,38 @@
           on the accordion. This is due to the fact that all the notes in those buttons are
           played by other notes. This is true for duplicate buttons.
           <i>To see which buttons are made redundant, select the <b>Press Redundant Buttons</b>
-          item in the Options.</i>
+            item in the Options.</i>
         </div>
-        <div id="ChordPicker">
+        <div class="tabContent" id="ChordPicker">
+          <h2>Chord Picker</h2>
           Below you can select any chord and see the different ways that it can be played
           on the accordion bass side.
         </div>
-        <div id="SeqPicker">
-          Common Progressions
+        <div class="tabContent" id="SeqPicker">
+          <h2>Progressions</h2>
         </div>
-        <div id="Default">
-          All in one deal! All the previous options are available as tabs!
+        <div class="tabContent" id="Default">
+          <h2>Accordion Bass Analyzer</h2>
+          Below is the whole analyzer put together. Each of the different modes are available
+          as separate tabs in the analyzer.
+          There is also an additional Options tab for advanced searched settings.
+          This version of the analyzer can be run outside of the browser if necessary.
         </div>		
       </div>
     </div>
-    <!--    <div id="appletControl" style="visibility: hidden">
-        <input type="checkbox" id="resizeCheck" onclick="toggleResizeCheck()"/>
-        <label for="resizeCheck">Auto-Resize Accordion Tool</label>
-        </div>-->
+    <div id="license">
+      <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+        <img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/80x15.png" />
+      </a>
 
-    <div id="drag_div">
+      <!--<br/>
+      <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Accordion Bass Analyzer</span>
+      is licensed under a
+      <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+      </a>.-->
+    </div>
+    <div id="contact">Questions? Comments? Problems? Please <a href="ikreymer.spamremove@gmail.com">send me a message!</a></div>
+    <!-- Accordion Analyzer Content -->
 
       <div id="applet_div">
         <applet code="app.AppletMain" name="the_applet" mayscript="true" archive="./AccordTools.jar" width="100%" height="100%">
@@ -160,6 +176,5 @@
         </applet>
       </div>
 
-    </div>
   </body>
 </html>
