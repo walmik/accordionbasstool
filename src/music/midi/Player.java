@@ -6,6 +6,8 @@ package music.midi;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.LinkedList;
 import javax.swing.Timer;
 import javax.sound.midi.*;
@@ -31,10 +33,24 @@ public class Player implements ActionListener
       synth = MidiSystem.getSynthesizer();
       synth.open();
 
-//      Soundbank bank = synth.getDefaultSoundbank();
-//      if (bank != null) {
-//        System.out.println("Using Soundback: " + bank.getName() + " - " + bank.getDescription());
-//      }
+      Instrument instrs[] = null;
+      Soundbank bank = synth.getDefaultSoundbank();
+
+      if (bank != null) {
+        instrs = bank.getInstruments();
+      }
+
+      if ((instrs == null) || (instrs.length == 0)) {
+        System.out.println("Bad Bank: " + bank + ", loading our own");
+        try {
+          URL url = getClass().getClassLoader().getResource("soundbank.gm");
+          synth.loadAllInstruments(MidiSystem.getSoundbank(url.openStream()));
+          System.out.println("Loaded Soundbank From: " + url);
+
+        } catch (Exception e) {
+          System.out.println(e);
+        }
+      }
 
       this.setInstrument(false, findInstrument("Accordion"));
       this.setInstrument(true, findInstrument("Tango Accordion"));

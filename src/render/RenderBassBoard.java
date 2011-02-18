@@ -180,7 +180,7 @@ public class RenderBassBoard extends JPanel
       _cols = _theBoard.getNumCols();
     }
     computeNeeded = true;
-    this.firePropertyChange(BassBoard.class.getSimpleName(), oldBoard, newBoard);
+    this.firePropertyChange("BassBoard", oldBoard, newBoard);
   }
 
   public BassBoard getBassBoard()

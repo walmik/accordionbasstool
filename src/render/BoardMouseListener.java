@@ -97,7 +97,7 @@ public class BoardMouseListener extends MouseAdapter
   @Override
   public void mouseExited(MouseEvent e)
   {
-    renderBoard.setClickPos((BassBoard.Pos)null, false);
+    renderBoard.clearClickPos(columnModel == null);
   }
 
   @Override

@@ -76,6 +76,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     renderBassBoard = renderBoardControl.renderBassBoard;
     renderBoardControl.renderBoardHeader.init(renderBassBoard, renderBoardControl.scrollPane);
+    renderBassBoard.addPropertyChangeListener("BassBoard", this);
 
     columnModel = new SeqColumnModel(renderBassBoard);
     sound = new SoundController(false);
@@ -152,6 +153,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
   public void init(ToolMode tool)
   {
+    sound.stop();
     SeqColumnModel currColModel;
 
     if (tool.useModel) {
@@ -397,9 +399,15 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
         this.toggleOrientation();
       }
     } else if (evt.getPropertyName().equals(ToolPanel.RESET_TO_PREF_SIZE)) {
-      if ((evt.getNewValue() == null) || !modeMenuEnabled) {
-        resetPrefDividers(true);
+      if (evt.getNewValue() != null) {
+        if (((JComponent)evt.getSource()).getTopLevelAncestor() == this) {
+          return;
+        }
       }
+
+      this.resetPrefDividers(true);
+    } else if (evt.getPropertyName().equals("BassBoard")) {
+      this.resetPrefDividers(true);
     }
   }
 

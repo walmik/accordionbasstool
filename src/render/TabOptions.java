@@ -61,7 +61,8 @@ public class TabOptions extends ToolPanel
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
     {
       Instrument instru = (Instrument) value;
-      return super.getListCellRendererComponent(list, instru.getName(), index, isSelected, cellHasFocus);
+      String name = ((instru != null) ? instru.getName() : "");
+      return super.getListCellRendererComponent(list, name, index, isSelected, cellHasFocus);
     }
   }
 
