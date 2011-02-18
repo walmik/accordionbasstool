@@ -607,7 +607,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     Instrument selected = sound.getPlayer().getInstrument(isForChord);
 
-    for (Instrument instru : sound.getPlayer().getSynth().getAvailableInstruments())
+    for (Instrument instru : sound.getPlayer().getInstruments())
     {
       JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(new InstruAction(instru, isForChord));
 

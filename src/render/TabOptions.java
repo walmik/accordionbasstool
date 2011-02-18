@@ -90,8 +90,8 @@ public class TabOptions extends ToolPanel
   {
     this.player = player;
 
-    this.comboBassInstru.setModel(new DefaultComboBoxModel(player.getSynth().getAvailableInstruments()));
-    this.comboChordInstru.setModel(new DefaultComboBoxModel(player.getSynth().getAvailableInstruments()));
+    this.comboBassInstru.setModel(new DefaultComboBoxModel(player.getInstruments()));
+    this.comboChordInstru.setModel(new DefaultComboBoxModel(player.getInstruments()));
 
     this.comboBassInstru.setSelectedItem(player.getInstrument(false));
     this.comboChordInstru.setSelectedItem(player.getInstrument(true));

@@ -25,6 +25,7 @@ public class Player implements ActionListener
   int velocity = 64;
   Instrument bassInstrument;
   Instrument chordInstrument;
+  Soundbank customBank = null;
 
   public boolean init()
   {
@@ -44,8 +45,9 @@ public class Player implements ActionListener
         System.out.println("Bad Bank: " + bank + ", loading our own");
         try {
           URL url = getClass().getClassLoader().getResource("soundbank.gm");
-          synth.loadAllInstruments(MidiSystem.getSoundbank(url.openStream()));
-          System.out.println("Loaded Soundbank From: " + url);
+          customBank = MidiSystem.getSoundbank(url.openStream());
+          synth.loadAllInstruments(customBank);
+          System.out.println("Loaded Soundbank From: " + url + "Supported? " + synth.isSoundbankSupported(bank));
 
         } catch (Exception e) {
           System.out.println(e);
@@ -64,9 +66,18 @@ public class Player implements ActionListener
     }
   }
 
-  public Synthesizer getSynth()
+//  public Synthesizer getSynth()
+//  {
+//    return synth;
+//  }
+
+  public Instrument[] getInstruments()
   {
-    return synth;
+    if (customBank != null) {
+      return synth.getLoadedInstruments();
+    } else {
+      return synth.getAvailableInstruments();
+    }
   }
 
   public Instrument getInstrument(boolean chord)
@@ -101,7 +112,7 @@ public class Player implements ActionListener
 
   public Instrument findInstrument(String name)
   {
-    Instrument[] ins = synth.getAvailableInstruments();
+    Instrument[] ins = synth.getLoadedInstruments();
 
     for (int i = 0; i < ins.length; i++) {
       //System.out.println("" + i + " " + ins[i].getName());
