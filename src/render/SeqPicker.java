@@ -433,7 +433,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     panScales.setLayout(panScalesLayout);
     panScalesLayout.setHorizontalGroup(
       panScalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(listScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
+      .addComponent(listScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
     );
     panScalesLayout.setVerticalGroup(
       panScalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -536,7 +536,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
     statusText.setText("[No Sequence Selected]");
 
     allowMulti.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-    allowMulti.setText("<html>Combine <br/>Seqs</html>");
+    allowMulti.setText("<html>Multiple <br/>Seqs</html>");
     allowMulti.setAlignmentX(0.5F);
     allowMulti.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
     allowMulti.addActionListener(new java.awt.event.ActionListener() {
@@ -559,8 +559,8 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
                 .addComponent(allowMulti, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
-              .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)))
+              .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+              .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)))
           .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addComponent(multiSeqPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))

@@ -35,8 +35,8 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="statusText" pref="337" max="32767" attributes="0"/>
-                          <Component id="tabby" alignment="0" pref="337" max="32767" attributes="2"/>
+                          <Component id="statusText" pref="343" max="32767" attributes="0"/>
+                          <Component id="tabby" alignment="0" pref="343" max="32767" attributes="2"/>
                       </Group>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
@@ -96,7 +96,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="listScrollPane" alignment="0" pref="332" max="32767" attributes="1"/>
+                  <Component id="listScrollPane" alignment="0" pref="338" max="32767" attributes="1"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -285,7 +285,7 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Tahoma" size="18" style="1"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="&lt;html&gt;Combine &lt;br/&gt;Seqs&lt;/html&gt;"/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;Multiple &lt;br/&gt;Seqs&lt;/html&gt;"/>
         <Property name="alignmentX" type="float" value="0.5"/>
         <Property name="horizontalTextPosition" type="int" value="0"/>
       </Properties>

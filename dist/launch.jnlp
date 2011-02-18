@@ -8,10 +8,11 @@
         <description kind="short">AccordionBassTool</description>
 
 
-    <offline-allowed/>
+    <icon href="snap.jpg" kind="default"/>
+<offline-allowed/>
 </information>
     <resources>
-<j2se java-vm-args="-ea" version="1.6+"/>
+<j2se java-vm-args="-Djava.security.policy=applet.policy" version="1.6+"/>
 <jar eager="true" href="AccordionBassTool.jar" main="true"/>
 
 

@@ -30,7 +30,7 @@
         var maxWidth = $(window).width();
         var maxHeight = $(window).height();
 
-        if ((prefWidth < maxWidth) && (prefHeight < maxHeight))
+        if ((prefWidth < maxWidth) && (prefHeight < maxHeight) && (prefWidth > 300))
         {
           if (prefWidth < prefHeight) {
             prefHeight *= (maxWidth / prefWidth);
@@ -54,6 +54,7 @@
         $('#tabs').bind('tabsselect', function(event, ui){
           document.the_applet.setMode(ui.panel.id);
         });
+        $("#applet_div").draggable({containment: "#drag_div", axis: "x", scroll: false });
         $("#applet_div").resizable({
           stop: function(event, ui)
           {
@@ -76,9 +77,15 @@
         width: 100%;
         height: 500px;
         display: block;
-        padding: 0px 12px 12px 0px;
+        padding: 24px 12px 12px 12px;
+        margin-left: 24px;
         background-color: #888;
         margin-top: 12px;
+      }
+
+      #drag_div {
+        width: 100%;
+        height: 100%
       }
 
     </style>
@@ -125,11 +132,15 @@
         <label for="resizeCheck">Auto-Resize Accordion Tool</label>
         </div>-->
 
-    <div id="applet_div">
-      <applet code="app.AppletMain" name="the_applet" mayscript="true" archive="../dist/AccordionBassTool.jar" width="100%" height="100%">
-        <param name="mode" value="BoardOnly"/>
-        <param name="resizeFunc" value="onAppletPrefSizeChanged"/>
-      </applet>
+    <div id="drag_div">
+
+      <div id="applet_div">
+        <applet code="app.AppletMain" name="the_applet" mayscript="true" archive="./AccordTools.jar" width="100%" height="100%">
+          <param name="mode" value="BoardOnly"/>
+          <param name="resizeFunc" value="onAppletPrefSizeChanged"/>
+        </applet>
+      </div>
+
     </div>
   </body>
 </html>

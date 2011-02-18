@@ -293,7 +293,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     menuOptions.removeAll();
 
-    if (tool.useTable) {
+    if (tool.useTable || tool.multiChord) {
       menuOptions.add(this.miOptFingers);
     }
 
