@@ -141,7 +141,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
 
 
   @Override
-  protected void syncUIToDataModel()
+  protected void syncUIToDataModel(SyncType sync)
   {
     if ((columnModel != null) && !isUpdating) {
       ParsedChordDef def = columnModel.getChordDef(0);

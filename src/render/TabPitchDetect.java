@@ -12,7 +12,6 @@ package render;
 
 import java.awt.BorderLayout;
 import java.awt.Graphics;
-import java.awt.event.ComponentEvent;
 import javax.swing.AbstractSpinnerModel;
 import javax.swing.JPanel;
 import music.Note;
@@ -61,7 +60,7 @@ public class TabPitchDetect extends ToolPanel implements PitchDetect.PitchUpdate
   }
 
   @Override
-  protected void syncUIToDataModel()
+  protected void syncUIToDataModel(SyncType sync)
   {
   }
 

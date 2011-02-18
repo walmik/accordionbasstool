@@ -10,8 +10,6 @@
  */
 package render;
 
-import javax.swing.JToggleButton;
-
 /**
  *
  * @author Ilya
@@ -26,7 +24,7 @@ public class TabTester extends ToolPanel
   }
 
   @Override
-  protected void syncUIToDataModel()
+  protected void syncUIToDataModel(SyncType sync)
   {
     
   }

@@ -60,11 +60,11 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
   @Override
   public void tableChanged(TableModelEvent e)
   {
-    syncUIToDataModel();
+    syncUIToDataModel(SyncType.COLUMN_CHANGE);
   }
 
   @Override
-  protected void syncUIToDataModel()
+  protected void syncUIToDataModel(SyncType sync)
   {
     if (isUpdating) {
       return;

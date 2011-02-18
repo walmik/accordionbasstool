@@ -187,7 +187,7 @@ public class SeqTablePanel extends ToolPanel
   }
 
   @Override
-  public void syncUIToDataModel()
+  public void syncUIToDataModel(SyncType sync)
   {
     ButtonCombo combo = columnModel.getSelectedButtonCombo();
 
@@ -196,7 +196,7 @@ public class SeqTablePanel extends ToolPanel
 
     if ((combo != null) && (combo.getLength() > 0)) {
 
-      if (!anim.isRunning() && playOnSelect) {
+      if (!anim.isRunning() && (sync != SyncType.SHOWN) && playOnSelect) {
         sound.play(combo, false);
       }
 

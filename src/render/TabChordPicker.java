@@ -168,7 +168,7 @@ public class TabChordPicker extends ToolPanel
   }
 
   @Override
-  protected void syncUIToDataModel()
+  protected void syncUIToDataModel(SyncType sync)
   {
     int index = columnModel.getSelectedColumn();
     if ((index >= 0) && (index < columnModel.getColumnCount())) {

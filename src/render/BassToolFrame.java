@@ -151,6 +151,11 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     pack();
   }
 
+  public void tempSound(boolean value)
+  {
+    seqTablePanel.playOnSelect = value;
+  }
+
   public void init(ToolMode tool)
   {
     sound.stop();

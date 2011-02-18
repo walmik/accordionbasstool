@@ -10,7 +10,6 @@
  */
 package render;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.util.Vector;
 import javax.swing.DefaultListCellRenderer;
@@ -59,7 +58,7 @@ public class TabChordInfo extends ToolPanel
   }
 
   @Override
-  protected void syncUIToDataModel()
+  protected void syncUIToDataModel(SyncType sync)
   {
     listChanging = true;
 
@@ -109,13 +108,13 @@ public class TabChordInfo extends ToolPanel
   public void setDisplayUnknown(boolean display)
   {
     displayUnknown = display;
-    syncUIToDataModel();
+    syncUIToDataModel(null);
   }
 
   public void setDisplayInversion(boolean display)
   {
     columnModel.matchingChordStore.setRemoveInversion(display);
-    syncUIToDataModel();
+    syncUIToDataModel(null);
   }
 
   private class ChordListRender extends DefaultListCellRenderer

@@ -16,7 +16,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextPane;
-import javax.swing.text.html.parser.ParserDelegator;
 
 /**
  *
@@ -75,16 +74,8 @@ public class TransparentTextPane extends JScrollPane
   }
   static EditAction editAction = null;
 
-  //Workaround for recentBug -- must create ParserDelegator
-  //for setText Crash
-  private static ParserDelegator workaround;
-
   public TransparentTextPane()
   {
-    if (workaround == null) {
-      workaround = new ParserDelegator();
-    }
-
     textPane = new JTextPane();
     textPane.setBackground(new Color(0, 0, 0, 0));
     textPane.setContentType("text/html");
@@ -146,7 +137,11 @@ public class TransparentTextPane extends JScrollPane
 
   public void setText(String text)
   {
-    textPane.setText(text);
+    try {
+      textPane.setText(text);
+    } catch (NullPointerException exc) {
+      System.err.println(exc);
+    }
   }
 
   public String getText()

@@ -26,6 +26,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
+import javax.swing.text.html.parser.ParserDelegator;
 import render.BassToolFrame;
 import render.ToolMode;
 
@@ -43,8 +44,8 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
   BassToolFrame frame;
   JButton toggleFrameButton;
   JPanel panel;
-  Dimension initialSize;
-
+  Dimension initialSize = null;
+  String currMode = null;
   // For JavaScript comm
   Object jsobj = null;
   Method jsEval = null;
@@ -56,13 +57,19 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
 
   private ToolMode getFrameParam()
   {
-    String modeVal = this.getParameter("mode");
+    String modeVal = null;
+    if (modeVal == null) {
+      modeVal = this.getParameter("mode");
+    }
     return ToolMode.findMode(modeVal);
   }
 
   @Override
   public void init()
   {
+    //Workaround for latest JRE bug, must call to setDTD() to non-null
+    new ParserDelegator();
+
     initialSize = this.getSize();
 
     Main.setNimbus();
@@ -249,6 +256,7 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
 
   public void setMode(String string)
   {
+    currMode = string;
     SwingUtilities.invokeLater(new ModeSwitcher(string));
   }
 
@@ -277,6 +285,8 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
 
   private void toggleFrame(boolean seperate)
   {
+    frame.tempSound(false);
+
     if (seperate) {
       toggleFrameButton.setText("Hide Seperate Window");
 
@@ -286,6 +296,7 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
 
       getContentPane().removeAll();
       getContentPane().add(panel);
+
       //this.setRootPane(altRootPane);
 
     } else {
@@ -307,5 +318,7 @@ public class AppletMain extends JApplet implements ActionListener, PropertyChang
     }
 
     attemptResizeApplet();
+
+    frame.tempSound(true);
   }
 }

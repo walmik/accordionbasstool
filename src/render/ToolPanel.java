@@ -22,6 +22,13 @@ public abstract class ToolPanel extends JPanel implements AncestorListener, Prop
   ListSelChangeListener rowChange;
   final static String RESET_TO_PREF_SIZE = "toolResetToPrefSize";
 
+  public enum SyncType
+  {
+    SHOWN,
+    COLUMN_CHANGE,
+    ROW_CHANGE,
+  }
+
   class ToolSelChangeListener extends ListSelChangeListener
   {
 
@@ -113,7 +120,7 @@ public abstract class ToolPanel extends JPanel implements AncestorListener, Prop
   {
     toggleListeners(true);
     if (columnModel != null) {
-      syncUIToDataModel();
+      syncUIToDataModel(SyncType.SHOWN);
     }
 
     this.firePropertyChange(ToolPanel.RESET_TO_PREF_SIZE, null, Boolean.TRUE);
@@ -135,7 +142,7 @@ public abstract class ToolPanel extends JPanel implements AncestorListener, Prop
     super.setVisible(visible);
   }
 
-  abstract protected void syncUIToDataModel();
+  abstract protected void syncUIToDataModel(SyncType sync);
 
   protected boolean listenToCols()
   {
@@ -150,14 +157,14 @@ public abstract class ToolPanel extends JPanel implements AncestorListener, Prop
   protected void columnSelectionChanged(int index)
   {
     if (columnModel != null) {
-      this.syncUIToDataModel();
+      this.syncUIToDataModel(SyncType.COLUMN_CHANGE);
     }
   }
 
   protected void rowSelectionChanged(int index)
   {
     if (columnModel != null) {
-      this.syncUIToDataModel();
+      this.syncUIToDataModel(SyncType.ROW_CHANGE);
     }
   }
 }

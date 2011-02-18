@@ -42,7 +42,7 @@ public class TabOptions extends ToolPanel
     initComponents();
 
     initLNFCombo();
-    syncUIToDataModel();
+    //syncUIToDataModel();
   }
 
   @Override
@@ -110,7 +110,7 @@ public class TabOptions extends ToolPanel
   }
 
   @Override
-  protected void syncUIToDataModel()
+  protected void syncUIToDataModel(SyncType sync)
   {
     this.maxComboThreshSpin.setValue(new Integer(ButtonCombo.optMaxDistThreshold));
     this.maxComboLenSpin.setValue(new Integer(BoardSearcher.optMaxComboLength));
