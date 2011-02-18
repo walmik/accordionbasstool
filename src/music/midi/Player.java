@@ -56,6 +56,8 @@ public class Player implements ActionListener
         System.out.println("Using Default MIDI Soundbank with " + instrs.length + " instruments");
       }
 
+      this.setVolume(64);
+
       this.setInstrument(false, findInstrument("Accordion"));
       this.setInstrument(true, findInstrument("Tango Accordion"));
 

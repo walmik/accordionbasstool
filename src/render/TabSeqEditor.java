@@ -115,7 +115,8 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
     });
 
     comboRecent.setEditable(true);
-    comboRecent.setFont(new java.awt.Font("Monospaced", 0, 18));
+    comboRecent.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
+    comboRecent.setToolTipText("<html>\n* Enter a progression of comma seperated chords  as text below<br/>\n* See <b>Chord Picker</b> for all valid chord abbrevs, ex. M = Major, m = minor<br/>\n* To specify a custom chord by notes, put the notes in [ ], ex. <b>[ABC], [D F# G]</b><br/>\n* Abbrev names and custom note lists can be appear in the same progression: <br/>\n   ex:<b>[A C E], E7, Dmin6, Am</b>\n</html>");
     comboRecent.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         comboRecentActionPerformed(evt);
@@ -131,7 +132,7 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
 
     checkAllowDups.setSelected(true);
     checkAllowDups.setText("Duplicate Note for Bass");
-    checkAllowDups.setToolTipText("<html>Advanced: When checked, duplicate notes in a chord, e.g [AACE] or Am/A imply that the note (e.g. A)\nmust be played in the bass and must be the lowest note.\nWhen not checked, duplicate are removed</html>");
+    checkAllowDups.setToolTipText("<html>Advanced: <br/>\n* When <b>checked</b>, duplicate notes in a chord,<br/>\ne.g [AACE] or Am/A imply that the note (e.g. A) must be played<br/>\nin the bass and must be the lowest note.<br/>\n* When<b> not checked</b>, duplicate notes are removed.</html>");
 
     buttonShowRecent.setText("Show Recent");
     buttonShowRecent.addActionListener(new java.awt.event.ActionListener() {

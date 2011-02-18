@@ -666,7 +666,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     menuTranspose = new javax.swing.JMenu();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-    setTitle("Accordion Bass Analyzer 1.0.10");
+    setTitle("Accordion Bass Analyzer 1.0.11");
 
     boardSplitPane.setDividerSize(16);
     boardSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);

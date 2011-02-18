@@ -95,6 +95,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Monospaced" size="18" style="0"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;* Enter a progression of comma seperated chords  as text below&lt;br/&gt;&#xa;* See &lt;b&gt;Chord Picker&lt;/b&gt; for all valid chord abbrevs, ex. M = Major, m = minor&lt;br/&gt;&#xa;* To specify a custom chord by notes, put the notes in [ ], ex. &lt;b&gt;[ABC], [D F# G]&lt;/b&gt;&lt;br/&gt;&#xa;* Abbrev names and custom note lists can be appear in the same progression: &lt;br/&gt;&#xa;   ex:&lt;b&gt;[A C E], E7, Dmin6, Am&lt;/b&gt;&#xa;&lt;/html&gt;"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="comboRecentActionPerformed"/>
@@ -112,7 +113,7 @@
           <Properties>
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Duplicate Note for Bass"/>
-            <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Advanced: When checked, duplicate notes in a chord, e.g [AACE] or Am/A imply that the note (e.g. A)&#xa;must be played in the bass and must be the lowest note.&#xa;When not checked, duplicate are removed&lt;/html&gt;"/>
+            <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Advanced: &lt;br/&gt;&#xa;* When &lt;b&gt;checked&lt;/b&gt;, duplicate notes in a chord,&lt;br/&gt;&#xa;e.g [AACE] or Am/A imply that the note (e.g. A) must be played&lt;br/&gt;&#xa;in the bass and must be the lowest note.&lt;br/&gt;&#xa;* When&lt;b&gt; not checked&lt;/b&gt;, duplicate notes are removed.&lt;/html&gt;"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="buttonShowRecent">

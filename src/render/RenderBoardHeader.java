@@ -56,7 +56,7 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   {
     this.renderBoard = renderBoard;
     this.boardScrollPane = pane;
-
+   
     doGradient = AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.PERPIXEL_TRANSLUCENT);
   }
 
