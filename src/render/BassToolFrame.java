@@ -154,6 +154,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   public void init(ToolMode tool)
   {
     sound.stop();
+    seqTablePanel.playOnSelect = false;
+    
     SeqColumnModel currColModel;
 
     if (tool.useModel) {
@@ -353,6 +355,8 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
         menuTabs.add(item);
       }
     }
+
+    seqTablePanel.playOnSelect = true;
   }
 
   public void restoreRootPane()

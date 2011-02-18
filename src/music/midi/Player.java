@@ -41,13 +41,12 @@ public class Player implements ActionListener
       }
 
       if ((instrs == null) || (instrs.length == 0)) {
-        System.out.println("Bad Bank: " + bank + ", loading our own");
+        //System.out.println("Bad Bank: " + bank + ", loading our own");
         try {
           URL url = getClass().getClassLoader().getResource("soundbank.gm");
           bank = customBank = MidiSystem.getSoundbank(url.openStream());
           synth.loadAllInstruments(customBank);
-          System.out.println("Loaded Soundbank From: " + url + 
-                  "Supported? " + synth.isSoundbankSupported(customBank) +
+          System.out.println("Soundbank From: " + url + 
                   ", " + customBank.getInstruments().length + " instruments");
 
         } catch (Exception e) {
@@ -77,7 +76,7 @@ public class Player implements ActionListener
   public Instrument[] getInstruments()
   {
     if (customBank != null) {
-      return synth.getLoadedInstruments();
+      return customBank.getInstruments();
     } else {
       return synth.getAvailableInstruments();
     }
@@ -115,7 +114,7 @@ public class Player implements ActionListener
 
   public Instrument findInstrument(String name)
   {
-    Instrument[] ins = synth.getLoadedInstruments();
+    Instrument[] ins = getInstruments();
 
     for (int i = 0; i < ins.length; i++) {
       //System.out.println("" + i + " " + ins[i].getName());

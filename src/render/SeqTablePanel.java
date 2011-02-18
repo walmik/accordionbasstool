@@ -13,6 +13,8 @@ package render;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Box;
@@ -39,6 +41,8 @@ public class SeqTablePanel extends ToolPanel
   private SeqAnimController anim;
   ChordSeqCmd.Action actionRemove;
   ColumnCountListener colListener;
+  boolean playOnSelect = false;
+  SeqViewerController seqViewer;
 
   /** Creates new form SeqTablePanel */
   public SeqTablePanel()
@@ -60,7 +64,8 @@ public class SeqTablePanel extends ToolPanel
   {
     super.init(model);
     seqTable.setSelectionModel(columnModel.getRowSelModel());
-    SeqViewerController seqViewer = new SeqViewerController(seqTable, columnModel, seqTableScrollPane, renderBoard);
+
+    seqViewer = new SeqViewerController(seqTable, columnModel, seqTableScrollPane, renderBoard);
 
     this.sound = sound;
     this.anim = anim;
@@ -73,6 +78,20 @@ public class SeqTablePanel extends ToolPanel
     actionRemove = ChordSeqCmd.RemoveChord.action;
 
     toolPlay.setAction(anim.getPlayStopAction());
+
+    seqTable.addMouseListener(new MouseAdapter()
+    {
+
+      @Override
+      public void mouseClicked(MouseEvent e)
+      {
+        if (e.getClickCount() >= 2) {
+          ButtonCombo combo = columnModel.getSelectedButtonCombo();
+          SeqTablePanel.this.sound.play(combo, false);
+        }
+      }
+    });
+
   }
 
   void toggleLeftRight(boolean left)
@@ -177,7 +196,7 @@ public class SeqTablePanel extends ToolPanel
 
     if ((combo != null) && (combo.getLength() > 0)) {
 
-      if (!anim.isRunning()) {
+      if (!anim.isRunning() && playOnSelect) {
         sound.play(combo, false);
       }
 

@@ -97,13 +97,18 @@ public class BoardMouseListener extends MouseAdapter
   @Override
   public void mouseExited(MouseEvent e)
   {
-    renderBoard.clearClickPos(columnModel == null);
+    renderBoard.clearClickPos(true);
   }
 
   @Override
   public void mouseMoved(MouseEvent e)
   {
-    renderBoard.setClickPos(e, false);
+    BassBoard.Pos clickPos = renderBoard.hitTest(e);
+
+    if ((clickPos == null) || (ignorePos == null) || !clickPos.equals(ignorePos)) {
+      renderBoard.setClickPos(e, false);
+      ignorePos = null;
+    }
   }
 
   @Override
@@ -118,7 +123,7 @@ public class BoardMouseListener extends MouseAdapter
       return;
     }
 
-    renderBoard.clearClickPos((columnModel == null));
+    renderBoard.clearClickPos(columnModel == null);
 
     if (isClickShiftMode) {
       if (!e.isShiftDown()) {
@@ -175,12 +180,15 @@ public class BoardMouseListener extends MouseAdapter
       updateFromClicked();
     }
   }
+  BassBoard.Pos ignorePos;
 
   @Override
   public void mouseReleased(MouseEvent e)
   {
+    ignorePos = renderBoard.hitTest(e);
+
     if (isInstaClick) {
-      renderBoard.setClickPos(e, false);
+      renderBoard.setClickPos(ignorePos, false);
       isInstaClick = false;
       sound.stop();
     }
