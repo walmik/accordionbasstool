@@ -136,7 +136,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
 
     super.hidden();
 
-    this.firePropertyChange(ToolPanel.RESET_TO_PREF_SIZE, null, null);
+    this.firePropertyChange(ToolPanel.RESET_TO_PREF_SIZE, null, Boolean.TRUE);
   }
 
 
@@ -497,7 +497,7 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(buttonRemove)
         .addContainerGap())
-      .addComponent(seqListScroller, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+      .addComponent(seqListScroller, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
     );
 
     buttonPlay.setFont(buttonPlay.getFont().deriveFont(buttonPlay.getFont().getStyle() | java.awt.Font.BOLD, buttonPlay.getFont().getSize()+3));
@@ -551,19 +551,18 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(layout.createSequentialGroup()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-              .addGroup(layout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addComponent(allowMulti, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
-              .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)))
+            .addComponent(tabby, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE))
           .addGroup(layout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(multiSeqPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            .addComponent(multiSeqPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addContainerGap()
+            .addComponent(allowMulti, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -573,12 +572,12 @@ public class SeqPicker extends ToolPanel implements PropertyChangeListener, Chan
           .addComponent(tabby, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+        .addComponent(multiSeqPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addComponent(allowMulti, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(statusText, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(multiSeqPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addGap(12, 12, 12))
+        .addContainerGap())
     );
 
     tabby.getAccessibleContext().setAccessibleName("Scales");

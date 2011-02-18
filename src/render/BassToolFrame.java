@@ -397,7 +397,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
         this.toggleOrientation();
       }
     } else if (evt.getPropertyName().equals(ToolPanel.RESET_TO_PREF_SIZE)) {
-      resetPrefDividers(true);
+      if ((evt.getNewValue() == null) || !modeMenuEnabled) {
+        resetPrefDividers(true);
+      }
     }
   }
 

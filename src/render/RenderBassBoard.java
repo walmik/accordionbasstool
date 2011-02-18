@@ -676,9 +676,9 @@ public class RenderBassBoard extends JPanel
     getStateBoardButton(pos.col, pos.row);
 
     // if unselOnly, render only over unselected buttons
-    if (unselOnly && (currBoardButton != BoardButtonImage.UNSELECTED)) {
-      return;
-    }
+//    if (unselOnly && (currBoardButton != BoardButtonImage.UNSELECTED)) {
+//      return;
+//    }
 
     if (boardButton == null) {
       repaintInfo.button = currBoardButton;
