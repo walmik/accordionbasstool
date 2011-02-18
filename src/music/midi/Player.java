@@ -6,7 +6,6 @@ package music.midi;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.LinkedList;
 import javax.swing.Timer;
@@ -45,13 +44,17 @@ public class Player implements ActionListener
         System.out.println("Bad Bank: " + bank + ", loading our own");
         try {
           URL url = getClass().getClassLoader().getResource("soundbank.gm");
-          customBank = MidiSystem.getSoundbank(url.openStream());
+          bank = customBank = MidiSystem.getSoundbank(url.openStream());
           synth.loadAllInstruments(customBank);
-          System.out.println("Loaded Soundbank From: " + url + "Supported? " + synth.isSoundbankSupported(bank));
+          System.out.println("Loaded Soundbank From: " + url + 
+                  "Supported? " + synth.isSoundbankSupported(customBank) +
+                  ", " + customBank.getInstruments().length + " instruments");
 
         } catch (Exception e) {
           System.out.println(e);
         }
+      } else {
+        System.out.println("Using Default MIDI Soundbank with " + instrs.length + " instruments");
       }
 
       this.setInstrument(false, findInstrument("Accordion"));
