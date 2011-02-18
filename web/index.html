@@ -8,81 +8,7 @@
     </script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js">
     </script>
-
-    <script type="text/javascript">
-      var appletPrefWidth = 0;
-      var appletPrefHeight = 0;
-
-      function onAppletPrefSizeChanged(prefWidth, prefHeight)
-      {
-        appletPrefWidth = prefWidth;
-        appletPrefHeight = prefHeight;
-        
-        //if ($('input[id=resizeCheck]').is(':checked')) {
-        //  return;
-        //}
-
-        var elem = document.getElementById("applet_div");
-        
-        //      prefWidth += elem.style.paddingRight;
-        //      prefHeight += elem.style.paddingBottom;
-
-        var maxWidth = $(window).width();
-        var maxHeight = $(window).height();
-
-        
-        if ((prefWidth < maxWidth) && (prefHeight < maxHeight) && (prefWidth > 300))
-        {
-          var xRatio = maxWidth / prefWidth;
-          var yRatio = maxHeight / prefHeight;
-
-          if (xRatio < yRatio) {
-            prefHeight *= xRatio;
-            prefWidth = maxWidth;
-          } else {
-            prefWidth *= yRatio;
-            prefHeight = maxHeight;
-          }
-        }
-         
-        //alert(prefWidth + " " + prefHeight);
-        $("#applet_div").css({width: prefWidth, height: prefHeight});
-      }
-
-      function toggleTabContent(vis)
-      {
-        if (!vis) {
-          var headHeight = $("#tabHeader").outerHeight();
-          $(".ui-widget-content").height(headHeight);
-        } else {
-          $(".ui-widget-content").height("auto");
-        }
-        $(".tabContent").css({"visibility" : (vis ? "visible" : "hidden")});
-        vis = !vis;
-      }
-
-      /* JQuery Inits Below */
-
-      $(document).ready(function()
-      {
-        $("#tabs").tabs();
-        //$(window).resize(function () { /* do something */ });
-        $('#tabs').bind('tabsselect', function(event, ui){
-          document.the_applet.setMode(ui.panel.id);
-        });
-        //     $("#applet_div").draggable({/*containment: "#drag_div",*/ scroll: false });
-        $("#applet_div").resizable({/*handles: "n, e, s, w, ne, se, sw, nw"*/
-          //       resize: function(event, ui) { setAbs(); },
-          //       start: function(event, ui) { setAbs(); },
-          //       stop: function(event, ui) { setAbs(); }
-
-        });
-
-        //var headHeight = $("#tabHeader").outerHeight();
-        //$(".ui-widget-content").css({"visibility" : "hidden"});
-        //$(".ui-widget-content").height(headHeight);
-      });
-    </script>
+    <script type="text/javascript" src="./script/main.js"></script>
 
 
     <style type="text/css" media="screen">
@@ -97,7 +23,7 @@
         width: 100%;
         height: 500px;
         display: block;
-        padding: 24px 12px 12px 12px;
+        padding: 12px 12px 12px 12px;
         margin-left: 24px;
         background-color: #888;
         margin-top: 12px;
@@ -112,6 +38,13 @@
 
       .tabContent {
         margin-bottom: 24px;
+      }
+
+      #desc_check {
+        float: right;
+        color: orange;
+        font-weight: bold;
+        font-size: larger;
       }
 
     </style>
@@ -132,6 +65,9 @@
           <a href="#SeqPicker">Progressions & Scales</a>
         </li>
         <li>
+          <a href="#CustomSeq">Custom Progression</a>
+        </li>
+        <li>
           <a href="#Default">Full Analyzer</a>
         </li>
       </ul>
@@ -141,7 +77,15 @@
         Moving around the board will show the corresponding row and column.
         Each row is a different type of chord/note.
         Each column is different note, with adjacent columns being a 5th apart.
-        (You can also view the board vertically and turn off the highliting in the Options menu.)
+        (You can also select <b>Board Vertical</b> and turn off the highliting in the Options menu.)
+
+        <h4>Sound</h4>
+        Clicking a button will play a synthesized MIDI sound for that note or chord.
+        Sound can be configured, or turned off in the <b>Sound</b> Menu.
+        The <b>Arpeggiate Chord</b> option will play the notes of a chord in sequence
+        rather than all at once.
+        A different MIDI instrument can be selected for the Bass buttons and the Chord buttons.
+        <br/>(If there is no sound but sound is set to on, please let me know.)
       </div>
       <div class="tabContent" id="ChordMatch">
         <h2>Button Combining</h2>
@@ -163,29 +107,95 @@
         <h2>Chord Picker</h2>
         Below you can select any chord and see the different ways that it can be played
         on the accordion bass side.
+        You can choose from an existing list of chords, and also edit the chord by
+        manipulating the steps within that chord. Changing the root will move the chord to that note.
+        <h3>Chord Inversion</h3>
+        Optionally, you can add an inversion to a chord.
+        Specifying an inversion will imply that the root note is played in the bass and that
+        it is the lowest note played. All other inversions of the chord will be filtered out.
+        <h3>Possible Button Combos Table</h3>
+        The table on the right lists the button possibilities for the currently selected chord.
+        The lowest note is specified in parantheses.<br/>
+        Mid C = the lowest C played by a chord button.<br/>
+        Bass C = the lowest C played by a bass button, lower than the Mid C.
+        If an inversion is set, only button combos with the correct root in the bass will be displayed.
+
       </div>
       <div class="tabContent" id="SeqPicker">
-        <h2>Progressions</h2>
+        <h2>Common Progressions & Scales</h2>
+        Below you can see some common progressions that are played on the accordion bass.
+        <h3>Progressions</h3>
+        Provided are two of the simplest rhythms, the Oom-Pah (Polka) and the Waltz.
+        (More Rhythms to be added soon!)
+        The basic pattern alternates between the root and the chord note.
+        Some common enchacements, such as alternating between the 5th and sometimes the 3rd
+        of the chord being played, are also available.
+        One a progression is set, click the <b>Play</b> to simulate the pattern.
+        <h3>Scales</h3>
+        A few common scales have been added as well. The scales only use bass notes
+        and are the basis of playing melody and bass runs on the accordion bass.
+        (More to be added!)
+        <h3>Multiple Seqs</h3>
+        By selecting the Multiple Seqs button, you can build a list of progressions
+        and string them together. Any Progression or Scale can be combined together
+        to form a long progression.
+      </div>
+      <div class="tabContent" id="CustomSeq">
+        <h2>Custom Progression</h2>
+        Here you can enter a completely custom sequence of chords and notes, seperated by a comma.
+        ex. <b>A, B, C,  Am, E7</b>
+        <h4>Chord Abbreviations</h4>
+        All Chord abbreviations available in the chord picker can be entered.
+        (Refer to the list of chords in the Chord Picker for full list)
+        (Note: Add List here?)
+        <h4>Listing Notes In A Chord</h4>
+        You can also list notes in a chord entirely by placing it in brackets.
+        Ex. <b>[A C E], E</b> is the same as writing <b>Am, E</b>
+        Any combinations of notes can be included in the brackets.
+        Ex. <b>[A B C D E]</b>
+        <h4>Recent Progression History</h4>
+        All entered progressions are saved (until <b>Clear Recent</b> is clicked)
+        If you've made a mistake, or want to go back to a previous progression,
+        click <b>Show Recent</b> or the drop down on the right to see and
+        select from a list of recent progressions.
       </div>
       <div class="tabContent" id="Default">
         <h2>Accordion Bass Analyzer</h2>
-        Below is the whole analyzer put together. Each of the different modes are available
-        as separate tabs in the analyzer.
-        There is also an additional Options tab for advanced searched settings.
-        This version of the analyzer can be run outside of the browser if necessary.
+        Below you can see the whole analyzer put together.
+        Each of the different modes are available as separate tabs in the analyzer.
+        There is also an additional <b>Options</b> tab for advanced searched settings.
+
+        <h4>Search Options</h4>
+        In the <b>Options</b> tab, you can alter the search settings used to filter out
+        possible button combos.
+        For example, <b>Max Button Combo Size</b> can be adjusted to only
+        allow combinations with up to 2 buttons, a more reasonable limit.
+
+        <h4>Finger Search (alpha)</h4>
+        There is also an option to include fingering on all the button combinations.
+        It can be enabled through either the <b>Options</b> tab or menu.
+        Finger searching is not quite working correctly for all combinations,
+        but the eventual goal is to have the finger search be a pivotal aspect of the
+        analyzer.
+
+        <h5>The Accordion Bass Analyzer is a complex application.
+          Any and all feedback is welcomed. Please let me know any thoughts on this project
+          and if you have requests and especially ideas on further usage.
+        </h5>
+
       </div>
     </div>
 
-    <span style="float: right">
-      <input type="checkbox" id="toggleTabCheck" checked="checked" onclick="toggleTabContent(this.checked)"/>
-      <label for="toggleTabCheck">Show Description</label><br/>
+    <span id="desc_check">
+      <input type="checkbox" id="toggleTabCheck" onclick="toggleTabContent(!this.checked)"/>
+      <label for="toggleTabCheck">Hide Description Text</label><br/>
     </span>
 
     <span id="contact">Questions? Comments? Problems? Please <a href="mailto:ikreymer.spamremove@gmail.com">send me a message!</a></span>
 
     <!-- Accordion Analyzer Content -->
     <div id="applet_div">
-      <applet code="app.AppletMain" name="the_applet" mayscript="true" archive="./AccordTools.jar" width="100%" height="100%">
+      <applet code="app.AppletMain" name="the_applet" alt="Java 6 or later is requested to run Accordion Bass Analyzer" mayscript="true" archive="./AccordTools.jar" width="100%" height="100%">
         <param name="mode" value="BoardOnly"/>
         <param name="resizeFunc" value="onAppletPrefSizeChanged"/>
       </applet>

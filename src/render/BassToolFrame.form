@@ -105,7 +105,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="0"/>
-    <Property name="title" type="java.lang.String" value="Accordion Bass Analyzer 1.01"/>
+    <Property name="title" type="java.lang.String" value="Accordion Bass Analyzer 1.0.10"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="menuBar" type="java.lang.String" value="theMenuBar"/>

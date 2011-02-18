@@ -13,7 +13,7 @@
 
   <boards>
 <!--Notes Only)-->
-    <board name="Notes Only" numColumns="12" filter="extra">
+    <board name="Notes Only" desc="Custom board containing no chords" numColumns="12" filter="extra">
       <row name="BassMaj3"/>
       <row name="BassRoot"/>
     </board>
@@ -118,7 +118,7 @@
       <row name="ChordDim"/>
     </board>
 <!--Aug 140-->
-    <board name="Aug 140" numColumns="12" filter="extra">
+    <board name="Custom Aug 60" desc="Small custom board for exploring Augmented Chords" numColumns="12" filter="extra">
       <row name="ChordAug"/>
       <row name="BassMaj3"/>
       <row name="BassRoot"/>

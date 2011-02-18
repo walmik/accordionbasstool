@@ -2,7 +2,7 @@
 <root>
   <mode
     id="BoardOnly"
-    title="Board View"
+    title="Explore Bass Board"
     useModel="false"
     useMouse="true"
     useTable="false"
@@ -14,7 +14,7 @@
 
   <mode
     id="ChordMatch"
-    title="Chord Matching"
+    title="Combine Buttons"
     useModel="true"
     useMouse="true"
     useTable="false"
@@ -39,7 +39,7 @@
   
   <mode
     id="SeqPicker"
-    title="Sequence Picking"
+    title="Progressions &amp; Scales"
     useModel="true"
     useMouse="false"
     useTable="false"
@@ -49,10 +49,23 @@
     startBoardSize="48">
     <tab name="SeqPicker"></tab>
   </mode>
+
+  <mode
+    id="CustomSeq"
+    title="Custom Progression"
+    useModel="true"
+    useMouse="true"
+    useTable="true"
+    useAllBoards="true"
+    useBlankChord="false"
+    multiChord="true"
+    startBoardSize="120">
+    <tab name="TabSeqEditor"></tab>
+  </mode>
   
   <mode
     id="Default"
-    title="Full Tool"
+    title="Full Analyzer"
     useModel="true"
     useMouse="true"
     useTable="true"

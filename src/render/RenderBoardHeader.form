@@ -21,13 +21,6 @@
 
   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
   <SubComponents>
-    <Container class="javax.swing.JPanel" name="extPanel">
-      <Properties>
-        <Property name="opaque" type="boolean" value="false"/>
-      </Properties>
-
-      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
-    </Container>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
@@ -39,6 +32,13 @@
         <Property name="text" type="java.lang.String" value="Current Board:"/>
       </Properties>
     </Component>
+    <Component class="javax.swing.JLabel" name="labelDesc">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Monospaced" size="14" style="0"/>
+        </Property>
+      </Properties>
+    </Component>
     <Component class="javax.swing.JComboBox" name="boardCombo">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
@@ -46,7 +46,6 @@
             <Font bold="true" component="boardCombo" property="font" relativeSize="true" size="7"/>
           </FontInfo>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Click and select one of the possible bass board layouts.&lt;br/&gt;&#xa;Standard boards vary in the number of bass and chord rows and which&lt;br/&gt;&#xa;chords are included.&lt;br/&gt;&#xa;The standard bass layout is 120-basses.&lt;br/&gt;&#xa;The smallest is usually 8 basses.&lt;br/&gt;&#xa;&lt;/html&gt;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="infoLabel">

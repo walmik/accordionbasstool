@@ -142,20 +142,20 @@ public class TabChordInfo extends ToolPanel
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
+    checkIgnoreInversion = new javax.swing.JCheckBox();
+    checkShowUnknownChords = new javax.swing.JCheckBox();
     jScrollPane1 = new javax.swing.JScrollPane();
     matchesListBox = new javax.swing.JList();
-    checkShowUnknownChords = new javax.swing.JCheckBox();
-    checkIgnoreInversion = new javax.swing.JCheckBox();
     clickTextPane = new render.TransparentTextPane();
 
     setToolTipText(toolTip);
 
-    jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Possible Matching Chords:"));
-    jScrollPane1.setToolTipText("");
-
-    matchesListBox.setFont(new java.awt.Font("Monospaced", 1, 17)); // NOI18N
-    matchesListBox.setToolTipText(toolTip);
-    jScrollPane1.setViewportView(matchesListBox);
+    checkIgnoreInversion.setText("Don't Show Inversion Bass");
+    checkIgnoreInversion.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        checkIgnoreInversionActionPerformed(evt);
+      }
+    });
 
     checkShowUnknownChords.setText("List Unknown Chords");
     checkShowUnknownChords.addActionListener(new java.awt.event.ActionListener() {
@@ -164,12 +164,17 @@ public class TabChordInfo extends ToolPanel
       }
     });
 
-    checkIgnoreInversion.setText("Don't Show Inversion Bass");
-    checkIgnoreInversion.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        checkIgnoreInversionActionPerformed(evt);
-      }
+    jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Possible Matching Chords:"));
+    jScrollPane1.setToolTipText("");
+
+    matchesListBox.setFont(new java.awt.Font("Monospaced", 1, 17)); // NOI18N
+    matchesListBox.setModel(new javax.swing.AbstractListModel() {
+      String[] strings = { "A", "B", "C", "D" };
+      public int getSize() { return strings.length; }
+      public Object getElementAt(int i) { return strings[i]; }
     });
+    matchesListBox.setToolTipText(toolTip);
+    jScrollPane1.setViewportView(matchesListBox);
 
     clickTextPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Currently Selected On Board:"));
     clickTextPane.setText("Info");
@@ -179,28 +184,24 @@ public class TabChordInfo extends ToolPanel
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
-        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addComponent(clickTextPane, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jScrollPane1, 0, 0, Short.MAX_VALUE)
           .addComponent(checkShowUnknownChords)
           .addComponent(checkIgnoreInversion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        .addContainerGap(53, Short.MAX_VALUE))
-      .addComponent(clickTextPane, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
+        .addContainerGap())
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(layout.createSequentialGroup()
-        .addComponent(clickTextPane, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+      .addComponent(clickTextPane, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE)
+      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(layout.createSequentialGroup()
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))
-          .addGroup(layout.createSequentialGroup()
-            .addGap(50, 50, 50)
-            .addComponent(checkShowUnknownChords)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(checkIgnoreInversion))))
+        .addComponent(checkShowUnknownChords)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addComponent(checkIgnoreInversion)
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
   }// </editor-fold>//GEN-END:initComponents
 

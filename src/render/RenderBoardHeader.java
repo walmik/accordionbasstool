@@ -10,6 +10,7 @@
  */
 package render;
 
+import com.sun.awt.AWTUtilities;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -39,6 +40,7 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   RenderBassBoard renderBoard;
   JScrollPane boardScrollPane;
   SeqColumnModel columnModel;
+  boolean doGradient;
 
   /** Creates new form RenderBoardHeader */
   public RenderBoardHeader()
@@ -54,12 +56,17 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   {
     this.renderBoard = renderBoard;
     this.boardScrollPane = pane;
+
+    doGradient = AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.PERPIXEL_TRANSLUCENT);
   }
 
-  public void setBoardConfig(SeqColumnModel model, boolean useAllBoards, int defaultSize)
+  public void setColumnModel(SeqColumnModel model)
   {
     columnModel = model;
-    
+  }
+
+  public void setBoardConfig(boolean useAllBoards, int defaultSize)
+  {
     DefaultComboBoxModel boardmodel;
 
     if (!useAllBoards) {
@@ -85,11 +92,6 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
 
     return false;
   }
-
-  public JPanel getExtPanel()
-  {
-    return this.extPanel;
-  }
   Component hiddenBox;
 
   public void toggleOrientation(boolean isHoriz)
@@ -112,7 +114,12 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   @Override
   public void paintComponent(Graphics g)
   {
-    paintGradientBack(this, g);
+    if (doGradient) {
+      paintGradientBack(this, g);
+    } else {
+      g.setColor(getBackground());
+      g.fillRect(0, 0, getWidth(), getHeight());
+    }
   }
 
   private static void paintGradientBack(JComponent comp, Graphics g)
@@ -198,12 +205,28 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
           columnModel.recomputeSeqs();
         }
 
-        String info = "<html>Range: <b>";
+        String info = "Range: <b>";
         info += newBoard.getMinRootNote().toString(true);
         info += " to ";
         info += newBoard.getMaxRootNote().toString(true);
-        info += "</b></html>";
-        this.infoLabel.setText(info);
+        info += "</b>";
+        this.infoLabel.setText("<html>" + info + "</html>");
+
+        String toolTip = "<html>Current Board: <b>" + def.toString() + "</b>";
+        toolTip += "<br/>" + info;
+
+        if (def.desc.length() > 0) {
+          toolTip += "<br/><i>" + def.desc + "</i>";
+        } else {
+          toolTip += "<br/><i>Standard Board Size</i>";
+        }
+
+        this.setToolTipText(toolTip);
+        jLabel1.setToolTipText(toolTip);
+        this.boardCombo.setToolTipText(toolTip);
+
+        //renderBoard.setBoardToolTip(toolTip);
+        //this.labelDesc.setText(def.desc);
       }
     }
   }
@@ -217,23 +240,22 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    extPanel = new javax.swing.JPanel();
     jLabel1 = new javax.swing.JLabel();
+    labelDesc = new javax.swing.JLabel();
     boardCombo = new javax.swing.JComboBox();
     infoLabel = new javax.swing.JLabel();
 
     setBackground(java.awt.SystemColor.activeCaption);
-
-    extPanel.setOpaque(false);
-    add(extPanel);
 
     jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getSize()+5f));
     jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     jLabel1.setText("Current Board:");
     add(jLabel1);
 
+    labelDesc.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+    add(labelDesc);
+
     boardCombo.setFont(boardCombo.getFont().deriveFont(boardCombo.getFont().getStyle() | java.awt.Font.BOLD, boardCombo.getFont().getSize()+7));
-    boardCombo.setToolTipText("<html>\nClick and select one of the possible bass board layouts.<br/>\nStandard boards vary in the number of bass and chord rows and which<br/>\nchords are included.<br/>\nThe standard bass layout is 120-basses.<br/>\nThe smallest is usually 8 basses.<br/>\n</html>");
     add(boardCombo);
 
     infoLabel.setFont(infoLabel.getFont().deriveFont(infoLabel.getFont().getSize()+5f));
@@ -244,8 +266,8 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox boardCombo;
-  private javax.swing.JPanel extPanel;
   private javax.swing.JLabel infoLabel;
   private javax.swing.JLabel jLabel1;
+  private javax.swing.JLabel labelDesc;
   // End of variables declaration//GEN-END:variables
 }

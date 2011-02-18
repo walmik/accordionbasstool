@@ -63,9 +63,9 @@ public class BoardRegistry
     @Override
     public String toString()
     {
-      String str = name;
-      if (str.length() > 0) {
-        str += " - ";
+      String str = "";
+      if (name.length() > 0) {
+        str += "(" + name + ") ";
       }
       str += numBasses() + " Bass (" + numCols + " X " + rowLayout.length + ")";
       return str;

@@ -103,8 +103,9 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
     comboRecent = new javax.swing.JComboBox();
     buttonClearRecent = new javax.swing.JButton();
     checkAllowDups = new javax.swing.JCheckBox();
+    buttonShowRecent = new javax.swing.JButton();
 
-    jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Full Chord Sequence:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
+    jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Enter Bass (Note and/or Chord) Progression:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
     computeButton.setText("Update Sequence");
     computeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -130,6 +131,14 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
 
     checkAllowDups.setSelected(true);
     checkAllowDups.setText("Duplicate Note for Bass");
+    checkAllowDups.setToolTipText("<html>Advanced: When checked, duplicate notes in a chord, e.g [AACE] or Am/A imply that the note (e.g. A)\nmust be played in the bass and must be the lowest note.\nWhen not checked, duplicate are removed</html>");
+
+    buttonShowRecent.setText("Show Recent");
+    buttonShowRecent.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        buttonShowRecentActionPerformed(evt);
+      }
+    });
 
     javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
     jPanel1.setLayout(jPanel1Layout);
@@ -138,24 +147,27 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
       .addGroup(jPanel1Layout.createSequentialGroup()
         .addContainerGap()
         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(jPanel1Layout.createSequentialGroup()
-            .addComponent(computeButton)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+          .addComponent(checkAllowDups)
+          .addComponent(comboRecent, 0, 420, Short.MAX_VALUE)
+          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
             .addComponent(buttonClearRecent)
-            .addGap(35, 35, 35)
-            .addComponent(checkAllowDups))
-          .addComponent(comboRecent, 0, 416, Short.MAX_VALUE))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addComponent(buttonShowRecent)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 103, Short.MAX_VALUE)
+            .addComponent(computeButton)))
         .addContainerGap())
     );
     jPanel1Layout.setVerticalGroup(
       jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+      .addGroup(jPanel1Layout.createSequentialGroup()
         .addComponent(comboRecent, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(buttonClearRecent)
           .addComponent(computeButton)
-          .addComponent(checkAllowDups)))
+          .addComponent(buttonClearRecent)
+          .addComponent(buttonShowRecent))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+        .addComponent(checkAllowDups))
     );
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -220,8 +232,15 @@ public class TabSeqEditor extends ToolPanel implements TableModelListener
 
       isUpdating = false;
     }//GEN-LAST:event_buttonClearRecentActionPerformed
+
+    private void buttonShowRecentActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_buttonShowRecentActionPerformed
+    {//GEN-HEADEREND:event_buttonShowRecentActionPerformed
+      this.comboRecent.showPopup();
+    }//GEN-LAST:event_buttonShowRecentActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton buttonClearRecent;
+  private javax.swing.JButton buttonShowRecent;
   private javax.swing.JCheckBox checkAllowDups;
   private javax.swing.JComboBox comboRecent;
   private javax.swing.JButton computeButton;
