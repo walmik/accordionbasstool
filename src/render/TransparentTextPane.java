@@ -16,6 +16,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextPane;
+import javax.swing.text.html.parser.ParserDelegator;
 
 /**
  *
@@ -24,7 +25,7 @@ import javax.swing.JTextPane;
 public class TransparentTextPane extends JScrollPane
 {
 
-  JTextPane textPane = new JTextPane();
+  JTextPane textPane;
 
   static class EditAction implements ActionListener
   {
@@ -40,7 +41,7 @@ public class TransparentTextPane extends JScrollPane
 
       copy = new JMenuItem("Copy", KeyEvent.VK_CONTROL + KeyEvent.VK_C);
       copy.addActionListener(this);
-      
+
       selectAll = new JMenuItem("Select All", KeyEvent.VK_CONTROL + KeyEvent.VK_A);
       selectAll.addActionListener(this);
 
@@ -74,8 +75,17 @@ public class TransparentTextPane extends JScrollPane
   }
   static EditAction editAction = null;
 
+  //Workaround for recentBug -- must create ParserDelegator
+  //for setText Crash
+  private static ParserDelegator workaround;
+
   public TransparentTextPane()
   {
+    if (workaround == null) {
+      workaround = new ParserDelegator();
+    }
+
+    textPane = new JTextPane();
     textPane.setBackground(new Color(0, 0, 0, 0));
     textPane.setContentType("text/html");
     textPane.setEditable(false);

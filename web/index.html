@@ -54,7 +54,7 @@
         $('#tabs').bind('tabsselect', function(event, ui){
           document.the_applet.setMode(ui.panel.id);
         });
-        $("#applet_div").draggable({/*containment: "#drag_div",*/ axis: "x", scroll: false });
+        $("#applet_div").draggable({/*containment: "#drag_div",*/ scroll: false });
         $("#applet_div").resizable({
           stop: function(event, ui)
           {
@@ -77,6 +77,7 @@
         width: 100%;
         height: 500px;
         display: block;
+        float: left;
         padding: 24px 12px 12px 12px;
         margin-left: 24px;
         background-color: #888;
@@ -131,12 +132,13 @@
           at the same time (up to 4).
           You will see a list possible chords (often more than one) that correspond to
           those buttons.
-          <h3>Redundant Buttons</h3>
-          When multiple buttons are pressed, other buttons will automatically fall through
-          on the accordion. This is due to the fact that all the notes in those buttons are
-          played by other notes. This is true for duplicate buttons.
-          <i>To see which buttons are made redundant, select the <b>Press Redundant Buttons</b>
-            item in the Options.</i>
+          <h4>Redundant Buttons</h4>
+          On the accordion, when certain buttons are pressed, buttons that have the same
+          notes are automatically pressed, that is, they will fall through.
+          This is the intended effect of the Stradella system, buttons that are connected
+          to the same notes have no effect. <br/>To see which buttons are made redundant,
+          the notes by them are already pressed, select <b>Press Redundant Buttons</b>
+            item in the Options.
         </div>
         <div class="tabContent" id="ChordPicker">
           <h2>Chord Picker</h2>
