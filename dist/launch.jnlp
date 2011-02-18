@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jnlp codebase="http://accordionbasstool.googlecode.com/hg/dist/" href="launch.jnlp" spec="1.0+">
     <information>
-        <title>AccordionBassTool</title>
+        <title>Accordion Bass Analyzer</title>
         <vendor>Ilya Kreymer</vendor>
         <homepage href="https://code.google.com/p/accordionbasstool/"/>
         <description>A utility that maps optimal bass button combinations for Accordion Stradella Bass</description>
-        <description kind="short">AccordionBassTool</description>
+        <description kind="short">Accordion Bass Analyzer</description>
 
 
     <icon href="snap.jpg" kind="default"/>

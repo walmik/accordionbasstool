@@ -50,8 +50,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   JRootPane origRootPane;
   JComponent editor;
   boolean modeMenuEnabled;
-  boolean updateDividers = false;
+  //boolean updateDividers = false;
   TransposePanel transposePanel;
+  boolean isModeSwitching = false;
 
   /** Creates new form BassToolFrame */
   public BassToolFrame()
@@ -159,8 +160,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
   public void init(ToolMode tool)
   {
     sound.stop();
+    isModeSwitching = true;
     seqTablePanel.playOnSelect = false;
-    
+
     SeqColumnModel currColModel;
 
     if (tool.useModel) {
@@ -271,8 +273,6 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
       currColModel.shrinkToFirst(tool.useBlankChord);
     }
 
-    this.resetPrefDividers(false);
-
 //    setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
 
@@ -362,6 +362,9 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     }
 
     seqTablePanel.playOnSelect = true;
+    isModeSwitching = false;
+
+    this.resetPrefDividers(true);
   }
 
   public void restoreRootPane()
@@ -408,15 +411,18 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
         this.toggleOrientation();
       }
     } else if (evt.getPropertyName().equals(ToolPanel.RESET_TO_PREF_SIZE)) {
-      if (evt.getNewValue() != null) {
-        if (((JComponent)evt.getSource()).getTopLevelAncestor() == this) {
-          return;
-        }
-      }
+//      if (evt.getNewValue() != null) {
+//        if (((JComponent)evt.getSource()).getTopLevelAncestor() == this) {
+//          return;
+//        }
+//      }
 
       this.resetPrefDividers(true);
     } else if (evt.getPropertyName().equals("BassBoard")) {
-      this.resetPrefDividers(true);
+//      this.resetPrefDividers(true);
+      if (!isModeSwitching) {
+        this.firePropertyChange("prefLayoutChange", null, origRootPane.getPreferredSize());
+      }
     }
   }
 
@@ -501,6 +507,10 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
   public void resetPrefDividers(boolean fireLayoutChange)
   {
+    if (isModeSwitching) {
+      return;
+    }
+
     Dimension newSize = getPreferredSize();
     setSize(newSize.width, newSize.height);
 
@@ -592,6 +602,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
   class InstruAction extends AbstractAction
   {
+
     Instrument instru;
     boolean isForChord;
 
@@ -616,8 +627,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
 
     Instrument selected = sound.getPlayer().getInstrument(isForChord);
 
-    for (Instrument instru : sound.getPlayer().getInstruments())
-    {
+    for (Instrument instru : sound.getPlayer().getInstruments()) {
       JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(new InstruAction(instru, isForChord));
 
       if (selected == instru) {
@@ -692,7 +702,7 @@ public class BassToolFrame extends javax.swing.JFrame implements PropertyChangeL
     menuTranspose = new javax.swing.JMenu();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-    setTitle("Accordion Bass Tool v1");
+    setTitle("Accordion Bass Analyzer 1.01");
 
     boardSplitPane.setDividerSize(16);
     boardSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);

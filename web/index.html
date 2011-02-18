@@ -24,12 +24,13 @@
 
         var elem = document.getElementById("applet_div");
         
-        prefWidth += elem.style.paddingRight;
-        prefHeight += elem.style.paddingBottom;
+        //      prefWidth += elem.style.paddingRight;
+        //      prefHeight += elem.style.paddingBottom;
 
         var maxWidth = $(window).width();
         var maxHeight = $(window).height();
 
+        
         if ((prefWidth < maxWidth) && (prefHeight < maxHeight) && (prefWidth > 300))
         {
           var xRatio = maxWidth / prefWidth;
@@ -43,16 +44,23 @@
             prefHeight = maxHeight;
           }
         }
-
-        elem.style.width = prefWidth + "px";
-        elem.style.height = prefHeight + "px";
+         
+        //alert(prefWidth + " " + prefHeight);
+        $("#applet_div").css({width: prefWidth, height: prefHeight});
       }
 
-      function setAbs()
+      function toggleTabContent(vis)
       {
-        document.getElementById("applet_div").style.position = "relative";
+        if (!vis) {
+          var headHeight = $("#tabHeader").outerHeight();
+          $(".ui-widget-content").height(headHeight);
+        } else {
+          $(".ui-widget-content").height("auto");
+        }
+        $(".tabContent").css({"visibility" : (vis ? "visible" : "hidden")});
+        vis = !vis;
       }
-   
+
       /* JQuery Inits Below */
 
       $(document).ready(function()
@@ -62,15 +70,17 @@
         $('#tabs').bind('tabsselect', function(event, ui){
           document.the_applet.setMode(ui.panel.id);
         });
-   //     $("#applet_div").draggable({/*containment: "#drag_div",*/ scroll: false });
+        //     $("#applet_div").draggable({/*containment: "#drag_div",*/ scroll: false });
         $("#applet_div").resizable({/*handles: "n, e, s, w, ne, se, sw, nw"*/
-   //       resize: function(event, ui) { setAbs(); },
-   //       start: function(event, ui) { setAbs(); },
-   //       stop: function(event, ui) { setAbs(); }
+          //       resize: function(event, ui) { setAbs(); },
+          //       start: function(event, ui) { setAbs(); },
+          //       stop: function(event, ui) { setAbs(); }
 
-      });
+        });
 
-        //document.getElementById("applet_div").style.position = "absolute";
+        //var headHeight = $("#tabHeader").outerHeight();
+        //$(".ui-widget-content").css({"visibility" : "hidden"});
+        //$(".ui-widget-content").height(headHeight);
       });
     </script>
 
@@ -107,80 +117,85 @@
     </style>
   </head>
   <body>
-    <div class="tabContainer">
-      <div id="tabs">
-        <ul>
-          <li>
-            <a href="#BoardOnly">Explore Bass Board</a>
-          </li>
-          <li>
-            <a href="#ChordMatch">Combine Buttons</a>
-          </li>
-          <li>
-            <a href="#ChordPicker">Chord Picker</a>
-          </li>
-          <li>
-            <a href="#SeqPicker">Progressions & Scales</a>
-          </li>		  
-          <li>
-            <a href="#Default">Full Analyzer</a>
-          </li>
-        </ul>
-        <div class="tabContent" id="BoardOnly">
-          <h2>Exploring the Board</h2>
-          Below you can see a typical accordion bass board.
-          Moving around the board will show the corresponding row and column.
-          Each row is a different type of chord/note.
-          Each column is different note, with adjacent columns being a 5th apart.
-          (You can also view the board vertically and turn off the highliting in the Options menu.)
-        </div>
-        <div class="tabContent" id="ChordMatch">
-          <h2>Button Combining</h2>
-          Combining multiple bass and chord, a more advanced technqiue, allows
-          for almost any chord to be played.<br/>
-          Below, you can <b>Click</b> and <b>Shift+Click</b> to select several buttons
-          at the same time (up to 4).
-          You will see a list possible chords (often more than one) that correspond to
-          those buttons.
-          <h4>Redundant Buttons</h4>
-          On the accordion, when certain buttons are pressed, buttons that have the same
-          notes are automatically pressed, that is, they will fall through.
-          This is the intended effect of the Stradella system, buttons that are connected
-          to the same notes have no effect. <br/>To see which buttons are made redundant,
-          the notes by them are already pressed, select <b>Press Redundant Buttons</b>
-            item in the Options.
-        </div>
-        <div class="tabContent" id="ChordPicker">
-          <h2>Chord Picker</h2>
-          Below you can select any chord and see the different ways that it can be played
-          on the accordion bass side.
-        </div>
-        <div class="tabContent" id="SeqPicker">
-          <h2>Progressions</h2>
-        </div>
-        <div class="tabContent" id="Default">
-          <h2>Accordion Bass Analyzer</h2>
-          Below is the whole analyzer put together. Each of the different modes are available
-          as separate tabs in the analyzer.
-          There is also an additional Options tab for advanced searched settings.
-          This version of the analyzer can be run outside of the browser if necessary.
-        </div>		
+    <div id="tabs">
+      <ul id="tabHeader">
+        <li>
+          <a href="#BoardOnly">Explore Bass Board</a>
+        </li>
+        <li>
+          <a href="#ChordMatch">Combine Buttons</a>
+        </li>
+        <li>
+          <a href="#ChordPicker">Chord Picker</a>
+        </li>
+        <li>
+          <a href="#SeqPicker">Progressions & Scales</a>
+        </li>
+        <li>
+          <a href="#Default">Full Analyzer</a>
+        </li>
+      </ul>
+      <div class="tabContent" id="BoardOnly">
+        <h2>Exploring the Board</h2>
+        Below you can see a typical accordion bass board.
+        Moving around the board will show the corresponding row and column.
+        Each row is a different type of chord/note.
+        Each column is different note, with adjacent columns being a 5th apart.
+        (You can also view the board vertically and turn off the highliting in the Options menu.)
+      </div>
+      <div class="tabContent" id="ChordMatch">
+        <h2>Button Combining</h2>
+        Combining multiple bass and chord, a more advanced technqiue, allows
+        for almost any chord to be played.<br/>
+        Below, you can <b>Click</b> and <b>Shift+Click</b> to select several buttons
+        at the same time (up to 4).
+        You will see a list possible chords (often more than one) that correspond to
+        those buttons.
+        <h4>Redundant Buttons</h4>
+        On the accordion, when certain buttons are pressed, buttons that have the same
+        notes are automatically pressed, that is, they will fall through.
+        This is the intended effect of the Stradella system, buttons that are connected
+        to the same notes have no effect. <br/>To see which buttons are made redundant,
+        the notes by them are already pressed, select <b>Press Redundant Buttons</b>
+        item in the Options.
+      </div>
+      <div class="tabContent" id="ChordPicker">
+        <h2>Chord Picker</h2>
+        Below you can select any chord and see the different ways that it can be played
+        on the accordion bass side.
+      </div>
+      <div class="tabContent" id="SeqPicker">
+        <h2>Progressions</h2>
+      </div>
+      <div class="tabContent" id="Default">
+        <h2>Accordion Bass Analyzer</h2>
+        Below is the whole analyzer put together. Each of the different modes are available
+        as separate tabs in the analyzer.
+        There is also an additional Options tab for advanced searched settings.
+        This version of the analyzer can be run outside of the browser if necessary.
       </div>
     </div>
-     <!-- Accordion Analyzer Content -->
 
-      <div id="applet_div">
-        <applet code="app.AppletMain" name="the_applet" mayscript="true" archive="./AccordTools.jar" width="100%" height="100%">
-          <param name="mode" value="BoardOnly"/>
-          <param name="resizeFunc" value="onAppletPrefSizeChanged"/>
-        </applet>
-      </div>
-  <div id="contact">Questions? Comments? Problems? Please <a href="ikreymer.spamremove@gmail.com">send me a message!</a></div>
-  <div id="license">
+    <span style="float: right">
+      <input type="checkbox" id="toggleTabCheck" checked="checked" onclick="toggleTabContent(this.checked)"/>
+      <label for="toggleTabCheck">Show Description</label><br/>
+    </span>
+
+    <span id="contact">Questions? Comments? Problems? Please <a href="mailto:ikreymer.spamremove@gmail.com">send me a message!</a></span>
+
+    <!-- Accordion Analyzer Content -->
+    <div id="applet_div">
+      <applet code="app.AppletMain" name="the_applet" mayscript="true" archive="./AccordTools.jar" width="100%" height="100%">
+        <param name="mode" value="BoardOnly"/>
+        <param name="resizeFunc" value="onAppletPrefSizeChanged"/>
+      </applet>
+    </div>
+    <!-- End Accordion Analyzer Content -->
+
+    <span id="license" style="float: right">
       <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
         <img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/80x15.png" />
       </a>
-    </div>
-
+    </span>
   </body>
 </html>

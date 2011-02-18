@@ -123,7 +123,7 @@ public abstract class ToolPanel extends JPanel implements AncestorListener, Prop
       syncUIToDataModel(SyncType.SHOWN);
     }
 
-    this.firePropertyChange(ToolPanel.RESET_TO_PREF_SIZE, null, Boolean.TRUE);
+    //this.firePropertyChange(ToolPanel.RESET_TO_PREF_SIZE, null, Boolean.TRUE);
   }
 
   protected void hidden()
