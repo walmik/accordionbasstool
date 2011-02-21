@@ -271,6 +271,9 @@ and open the template in the editor.
 
       function buildVisiblePlaceList()
       {
+	    if (!markersLoaded) {
+		  return false;
+		}
         var root = document.getElementById("data_list");
         if (root.childNodes.length > 0) {
           root.removeChild(root.childNodes[0]);
