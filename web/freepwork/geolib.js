@@ -8,7 +8,7 @@ var geolib = (function() {
 
   var geocoder;
 
-  var usingGearsGeoloc = true;
+  var usingGearsGeoloc = false;
 
   var map;
   var mapMarker;

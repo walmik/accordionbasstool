@@ -12,17 +12,36 @@ and open the template in the editor.
     </script>
     <script type="text/javascript" src="http://code.google.com/apis/gears/gears_init.js">
     </script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js">
+    </script>
 
+    <script type="text/javascript" src="splitter.js"></script>
     <script type="text/javascript" src="geolib.js"></script>
-    <script type="text/javascript" src="services.json"></script>
+    <script type="text/javascript" src="FreeServices.json"></script>
 
     <style type="text/css">
-      .datalist ol { border: 0; margin: 12; padding: 12; }
-      .datalist ol li a { padding: 10px; text-decoration: none; display: block; overflow: hidden; }
-      .datalist ol li a:hover { background-color: #DBF1F9;/* light blue */ }
+      body img { border-style: none }
+      .datalist div { }
+      .datalist ul { border: 0; margin: 0; padding: 0; }
+      .datalist ul li { list-style-type: none }
+      .datalist ul li a { border: 0; padding: 10px; text-decoration: none; display: block; overflow: hidden; }
+      .datalist ul li a:hover { background-color: #DBF1F9;/* light blue */ }
       .itemPlain a { background-color: inherit}
       .itemSel a { background-color: #007F00}
       .contentInfo { float: none }
+      /* Place Styles */
+      .hiddenDist { visibility: hidden; display: none}
+      .placeImg { float: left; border: 0px; }
+      .placeDist {  float: right; font-style: italic; margin-right: 24px;}
+      .placeName { float: left; font-weight: bold; }
+      .placeAddress { float: none; clear: left; }
+      .placePhone { font-size: larger; font-weight: bold}
+      .placeDesc { font-size: larger}
+      /* Splitter */
+      .vsplitbar {
+        width: 5px;
+        background: #aaa;
+      }
     </style>
 
     <script type="text/javascript">
@@ -31,6 +50,9 @@ and open the template in the editor.
       var theInfoWin = null;
       var markersLoaded = false;
       var rootUL;
+
+      var globalNumVisible = 0;
+      var globalUserAddress = "";
 
       function init()
       {
@@ -51,31 +73,16 @@ and open the template in the editor.
 
         theInfoWin = new google.maps.InfoWindow();
 
-
-        /*
-        google.maps.event.addListener(theInfoWin, "domready", function()
-        {
-
-        }
-		
-        google.maps.event.addListener(theInfoWin, "closeclick", function()
-        {
-          if ((selectedMarker != undefined) && (selectedMarker.place != null)) {
-            selectedMarker.place.theLI.setAttribute("class", "itemPlain");
-          }
-          selectedMarker = undefined;
-        });
-         */
-
         google.maps.event.addListener(geolib.getMap(), "bounds_changed", buildVisiblePlaceList);
 
         geolib.getMarker().setZIndex(1000);
+        geolib.getMap().setZoom(12);
+        
+        geolib.getMarker().setIcon(imageUrls3D["MyLoc"]);
+        
+        //$("#myloc").html("<img src='" + imageUrls2D["MyLoc"] + "'/> My Address");
 
         loadAllMarkers();
-
-        //var root = document.getElementById("data_list");
-        //rootUL = document.createElement("ul");
-        //root.appendChild(rootUL);
       }
 
       function acceptPosChange(pos)
@@ -98,12 +105,30 @@ and open the template in the editor.
 
       function onMarkerAddrChanged(text)
       {
-        document.getElementById("statusAddr").innerHTML = "<b>Below are the services, Nearest to Farthest from \"" + text + "\"</b>";
+        globalUserAddress = text;
+        updateInfoStatus();
+      }
+      
+      function updateInfoStatus()
+      {
+        var infoStr = "<i>Showing " + globalNumVisible + " services nearest to farthest from ";
+        infoStr += "<img src='" + imageUrls2D["MyLoc"] + "'/>";
+        infoStr += "<b>\"" + globalUserAddress + "\"</b></i>";
+
+        document.getElementById("statusAddr").innerHTML = infoStr;
       }
 
-      var imageUrls = {"Pantry": "http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|0000FF|13|b|P",
-        "Eats" : "http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|FF0000|13|b|E",
-        "Shelter" : "http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|FFFF00|13|b|S"};
+      var imageUrls2D =
+        {"Pantry": "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=P|0099FF",
+        "Eats" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=E|FF3300",
+        "Shelter" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=S|FFFF00",
+        "MyLoc" : "http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=location|00FF00"};
+
+      var imageUrls3D =
+        {"Pantry": "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=P|0099FF",
+        "Eats" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=E|FF3300",
+        "Shelter" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=S|FFFF00",
+        "MyLoc" : "http://chart.apis.google.com/chart?chst=d_map_pin_icon_withshadow&chld=location|00FF00"};
 
       function addFilterCheck(index, folder)
       {
@@ -112,7 +137,7 @@ and open the template in the editor.
         //root.appendChild(document.createElement("br"));
 
         var img = document.createElement("img");
-        img.src = imageUrls[folder.name];
+        img.src = imageUrls2D[folder.name];
         root.appendChild(img);
 
         var input = document.createElement("input");
@@ -123,7 +148,6 @@ and open the template in the editor.
         {
           toggleFilterCheck(folder.name, this.checked);
         };
-
         
         root.appendChild(input);
         input.checked = "checked";
@@ -132,6 +156,12 @@ and open the template in the editor.
         root.appendChild(label);
         label.setAttribute("for", input.id);
         label.appendChild(document.createTextNode("Show " + folder.name));
+      }
+
+      function round(value, decimal)
+      {
+        var scale = Math.pow(10, decimal);
+        return Math.round(value * scale) / scale;
       }
 
       function computeMarkerDist()
@@ -151,16 +181,14 @@ and open the template in the editor.
 
             var feet = place.dist * 3.2808399;
             var units = "";
-            if (feet < 1024) {
-              place.distDesc = String(feet);
-              units = " ft.";
-            } else {
-              place.distDesc = String(feet / 1024);
-              units = " mi.";
-            }
-            if (place.distDesc.length > 7) {
-              place.distDesc = place.distDesc.substr(0, 7);
-            }
+            //            if (feet < 1024) {
+            //              place.distDesc = String(feet);
+            //              units = " ft.";
+            //            } else {
+            place.distDesc = String(feet / 1024);
+            units = " mi.";
+            //            }
+            place.distDesc = round(place.distDesc, 2);
             place.distDesc += units;
             place.distDesc += " Away";
           }
@@ -196,44 +224,70 @@ and open the template in the editor.
         geolib.getMap().setCenter(marker.getPosition());
       }
 
-      /*
-      function addToData(marker)
+      function getAddressString(place)
       {
-        marker.place.theLI = createLI(marker.place, marker.place.ith, marker.place.jth);
-      }
-
-      function removeFromData(marker)
-      {
-        if (marker.place.theLI != undefined) {
-          marker.place.theLI.parentNode.remove(marker.place.theLI);
-          marker.place.theLI = undefined;
+        var full = place.address;
+        if (place.address != "")
+          full += ", ";
+        full += "<br/>";
+        if (place.city != "") {
+          full += place.city + ", " + place.state;
         }
+        full += " " + place.zip;
+        return full;
       }
 
-       */
+      function getSpanString(spanClass, contents)
+      {
+        return "<span class='" + spanClass + "' + id='" + spanClass + "'>" + contents + "</span>";
+      }
 
-      function getPlaceHtml(place, i, noImage)
+      function getPlaceHtml(place, i)
       {
         var descText = "";
-        if (!noImage) {
-          descText += "<img border='0' src=\"" + imageUrls[DATA.Markers.Folder[i].name] + "\"/>";
+
+        // Hidden Dist
+        if (place.dist) {
+          descText += getSpanString("hiddenDist", place.dist);
         }
-		
-        if (place.distDesc != undefined) {
-          descText += "<span style='float: right'>" + place.distDesc + "</span>";
+        
+        var imgStr = "<img src=\"" + imageUrls2D[DATA.Markers.Folder[i].name] + "\"/>";
+
+        descText += "<div>";
+
+        if (place.distDesc) {
+          descText += getSpanString("placeDist", place.distDesc);
         }
-        descText += "<b>" + place.name + "</b>";
-        if (place.address != undefined) {
-          descText += "<br/><h2><i>" + place.address + "</i></h2>";
+        
+        if (place.name) {
+          descText += getSpanString("placeName", imgStr + place.name);
         }
-        descText += "<br/>" + place.description;
+
+        descText += "<br/>";
+        descText += "</div>";
+        descText += "<br/>";
+        
+        if (place.address) {
+          descText += getSpanString("placeAddress", getAddressString(place));
+          descText += "<br/>";
+        }
+
+        if (place.phone) {
+          descText += getSpanString("placePhone", place.phone);
+          descText += "<br/>";
+        }
+
+        if (place.description) {
+          descText += getSpanString("placeDesc", "<p>" + place.description + "</p>");
+        }
+        
         return descText;
       }
 
       function createLI(place, i, j)
       {
         var newLI = document.createElement("li");
-        newLI.setAttribute("id", place.index);
+        //newLI.setAttribute("id", place.index);
 
         //    if (selectedMarker == place.marker) {
         //      newLI.setAttribute("class", "itemSel");
@@ -246,6 +300,7 @@ and open the template in the editor.
         var descText = getPlaceHtml(place, i, false);
 
         newLI.innerHTML = "<a " + onclickSelectMarker + "href='#'>" + descText + "</a>";
+        //newLI.innerHTML = "<div " + onclickSelectMarker + ">" + descText + "</div>";
 
         place.theLI = newLI;
         
@@ -258,9 +313,9 @@ and open the template in the editor.
 
         for (c = 0; c < rootUL.childNodes.length; c++)
         {
-          id = Number(rootUL.childNodes[c].id);
-          //alert(newDist + " < " + allMarkers[id].place.dist);
-          if (newDist < allPlaces[id].dist) {
+          var dist = Number($("//span[id='hiddenDist']", rootUL.childNodes[c]).text());
+
+          if (newDist < dist) {
             rootUL.insertBefore(newLI, rootUL.childNodes[c]);
             return;
           }
@@ -271,14 +326,16 @@ and open the template in the editor.
 
       function buildVisiblePlaceList()
       {
-	    if (!markersLoaded) {
-		  return false;
-		}
+        if (!markersLoaded) {
+          return false;
+        }
+        
         var root = document.getElementById("data_list");
+
         if (root.childNodes.length > 0) {
           root.removeChild(root.childNodes[0]);
         }
-        rootUL = document.createElement("ol");
+        rootUL = document.createElement("ul");
         root.appendChild(rootUL);
 
         var bounds = geolib.getMap().getBounds();
@@ -311,17 +368,19 @@ and open the template in the editor.
           }
         }
 		
-        document.getElementById("statusFound").innerHTML = "<b>Showing " + count + " Free Services on this map.</b>";
+        //document.getElementById("statusFound").innerHTML = "<b>Showing " + count + " Free Services on this map.</b>";
+        globalNumVisible = count;
+        updateInfoStatus();
       }
 
-      var allPlaces;
+      //var allPlaces;
 
       function loadAllMarkers()
       {
         var map = geolib.getMap();
 
-        allPlaces = new Array();
-        var count = 0;
+        //allPlaces = new Array();
+        //var count = 0;
 
         for (i = 0; i < DATA.Markers.Folder.length; i++)
         {
@@ -338,12 +397,12 @@ and open the template in the editor.
               map: map,
               position: geolib.parseLatLong(place.Point.coordinates, true),
               draggable: false,
-              title: place.name,
-              icon: new google.maps.MarkerImage(imageUrls[folder.name])
+              title: place.name + "\n" + getAddressString(place),
+              icon: new google.maps.MarkerImage(imageUrls3D[folder.name])
             });
 
-            place.index = count++;
-            allPlaces.push(place);
+            //place.index = count++;
+            //allPlaces.push(place);
             
             function doOpen(win, place, i)
             {
@@ -361,29 +420,6 @@ and open the template in the editor.
 
         markersLoaded = true;
         computeMarkerDist();
-
-        /*
-        function onLookupAddress(currPlace)
-        {
-          return function(responses)
-          {
-            if (responses && responses.length > 0) {
-              currPlace.address = responses[0].formatted_address;
-            }
-            
-            if ((currPlace.index + 1) < allPlaces.length) {
-              alert(currPlace.index + " " + currPlace.address);
-              geolib.getGeoCoder().geocode({latLng: allPlaces[currPlace.index + 1].marker.getPosition()},
-              onLookupAddress(allPlaces[currPlace.index + 1]));
-            }
-          }
-        }
-
-        geolib.getGeoCoder().geocode({latLng: allPlaces[0].marker.getPosition()},
-        onLookupAddress(allPlaces[0]));
-
-         */
-
       }
 	  
       function showClicked()
@@ -394,15 +430,25 @@ and open the template in the editor.
         geolib.getMap().setZoom(15);
       }
 
+      $(document).ready(function()
+      {
+        $("#floatSplitter").splitter({
+          minLeft: 100, sizeLeft: 500, minRight: 100,
+          resizeToWidth: true
+        });
+        
+        init();
+      });
+
     </script>
   </head>
-  <body onload="init()">
+  <body>
     <h1>San Francisco Free Services Locator</h1>
     <div id="inputs">Enter your address:
       <input type="text" name="address" id="address" style="width: 500px" value="San Francisco, CA"/>
       <input type="hidden" name="posLatlng" id="posLatlng" value="37.7749295, -122.4194155"/>
+      <br/>
       <input type="button" name="centerMe" id="centerMe" value="Show Services Near This Address" onclick="showClicked()"/>
-
       <input type="button" name="zoomIn" id="zoomIn" value="Zoom In" onclick="geolib.getMap().setZoom(geolib.getMap().getZoom() + 1)"/>
       <input type="button" name="zoomIn" id="zoomOut" value="Zoom Out" onclick="geolib.getMap().setZoom(geolib.getMap().getZoom() - 1)"/>
     </div>
@@ -412,9 +458,11 @@ and open the template in the editor.
     <div id="markerFilters"></div>
     <br/>
 
-    <div id="data_list" class="datalist" style="float: left; display: block; width: 40%; height: 100%; overflow: scroll"></div>
-    <div id="floater" stlye="width: 60%; height: 100%">
-      <div id="map_canvas" style="height: 100%;"></div>
+    <div id="floatSplitter" style="width: 100%; height: 100%">
+      <div style="overflow: scroll">
+      <div id="data_list" class="datalist"></div>
+      </div>
+      <div id="map_canvas" style="height: 100%"></div>
     </div>
 
   </body>
