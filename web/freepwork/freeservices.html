@@ -29,25 +29,22 @@ and open the template in the editor.
 
       .datalist div { }
       .datalist ul { border: 0; margin: 0; padding: 0; }
-      .datalist ul li { list-style-type: none }
-      .datalist ul li a { border: 0; padding: 10px; text-decoration: none; display: block; overflow: hidden; }
-      .datalist ul li a:hover { background-color: #DBF1F9;/* light blue */ }
-      .itemPlain a { background-color: inherit}
-      .itemSel a { background-color: #007F00}
+      .datalist ul li { list-style-type: none; border: 0; padding: 8px 0 8px 0; margin: 0px }
       .contentInfo { float: none }
       /* Place Styles */
       .placeImg { float: left; border: 0px; }
-      .placeDist {  float: right; font-style: italic; margin-right: 24px;}
+      .placeDist {  float: right; font-style: italic; text-align: right; margin-right: 24px;}
       .placeName { float: left; font-weight: bold; }
       .placeAddress { clear: both; }
       .placePhone { font-size: larger; font-weight: bold}
       .placeDesc { font-size: larger}
+      .placeLinks { float: right}
       /* Splitter */
       .vsplitbar { width: 8px; background: #aaa; }
       /* Place List Item Styles */
       .hiddenPlace { visibility: hidden; display: none }
-      .visiblePlace { visibility: visible; display: inherit }
       .selectedPlace { background-color: silver }
+      .placeHover { background-color: #DBF1F9; cursor: pointer}
     </style>
 
     <script type="text/javascript">
@@ -142,9 +139,9 @@ and open the template in the editor.
 
       var filterColors =
         {"Pantry" : "0099FF",
-         "Eats" : "FF3300",
-         "Shelter" : "FFCC00",
-         "MyLoc" : "00FF00"};
+        "Eats" : "FF3300",
+        "Shelter" : "FFCC00",
+        "MyLoc" : "00FF00"};
 
 
       function addFilterCheck(index, folder)
@@ -288,7 +285,18 @@ and open the template in the editor.
         return "<input type='hidden' name='" + name + "' id='" + name + "' value='" + value + "' />";
       }
 
-      function getPlaceHtml(place, i)
+      function zoomTo(elem, zoom)
+      {      
+        var idStr = $(elem).parent().attr("id");
+
+        var result = getPlaceInfo(idStr);
+        if (result) {
+          geolib.getMap().setCenter(result.place.marker.getPosition());
+        }
+        geolib.getMap().setZoom(zoom);
+      }
+
+      function getPlaceHtml(place, i, isInInfoWin)
       {
         var descText = "";
 
@@ -299,19 +307,26 @@ and open the template in the editor.
         
         var imgStr = "<img src=\"" + imageUrls2D[DATA.Markers.Folder[i].name] + "\"/>";
 
-        descText += "<div>";
-
         if (place.distDesc) {
-          descText += getSpanString("placeDist", place.distDesc);
+          var dirLink = "";
+          if (isInInfoWin) {
+            //dirLink = "<br/><a href='#'>Directions</a>";
+          }
+
+          dirLink = "<br/><a href='#' onclick='zoomTo(this.parentNode, 15)'>Zoom Here</a>";
+          descText += getSpanString("placeDist", place.distDesc + dirLink);
         }
         
         if (place.name) {
           descText += getSpanString("placeName", imgStr + place.name);
         }
 
+        //var links = "";//<a href='#' onclick='zoomTo(this, 11)'>Zoom To City</a>";
+
+
         descText += "<div style='clear: both'></div>";
-        descText += "</div>";
-        descText += "<br/>";
+        //descText += "</div>";
+        //descText += "<br/>";
         
         if (place.address) {
           descText += getSpanString("placeAddress", getAddressString(place));
@@ -330,26 +345,35 @@ and open the template in the editor.
         return descText;
       }
 
+      function hoverListItem(inOut, rootDiv)
+      {
+        //var dirDiv = $("//span[id=placeDir]", rootDiv);
+        if (inOut) {
+          $(rootDiv).addClass("placeHover");
+          //dirDiv.html("<br/><a href='#'>Show Directions</a>");
+        } else {
+          $(rootDiv).removeClass("placeHover");
+          //dirDiv.html("");
+        }
+      }
+
       function createLI(place, i, j)
       {
         var newLI = document.createElement("li");
 
         var id = i + ", " + j;
         newLI.setAttribute("id", id);
-
-        //    if (selectedMarker == place.marker) {
-        //      newLI.setAttribute("class", "itemSel");
-        //    }
         
         var onclickSelectMarker = "onclick=" + "\"selectMarker(";
         onclickSelectMarker += id + ", this)\"";
+        onclickSelectMarker += " onmouseover = 'hoverListItem(true, this)' onmouseout='hoverListItem(false, this)' ";
 		
-        var descText = getPlaceHtml(place, i);
+        var descText = getPlaceHtml(place, i, false);
 
-        newLI.innerHTML = "<a " + onclickSelectMarker + "href='#'>" + descText + "</a>";
-        //newLI.innerHTML = "<div " + onclickSelectMarker + ">" + descText + "</div>";
+        //newLI.innerHTML = "<a " + onclickSelectMarker + "href='#'>" + descText + "</a>";
+        newLI.innerHTML = "<div id='" + id + "' " + onclickSelectMarker + ">" + descText + "</div>";
 
-        place.theLI = newLI;
+        //place.theLI = newLI;
         
         if (place.dist == undefined) {
           rootUL.appendChild(newLI);
@@ -360,7 +384,7 @@ and open the template in the editor.
 
         for (c = 0; c < rootUL.childNodes.length; c++)
         {
-          var dist = Number($("//input[id='hiddenDist']", rootUL.childNodes[c]).attr("value"));
+          var dist = parseFloat($("//input[id='hiddenDist']", rootUL.childNodes[c]).attr("value"));
 
           if (newDist < dist) {
             rootUL.insertBefore(newLI, rootUL.childNodes[c]);
@@ -369,6 +393,31 @@ and open the template in the editor.
         }
 
         rootUL.appendChild(newLI);
+      }
+
+      function getPlaceInfo(idStr)
+      {
+        var vals = idStr.split(",", 2);
+        if (!vals) {
+          return;
+        }
+
+        var i = parseInt(vals[0]);
+        var j = parseInt(vals[1]);
+
+        if (i >= DATA.Markers.Folder.length) {
+          return;
+        }
+
+        var folder = DATA.Markers.Folder[i];
+
+        if (j >= folder.Placemark.length) {
+          return;
+        }
+
+        var place = folder.Placemark[j];
+
+        return {"place" : place,  "folder" : folder};
       }
 
       function isPlaceVisible(folder, place, bounds)
@@ -401,37 +450,23 @@ and open the template in the editor.
         for (c = 0; c < rootUL.childNodes.length; c++)
         {
           var idStr = rootUL.childNodes[c].id;
-          var vals = idStr.split(",", 2);
-          if (!vals) {
+          var result = getPlaceInfo(idStr);
+
+          if (!result) {
             continue;
           }
 
-          var i = parseInt(vals[0]);
-          var j = parseInt(vals[1]);
-
-          if (i >= DATA.Markers.Folder.length) {
-            continue;
-          }
-
-          var folder = DATA.Markers.Folder[i];
-
-          if (j >= folder.Placemark.length) {
-            continue;
-          }
-          
-          var place = folder.Placemark[j];
-
-          var visible = isPlaceVisible(folder, place, bounds);
+          var visible = isPlaceVisible(result.folder, result.place, bounds);
           if (visible) {
             count++;
-            if (selectedPlaceId && (idStr == selectedPlaceId)) {
-              selElem = rootUL.childNodes[c];
-              rootUL.childNodes[c].setAttribute("class", "selectedPlace");
-            } else {
-              rootUL.childNodes[c].setAttribute("class", "visiblePlace");
-            }
+            //if (selectedPlaceId && (idStr == selectedPlaceId)) {
+            //  selElem = rootUL.childNodes[c];
+            //  rootUL.childNodes[c].setAttribute("class", "selectedPlace");
+            //  rootUL.childNodes[c].style.visibility = "visible";
+            //}
+            $(rootUL.childNodes[c]).removeClass("hiddenPlace");
           } else {
-            rootUL.childNodes[c].setAttribute("class", "hiddenPlace");
+            $(rootUL.childNodes[c]).addClass("hiddenPlace");
           }
         }
 
@@ -535,7 +570,8 @@ and open the template in the editor.
             {
               return function()
               {
-                var divWrap = "<div class='contentInfo'>" + getPlaceHtml(place, i) + "</div>";
+                var idStr = i + ", " + j;
+                var divWrap = "<div id='" + idStr + "'> " + getPlaceHtml(place, i, true) + "</div>";
                 win.setContent(divWrap);
                 win.open(map, place.marker);
                 //setSelectedPlace(i, j);
