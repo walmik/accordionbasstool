@@ -20,7 +20,13 @@ and open the template in the editor.
     <script type="text/javascript" src="FreeServices.json"></script>
 
     <style type="text/css">
+      body { font-family: sans-serif; margin: 8px 8px 8px 8px; border: 0px; padding: 0px; }
       body img { border-style: none }
+      div { margin: 0px; padding: 0px; border: 0; }
+      /* Filter Checks */
+      #markerFilters { font-size: larger }
+      .largerCheck { width: 30px; height: 30px }
+
       .datalist div { }
       .datalist ul { border: 0; margin: 0; padding: 0; }
       .datalist ul li { list-style-type: none }
@@ -30,18 +36,18 @@ and open the template in the editor.
       .itemSel a { background-color: #007F00}
       .contentInfo { float: none }
       /* Place Styles */
-      .hiddenDist { visibility: hidden; display: none}
       .placeImg { float: left; border: 0px; }
       .placeDist {  float: right; font-style: italic; margin-right: 24px;}
       .placeName { float: left; font-weight: bold; }
-      .placeAddress { float: none; clear: left; }
+      .placeAddress { clear: both; }
       .placePhone { font-size: larger; font-weight: bold}
       .placeDesc { font-size: larger}
       /* Splitter */
-      .vsplitbar {
-        width: 5px;
-        background: #aaa;
-      }
+      .vsplitbar { width: 8px; background: #aaa; }
+      /* Place List Item Styles */
+      .hiddenPlace { visibility: hidden; display: none }
+      .visiblePlace { visibility: visible; display: inherit }
+      .selectedPlace { background-color: silver }
     </style>
 
     <script type="text/javascript">
@@ -53,6 +59,8 @@ and open the template in the editor.
 
       var globalNumVisible = 0;
       var globalUserAddress = "";
+      
+      var selectedPlaceId;
 
       function init()
       {
@@ -73,7 +81,7 @@ and open the template in the editor.
 
         theInfoWin = new google.maps.InfoWindow();
 
-        google.maps.event.addListener(geolib.getMap(), "bounds_changed", buildVisiblePlaceList);
+        google.maps.event.addListener(geolib.getMap(), "bounds_changed", updateVisiblePlaceList);
 
         geolib.getMarker().setZIndex(1000);
         geolib.getMap().setZoom(12);
@@ -83,6 +91,8 @@ and open the template in the editor.
         //$("#myloc").html("<img src='" + imageUrls2D["MyLoc"] + "'/> My Address");
 
         loadAllMarkers();
+
+        buildVisiblePlaceList(geolib.getPos());
       }
 
       function acceptPosChange(pos)
@@ -97,10 +107,8 @@ and open the template in the editor.
 
       function onMarkerPosChanged(pos)
       {
-        if (markersLoaded) {
-          computeMarkerDist();
-        }
-        buildVisiblePlaceList();
+        geolib.getMap().setZoom(15);
+        buildVisiblePlaceList(pos);
       }
 
       function onMarkerAddrChanged(text)
@@ -111,9 +119,11 @@ and open the template in the editor.
       
       function updateInfoStatus()
       {
-        var infoStr = "<i>Showing " + globalNumVisible + " services nearest to farthest from ";
-        infoStr += "<img src='" + imageUrls2D["MyLoc"] + "'/>";
-        infoStr += "<b>\"" + globalUserAddress + "\"</b></i>";
+        var infoStr = "";
+        //infoStr += "<i><img src='" + imageUrls2D["MyLoc"] + "'/>";
+        //infoStr += "<i>Your Address</i>";
+        infoStr += "<b>" + globalUserAddress + "</b></i>";
+        //infoStr += "<br/>  (" + globalNumVisible + " services shown on this map)";
 
         document.getElementById("statusAddr").innerHTML = infoStr;
       }
@@ -129,6 +139,13 @@ and open the template in the editor.
         "Eats" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=E|FF3300",
         "Shelter" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=S|FFFF00",
         "MyLoc" : "http://chart.apis.google.com/chart?chst=d_map_pin_icon_withshadow&chld=location|00FF00"};
+
+      var filterColors =
+        {"Pantry" : "0099FF",
+         "Eats" : "FF3300",
+         "Shelter" : "FFCC00",
+         "MyLoc" : "00FF00"};
+
 
       function addFilterCheck(index, folder)
       {
@@ -148,6 +165,7 @@ and open the template in the editor.
         {
           toggleFilterCheck(folder.name, this.checked);
         };
+        //input.setAttribute("class", "largerCheck");
         
         root.appendChild(input);
         input.checked = "checked";
@@ -155,7 +173,10 @@ and open the template in the editor.
         var label = document.createElement("label");
         root.appendChild(label);
         label.setAttribute("for", input.id);
+        label.setAttribute("style", "color: " + filterColors[folder.name]);
         label.appendChild(document.createTextNode("Show " + folder.name));
+
+        //root.appendChild(document.createElement("br"));
       }
 
       function round(value, decimal)
@@ -213,8 +234,7 @@ and open the template in the editor.
           }
         }
 
-        buildVisiblePlaceList();
-
+        updateVisiblePlaceList();
       }
 
       function selectMarker(i, j, elem)
@@ -224,6 +244,27 @@ and open the template in the editor.
         geolib.getMap().setCenter(marker.getPosition());
       }
 
+      /*
+      function setSelectedPlace(i, j)
+      {
+        if (selectedPlaceId) {
+          var oldSel = document.getElementById(selectedPlaceId);
+          if (oldSel) {
+            oldSel.setAttribute("class", "visiblePlace");
+          }
+        }
+
+        selectedPlaceId = i + ", " + j;
+
+        var newSel = document.getElementById(selectedPlaceId);
+        if (newSel) {
+          var scrollOff = $(newSel).position().top - $("#data_list").position().top;
+          //alert(scrollOff);
+          $("#data_list").scrollTop(scrollOff);
+          newSel.setAttribute("class", "selectedPlace");
+        }
+      }
+       */
       function getAddressString(place)
       {
         var full = place.address;
@@ -242,13 +283,18 @@ and open the template in the editor.
         return "<span class='" + spanClass + "' + id='" + spanClass + "'>" + contents + "</span>";
       }
 
+      function getHiddenFieldString(name, value)
+      {
+        return "<input type='hidden' name='" + name + "' id='" + name + "' value='" + value + "' />";
+      }
+
       function getPlaceHtml(place, i)
       {
         var descText = "";
 
         // Hidden Dist
         if (place.dist) {
-          descText += getSpanString("hiddenDist", place.dist);
+          descText += getHiddenFieldString("hiddenDist", place.dist);
         }
         
         var imgStr = "<img src=\"" + imageUrls2D[DATA.Markers.Folder[i].name] + "\"/>";
@@ -263,7 +309,7 @@ and open the template in the editor.
           descText += getSpanString("placeName", imgStr + place.name);
         }
 
-        descText += "<br/>";
+        descText += "<div style='clear: both'></div>";
         descText += "</div>";
         descText += "<br/>";
         
@@ -287,17 +333,18 @@ and open the template in the editor.
       function createLI(place, i, j)
       {
         var newLI = document.createElement("li");
-        //newLI.setAttribute("id", place.index);
+
+        var id = i + ", " + j;
+        newLI.setAttribute("id", id);
 
         //    if (selectedMarker == place.marker) {
         //      newLI.setAttribute("class", "itemSel");
         //    }
         
         var onclickSelectMarker = "onclick=" + "\"selectMarker(";
-        onclickSelectMarker += i + ", ";
-        onclickSelectMarker += j + ", this)\"";
+        onclickSelectMarker += id + ", this)\"";
 		
-        var descText = getPlaceHtml(place, i, false);
+        var descText = getPlaceHtml(place, i);
 
         newLI.innerHTML = "<a " + onclickSelectMarker + "href='#'>" + descText + "</a>";
         //newLI.innerHTML = "<div " + onclickSelectMarker + ">" + descText + "</div>";
@@ -313,7 +360,7 @@ and open the template in the editor.
 
         for (c = 0; c < rootUL.childNodes.length; c++)
         {
-          var dist = Number($("//span[id='hiddenDist']", rootUL.childNodes[c]).text());
+          var dist = Number($("//input[id='hiddenDist']", rootUL.childNodes[c]).attr("value"));
 
           if (newDist < dist) {
             rootUL.insertBefore(newLI, rootUL.childNodes[c]);
@@ -324,11 +371,92 @@ and open the template in the editor.
         rootUL.appendChild(newLI);
       }
 
-      function buildVisiblePlaceList()
+      function isPlaceVisible(folder, place, bounds)
+      {
+        if (!folder.name || !document.getElementById("checkbox" + folder.name).checked) {
+          return false;
+        }
+
+        if (!place.marker.getVisible()) {
+          return false;
+        }
+
+        if (!bounds.contains(place.marker.getPosition())) {
+          return false;
+        }
+
+        return true;
+      }
+
+      function updateVisiblePlaceList()
+      {
+        if (!markersLoaded || !rootUL) {
+          return false;
+        }
+
+        var count = 0;
+        var bounds = geolib.getMap().getBounds();
+        var selElem;
+
+        for (c = 0; c < rootUL.childNodes.length; c++)
+        {
+          var idStr = rootUL.childNodes[c].id;
+          var vals = idStr.split(",", 2);
+          if (!vals) {
+            continue;
+          }
+
+          var i = parseInt(vals[0]);
+          var j = parseInt(vals[1]);
+
+          if (i >= DATA.Markers.Folder.length) {
+            continue;
+          }
+
+          var folder = DATA.Markers.Folder[i];
+
+          if (j >= folder.Placemark.length) {
+            continue;
+          }
+          
+          var place = folder.Placemark[j];
+
+          var visible = isPlaceVisible(folder, place, bounds);
+          if (visible) {
+            count++;
+            if (selectedPlaceId && (idStr == selectedPlaceId)) {
+              selElem = rootUL.childNodes[c];
+              rootUL.childNodes[c].setAttribute("class", "selectedPlace");
+            } else {
+              rootUL.childNodes[c].setAttribute("class", "visiblePlace");
+            }
+          } else {
+            rootUL.childNodes[c].setAttribute("class", "hiddenPlace");
+          }
+        }
+
+        /*if (selElem) {
+          var scrollOff = $(selElem).position().top - $("#data_list").position().top;
+          $("#data_list").scrollTop(scrollOff);
+        }*/
+        
+        globalNumVisible = count;
+        updateInfoStatus();
+      }
+
+      var userPos;
+
+      function buildVisiblePlaceList(pos)
       {
         if (!markersLoaded) {
           return false;
         }
+
+        if (userPos && userPos.equals(pos)) {
+          return false;
+        }
+
+        computeMarkerDist();
         
         var root = document.getElementById("data_list");
 
@@ -338,39 +466,38 @@ and open the template in the editor.
         rootUL = document.createElement("ul");
         root.appendChild(rootUL);
 
-        var bounds = geolib.getMap().getBounds();
+        //var bounds = geolib.getMap().getBounds();
 
-        var count = 0;
+        //var count = 0;
 
         for (i = 0; i < DATA.Markers.Folder.length; i++)
         {
           var folder = DATA.Markers.Folder[i];
 
-          if (!document.getElementById("checkbox" + folder.name).checked) {
-            continue;
-          }
+          //if (!folder.name || !document.getElementById("checkbox" + folder.name).checked) {
+          //  continue;
+          //}
 
           for (j = 0; j < folder.Placemark.length; j++)
           {
 
             var place = folder.Placemark[j];
 
-            if (!place.marker.getVisible()) {
-              continue;
-            }
+            //if (!place.marker.getVisible()) {
+            //  continue;
+            //}
+            //
+            //if (!bounds.contains(place.marker.getPosition())) {
+            //  continue;
+            //}
 
-            if (!bounds.contains(place.marker.getPosition())) {
-              continue;
-            }
-
-            count++;
+            //count++;
             createLI(place, i, j);
           }
         }
 		
         //document.getElementById("statusFound").innerHTML = "<b>Showing " + count + " Free Services on this map.</b>";
-        globalNumVisible = count;
-        updateInfoStatus();
+        updateVisiblePlaceList();
       }
 
       //var allPlaces;
@@ -404,40 +531,69 @@ and open the template in the editor.
             //place.index = count++;
             //allPlaces.push(place);
             
-            function doOpen(win, place, i)
+            function doOpen(win, place, i, j)
             {
               return function()
               {
-                var divWrap = "<div class='contentInfo'>" + getPlaceHtml(place, i, false) + "</div>";
+                var divWrap = "<div class='contentInfo'>" + getPlaceHtml(place, i) + "</div>";
                 win.setContent(divWrap);
-                win.open(map, place.marker);				
+                win.open(map, place.marker);
+                //setSelectedPlace(i, j);
               }
             }
 
-            google.maps.event.addListener(place.marker, "click", doOpen(theInfoWin, place, i));
+            google.maps.event.addListener(place.marker, "click", doOpen(theInfoWin, place, i, j));
           }
         }
 
         markersLoaded = true;
-        computeMarkerDist();
       }
 	  
       function showClicked()
       {
+        document.getElementById("addressError").innerHTML = "";
         if (!geolib.syncToEnteredAddress()) {
           geolib.getMap().setCenter(geolib.getPos());
         }
+        document.getElementById("address").value = globalUserAddress;
+
         geolib.getMap().setZoom(15);
+      }
+
+      function fixSizes()
+      {
+        var margin = parseInt($(document.body).css("marginBottom"));
+        $("#floatSplitter").height($(window).height() - margin - $('#floatSplitter').position().top);
+        $("#data_list").height($("#leftDiv").height() - $("#data_list").position().top);
       }
 
       $(document).ready(function()
       {
+        $(window).bind("resize", fixSizes);
+
+        init();
+
+        fixSizes();
+        
         $("#floatSplitter").splitter({
-          minLeft: 100, sizeLeft: 500, minRight: 100,
+          minLeft: 300, sizeLeft: 500, minRight: 100,
           resizeToWidth: true
         });
-        
-        init();
+
+        //$("#data_list").height($("#leftDiv").height() - $("#data_list").position().top);
+
+        $("#map_canvas").bind("resize", function()
+        {
+          google.maps.event.trigger(geolib.getMap(), "resize");
+        });
+
+        /*$("#leftDiv").bind("resize", function()
+        {
+          $("#data_list").height($("#leftDiv").height() - $("#data_list").position().top);
+        });
+         */
+
+        $("#data_list").height($("#floatSplitter").height() - $("#data_list").position().top);
       });
 
     </script>
@@ -447,22 +603,25 @@ and open the template in the editor.
     <div id="inputs">Enter your address:
       <input type="text" name="address" id="address" style="width: 500px" value="San Francisco, CA"/>
       <input type="hidden" name="posLatlng" id="posLatlng" value="37.7749295, -122.4194155"/>
-      <br/>
-      <input type="button" name="centerMe" id="centerMe" value="Show Services Near This Address" onclick="showClicked()"/>
+      <input type="button" name="centerMe" id="centerMe" value="Show Services Near My Address" onclick="showClicked()"/>
       <input type="button" name="zoomIn" id="zoomIn" value="Zoom In" onclick="geolib.getMap().setZoom(geolib.getMap().getZoom() + 1)"/>
       <input type="button" name="zoomIn" id="zoomOut" value="Zoom Out" onclick="geolib.getMap().setZoom(geolib.getMap().getZoom() - 1)"/>
     </div>
     <div id="addressError" style="color: red"></div>
     <br/>
-    <div id="statusFound"></div><div id="statusAddr"></div><br/>
-    <div id="markerFilters"></div>
-    <br/>
 
     <div id="floatSplitter" style="width: 100%; height: 100%">
-      <div style="overflow: scroll">
-      <div id="data_list" class="datalist"></div>
+      <div id="leftDiv" style="overflow: auto; width: 40%;">
+        <div id="keyHeader" style="height: 100px">
+          <img src="http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=location|00FF00"/>
+          <span style="" id="statusAddr"></span>
+          <div style="" id="markerFilters"></div>
+          <br/>
+        </div>
+        <div style="overflow: auto; height: 400px" id="data_list" class="datalist"></div>
       </div>
-      <div id="map_canvas" style="height: 100%"></div>
+
+      <div id="map_canvas" style="width: 60%; height: 100%"></div>
     </div>
 
   </body>
