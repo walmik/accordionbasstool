@@ -128,8 +128,7 @@ function addFilterCheck(index, folder)
   var label = document.createElement("label");
   root.appendChild(label);
   label.setAttribute("for", input.id);
-  //label.setAttribute("style", "color: " + filterColors[folder.name]);
-  label.style.color = filterColors[folder.name];
+  label.style.color = "#" + filterColors[folder.name];
   label.appendChild(document.createTextNode("Show " + folder.name));
 
 //root.appendChild(document.createElement("br"));
