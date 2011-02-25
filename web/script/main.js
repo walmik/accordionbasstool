@@ -1,8 +1,19 @@
 var appletPrefWidth = 0;
 var appletPrefHeight = 0;
+var loaded = false;
+var requestMode = null;
 
 function onAppletPrefSizeChanged(prefWidth, prefHeight)
 {
+  // If requestMode was set while loading, switch to that mode
+  // Clear mode before setting to avoid reentry
+  if (requestMode != null) {
+    var mode = requestMode;
+    requestMode = null;
+    document.the_applet.setMode(mode);
+    return;
+  }
+
   appletPrefWidth = prefWidth;
   appletPrefHeight = prefHeight;
 
@@ -38,6 +49,8 @@ function onAppletPrefSizeChanged(prefWidth, prefHeight)
     width: prefWidth,
     height: prefHeight
   });
+
+  loaded = true;
 }
 
 function toggleTabContent(vis)
@@ -48,9 +61,11 @@ function toggleTabContent(vis)
   } else {
     $(".ui-widget-content").height("auto");
   }
+
   $(".tabContent").css({
     "visibility" : (vis ? "visible" : "hidden")
     });
+
   vis = !vis;
 }
 
@@ -61,7 +76,11 @@ $(document).ready(function()
   $("#tabs").tabs();
   //$(window).resize(function () { /* do something */ });
   $('#tabs').bind('tabsselect', function(event, ui){
-    document.the_applet.setMode(ui.panel.id);
+    if (loaded) {
+      document.the_applet.setMode(ui.panel.id);
+    } else {
+      requestMode = ui.panel.id;
+    }
   });
   //     $("#applet_div").draggable({/*containment: "#drag_div",*/ scroll: false });
   $("#applet_div").resizable({/*handles: "n, e, s, w, ne, se, sw, nw"*/
