@@ -8,8 +8,7 @@
         <description kind="short">Accordion Bass Analyzer</description>
 
 
-    <icon href="snap.jpg" kind="default"/>
-<offline-allowed/>
+    <offline-allowed/>
 </information>
     <resources>
 <j2se java-vm-args="-ea" version="1.6+"/>
