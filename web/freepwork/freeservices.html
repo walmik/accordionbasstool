@@ -1,12 +1,11 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <!--
 Free Services Locator - Main Page
 Created by Ilya Kreymer, 2011
 Licensed Under Creative Commons License
 -->
 
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>San Francisco Free Services Locator</title>
@@ -44,8 +43,11 @@ Licensed Under Creative Commons License
           <script type="text/javascript">
             document.write("<img src='" + getImageStr("UserLoc") + "' alt='Your Address'/>");
           </script>
-          <span style="" id="statusAddr"></span>
-          <div style="" id="markerFilters"></div>
+          <span id="statusAddr"></span>
+          <div id="markerFilters"></div>
+          <span class="filterDesc hidden" id="filterPantry">Pantry - Provides free food storage facilities</span>
+          <span class="filterDesc hidden" id="filterEats">Eats - Provides free food to be eaten</span>
+          <span class="filterDesc hidden" id="filterShelter">Shelter - Provides free overnight stay services</span>
           <br/>
         </div>
         <div style="overflow: auto; height: 400px" id="data_list" class="datalist"></div>

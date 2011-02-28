@@ -1,6 +1,6 @@
 /* 
 
-Free Services Locator -- Stylesheet
+Free Services Locator - Stylesheet
 Created by Ilya Kreymer, 2011
 Licensed Under Creative Commons License
 
@@ -17,6 +17,7 @@ div { margin: 0px; padding: 0px; border: 0; }
 .datalist ul { border: 0; margin: 0; padding: 0; }
 .datalist ul li { list-style-type: none; border: 0; padding: 8px 0 8px 0; margin: 0px }
 .contentInfo { float: none }
+.filterDesc { font-size: larger; padding: 0px 8px 0px 8px; margin-left: 48px; font-style: italic; background-color: silver}
 /* Place Styles */
 .placeImg { float: left; border: 0px; }
 .placeDist {  float: right; font-style: italic; text-align: right; margin-right: 24px;}
@@ -28,7 +29,7 @@ div { margin: 0px; padding: 0px; border: 0; }
 /* Splitter */
 .vsplitbar { width: 8px; background: #aaa; }
 /* Place List Item Styles */
-.hiddenPlace { visibility: hidden; display: none }
+.hidden { visibility: hidden; display: none }
 .selectedPlace { background-color: silver }
 .placeHover { background-color: #DBF1F9; cursor: pointer}
 

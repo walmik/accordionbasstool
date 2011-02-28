@@ -1,6 +1,6 @@
 //
-//Free Services Locator -- Script File
-//Created by Ilya Kreymer, 2010
+//Free Services Locator - Script File
+//Created by Ilya Kreymer, 2011
 //Licensed Under Creative Commons License
 //
 
@@ -158,11 +158,12 @@ function addFilterCheck(index, folder)
 {
   var root = document.getElementById("markerFilters");
 
-  //root.appendChild(document.createElement("br"));
+  var span = document.createElement("span");
+  root.appendChild(span);
 
   var img = document.createElement("img");
   img.src = getImageStr(folder.name);
-  root.appendChild(img);
+  span.appendChild(img);
 
   var input = document.createElement("input");
   input.type = "checkbox";
@@ -174,16 +175,17 @@ function addFilterCheck(index, folder)
   };
   //input.setAttribute("class", "largerCheck");
 
-  root.appendChild(input);
+  span.appendChild(input);
   input.checked = "checked";
 
   var label = document.createElement("label");
-  root.appendChild(label);
+  span.appendChild(label);
   label.setAttribute("for", input.id);
   label.style.color = "#" + FilterData[folder.name].imageColor;
   label.appendChild(document.createTextNode("Show " + folder.name));
 
-//root.appendChild(document.createElement("br"));
+  span.onmouseover = function() { $("#filter" + folder.name).removeClass("hidden"); }
+  span.onmouseout = function() { $("#filter" + folder.name).addClass("hidden"); }
 }
 
 function round(value, decimal)
@@ -477,9 +479,9 @@ function updateVisiblePlaceList()
       //  rootUL.childNodes[c].setAttribute("class", "selectedPlace");
       //  rootUL.childNodes[c].style.visibility = "visible";
       //}
-      $(rootUL.childNodes[c]).removeClass("hiddenPlace");
+      $(rootUL.childNodes[c]).removeClass("hidden");
     } else {
-      $(rootUL.childNodes[c]).addClass("hiddenPlace");
+      $(rootUL.childNodes[c]).addClass("hidden");
     }
   }
 
