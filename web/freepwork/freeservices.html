@@ -1,10 +1,12 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <!--
-To change this template, choose Tools | Templates
-and open the template in the editor.
+Free Services Locator - Main Page
+Created by Ilya Kreymer, 2011
+Licensed Under Creative Commons License
 -->
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-   "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>San Francisco Free Services Locator</title>
@@ -21,33 +23,7 @@ and open the template in the editor.
     <script type="text/javascript" src="geolib.js"></script>
     <script type="text/javascript" src="FreeServices.json"></script>
 
-    <style type="text/css">
-      body { font-family: sans-serif; margin: 8px 8px 8px 8px; border: 0px; padding: 0px; }
-      body img { border-style: none }
-      div { margin: 0px; padding: 0px; border: 0; }
-      /* Filter Checks */
-      #markerFilters { font-size: larger }
-      .largerCheck { width: 30px; height: 30px }
-
-      .datalist div { }
-      .datalist ul { border: 0; margin: 0; padding: 0; }
-      .datalist ul li { list-style-type: none; border: 0; padding: 8px 0 8px 0; margin: 0px }
-      .contentInfo { float: none }
-      /* Place Styles */
-      .placeImg { float: left; border: 0px; }
-      .placeDist {  float: right; font-style: italic; text-align: right; margin-right: 24px;}
-      .placeName { float: left; font-weight: bold; }
-      .placeAddress { clear: both; }
-      .placePhone { font-size: larger; font-weight: bold}
-      .placeDesc { font-size: larger}
-      .placeLinks { float: right}
-      /* Splitter */
-      .vsplitbar { width: 8px; background: #aaa; }
-      /* Place List Item Styles */
-      .hiddenPlace { visibility: hidden; display: none }
-      .selectedPlace { background-color: silver }
-      .placeHover { background-color: #DBF1F9; cursor: pointer}
-    </style>
+    <link rel="stylesheet" type="text/css" href="./freeservices.css"/>
 
     <script type="text/javascript" src="freeservices.js">
     </script>
@@ -65,7 +41,9 @@ and open the template in the editor.
     <div id="floatSplitter" style="margin-top: 12px; width: 100%; height: 100%">
       <div id="leftDiv" style="overflow: auto; width: 40%;">
         <div id="keyHeader" style="height: 100px">
-          <img src="http://chart.apis.google.com/chart?chst=d_map_pin_icon&amp;chld=location|00FF00" alt="Your Address"/>
+          <script type="text/javascript">
+            document.write("<img src='" + getImageStr("UserLoc") + "' alt='Your Address'/>");
+          </script>
           <span style="" id="statusAddr"></span>
           <div style="" id="markerFilters"></div>
           <br/>

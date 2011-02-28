@@ -1,0 +1,34 @@
+/* 
+
+Free Services Locator -- Stylesheet
+Created by Ilya Kreymer, 2011
+Licensed Under Creative Commons License
+
+*/
+
+body { font-family: sans-serif; margin: 8px 8px 8px 8px; border: 0px; padding: 0px; }
+body img { border-style: none }
+div { margin: 0px; padding: 0px; border: 0; }
+/* Filter and Status */
+#markerFilters { font-size: larger }
+#statusAddr { color: #00CC00 }
+/* Data List */
+.datalist div { }
+.datalist ul { border: 0; margin: 0; padding: 0; }
+.datalist ul li { list-style-type: none; border: 0; padding: 8px 0 8px 0; margin: 0px }
+.contentInfo { float: none }
+/* Place Styles */
+.placeImg { float: left; border: 0px; }
+.placeDist {  float: right; font-style: italic; text-align: right; margin-right: 24px;}
+.placeName { float: left; font-weight: bold; }
+.placeAddress { clear: both; }
+.placePhone { font-size: larger; font-weight: bold}
+.placeDesc { font-size: larger}
+.placeLinks { float: right}
+/* Splitter */
+.vsplitbar { width: 8px; background: #aaa; }
+/* Place List Item Styles */
+.hiddenPlace { visibility: hidden; display: none }
+.selectedPlace { background-color: silver }
+.placeHover { background-color: #DBF1F9; cursor: pointer}
+

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Bouncer</title>
+    <script type="text/javascript" src="jquery.min.js">
+    </script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js">
+    </script>
+
+
+    <style type="text/css">
+      body { margin: 0px; border: 0px; padding: 0px; outline: 0px}
+      #bounds { width: 500px; height: 100px; padding-bottom: 4px; margin: 12px; border: 2px black solid }
+      #bouncer { position: absolute; padding: 0px; margin: 0px; left: 60px; top: 60px; width: 64px; height: 64px; float: left; position: relative; background-color: blue;}
+
+      .rect { position: absolute; border: 4px teal solid}
+    </style>
+
+    <script type="text/javascript">
+      var bouncer;
+      var outerBounds;
+      var xVel, yVel;
+
+      var bId;
+
+      function getBounds(div, xV, yV)
+      {
+        var divBounds = $(div).offset();
+        if (xV) {
+          divBounds.left += xV;
+        }
+        if (yV) {
+          divBounds.top += yV;
+        }
+        divBounds.right = divBounds.left + $(div).outerWidth();
+        divBounds.bottom = divBounds.top + $(div).outerHeight();
+        return divBounds;
+      }
+
+      function addBounds(divBounds, xV, yV)
+      {
+        divBounds.left += xV;
+        divBounds.right += xV;
+        divBounds.top += yV;
+        divBounds.bottom += yV;
+        return divBounds;
+      }
+
+      function intersects(targetPos, otherPos, state)
+      {
+        //var targetPos = getBounds(target, state.xV, state.yV);
+        //var otherPos = getBounds(other);
+        
+        var xD, yD;
+        var xD2, yD2;
+
+        //if (state.xV < 0) {
+          xD =  otherPos.right - targetPos.left;
+          xD2 = targetPos.right - otherPos.left;
+        //} else {
+        //  xD2 = otherPos.right - targetPos.left;
+        //  xD = targetPos.right - otherPos.left;
+        //}
+
+        //if (state.yV < 0) {
+          yD =  otherPos.bottom - targetPos.top;
+          yD2 = targetPos.bottom - otherPos.top;
+        //} else {
+        //yD2 = otherPos.bottom - targetPos.top;
+        //yD = targetPos.bottom - otherPos.top;
+        //}
+
+        if ((xD > 0) && (yD > 0) && (yD2 > 0) && (xD2 > 0)) {
+          xD = Math.min(xD, xD2);
+          yD = Math.min(yD, yD2);
+          //Intersecting, check smallest
+          if (xD < yD) {
+            // Intersect in X first
+            state.t = (xD / Math.abs(state.xV));
+            state.t = 1.0 - state.t;
+            state.xV = -state.xV;
+          } else {
+            // Intersect in Y first
+            state.t = (yD / Math.abs(state.yV));
+            state.t = 1.0 - state.t;
+            state.yV = -state.yV;
+          }
+        } else {
+          state.t = 1.0;
+        }
+
+        return state;
+      }
+
+      function ensureInside(inner, outer)
+      {
+        if (inner.left < outer.left) {
+          inner.left = outer.left;
+        } else if (inner.right >= outer.right) {
+          inner.left = outer.right - (inner.right - inner.left);
+        }
+
+        if (inner.top < outer.top) {
+          inner.top = outer.top;
+        } else if (inner.bottom >= outer.bottom) {
+          inner.top = outer.bottom - (inner.bottom - inner.top);
+        }
+      }
+
+      function makeBounds(left, top, right, bottom)
+      {
+        return {
+          left: $(left).offset().left + $(left).outerWidth(),
+          top:  $(top).offset().top + $(top).outerHeight(),
+          right: $(right).offset().left,
+          bottom:  $(bottom).offset().top
+        };
+      }
+
+      var walls = ["#leftWall", "#rightWall", "#topWall", "#bottomWall", "#brick"];
+
+      function run(xInc, yInc)
+      {
+        var bounds = getBounds(bouncer);
+
+        bounds.top += yInc;
+        bounds.left += xInc;
+
+        //outerBounds = makeBounds("#leftWall", "#topWall", "#rightWall", "#bottomWall");
+        //densureInside(bounds, outerBounds);
+
+        $(bouncer).offset(bounds);
+
+        var closestIsect;
+        var minT = 1.0;
+
+        bounds = getBounds(bouncer, xVel, yVel);
+
+        for (i = 0; i < walls.length; i++)
+        {
+          var state = {xV: xVel, yV: yVel};
+          
+          state = intersects(bounds,
+          getBounds(walls[i]),
+          state);
+
+          if (state.t < minT) {
+            minT = state.t;
+            closestIsect = state;
+          }
+        }
+
+        if (closestIsect) {
+          var runStr = "run(" + (xVel * minT) + ", " + (yVel * minT) + ")";
+          xVel = closestIsect.xV;
+          yVel = closestIsect.yV;
+          bId = setTimeout(runStr, timeInc * minT);
+        } else {
+          var runStr = "run(" + xVel + ", " + yVel + ")";
+          bId = setTimeout(runStr, timeInc);
+        }
+      }
+
+      var timeInc = 50.0;
+
+      function init()
+      {
+        //bounds = document.getElementById("bounds");
+
+        $("#brick").draggable();
+
+        bouncer = document.getElementById("bouncer");
+        xVel = parseInt(document.getElementById("xVel").value);
+        yVel = parseInt(document.getElementById("yVel").value);
+
+        outerBounds = makeBounds("#leftWall", "#topWall", "#rightWall", "#bottomWall");
+
+        run(0, 0);
+
+        
+      }
+
+      $(document).ready(init);
+
+    </script>
+  </head>
+  <body onload="">
+
+    <div style="width: 600px; height: 600px">
+
+      <div id="bouncer">
+        <input type="hidden" name="xVel" id="xVel" value="2"/>
+        <input type="hidden" name="yVel" id="yVel" value="4"/>
+      </div>
+
+      <!--<div id="rightWall" class="rect" style="float: right; width: 40px; height: 100%"/>-->
+      <div id="topWall" class="rect" style="left: 0px; top: 0px; width: 100%; height: 40px"></div>
+      <div id="leftWall" class="rect" style="left: 0px; top: 0px; width: 40px; height: 100%"></div>
+      <div id="rightWall" class="rect" style="right: 0px; top: 0px; width: 40px; height: 100%"></div>
+      <div id="bottomWall" class="rect" style="left: 0px; bottom: 0px; width: 100%; height: 40px"></div>
+
+      <div id="brick" class="rect" style="left: 200px; top: 200px; width: 80px; height: 80px"></div>
+
+
+    </div>
+
+  </body>
+</html>

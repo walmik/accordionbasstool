@@ -1,3 +1,8 @@
+//
+//Free Services Locator -- Script File
+//Created by Ilya Kreymer, 2010
+//Licensed Under Creative Commons License
+//
 
 var SFBounds;
 var theInfoWin = null;
@@ -35,9 +40,9 @@ function init()
   geolib.getMarker().setZIndex(1000);
   geolib.getMap().setZoom(12);
 
-  geolib.getMarker().setIcon(imageUrls3D["MyLoc"]);
+  geolib.getMarker().setIcon(getImageStr("UserLoc", true));
 
-  //$("#myloc").html("<img src='" + imageUrls2D["MyLoc"] + "'/> My Address");
+  //$("#myloc").html("<img src='" + getImageStr("UserLoc") + "'/> My Address");
 
   loadAllMarkers();
 
@@ -69,7 +74,7 @@ function onMarkerAddrChanged(text)
 function updateInfoStatus()
 {
   var infoStr = "";
-  //infoStr += "<i><img src='" + imageUrls2D["MyLoc"] + "'/>";
+  //infoStr += "<i><img src='" + getImageStr("UserLoc") + "'/>";
   //infoStr += "<i>Your Address</i>";
   infoStr += "<b>" + globalUserAddress + "</b></i>";
   //infoStr += "<br/>  (" + globalNumVisible + " services shown on this map)";
@@ -77,29 +82,76 @@ function updateInfoStatus()
   document.getElementById("statusAddr").innerHTML = infoStr;
 }
 
-var imageUrls2D =
+var FilterData =
 {
-  "Pantry": "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=P|0099FF",
-  "Eats" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=E|FF3300",
-  "Shelter" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=S|FFFF00",
-  "MyLoc" : "http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=location|00FF00"
-};
+  "Pantry" :
+  {
+    imageQuery: "d_map_pin_letter",
+    imageCode:  "P",
+    imageColor: "0099FF"
+  },
 
-var imageUrls3D =
-{
-  "Pantry": "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=P|0099FF",
-  "Eats" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=E|FF3300",
-  "Shelter" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=S|FFFF00",
-  "MyLoc" : "http://chart.apis.google.com/chart?chst=d_map_pin_icon_withshadow&chld=location|00FF00"
-};
+  "Eats" :
+  {
+    imageQuery: "d_map_pin_letter",
+    imageCode:  "E",
+    imageColor: "FF3300"
+  },
 
-var filterColors =
+  "Shelter" :
+  {
+    imageQuery: "d_map_pin_letter",
+    imageCode:  "S",
+    imageColor: "FFEE00"
+  },
+
+  "UserLoc" :
+  {
+    imageQuery: "d_map_pin_icon",
+    imageCode:  "location",
+    imageColor: "00FF00"
+  }
+}
+
+
+//var imageUrls2D =
+//{
+//  "Pantry": "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=P|0099FF",
+//  "Eats" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=E|FF3300",
+//  "Shelter" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=S|FFFF00",
+//  "MyLoc" : "http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=location|00FF00"
+//};
+//
+//var imageUrls3D =
+//{
+//  "Pantry": "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=P|0099FF",
+//  "Eats" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=E|FF3300",
+//  "Shelter" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=S|FFFF00",
+//  "MyLoc" : "http://chart.apis.google.com/chart?chst=d_map_pin_icon_withshadow&chld=location|00FF00"
+//};
+//
+//var filterColors =
+//{
+//  "Pantry" : "0099FF",
+//  "Eats" : "FF3300",
+//  "Shelter" : "FFCC00",
+//  "MyLoc" : "00FF00"
+//};
+
+function getImageStr(filter, is3D)
 {
-  "Pantry" : "0099FF",
-  "Eats" : "FF3300",
-  "Shelter" : "FFCC00",
-  "MyLoc" : "00FF00"
-};
+  var imgUrl = "http://chart.apis.google.com/chart?chst=";
+  var entry = FilterData[filter];
+  imgUrl += entry.imageQuery;
+  if (is3D) {
+    imgUrl += "_withshadow";
+  }
+  imgUrl += "&chld=";
+  imgUrl += entry.imageCode;
+  imgUrl += "|";
+  imgUrl += entry.imageColor;
+  return imgUrl;
+}
 
 
 function addFilterCheck(index, folder)
@@ -109,7 +161,7 @@ function addFilterCheck(index, folder)
   //root.appendChild(document.createElement("br"));
 
   var img = document.createElement("img");
-  img.src = imageUrls2D[folder.name];
+  img.src = getImageStr(folder.name);
   root.appendChild(img);
 
   var input = document.createElement("input");
@@ -128,7 +180,7 @@ function addFilterCheck(index, folder)
   var label = document.createElement("label");
   root.appendChild(label);
   label.setAttribute("for", input.id);
-  label.style.color = "#" + filterColors[folder.name];
+  label.style.color = "#" + FilterData[folder.name].imageColor;
   label.appendChild(document.createTextNode("Show " + folder.name));
 
 //root.appendChild(document.createElement("br"));
@@ -219,7 +271,7 @@ function selectMarker(i, j, elem)
           newSel.setAttribute("class", "selectedPlace");
         }
       }
-       */
+ */
 function getAddressString(place)
 {
   var full = place.address;
@@ -263,7 +315,7 @@ function getPlaceHtml(place, i, isInInfoWin)
     descText += getHiddenFieldString("hiddenDist", place.dist);
   }
 
-  var imgStr = "<img src=\"" + imageUrls2D[DATA.Markers.Folder[i].name] + "\"/>";
+  var imgStr = "<img src=\"" + getImageStr(DATA.Markers.Folder[i].name) + "\"/>";
 
   if (place.distDesc) {
     var dirLink = "";
@@ -357,20 +409,20 @@ function getPlaceInfo(idStr)
 {
   var vals = idStr.split(",", 2);
   if (!vals) {
-    return;
+    return null;
   }
 
   var i = parseInt(vals[0]);
   var j = parseInt(vals[1]);
 
   if (i >= DATA.Markers.Folder.length) {
-    return;
+    return null;
   }
 
   var folder = DATA.Markers.Folder[i];
 
   if (j >= folder.Placemark.length) {
-    return;
+    return null;
   }
 
   var place = folder.Placemark[j];
@@ -401,7 +453,7 @@ function isPlaceVisible(folder, place, bounds)
 function updateVisiblePlaceList()
 {
   if (!markersLoaded || !rootUL) {
-    return false;
+    return;
   }
 
   var count = 0;
@@ -445,11 +497,11 @@ var userPos;
 function buildVisiblePlaceList(pos)
 {
   if (!markersLoaded) {
-    return false;
+    return;
   }
 
   if (userPos && userPos.equals(pos)) {
-    return false;
+    return;
   }
 
   computeMarkerDist();
@@ -521,7 +573,7 @@ function loadAllMarkers()
         position: geolib.parseLatLong(place.Point.coordinates, true),
         draggable: false,
         title: place.name + "\n" + getAddressString(place),
-        icon: new google.maps.MarkerImage(imageUrls3D[folder.name])
+        icon: new google.maps.MarkerImage(getImageStr(folder.name, true))
       });
 
       //place.index = count++;
@@ -590,7 +642,7 @@ $(document).ready(function()
         {
           $("#data_list").height($("#leftDiv").height() - $("#data_list").position().top);
         });
-         */
+   */
 
   $("#data_list").height($("#floatSplitter").height() - $("#data_list").position().top);
 });
