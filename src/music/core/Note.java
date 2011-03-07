@@ -1,4 +1,4 @@
-package music;
+package music.core;
 
 /**
  * 
@@ -264,18 +264,24 @@ public class Note
 
     return new Note(newNote, newSOF);
   }
-  static int lastParserOffset = 0;
 
-  public static Note fromString(StringParser parser)
+  private static int lastParserOffset = 0;
+
+  public static int getLastParserOffset()
   {
-    Note note = fromString(parser.input());
-
-    if (note != null) {
-      parser.incOffset(lastParserOffset);
-    }
-
-    return note;
+    return lastParserOffset;
   }
+
+//  public static Note fromString(StringParser parser)
+//  {
+//    Note note = fromString(parser.input());
+//
+//    if (note != null) {
+//      parser.incOffset(lastParserOffset);
+//    }
+//
+//    return note;
+//  }
 
   public static Note fromString(String input)
   {

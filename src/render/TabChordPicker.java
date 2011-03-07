@@ -14,8 +14,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import music.Chord;
-import music.Note;
+import music.core.Chord;
+import music.core.Note;
 import music.ParsedChordDef;
 import music.RelChord;
 
@@ -27,15 +27,18 @@ public class TabChordPicker extends ToolPanel
         implements ActionListener, PropertyChangeListener
 {
 
-  Note rootNote = new Note();
+  Note rootNote;
   RelChord currRelChord;
-  Note addedBassNote = new Note();
+  Note addedBassNote;
   final static int DEFAULT_TABLE_COL_WIDTH = 96;
   int isUpdatingChord = 0;
   boolean usingAddedBass;
 
   public TabChordPicker()
   {
+    rootNote = new Note();
+    addedBassNote = new Note();
+    
     initComponents();
   }
 

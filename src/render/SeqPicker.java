@@ -21,10 +21,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import music.ChordParser;
 import music.ChordRegistry;
-import music.Interval;
-import music.Note;
+import music.core.Interval;
+import music.core.Note;
 import music.ParsedChordDef;
-import music.StringParser;
+import music.core.StringParser;
 
 /**
  *

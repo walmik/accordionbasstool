@@ -16,9 +16,9 @@ import java.awt.event.ActionListener;
 import java.util.Vector;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import music.Chord;
-import music.Interval;
-import music.Note;
+import music.core.Chord;
+import music.core.Interval;
+import music.core.Note;
 
 /**
  *

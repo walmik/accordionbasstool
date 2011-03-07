@@ -10,7 +10,6 @@ import java.net.URL;
 import java.util.LinkedList;
 import javax.swing.Timer;
 import javax.sound.midi.*;
-import music.Note;
 
 /**
  *
@@ -22,6 +21,7 @@ public class Player implements ActionListener
   private Synthesizer synth;
   LinkedList<AudioTask> cancelTasks;
   int velocity = 64;
+  int NUM_HALFSTEPS = 12;
   Instrument bassInstrument;
   Instrument chordInstrument;
   Soundbank customBank = null;
@@ -46,8 +46,8 @@ public class Player implements ActionListener
           URL url = getClass().getClassLoader().getResource("soundbank.gm");
           bank = customBank = MidiSystem.getSoundbank(url.openStream());
           synth.loadAllInstruments(customBank);
-          System.out.println("Soundbank From: " + url + 
-                  ", " + customBank.getInstruments().length + " instruments");
+          System.out.println("Soundbank From: " + url
+                  + ", " + customBank.getInstruments().length + " instruments");
 
         } catch (Exception e) {
           System.out.println(e);
@@ -74,7 +74,6 @@ public class Player implements ActionListener
 //  {
 //    return synth;
 //  }
-
   public Instrument[] getInstruments()
   {
     if (customBank != null) {
@@ -87,6 +86,13 @@ public class Player implements ActionListener
   public Instrument getInstrument(boolean chord)
   {
     return (chord ? chordInstrument : bassInstrument);
+  }
+
+  public void setInstrument(String name)
+  {
+    Instrument instru = findInstrument(name);
+    this.setInstrument(false, instru);
+    this.setInstrument(true, instru);
   }
 
   public void setInstrument(boolean chord, Instrument instru)
@@ -151,7 +157,7 @@ public class Player implements ActionListener
   {
     int totalDelay = 0;
 
-    for (int i = 0; i < Note.NUM_HALFSTEPS * 2; i++) {
+    for (int i = 0; i < NUM_HALFSTEPS * 2; i++) {
       if ((chordMask & (1 << i)) != 0) {
         AudioTask playTask = new AudioTask(1 << i, delay - 1, totalDelay);
         //audioTimer.schedule(playTask, totalDelay);
@@ -173,10 +179,10 @@ public class Player implements ActionListener
         return false;
       }
 
-      for (int i = 0; i < Note.NUM_HALFSTEPS * 2; i++) {
+      for (int i = 0; i < NUM_HALFSTEPS * 2; i++) {
         if ((chordMask & (1 << i)) != 0) {
           int midinote = bitToMidi(i);
-          chans[chanUsed + (i / Note.NUM_HALFSTEPS)].noteOn(midinote, velocity);
+          chans[chanUsed + (i / NUM_HALFSTEPS)].noteOn(midinote, velocity);
           //System.out.println("Playing Note: " + midinote);
         }
       }
@@ -231,10 +237,10 @@ public class Player implements ActionListener
   {
     MidiChannel[] chans = synth.getChannels();
 
-    for (int i = 0; i < Note.NUM_HALFSTEPS * 2; i++) {
+    for (int i = 0; i < NUM_HALFSTEPS * 2; i++) {
       if ((chordMask & (1 << i)) != 0) {
         int midinote = bitToMidi(i);
-        chans[chanUsed + (i / Note.NUM_HALFSTEPS)].noteOff(midinote, 50);
+        chans[chanUsed + (i / NUM_HALFSTEPS)].noteOff(midinote, 50);
       }
     }
   }

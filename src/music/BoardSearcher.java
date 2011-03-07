@@ -1,5 +1,7 @@
 package music;
 
+import music.core.Chord;
+import music.core.Note;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -135,7 +137,7 @@ public class BoardSearcher
       for (int c = 0; c < board.getNumCols(); c++) {
         Chord chord = board.getChordAt(r, c);
 
-        if (chord.isSingleNote() && chord.notes[0].equals(note)) {
+        if (chord.isSingleNote() && chord.getNoteAt(0).equals(note)) {
           combos.add(new ButtonCombo(new BassBoard.Pos(r, c), board));
         }
       }

@@ -4,6 +4,10 @@
  */
 package music;
 
+import music.core.StringParser;
+import music.core.Interval;
+import music.core.Chord;
+import music.core.Note;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -28,7 +32,7 @@ public class BoardRow
     shortname = root.getAttribute("shortname");
 
     String chordName = root.getAttribute("chord");
-    Chord chord = ChordParser.parseNoteList(new StringParser(chordName));
+    Chord chord = new StringParser(chordName).parseNoteList();
 
     isSingleNote = chord.isSingleNote();
     ivals = chord.extractInterval();

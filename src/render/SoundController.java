@@ -5,7 +5,7 @@
 package render;
 
 import music.ButtonCombo;
-import music.Chord;
+import music.core.Chord;
 import music.midi.Player;
 
 /**

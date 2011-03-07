@@ -25,7 +25,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ToolTipManager;
 import music.BassBoard;
 import music.ButtonComboSequence;
-import music.Chord;
+import music.core.Chord;
 import render.RenderBoardUI.BoardButtonImage;
 
 public class RenderBassBoard extends JPanel

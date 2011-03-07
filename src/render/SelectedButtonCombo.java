@@ -4,7 +4,7 @@ package render;
 import javax.swing.DefaultListSelectionModel;
 import music.ButtonCombo;
 import music.ButtonComboSequence;
-import music.Chord;
+import music.core.Chord;
 import music.FingerComboSequence;
 
 public class SelectedButtonCombo extends DefaultListSelectionModel

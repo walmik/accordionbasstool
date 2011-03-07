@@ -1,5 +1,10 @@
 package music;
 
+import music.core.StringParser;
+import music.core.Chord;
+import music.core.Interval;
+import music.core.Note;
+
 final public class RegistryChordDef
 {
   final public String name;
@@ -7,7 +12,7 @@ final public class RegistryChordDef
   final public String abbrevPlain;
   final public String group;
   
-  final private music.Chord chord;
+  final private music.core.Chord chord;
   final Interval[] ivals;
   final public RelChord relChord;
 
@@ -16,7 +21,7 @@ final public class RegistryChordDef
     name = _name;
     abbrevHtml = _abb.replace("[", "<sup><font size='+1'>").replace("]", "</font></sup>");
     abbrevPlain = _abb.replace("[", "").replace("]", "");
-    chord = music.ChordParser.parseNoteList(new StringParser(_notes));
+    chord = new StringParser(_notes).parseNoteList();
     group = _group;
 
     relChord = new RelChord(chord);

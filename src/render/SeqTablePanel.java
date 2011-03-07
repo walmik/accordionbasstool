@@ -28,7 +28,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.TableColumnModelEvent;
 import music.ButtonCombo;
 import music.ChordRegistry;
-import music.Note;
+import music.core.Note;
 
 /**
  *

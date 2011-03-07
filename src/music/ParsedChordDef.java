@@ -4,6 +4,9 @@
  */
 package music;
 
+import music.core.Interval;
+import music.core.Chord;
+import music.core.Note;
 import java.util.ListIterator;
 
 /**

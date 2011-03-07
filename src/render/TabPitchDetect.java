@@ -14,7 +14,7 @@ import java.awt.BorderLayout;
 import java.awt.Graphics;
 import javax.swing.AbstractSpinnerModel;
 import javax.swing.JPanel;
-import music.Note;
+import music.core.Note;
 import music.ParsedChordDef;
 import music.input.PitchDetect;
 

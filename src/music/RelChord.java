@@ -4,6 +4,10 @@
  */
 package music;
 
+import music.core.NamedInterval;
+import music.core.Interval;
+import music.core.Chord;
+import music.core.Note;
 import java.util.Vector;
 
 /**
@@ -68,19 +72,17 @@ public class RelChord implements Cloneable
 
   public RelChord(Chord chord)
   {
-    this(chord.notes, 0, chord.notes.length);
-  }
+    int offset = 0;
+    int length = chord.getNumNotes();
 
-  public RelChord(Note[] notes, int offset, int length)
-  {
-    if (notes.length == 0) {
+    if (length == 0) {
       return;
     }
 
-    Note root = notes[offset];
+    Note root = chord.getNoteAt(offset);
 
-    for (int i = 1; i < length; i++) {
-      Note note = notes[(i + offset) % length + (notes.length - length)];
+    for (int i = 1; i < chord.getNumNotes(); i++) {
+      Note note = chord.getNoteAt(i % length);
 
       if (note == null) {
         continue;

@@ -11,8 +11,8 @@
 
 package render;
 
-import music.Interval;
-import music.Note;
+import music.core.Interval;
+import music.core.Note;
 
 /**
  *

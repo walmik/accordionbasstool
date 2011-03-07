@@ -1,4 +1,6 @@
-package music;
+package music.core;
+
+import java.util.Vector;
 
 public class StringParser
 {
@@ -43,6 +45,35 @@ public class StringParser
   {
     skipWhiteSpace();
     return fullString.substring(offset);
+  }
+
+  public Note getNote()
+  {
+    Note note = Note.fromString(input());
+
+    if (note != null) {
+      incOffset(Note.getLastParserOffset());
+    }
+
+    return note;
+  }
+
+  public Chord parseNoteList()
+  {
+    Vector<Note> notes = new Vector<Note>();
+    Note newNote;
+
+    while ((newNote = getNote()) != null) {
+      notes.add(newNote);
+      skipWhiteSpace();
+    }
+
+    if (notes.isEmpty()) {
+      notes.add(new Note());
+    }
+
+    Note[] noteArray = new Note[notes.size()];
+    return new Chord(notes.toArray(noteArray));
   }
 
   public char nextChar()

@@ -1,4 +1,5 @@
-package music;
+package music.core;
+
 /**
  * 
  */

@@ -1,28 +1,12 @@
 package music;
 
+import music.core.StringParser;
+import music.core.Chord;
+import music.core.Note;
 import java.util.Vector;
 
 public class ChordParser
 {
-
-  public static Chord parseNoteList(StringParser parser)
-  {
-    Vector<Note> notes = new Vector<Note>();
-    Note newNote;
-
-    while ((newNote = Note.fromString(parser)) != null) {
-      notes.add(newNote);
-      parser.skipWhiteSpace();
-    }
-
-    if (notes.isEmpty()) {
-      notes.add(new Note());
-    }
-
-    Note[] noteArray = new Note[notes.size()];
-    return new Chord(notes.toArray(noteArray));
-  }
-
   public static Vector<ParsedChordDef> parseChords(StringParser parser, boolean removeDupNotes)
   {
     Vector<ParsedChordDef> chordVec = new Vector<ParsedChordDef>();
@@ -42,7 +26,7 @@ public class ChordParser
     // so parse them individually
     if (parser.input().startsWith("[")) {
       parser.incOffset(1);
-      Chord chord = parseNoteList(parser);
+      Chord chord = parser.parseNoteList();
       if (removeDupNotes) {
         chord = chord.getUndupedChord();
       }
@@ -53,7 +37,7 @@ public class ChordParser
     }
 
     // Otherwise, parse the chord name
-    Note rootNote = Note.fromString(parser);
+    Note rootNote = parser.getNote();
 
     // Convert invalid note to a default C
     if (rootNote == null) {
@@ -81,7 +65,7 @@ public class ChordParser
     if (parser.nextChar() == '\\') {
       parser.incOffset(1);
 
-      Note bassNote = Note.fromString(parser);
+      Note bassNote = parser.getNote();
 
       //return new Chord(rootNote, result.ivals, bassNote, true);
       return new ParsedChordDef(rootNote, bassNote, relChord, ParsedChordDef.BassSetting.NotLowestBass);
@@ -92,7 +76,7 @@ public class ChordParser
     if (parser.nextChar() == '/') {
       parser.incOffset(1);
 
-      Note bassNote = Note.fromString(parser);
+      Note bassNote = parser.getNote();
 
       //return new Chord(rootNote, result.ivals, bassNote, false);
       return new ParsedChordDef(rootNote, bassNote, relChord, ParsedChordDef.BassSetting.LowestBass);

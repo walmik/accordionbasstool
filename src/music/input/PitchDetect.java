@@ -3,8 +3,8 @@ package music.input;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import javax.sound.sampled.*;
-import music.Interval;
-import music.Note;
+import music.core.Interval;
+import music.core.Note;
 
 public class PitchDetect
 {

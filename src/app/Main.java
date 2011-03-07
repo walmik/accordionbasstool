@@ -2,7 +2,7 @@ package app;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import music.StringParser;
+import music.core.StringParser;
 import java.net.URL;
 import javax.swing.JApplet;
 import javax.swing.JFrame;

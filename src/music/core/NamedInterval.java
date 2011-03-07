@@ -1,4 +1,4 @@
-package music;
+package music.core;
 
 public enum NamedInterval
 {

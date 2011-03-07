@@ -44,7 +44,7 @@ import music.ButtonComboSequence;
 import music.CollSequence;
 import music.FingerCombo;
 import music.FingerComboSequence;
-import music.Note;
+import music.core.Note;
 import music.ParsedChordDef;
 
 /**

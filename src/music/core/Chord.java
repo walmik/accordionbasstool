@@ -1,4 +1,4 @@
-package music;
+package music.core;
 
 import java.util.Vector;
 
@@ -33,6 +33,12 @@ public class Chord
 
     private int noteToMask(Note note)
     {
+      value = noteToMask(value, note);
+      return value;
+    }
+
+    public static int noteToMask(int value, Note note)
+    {
       int bit = toUpperOctaveBit(note);
       if ((value & (1 << bit)) != 0) {
         bit = toLowerOctaveBit(bit);
@@ -46,7 +52,7 @@ public class Chord
       return value;
     }
 
-    void sortChordNotes(Chord chord, Note[] sortArray)
+    public void sortChordNotes(Chord chord, Note[] sortArray)
     {
       // Highest bit in the byte is the lowest note
 
@@ -70,22 +76,22 @@ public class Chord
       }
     }
 
-    final static private int toUpperOctaveBit(Note note)
+    public final static int toUpperOctaveBit(Note note)
     {
       return (note.value() + Note.NUM_HALFSTEPS);
     }
 
-    final static int toUpperOctaveBit(int lowerbit)
+    public final static int toUpperOctaveBit(int lowerbit)
     {
       return (lowerbit + Note.NUM_HALFSTEPS);
     }
 
-    final static int toLowerOctaveBit(int upperbit)
+    public final static int toLowerOctaveBit(int upperbit)
     {
       return (upperbit - Note.NUM_HALFSTEPS);
     }
 
-    final static boolean isLowerOctaveBit(int bit)
+    public final static boolean isLowerOctaveBit(int bit)
     {
       return (bit < Note.NUM_HALFSTEPS);
     }
@@ -114,17 +120,17 @@ public class Chord
 //			int stripLowRegMask = otherMask.value % (1 << Note.NUM_HALFSTEPS);
 //			return contains(value, stripLowRegMask);
 //		}
-    boolean equals(int maskValue)
+    public boolean equals(int maskValue)
     {
       return (value == maskValue);
     }
 
-    boolean equals(Mask otherMask)
+    public boolean equals(Mask otherMask)
     {
       return (value == otherMask.value);
     }
 
-    boolean equals(Chord otherChord)
+    public boolean equals(Chord otherChord)
     {
       return equals(otherChord.getChordMask());
     }
@@ -143,12 +149,12 @@ public class Chord
       return false;
     }
 
-    Mask concat(Mask otherMask)
+    public Mask concat(Mask otherMask)
     {
       return new Mask(value | otherMask.value);
     }
 
-    void concatMe(Mask otherMask)
+    public void concatMe(Mask otherMask)
     {
       value |= otherMask.value;
     }
@@ -164,7 +170,7 @@ public class Chord
       return getLowerValue() != 0;
     }
 
-    void unmaskRegister(Mask otherMask)
+    public void unmaskRegister(Mask otherMask)
     {
       int res = value & otherMask.value;
       if (res != 0) {
@@ -172,7 +178,7 @@ public class Chord
       }
     }
 
-    void unmaskLowRegisterAndAbove(Mask otherMask, int lowestBit)
+    public void unmaskLowRegisterAndAbove(Mask otherMask, int lowestBit)
     {
       int maskToRestrict = otherMask.value;
 

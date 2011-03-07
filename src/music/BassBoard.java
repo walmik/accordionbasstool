@@ -1,5 +1,9 @@
 package music;
 
+import music.core.NamedInterval;
+import music.core.Chord;
+import music.core.Note;
+
 public class BassBoard
 {
 

@@ -20,61 +20,22 @@ and open the template in the editor.
       #bouncer { position: absolute; padding: 0px; margin: 0px; left: 60px; top: 60px; width: 64px; height: 64px; float: left; position: relative; background-color: blue;}
 
       .rect { position: absolute; border: 4px teal solid}
+      .circle { position: absolute; border: 0px}
     </style>
 
     <script type="text/javascript">
-      var bouncer;
-      var outerBounds;
-      var xVel, yVel;
 
-      var bId;
 
-      function getBounds(div, xV, yV)
+      function boxBoxCollision(targetPos, otherPos, state)
       {
-        var divBounds = $(div).offset();
-        if (xV) {
-          divBounds.left += xV;
-        }
-        if (yV) {
-          divBounds.top += yV;
-        }
-        divBounds.right = divBounds.left + $(div).outerWidth();
-        divBounds.bottom = divBounds.top + $(div).outerHeight();
-        return divBounds;
-      }
-
-      function addBounds(divBounds, xV, yV)
-      {
-        divBounds.left += xV;
-        divBounds.right += xV;
-        divBounds.top += yV;
-        divBounds.bottom += yV;
-        return divBounds;
-      }
-
-      function intersects(targetPos, otherPos, state)
-      {
-        //var targetPos = getBounds(target, state.xV, state.yV);
-        //var otherPos = getBounds(other);
-        
         var xD, yD;
         var xD2, yD2;
 
-        //if (state.xV < 0) {
-          xD =  otherPos.right - targetPos.left;
-          xD2 = targetPos.right - otherPos.left;
-        //} else {
-        //  xD2 = otherPos.right - targetPos.left;
-        //  xD = targetPos.right - otherPos.left;
-        //}
+        xD =  otherPos.right - targetPos.left;
+        xD2 = targetPos.right - otherPos.left;
 
-        //if (state.yV < 0) {
-          yD =  otherPos.bottom - targetPos.top;
-          yD2 = targetPos.bottom - otherPos.top;
-        //} else {
-        //yD2 = otherPos.bottom - targetPos.top;
-        //yD = targetPos.bottom - otherPos.top;
-        //}
+        yD =  otherPos.bottom - targetPos.top;
+        yD2 = targetPos.bottom - otherPos.top;
 
         if ((xD > 0) && (yD > 0) && (yD2 > 0) && (xD2 > 0)) {
           xD = Math.min(xD, xD2);
@@ -97,6 +58,121 @@ and open the template in the editor.
 
         return state;
       }
+
+      function boxCircleCollision(box, circle, state)
+      {
+        return boxBoxCollision(box, circle, state);
+      }
+
+      function circleCircleCollision(target, other, state)
+      {
+        var dist = Math.sqrt((target.cx - other.cx) + (target.cy + other.cy));
+        if (dist < (target.radius + other.radius)) {
+          state.t = 1.0 - dist / state.velMag;
+          state.xV = (other.cx - target.cx) / 2;
+          state.yV = (other.cy - target.cy) / 2;
+        }
+
+        return state;
+      }
+
+      var Shape = function(div)
+      {
+        this.xVel = 0;
+        this.yVel = 0;
+        this.div = div;
+      }
+
+
+      Shape.prototype.getBounds = function(xV, yV)
+      {
+        var div = this.div;
+        var divBounds = $(this.div).offset();
+        if (xV) {
+          divBounds.left += xV;
+        }
+        if (yV) {
+          divBounds.top += yV;
+        }
+        divBounds.right = divBounds.left + $(div).outerWidth();
+        divBounds.bottom = divBounds.top + $(div).outerHeight();
+        return divBounds;
+      }
+
+      Shape.prototype.moveBy = function(xInc, yInc)
+      {
+        var bounds = this.getBounds();
+
+        bounds.top += yInc;
+        bounds.left += xInc;
+
+        //outerBounds = makeBounds("#leftWall", "#topWall", "#rightWall", "#bottomWall");
+        //densureInside(bounds, outerBounds);
+
+        $(this.div).offset(bounds);
+
+      }
+
+      Rect.prototype = new Shape();
+      Rect.prototype.constructor = Rect;
+      
+      function Rect(thediv, xV, yV)
+      {
+        this.div = thediv;
+        this.xVel = xV;
+        this.yVel = yV;
+      }
+
+      Rect.prototype.intersects = function(object, state)
+      {
+        var targetBox = this.getBounds(this.xVel,
+                                       this.yVel);
+
+        if (Rect.prototype.isPrototypeOf(object)) {
+          return boxBoxCollision(targetBox, object.getBounds(), state);
+        } else if (Circle.isPrototypeOf(object)) {
+          return boxCircleCollision(targetBox, object.getBounds(), state);
+        } else {
+          return state;
+        }
+      }
+
+      Circle.prototype = new Shape();
+      Circle.prototype.constructor = Circle;
+
+      function Circle(thediv, xV, yV)
+      {
+        this.div = thediv;
+        this.xVel = xV;
+        this.yVel = yV;
+        this.velMag = Math.sqrt(xV, yV);
+      }
+
+      Circle.prototype.getBounds = function(xV, yV)
+      {
+        var bounds = Shape.prototype.getBounds(xV, yV);
+        bounds.cx = (bounds.left + bounds.right) / 2;
+        bounds.cy = (bounds.top + bounds.bottom) / 2;
+        bounds.radius = Math.min(bounds.right - bounds.left,
+                                 bounds.bottom - bounds.top);
+        return bounds;
+      }
+
+      Circle.prototype.intersects = function(object, state)
+      {
+        var targetCircle = this.getBounds(this.xVel, this.yVel);
+
+        if (Rect.prototype.isPrototypeOf(object)) {
+          return boxCircleCollision(object.getBounds(), targetCircle, state);
+        } else if (Circle.isPrototypeOf(object)) {
+          return circleCircleCollision(targetCircle, object.getBounds(), state);
+        } else {
+          return state;
+        }
+      }
+      
+      var bouncer;
+      var bId;
 
       function ensureInside(inner, outer)
       {
@@ -123,32 +199,24 @@ and open the template in the editor.
         };
       }
 
-      var walls = ["#leftWall", "#rightWall", "#topWall", "#bottomWall", "#brick"];
+      var walls = ["leftWall", "rightWall", "topWall", "bottomWall", "brick", "ball"];
 
       function run(xInc, yInc)
       {
-        var bounds = getBounds(bouncer);
-
-        bounds.top += yInc;
-        bounds.left += xInc;
-
-        //outerBounds = makeBounds("#leftWall", "#topWall", "#rightWall", "#bottomWall");
-        //densureInside(bounds, outerBounds);
-
-        $(bouncer).offset(bounds);
+        bouncer.moveBy(xInc, yInc);
 
         var closestIsect;
         var minT = 1.0;
 
-        bounds = getBounds(bouncer, xVel, yVel);
+        //var bounds = bouncer.getBounds(bouncer.xVel, bouncer.yVel);
+        var xVel = bouncer.xVel;
+        var yVel = bouncer.yVel;
 
         for (i = 0; i < walls.length; i++)
         {
           var state = {xV: xVel, yV: yVel};
           
-          state = intersects(bounds,
-          getBounds(walls[i]),
-          state);
+          state = bouncer.intersects(walls[i], state);
 
           if (state.t < minT) {
             minT = state.t;
@@ -158,9 +226,9 @@ and open the template in the editor.
 
         if (closestIsect) {
           var runStr = "run(" + (xVel * minT) + ", " + (yVel * minT) + ")";
-          xVel = closestIsect.xV;
-          yVel = closestIsect.yV;
-          bId = setTimeout(runStr, timeInc * minT);
+          bouncer.xVel = closestIsect.xV;
+          bouncer.yVel = closestIsect.yV;
+          bId = setTimeout(runStr, (minT > 0) ? (timeInc * minT) : 0);
         } else {
           var runStr = "run(" + xVel + ", " + yVel + ")";
           bId = setTimeout(runStr, timeInc);
@@ -169,21 +237,34 @@ and open the template in the editor.
 
       var timeInc = 50.0;
 
+      function createObj(tid, x, y)
+      {
+        var elem = document.getElementById(tid);
+        //if (elem.getAttribute("class") == "circle")
+        //  return new Circle(elem, x, y);
+        //else
+          return new Rect(elem, x, y);
+      }
+
       function init()
       {
         //bounds = document.getElementById("bounds");
 
         $("#brick").draggable();
+        $("#ball").draggable();
 
-        bouncer = document.getElementById("bouncer");
-        xVel = parseInt(document.getElementById("xVel").value);
-        yVel = parseInt(document.getElementById("yVel").value);
+        var xVel = parseInt(document.getElementById("xVel").value);
+        var yVel = parseInt(document.getElementById("yVel").value);
+        bouncer = createObj("bouncer", xVel, yVel);
 
-        outerBounds = makeBounds("#leftWall", "#topWall", "#rightWall", "#bottomWall");
+        for (i = 0; i < walls.length; i++)
+        {
+          walls[i] = createObj(walls[i], 0, 0);
+        }
 
-        run(0, 0);
+        //outerBounds = makeBounds("#leftWall", "#topWall", "#rightWall", "#bottomWall");
 
-        
+        run(0, 0);        
       }
 
       $(document).ready(init);
@@ -194,7 +275,7 @@ and open the template in the editor.
 
     <div style="width: 600px; height: 600px">
 
-      <div id="bouncer">
+      <div id="bouncer" class="circle">
         <input type="hidden" name="xVel" id="xVel" value="2"/>
         <input type="hidden" name="yVel" id="yVel" value="4"/>
       </div>
@@ -206,6 +287,10 @@ and open the template in the editor.
       <div id="bottomWall" class="rect" style="left: 0px; bottom: 0px; width: 100%; height: 40px"></div>
 
       <div id="brick" class="rect" style="left: 200px; top: 200px; width: 80px; height: 80px"></div>
+
+      <div id="ball" class="circle" style="left: 400px; top: 250px; width: 80px; height: 80px">
+        <img src="circle.jpg"/>
+      </div>
 
 
     </div>

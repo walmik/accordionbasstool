@@ -5,6 +5,7 @@
 //
 
 var SFBounds;
+
 var theInfoWin = null;
 var markersLoaded = false;
 var rootUL;
@@ -54,7 +55,7 @@ function acceptPosChange(pos)
   var acceptable = SFBounds.contains(pos);
   var statusText = (acceptable ? "" : "This is not a valid San Francisco address. Please try again");
 
-  document.getElementById("addressError").innerHTML = statusText;
+  $("#addressError").text(statusText);
 
   return acceptable;
 }
@@ -79,7 +80,7 @@ function updateInfoStatus()
   infoStr += "<b>" + globalUserAddress + "</b></i>";
   //infoStr += "<br/>  (" + globalNumVisible + " services shown on this map)";
 
-  document.getElementById("statusAddr").innerHTML = infoStr;
+  $("#statusAddr").html(infoStr);
 }
 
 var FilterData =
@@ -184,8 +185,12 @@ function addFilterCheck(index, folder)
   label.style.color = "#" + FilterData[folder.name].imageColor;
   label.appendChild(document.createTextNode("Show " + folder.name));
 
-  span.onmouseover = function() { $("#filter" + folder.name).removeClass("hidden"); }
-  span.onmouseout = function() { $("#filter" + folder.name).addClass("hidden"); }
+  span.onmouseover = function() {
+    $("#filter" + folder.name).removeClass("hidden");
+  }
+  span.onmouseout = function() {
+    $("#filter" + folder.name).addClass("hidden");
+  }
 }
 
 function round(value, decimal)
@@ -209,18 +214,10 @@ function computeMarkerDist()
       var pos = place.marker.getPosition();
       place.dist = google.maps.geometry.spherical.computeDistanceBetween(orig, pos);
 
-      var feet = place.dist * 3.2808399;
-      var units = "";
-      //            if (feet < 1024) {
-      //              place.distDesc = String(feet);
-      //              units = " ft.";
-      //            } else {
-      place.distDesc = String(feet / 1024);
-      units = " mi.";
-      //            }
-      place.distDesc = round(place.distDesc, 2);
-      place.distDesc += units;
-      place.distDesc += " Away";
+      var miles = place.dist / 1609.344;
+      place.distDesc = String(miles);
+      place.distDesc = round(place.distDesc, 1);
+      place.distDesc += "mi. Away";
     }
   }
 }
@@ -383,7 +380,7 @@ function createLI(place, i, j)
   var descText = getPlaceHtml(place, i, false);
 
   //newLI.innerHTML = "<a " + onclickSelectMarker + "href='#'>" + descText + "</a>";
-  newLI.innerHTML = "<div id='" + id + "' " + onclickSelectMarker + ">" + descText + "</div>";
+  $(newLI).html("<div id='" + id + "' " + onclickSelectMarker + ">" + descText + "</div>");
 
   //place.theLI = newLI;
 
@@ -459,8 +456,9 @@ function updateVisiblePlaceList()
   }
 
   var count = 0;
+  var accumHeight = 0;
+  var selFound = false;
   var bounds = geolib.getMap().getBounds();
-  var selElem;
 
   for (c = 0; c < rootUL.childNodes.length; c++)
   {
@@ -471,24 +469,27 @@ function updateVisiblePlaceList()
       continue;
     }
 
+    var selChild;
+
     var visible = isPlaceVisible(result.folder, result.place, bounds);
     if (visible) {
       count++;
-      //if (selectedPlaceId && (idStr == selectedPlaceId)) {
-      //  selElem = rootUL.childNodes[c];
-      //  rootUL.childNodes[c].setAttribute("class", "selectedPlace");
-      //  rootUL.childNodes[c].style.visibility = "visible";
-      //}
+      if (selectedPlaceId && (idStr == selectedPlaceId)) {
+        selChild = rootUL.childNodes[c];
+        selFound = true;
+      }
+      if (!selFound)
+        accumHeight += $(rootUL.childNodes[c]).height();
       $(rootUL.childNodes[c]).removeClass("hidden");
     } else {
       $(rootUL.childNodes[c]).addClass("hidden");
     }
   }
 
-  /*if (selElem) {
-          var scrollOff = $(selElem).position().top - $("#data_list").position().top;
-          $("#data_list").scrollTop(scrollOff);
-        }*/
+  if (selChild) {
+    //accumHeight += $("#data_list").position().top;
+    //$("#data_list").scrollTop(accumHeight);
+  }
 
   globalNumVisible = count;
   updateInfoStatus();
@@ -524,24 +525,11 @@ function buildVisiblePlaceList(pos)
   {
     var folder = DATA.Markers.Folder[i];
 
-    //if (!folder.name || !document.getElementById("checkbox" + folder.name).checked) {
-    //  continue;
-    //}
-
     for (j = 0; j < folder.Placemark.length; j++)
     {
 
       var place = folder.Placemark[j];
 
-      //if (!place.marker.getVisible()) {
-      //  continue;
-      //}
-      //
-      //if (!bounds.contains(place.marker.getPosition())) {
-      //  continue;
-      //}
-
-      //count++;
       createLI(place, i, j);
     }
   }
@@ -589,7 +577,8 @@ function loadAllMarkers()
           var divWrap = "<div id='" + idStr + "'> " + getPlaceHtml(place, i, true) + "</div>";
           win.setContent(divWrap);
           win.open(map, place.marker);
-        //setSelectedPlace(i, j);
+
+          selectedPlaceId = i + ", " + j;
         }
       }
 
@@ -602,7 +591,7 @@ function loadAllMarkers()
 
 function showClicked()
 {
-  document.getElementById("addressError").innerHTML = "";
+  $("addressError").text("");
   if (!geolib.syncToEnteredAddress()) {
     geolib.getMap().setCenter(geolib.getPos());
   }
@@ -633,18 +622,10 @@ $(document).ready(function()
     resizeToWidth: true
   });
 
-  //$("#data_list").height($("#leftDiv").height() - $("#data_list").position().top);
-
   $("#map_canvas").bind("resize", function()
   {
     google.maps.event.trigger(geolib.getMap(), "resize");
   });
-
-  /*$("#leftDiv").bind("resize", function()
-        {
-          $("#data_list").height($("#leftDiv").height() - $("#data_list").position().top);
-        });
-   */
 
   $("#data_list").height($("#floatSplitter").height() - $("#data_list").position().top);
 });

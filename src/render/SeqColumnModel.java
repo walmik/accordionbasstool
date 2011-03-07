@@ -17,9 +17,9 @@ import music.CollSequence;
 import music.FingerCombo;
 import music.FingerComboSequence;
 import music.FingerSearcher;
-import music.Interval;
-import music.Note;
-import music.StringParser;
+import music.core.Interval;
+import music.core.Note;
+import music.core.StringParser;
 
 public class SeqColumnModel extends DefaultTableColumnModel
 {

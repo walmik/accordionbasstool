@@ -19,9 +19,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import music.BassBoard;
 import music.BoardRow;
-import music.Chord;
-import music.NamedInterval;
-import music.Note;
+import music.core.Chord;
+import music.core.NamedInterval;
+import music.core.Note;
 
 /**
  *

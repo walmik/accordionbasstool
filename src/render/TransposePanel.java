@@ -16,8 +16,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.MenuElement;
 import javax.swing.MenuSelectionManager;
 import javax.swing.SpinnerListModel;
-import music.Interval;
-import music.NamedInterval;
+import music.core.Interval;
+import music.core.NamedInterval;
 
 /**
  *

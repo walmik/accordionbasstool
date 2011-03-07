@@ -3,6 +3,8 @@
  */
 package music;
 
+import music.core.Chord;
+import music.core.Note;
 import java.util.BitSet;
 
 public class ButtonCombo
