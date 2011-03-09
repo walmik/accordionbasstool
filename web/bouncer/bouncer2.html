@@ -1,0 +1,445 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/themes/base/jquery-ui.css" type="text/css" />
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js">
+    </script>
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js">
+    </script>
+
+    <script type="text/javascript" src="jquery.svg.js"></script>
+
+    <style type="text/css">
+      #thesvg {
+        width: 500px;
+        height: 500px;
+        display: block;
+        margin-left: 24px;
+        /*background-color: #888;*/
+        float: left;
+        margin-top: 12px;
+        overflow: hidden !important;
+      }
+
+      #controls {
+        margin: 20px;
+        padding: 8px;
+        background-color: #888;
+        float: left;
+      }
+
+      #bouncerControls {
+        margin: 20px;
+        padding: 8px;
+        background-color: #080;
+        float: left;
+      }
+    </style>
+
+    <script type="text/javascript">
+
+      //=======================================================================
+      // Math
+      //=======================================================================
+      Vec2 = function(initX, initY)
+      {
+        var x = initX;
+        var y = initY;
+
+        this.dot = function(v1, v2)
+        {
+          return v1.x * v2.x + v1.y * v2.y;
+        }
+
+        this.length = function()
+        {
+          return Math.sqrt(x, y);
+        }
+
+        this.scale = function(scaler)
+        {
+          x *= scaler;
+          y *= scaler;
+        }
+      }
+
+
+      var svgObj = null;
+      var outline = 2;
+
+      var theBouncer = null;
+
+      function init(svg)
+      {
+        svgObj = svg;
+        svgObj.root().setAttribute("onmousemove", "dragChange(evt, this);");
+        svgObj.root().setAttribute("onmouseup", "dragEnd(evt, this);");
+        svgObj.root().setAttribute("onmousedown", "emptyClick(evt);");
+
+        svgObj.root().setAttribute("width", "100%");
+        svgObj.root().setAttribute("height", "100%");
+
+        buildWalls(svg);
+
+        var dim = getSvgDimens();
+        theBouncer = makeCircle(dim.width / 2, dim.height / 2, 25);
+        theBouncer.setAttribute("fill", "#080");
+      }
+
+      function doResize(evt)
+      {
+        resizeWalls();
+      }
+
+      function makeRect(x, y, w, h, text, isfixed)
+      {
+        var params = {fill: 'white', stroke: 'black', strokeWidth: outline*2};
+        params.onmousedown = "dragStart(evt, this);";
+        //params.onmousemove = "dragChange(evt, this);";
+        //params.onmouseup = "dragEnd(evt, this);"
+        if (isfixed) {
+          params.fixed = true;
+        }
+
+        var gr = svgObj.group();
+        var obj = svgObj.rect(gr, x, y, w, h, params);
+        if (!text) {
+          text = "";
+        }
+        obj.setAttribute("notes", text);
+        makeText(gr, x + w/2, y + h/2, text);
+        return obj;
+      }
+
+      function makeCircle(x, y, r, text, isfixed)
+      {
+        var params = {fill: 'white', stroke: 'black', strokeWidth: outline*2};
+        params.onmousedown = "dragStart(evt, this);";
+        //params.onmousemove = "dragChange(evt, this);";
+        //params.onmouseup = "dragEnd(evt, this);"
+        if (isfixed) {
+          params.fixed = true;
+        }
+
+        var gr = svgObj.group();
+        var obj = svgObj.circle(gr, x, y, r, params);
+        if (!text) {
+          text = "";
+        }
+        obj.setAttribute("notes", text);
+        makeText(gr, x, y, text);
+        return obj;
+      }
+
+      function makeText(gr, x, y, text)
+      {
+        if (!text) {
+          text = "";
+        }
+        var obj = svgObj.text(gr, x, y, text, {"text-anchor" : "middle", 
+          "alignment-baseline" : "middle",
+          "onmousedown" : "dragStart(evt, this.previousSibling)"});
+      }
+
+      //======================================================================
+      // Mouse Dragging
+      //======================================================================
+
+      var lastDragOffset = null;
+      var draggedObj = null;
+      var selectedObj = null;
+
+      function getMousePos(evt)
+      {
+        return {x: evt.clientX, y: evt.clientY};
+      }
+
+      function selectShape(obj)
+      {
+        if (selectedObj != null) {
+          svgObj.change(selectedObj, {stroke: 'black'});
+        }
+
+        selectedObj = obj;
+
+        if (selectedObj != null) {
+          svgObj.change(selectedObj, {stroke: 'blue'});
+          setCurrShape(selectedObj.tagName, selectedObj);
+        }
+      }
+
+      function emptyClick(evt)
+      {
+        draggedObj = null;
+        addNew(evt.offsetX, evt.offsetY);
+      }
+
+      function addNew(x, y)
+      {
+        if (currShapeType == "circle") {
+          addCircle(x, y);
+        } else if (currShapeType == "rect") {
+          addRect(x, y);
+        } else {
+          selectShape(null);
+        }
+      }
+
+      function isFixed(obj)
+      {
+        return obj.getAttribute("fixed") == "true";
+      }
+
+      function dragStart(evt, obj)
+      {
+        selectShape(obj);
+        if (!isFixed(obj)) {
+          draggedObj = obj;
+          lastDragOffset = getMousePos(evt);
+        }
+        evt.stopPropagation();
+      }
+
+      function dragChange(evt, obj)
+      {
+        if (lastDragOffset != null) {
+          obj = draggedObj;
+          var newPos = getMousePos(evt);
+          var dx = newPos.x - lastDragOffset.x;
+          var dy = newPos.y - lastDragOffset.y;
+          translate(obj, dx, dy);
+          lastDragOffset = newPos;
+        }
+      }
+
+      function dragEnd(evt)
+      {
+        draggedObj = null;
+        lastDragOffset = null;
+      }
+
+      function translate(obj, dx, dy)
+      {
+        if ((obj.tagName == "rect") || (obj.tagName == "text")) {
+          var x = parseInt(obj.getAttribute("x"));
+          var y = parseInt(obj.getAttribute("y"));
+          svgObj.change(obj, {x: x + dx, y: y + dy});
+        } else if (obj.tagName == "circle") {
+          var x = parseInt(obj.getAttribute("cx"));
+          var y = parseInt(obj.getAttribute("cy"));
+          svgObj.change(obj, {cx: x + dx, cy: y + dy});
+        }
+
+        if (obj.nextSibling != null) {
+          translate(obj.nextSibling, dx, dy);
+        }
+      }
+
+      function getCenter(obj)
+      {
+        if ((obj.tagName == "rect")) {
+          var x = parseInt(obj.getAttribute("x"));
+          var y = parseInt(obj.getAttribute("y"));
+          var width = parseInt(obj.getAttribute("width"));
+          var height = parseInt(obj.getAttribute("height"));
+          return {x: x + width/2, y: y + height/2};
+        } else if (obj.tagName == "circle") {
+          var x = parseInt(obj.getAttribute("cx"));
+          var y = parseInt(obj.getAttribute("cy"));
+          return {x: x, y: y};
+        }
+      }
+
+      function getSvgDimens()
+      {
+        return {width:  $('#thesvg').outerWidth(),
+          height: $('#thesvg').outerHeight()};
+      }
+
+      //======================================================================
+      // Walls
+      //======================================================================
+      var walls = {};
+      var thickness = 20;
+
+      function resizeWalls()
+      {
+        var dimen = getSvgDimens();
+
+        //svgObj.root().setAttribute("width", newWidth);
+        //svgObj.root().setAttribute("height", newHeight);
+
+        svgObj.change(walls.top, {width: dimen.width - outline*2});
+
+        svgObj.change(walls.bottom, {y: dimen.height - outline - thickness,
+          width: dimen.width - outline*2});
+
+        svgObj.change(walls.left, {height: dimen.height - 2*outline});
+
+        svgObj.change(walls.right, {x: dimen.width - outline - thickness,
+          height: dimen.height - 2*outline});
+      }
+        
+      function buildWalls(svg) {
+        var divDimens = getSvgDimens();
+
+        walls.top = makeRect(outline, outline, divDimens.width - outline*2, thickness, "", true);
+        walls.bottom = makeRect(outline, divDimens.height - outline - thickness, divDimens.width - outline*2, thickness, "", true);
+        walls.left = makeRect(outline, outline, thickness, divDimens.height - 2*outline, "", true);
+        walls.right = makeRect(divDimens.width - outline - thickness, outline, thickness, divDimens.height - 2*outline, "", true);
+
+        //$(svgObj).bind("resize", resizeWalls);
+      }
+
+      //=======================================================================
+      //Add Shapes
+      //=======================================================================
+      function addCircle(x, y)
+      {
+        if (!x || !y) {
+          var divDimens = getSvgDimens();
+          x = divDimens.width / 2;
+          y = divDimens.height / 2;
+        }
+
+        var radius = $('#circleRadius').val();
+        var notes = $('#notes').val();
+        var obj = makeCircle(x, y, radius, notes);
+        selectShape(obj);
+      }
+
+      function addRect(x, y)
+      {
+        if (!x || !y) {
+          var divDimens = getSvgDimens();
+          x = divDimens.width / 2;
+          y = divDimens.height / 2;
+        }
+        var width = $('#rectWidth').val();
+        var height = $('#rectHeight').val();
+        var notes = $('#notes').val();
+        var obj = makeRect(x - width / 2, y - height / 2, width, height, notes);
+        selectShape(obj);
+      }
+
+      var currShapeType = "circle";
+      
+      function setCurrShape(shape, obj)
+      {
+        currShapeType = shape;
+        $("#rectWidth").attr("disabled", "disabled");
+        $("#rectHeight").attr("disabled", "disabled");
+        $("#circleRadius").attr("disabled", "disabled");
+        
+        if (currShapeType == "circle") {
+          $("#circleRadius").removeAttr("disabled");
+          if (obj) {
+            $("#circleRadius").val(obj.getAttribute("r"));
+          }
+        } else if (currShapeType == "rect") {
+          $("#rectWidth").removeAttr("disabled");
+          $("#rectHeight").removeAttr("disabled");
+          if (obj) {
+            $("#rectWidth").val(obj.getAttribute("width"));
+            $("#rectHeight").val(obj.getAttribute("height"));
+          }
+        }
+        if (obj) {
+          $("#notes").val(obj.getAttribute("notes"));
+        }
+      }
+
+      function updateCurrShape()
+      {
+        if ((selectedObj == null)) {
+          return;
+        }
+
+        if (!isFixed(selectedObj)) {
+          var center = getCenter(selectedObj);
+          deleteCurrShape();
+          addNew(center.x, center.y);
+          //          if (currShapeType == "circle") {
+          //            selectedObj.setAttribute("r", $("#circleRadius").val());
+          //          } else if (currShapeType == "rect") {
+          //            selectedObj.setAttribute("width", $("#rectWidth").val());
+          //            selectedObj.setAttribute("height", $("#rectHeight").val());
+          //          }
+        } else {
+          var noteStr = $("#notes").val();
+          if (!noteStr) {
+            noteStr = "";
+          }
+          selectedObj.setAttribute("notes", noteStr);
+          $(selectedObj.nextSibling).text(noteStr);
+        }
+      }
+
+      function deleteCurrShape()
+      {
+        if ((selectedObj != null) && !isFixed(selectedObj)) {
+          var gNode = selectedObj.parentNode;
+          gNode.parentNode.removeChild(gNode);
+        }
+      }
+      
+      $(document).ready(function()
+      {
+        $('#thesvg').resizable({resize: doResize});
+        $('#thesvg').svg({onLoad: init, onresize: doResize});
+
+        $("#radioCircle").click();
+      });
+
+    </script>
+  </head>
+  <body>
+
+    <div id="thesvg">
+    </div>
+
+    <div id="controls">
+      <table style="width: 300px">
+        <tr>
+          <td>
+            <input type="radio" id="radioCircle" name="shape" value="Circle" onclick="setCurrShape('circle')"/>Circle
+          </td>
+          <td>
+            Circle Radius: <input type="text" id="circleRadius" value="20"/>
+          </td>
+        </tr>
+        <tr>
+          <td><input type="radio" id="radioRect" name="shape" value="Rect" onclick="setCurrShape('rect')"/>Rect</td>
+
+          <td>Rect Width: <input type="text" id="rectWidth" value="40"/></td>
+          <td>Rect Height: <input type="text" id="rectHeight" value="40"/></td>
+        </tr>
+        <tr>
+          <td>
+            <span style="font-size: larger">
+              Notes: <input style="font-size: larger" type="text" id="notes" value="C"/>
+            </span>
+          </td>
+          <td>
+            <input type="button" value="Update Selected" onclick="updateCurrShape()"/>
+            <input type="button" value="Delete Selected" onclick="deleteCurrShape()"/>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="bouncerControls">
+      X: <input type="text" value="1"/>
+      Y: <input type="text" value="1"/>
+    </div>
+
+  </body>
+</html>
