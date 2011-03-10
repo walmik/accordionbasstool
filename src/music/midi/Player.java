@@ -144,7 +144,7 @@ public class Player implements ActionListener
     return null;
   }
 
-  int lowCValue;
+  int lowCValue = 48;
 
   public void setLowCValue(int val)
   {
