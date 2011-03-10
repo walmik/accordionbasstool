@@ -58,7 +58,7 @@ public class StringParser
     return note;
   }
 
-  public Chord parseNoteList()
+  public Note[] parseNoteListArray()
   {
     Vector<Note> notes = new Vector<Note>();
     Note newNote;
@@ -73,7 +73,14 @@ public class StringParser
     }
 
     Note[] noteArray = new Note[notes.size()];
-    return new Chord(notes.toArray(noteArray));
+    notes.toArray(noteArray);
+    return noteArray;
+  }
+
+  public Chord parseNoteList()
+  {
+    Note[] noteArray = parseNoteListArray();
+    return new Chord(noteArray);
   }
 
   public char nextChar()

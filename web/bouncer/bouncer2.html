@@ -20,8 +20,8 @@ and open the template in the editor.
 
     <style type="text/css">
       #thesvg {
-        width: 500px;
-        height: 500px;
+        width: 600px;
+        height: 400px;
         display: block;
         margin-left: 24px;
         /*background-color: #888;*/
@@ -37,15 +37,48 @@ and open the template in the editor.
         float: left;
       }
 
-      #bouncerControls {
+      #velControls {
         margin: 20px;
         padding: 8px;
         background-color: #080;
         float: left;
       }
+
+      #otherControls {
+        margin: 20px;
+        padding: 8px;
+        background-color: #026;
+        float: left;
+      }
     </style>
 
     <script type="text/javascript">
+
+      //=======================================================================
+      // Link List of Shapes
+      //=======================================================================
+      var firstShape = {next: null, prev: null};
+
+      function listAdd(obj)
+      {
+        firstShape.prev = obj;
+        obj.prev = null;
+        obj.next = firstShape;
+        firstShape = obj;
+      }
+
+      function listRemove(obj)
+      {
+        if (obj.prev != null) {
+          obj.prev.next = obj.next;
+        }
+        if (obj.next != null) {
+          obj.next.prev = obj.prev;
+        }
+        if (obj == firstShape) {
+          firstShape = obj.next;
+        }
+      }
 
       //=======================================================================
       // Math
@@ -54,21 +87,273 @@ and open the template in the editor.
       {
         var x = initX;
         var y = initY;
+        this.x = x;
+        this.y = y;
 
-        this.dot = function(v1, v2)
+        this.dot = function(v2)
         {
-          return v1.x * v2.x + v1.y * v2.y;
+          return this.x * v2.x + this.y * v2.y;
         }
 
         this.length = function()
         {
-          return Math.sqrt(x, y);
+          return Math.sqrt(this.lengthSquared());
+        }
+
+        this.lengthSquared = function()
+        {
+          return this.x * this.x + this.y * this.y;
         }
 
         this.scale = function(scaler)
         {
-          x *= scaler;
-          y *= scaler;
+          this.x *= scaler;
+          this.y *= scaler;
+        }
+
+        this.sub = function(v1, v2)
+        {
+          this.x = v1.x - v2.x;
+          this.y = v1.y - v2.y;
+        }
+
+        this.normalize = function()
+        {
+          var len = this.length();
+          if (len > 0) {
+            this.scale(1.0 / len);
+          }
+        }
+      }
+
+      function pointDistance(A, B)
+      {
+        var dx = A.x - B.x;
+        var dy = A.y - B.y;
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      function rectRectCollision(bouncer, other, vel)
+      {
+        var xD, yD;
+        var xD2, yD2;
+
+        xD =  other.right - bouncer.left;
+        xD2 = bouncer.right - other.left;
+
+        yD =  other.bottom - bouncer.top;
+        yD2 = bouncer.bottom - other.top;
+
+        xD -= vel.x;
+        yD -= vel.y;
+        xD2 += vel.x;
+        yD2 += vel.y;
+
+        var t = 0.0;
+
+        if ((xD > 0) && (yD > 0) && (yD2 > 0) && (xD2 > 0)) {
+          xD = Math.min(xD, xD2);
+          yD = Math.min(yD, yD2);
+          //Intersecting, check smallest
+          if (xD < yD) {
+            // Intersect in X first
+            t = (xD / Math.abs(vel.x));
+            vel.x = -vel.x;
+          } else {
+            // Intersect in Y first
+            t = (yD / Math.abs(vel.y));
+            vel.y = -vel.y;
+          }
+        }
+        t = 1.0 - t;
+        return t;
+      }
+
+      function circleRectCollision(bouncer, other, vel)
+      {
+        //TODO:
+        return rectRectCollision(bouncer, other, vel);
+      }
+
+      //Implementation based on algo from Gamasutra article
+      //"Pool Hall Lessons: Fast, Accurate Collision Detection Between Circles or Spheres""
+      //by Joe van den Heuvel, Miles Jackson
+      //
+      //http://www.gamasutra.com/view/feature/3015/pool_hall_lessons_fast_accurate_.php
+      function circleCircleCollision(bouncer, other, velocity)
+      {
+        var circleDist = pointDistance(other.center, bouncer.center);
+
+        var sumRadii = (other.radius + bouncer.radius);
+        var speed = velocity.length();
+
+        // Diff
+        var C = new Vec2();
+        C.sub(other.center, bouncer.center);
+
+        if (speed < (circleDist - sumRadii)) {
+          return 1.0;
+        }
+
+        // Normalized dir
+        var direction = new Vec2(velocity.x, velocity.y);
+        direction.scale(1.0 / speed);
+
+        // Check direction
+        var D = direction.dot(C);
+
+        if (D <= 0) {
+          return 1.0;
+        }
+
+        var F = C.lengthSquared() - (D * D);
+
+        // Escape test: if the closest that A will get to B
+        // is more than the sum of their radii, there's no
+        // way they are going collide
+        var sumRadiiSquared = sumRadii * sumRadii;
+        if (F >= sumRadiiSquared) {
+          return 1.0;
+        }
+
+        // We now have F and sumRadii, two sides of a right triangle.
+        // Use these to find the third side, sqrt(T)
+        var T = sumRadiiSquared - F;
+
+        // If there is no such right triangle with sides length of
+        // sumRadii and sqrt(f), T will probably be less than 0.
+        // Better to check now than perform a square root of a
+        // negative number.
+        if (T < 0) {
+          return 1.0;
+        }
+
+        // Therefore the distance the circle has to travel along
+        // movevec is D - sqrt(T)
+        var collisionDistance = (D - Math.sqrt(T));
+
+        // Get the magnitude of the movement vector
+        //double mag = movevec.Magnitude();
+
+        // Finally, make sure that the distance A has to move
+        // to touch B is not greater than the magnitude of the
+        // movement vector.
+        if (speed < collisionDistance) {
+          return 1.0;
+        }
+
+        // Set new velocity to circle normal
+        velocity.x = C.x;
+        velocity.y = C.y;
+        velocity.normalize();
+        velocity.scale(-speed);
+
+        return (collisionDistance / speed);
+      }
+
+      function intersect(bouncer, other, vel)
+      {
+        if ((bouncer.tagName == "circle")) {
+          if (other.tagName == "circle") {
+            return circleCircleCollision(getBounds(bouncer), getBounds(other), vel);
+          } else if (other.tagName == "rect") {
+            return circleRectCollision(getBounds(bouncer), getBounds(other), vel);
+          }
+        }        
+      }
+
+      //=======================================================================
+      // Simulation
+      //=======================================================================
+
+      var timeInc = 10;
+      var velocity = null;
+      var nextVel = null;
+      var isPaused = false;
+
+      function run()
+      {
+        if (theBouncer != draggedObj) {
+          translate(theBouncer, velocity.x, velocity.y);
+        }
+        
+        if (nextVel != null) {
+          velocity.x = nextVel.x;
+          velocity.y = nextVel.y;
+          $("#velX").val(velocity.x);
+          $("#velY").val(velocity.y);
+          nextVel = null;
+        }
+
+        //var bounds = bouncer.getBounds(bouncer.xVel, bouncer.yVel);
+        //var vel = bouncer.vel;
+        var newVel = null;
+        var minT = 1.0;
+        var collShape = null;
+        
+        var currShape = firstShape;
+
+        while (currShape.next != null) {
+
+          var currVel = new Vec2(velocity.x, velocity.y);
+          var t = intersect(theBouncer, currShape, currVel);
+          if (t < minT) {
+            minT = t;
+            newVel = currVel;
+            collShape = currShape;
+          }
+         
+          currShape = currShape.next;
+        }
+
+        if (collShape != null) {
+          velocity.x = (velocity.x * minT);
+          velocity.y = (velocity.y * minT);
+          nextVel = newVel;
+          onIntersect(collShape);
+        }
+
+        if (!isPaused) {
+          setTimeout("run()", timeInc);
+        }
+      }
+
+      function onIntersect(obj)
+      {
+        var note = incNote(obj);
+        if (note != null) {
+          document.midiPlayer.playNote(note, 500, 0);
+        }
+      }
+
+      function togglePause()
+      {
+        isPaused = !isPaused;
+        if (!isPaused) {
+          run();
+        }
+      }
+
+      function resetBouncer()
+      {
+        var dim = getSvgDimens();
+        svgObj.change(theBouncer, {x: dim.width/2, y: dim.height/2});
+      }
+
+      function changeSlopeSpeed()
+      {
+        var newX = parseInt($("#velX").val());
+        var newY = parseInt($("#velY").val());
+        var newInc = parseInt($("#timeInc").val());
+
+
+        if (!isNaN(newInc)) {
+          timeInc = newInc;
+        }
+        
+        if (!isNaN(newX) && !isNaN(newY)) {
+          velocity.x = newX;
+          velocity.y = newY;
         }
       }
 
@@ -78,21 +363,48 @@ and open the template in the editor.
 
       var theBouncer = null;
 
+      function keyDown(evt)
+      {
+        var code = evt.keyCode;
+        if (!code) {
+          code = evt.which;
+        }
+
+        if ((code == 8) || (code == 46)) {
+          deleteCurrShape();
+          evt.stopPropagation();
+          evt.preventDefault();
+        }
+      }
+
       function init(svg)
       {
         svgObj = svg;
         svgObj.root().setAttribute("onmousemove", "dragChange(evt, this);");
         svgObj.root().setAttribute("onmouseup", "dragEnd(evt, this);");
         svgObj.root().setAttribute("onmousedown", "emptyClick(evt);");
+        //svgObj.root().setAttribute("onkeydown", "keyDown(evt)");
 
         svgObj.root().setAttribute("width", "100%");
         svgObj.root().setAttribute("height", "100%");
 
         buildWalls(svg);
+        
+        velocity = new Vec2(4, 4);
+
+        document.midiPlayer.setInstrument("Trumpet");
+        setNotesText(walls.left, "A,C, E");
+        setNotesText(walls.top, "D, F, A");
+        setNotesText(walls.right, "A,C,E");
+        setNotesText(walls.bottom, "E,G#,B");
 
         var dim = getSvgDimens();
-        theBouncer = makeCircle(dim.width / 2, dim.height / 2, 25);
+        theBouncer = makeCircle(dim.width / 2 + 10, dim.height / 2 + 20, 25);
         theBouncer.setAttribute("fill", "#080");
+
+        //listAdd(addCircle(50, 50));
+
+        run();
       }
 
       function doResize(evt)
@@ -115,8 +427,8 @@ and open the template in the editor.
         if (!text) {
           text = "";
         }
-        obj.setAttribute("notes", text);
-        makeText(gr, x + w/2, y + h/2, text);
+        makeText(gr, x + w/2, y + h/2);
+        setNotesText(obj, text);
         return obj;
       }
 
@@ -132,22 +444,55 @@ and open the template in the editor.
 
         var gr = svgObj.group();
         var obj = svgObj.circle(gr, x, y, r, params);
+
         if (!text) {
           text = "";
         }
-        obj.setAttribute("notes", text);
-        makeText(gr, x, y, text);
+        
+        makeText(gr, x, y);
+        setNotesText(obj, text);
         return obj;
       }
 
-      function makeText(gr, x, y, text)
+      function makeText(gr, x, y)
+      {
+        var obj = svgObj.text(gr, x, y, "", {"text-anchor" : "middle",
+          "alignment-baseline" : "middle",
+          "onmousedown" : "dragStart(evt, this.previousSibling)"});
+      }
+
+      function setNotesText(obj, text)
       {
         if (!text) {
           text = "";
+        } else {
+          text = String(text);
         }
-        var obj = svgObj.text(gr, x, y, text, {"text-anchor" : "middle", 
-          "alignment-baseline" : "middle",
-          "onmousedown" : "dragStart(evt, this.previousSibling)"});
+
+        obj.allNotes = text.split(",");
+        
+        if (obj.allNotes.length > 0) {
+          obj.noteIndex = 0;
+          obj.currNote = obj.allNotes[0];
+        } else {
+          obj.noteIndex = -1;
+          obj.currNote = "";
+        }
+
+        $(obj.nextSibling).text(obj.currNote);
+      }
+
+      function incNote(obj)
+      {
+        if ((obj.noteIndex != null) && (obj.noteIndex >= 0)) {
+          obj.noteIndex = (obj.noteIndex + 1) % obj.allNotes.length;
+          var note = obj.currNote;
+          obj.currNote = obj.allNotes[obj.noteIndex];
+          $(obj.nextSibling).text(obj.currNote);
+          return note;
+        }
+
+        return null;
       }
 
       //======================================================================
@@ -180,15 +525,16 @@ and open the template in the editor.
       function emptyClick(evt)
       {
         draggedObj = null;
-        addNew(evt.offsetX, evt.offsetY);
+        var off = $("#thesvg").offset();
+        addNew(evt.clientX - off.left, evt.clientY - off.top);
       }
 
       function addNew(x, y)
       {
         if (currShapeType == "circle") {
-          addCircle(x, y);
+          listAdd(addCircle(x, y));
         } else if (currShapeType == "rect") {
-          addRect(x, y);
+          listAdd(addRect(x, y));
         } else {
           selectShape(null);
         }
@@ -259,6 +605,34 @@ and open the template in the editor.
         }
       }
 
+      function getBounds(obj)
+      {
+        if ((obj.tagName == "rect")) {
+          var x = parseInt(obj.getAttribute("x"));
+          var y = parseInt(obj.getAttribute("y"));
+          var width = parseInt(obj.getAttribute("width")) - 1;
+          var height = parseInt(obj.getAttribute("height")) - 1;
+          return {left: x,
+            right: x + width,
+            top: y,
+            bottom: y + height,
+            center: {x: x + width/2, y: y + height/2}
+          };
+
+        } else if (obj.tagName == "circle") {
+          var cx = parseInt(obj.getAttribute("cx"));
+          var cy = parseInt(obj.getAttribute("cy"));
+          var r = parseInt(obj.getAttribute("r"));
+          return {left: cx - r,
+            right: cx + r - 1,
+            top: cy - r,
+            bottom: cy + r - 1,
+            center: {x: cx, y: cy},
+            radius: r
+          };
+        }
+      }
+
       function getSvgDimens()
       {
         return {width:  $('#thesvg').outerWidth(),
@@ -270,6 +644,13 @@ and open the template in the editor.
       //======================================================================
       var walls = {};
       var thickness = 20;
+
+      function updateTextPos(obj)
+      {
+        var center = getCenter(obj);
+        var textObj = obj.nextSibling;
+        svgObj.change(textObj, {x: center.x, y: center.y});
+      }
 
       function resizeWalls()
       {
@@ -287,6 +668,11 @@ and open the template in the editor.
 
         svgObj.change(walls.right, {x: dimen.width - outline - thickness,
           height: dimen.height - 2*outline});
+
+        updateTextPos(walls.top);
+        updateTextPos(walls.left);
+        updateTextPos(walls.right);
+        updateTextPos(walls.bottom);
       }
         
       function buildWalls(svg) {
@@ -297,6 +683,10 @@ and open the template in the editor.
         walls.left = makeRect(outline, outline, thickness, divDimens.height - 2*outline, "", true);
         walls.right = makeRect(divDimens.width - outline - thickness, outline, thickness, divDimens.height - 2*outline, "", true);
 
+        listAdd(walls.top);
+        listAdd(walls.bottom);
+        listAdd(walls.left);
+        listAdd(walls.right);
         //$(svgObj).bind("resize", resizeWalls);
       }
 
@@ -315,6 +705,7 @@ and open the template in the editor.
         var notes = $('#notes').val();
         var obj = makeCircle(x, y, radius, notes);
         selectShape(obj);
+        return obj;
       }
 
       function addRect(x, y)
@@ -329,6 +720,7 @@ and open the template in the editor.
         var notes = $('#notes').val();
         var obj = makeRect(x - width / 2, y - height / 2, width, height, notes);
         selectShape(obj);
+        return obj;
       }
 
       var currShapeType = "circle";
@@ -354,7 +746,7 @@ and open the template in the editor.
           }
         }
         if (obj) {
-          $("#notes").val(obj.getAttribute("notes"));
+          $("#notes").val(obj.allNotes);
         }
       }
 
@@ -364,37 +756,60 @@ and open the template in the editor.
           return;
         }
 
-        if (!isFixed(selectedObj)) {
+        var updateNote = false;
+
+        if (currShapeType == selectedObj.tagName) {
+          if (currShapeType == "circle") {
+            selectedObj.setAttribute("r", $("#circleRadius").val());
+          } else if (currShapeType == "rect") {
+            selectedObj.setAttribute("width", $("#rectWidth").val());
+            selectedObj.setAttribute("height", $("#rectHeight").val());
+          }
+          updateNote = (selectedObj != theBouncer);
+        } else if (isDeletable(selectedObj)) {
           var center = getCenter(selectedObj);
           deleteCurrShape();
           addNew(center.x, center.y);
-          //          if (currShapeType == "circle") {
-          //            selectedObj.setAttribute("r", $("#circleRadius").val());
-          //          } else if (currShapeType == "rect") {
-          //            selectedObj.setAttribute("width", $("#rectWidth").val());
-          //            selectedObj.setAttribute("height", $("#rectHeight").val());
-          //          }
-        } else {
+        }
+        
+        if (updateNote) {
           var noteStr = $("#notes").val();
           if (!noteStr) {
             noteStr = "";
           }
-          selectedObj.setAttribute("notes", noteStr);
-          $(selectedObj.nextSibling).text(noteStr);
+          setNotesText(selectedObj, noteStr);
         }
+      }
+
+      function isDeletable(obj)
+      {
+        return ((theBouncer != obj) && !isFixed(obj));
       }
 
       function deleteCurrShape()
       {
-        if ((selectedObj != null) && !isFixed(selectedObj)) {
+        if ((selectedObj != null) && isDeletable(selectedObj)) {
           var gNode = selectedObj.parentNode;
+          listRemove(selectedObj);
           gNode.parentNode.removeChild(gNode);
         }
+        selectShape(null);
       }
       
       $(document).ready(function()
       {
         $('#thesvg').resizable({resize: doResize});
+
+        $("#thesvg").keydown(keyDown);
+
+        //        $("input[type='text']").each(function(index, obj)
+        //        {
+        //          $(obj).keydown(function(evt)
+        //          {
+        //            evt.stopPropagation();
+        //          });
+        //        });
+
         $('#thesvg').svg({onLoad: init, onresize: doResize});
 
         $("#radioCircle").click();
@@ -404,7 +819,7 @@ and open the template in the editor.
   </head>
   <body>
 
-    <div id="thesvg">
+    <div id="thesvg" tabindex="0">
     </div>
 
     <div id="controls">
@@ -414,7 +829,7 @@ and open the template in the editor.
             <input type="radio" id="radioCircle" name="shape" value="Circle" onclick="setCurrShape('circle')"/>Circle
           </td>
           <td>
-            Circle Radius: <input type="text" id="circleRadius" value="20"/>
+            Circle Radius: <input type="text" id="circleRadius" value="40"/>
           </td>
         </tr>
         <tr>
@@ -436,9 +851,25 @@ and open the template in the editor.
         </tr>
       </table>
     </div>
-    <div id="bouncerControls">
-      X: <input type="text" value="1"/>
-      Y: <input type="text" value="1"/>
+    <div id="velControls">
+      X: <input id="velX" type="text" value="1"/>
+      Y: <input id="velY "type="text" value="1"/>
+      <br/>Bounce Speed<input id="timeInc" type="text" value="10"/>
+      <input type="button" value="Change" onclick="changeSlopeSpeed()"/>
+    </div>
+    <br/>
+    <div id="otherControls">
+      <input type="button" value="Pause/Unpause" onclick="togglePause()"/>
+      <input type="button" value="Reset Bouncer" onclick="resetBouncer()"/>
+    </div>
+    <div id="soundApplet">
+      <applet code="music.midi.PlayerApplet"
+              name="midiPlayer"
+              alt="Java 6 or later is requested"
+              mayscript="true"
+              archive="../AccordTools.jar"
+              width="235" height="80">
+      </applet>
     </div>
 
   </body>

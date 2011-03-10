@@ -70,10 +70,20 @@ public class Player implements ActionListener
     }
   }
 
-//  public Synthesizer getSynth()
-//  {
-//    return synth;
-//  }
+  @Override
+  public void finalize()
+  {
+    if (synth != null) {
+      stopAll();
+      synth.close();
+    }
+  }
+
+  public int getMaxVolume()
+  {
+    return 128;
+  }
+
   public Instrument[] getInstruments()
   {
     if (customBank != null) {
@@ -134,9 +144,16 @@ public class Player implements ActionListener
     return null;
   }
 
+  int lowCValue;
+
+  public void setLowCValue(int val)
+  {
+    lowCValue = Math.min(Math.max(val, 24), 88);
+  }
+
   int bitToMidi(int bit)
   {
-    return bit + 48;// + 24 * (bit / Note.NUM_HALFSTEPS);
+    return bit + lowCValue;// + 24 * (bit / Note.NUM_HALFSTEPS);
   }
   int chanUsed = 0;
 
