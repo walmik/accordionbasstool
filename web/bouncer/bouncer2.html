@@ -85,14 +85,12 @@ and open the template in the editor.
       //=======================================================================
       Vec2 = function(initX, initY)
       {
-        var x = initX;
-        var y = initY;
-        this.x = x;
-        this.y = y;
+        this.x = initX;
+        this.y = initY;
 
-        this.dot = function(v2)
+        this.dot = function(other)
         {
-          return this.x * v2.x + this.y * v2.y;
+          return this.x * other.x + this.y * other.y;
         }
 
         this.length = function()
@@ -133,7 +131,7 @@ and open the template in the editor.
         return Math.sqrt(dx * dx + dy * dy);
       }
 
-      function rectRectCollision(bouncer, other, vel)
+      function rectRectCollision(bouncer, other, vel, otherName)
       {
         var xD, yD;
         var xD2, yD2;
@@ -169,10 +167,10 @@ and open the template in the editor.
         return t;
       }
 
-      function circleRectCollision(bouncer, other, vel)
+      function circleRectCollision(bouncer, other, vel, otherName)
       {
         //TODO:
-        return rectRectCollision(bouncer, other, vel);
+        return rectRectCollision(bouncer, other, vel, otherName);
       }
 
       //Implementation based on algo from Gamasutra article
@@ -180,12 +178,12 @@ and open the template in the editor.
       //by Joe van den Heuvel, Miles Jackson
       //
       //http://www.gamasutra.com/view/feature/3015/pool_hall_lessons_fast_accurate_.php
-      function circleCircleCollision(bouncer, other, velocity)
+      function circleCircleCollision(bouncer, other, vel, otherName)
       {
         var circleDist = pointDistance(other.center, bouncer.center);
 
         var sumRadii = (other.radius + bouncer.radius);
-        var speed = velocity.length();
+        var speed = vel.length();
 
         // Diff
         var C = new Vec2();
@@ -196,7 +194,7 @@ and open the template in the editor.
         }
 
         // Normalized dir
-        var direction = new Vec2(velocity.x, velocity.y);
+        var direction = new Vec2(vel.x, vel.y);
         direction.scale(1.0 / speed);
 
         // Check direction
@@ -243,10 +241,10 @@ and open the template in the editor.
         }
 
         // Set new velocity to circle normal
-        velocity.x = C.x;
-        velocity.y = C.y;
-        velocity.normalize();
-        velocity.scale(-speed);
+        vel.x = C.x;
+        vel.y = C.y;
+        vel.normalize();
+        vel.scale(-speed);
 
         return (collisionDistance / speed);
       }
@@ -255,9 +253,9 @@ and open the template in the editor.
       {
         if ((bouncer.tagName == "circle")) {
           if (other.tagName == "circle") {
-            return circleCircleCollision(getBounds(bouncer), getBounds(other), vel);
+            return circleCircleCollision(getBounds(bouncer), getBounds(other), vel, other.name);
           } else if (other.tagName == "rect") {
-            return circleRectCollision(getBounds(bouncer), getBounds(other), vel);
+            return circleRectCollision(getBounds(bouncer), getBounds(other), vel, other.name);
           }
         }        
       }
@@ -280,8 +278,10 @@ and open the template in the editor.
         if (nextVel != null) {
           velocity.x = nextVel.x;
           velocity.y = nextVel.y;
-          $("#velX").val(velocity.x);
           $("#velY").val(velocity.y);
+          $("#velX").val(velocity.x);
+//          if (typeof(velocity) != "number")
+//          alert((typeof(velocity.y) + " " + typeof(velocity.x)));
           nextVel = null;
         }
 
@@ -337,14 +337,14 @@ and open the template in the editor.
       function resetBouncer()
       {
         var dim = getSvgDimens();
-        svgObj.change(theBouncer, {x: dim.width/2, y: dim.height/2});
+        svgObj.change(theBouncer, {cx: dim.width/2.0, cy: dim.height/2.0});
       }
 
       function changeSlopeSpeed()
       {
-        var newX = parseInt($("#velX").val());
-        var newY = parseInt($("#velY").val());
-        var newInc = parseInt($("#timeInc").val());
+        var newX = parseFloat($("#velX").val());
+        var newY = parseFloat($("#velY").val());
+        var newInc = parseFloat($("#timeInc").val());
 
 
         if (!isNaN(newInc)) {
@@ -399,8 +399,10 @@ and open the template in the editor.
         setNotesText(walls.bottom, "E,G#,B");
 
         var dim = getSvgDimens();
-        theBouncer = makeCircle(dim.width / 2 + 10, dim.height / 2 + 20, 25);
+        theBouncer = makeCircle(dim.width / 2 + 10, dim.height / 2 + 20, $("#circleRadius").val());
         theBouncer.setAttribute("fill", "#080");
+
+        changeSlopeSpeed()
 
         //listAdd(addCircle(50, 50));
 
@@ -412,7 +414,7 @@ and open the template in the editor.
         resizeWalls();
       }
 
-      function makeRect(x, y, w, h, text, isfixed)
+      function makeRect(x, y, w, h, text, isfixed, name)
       {
         var params = {fill: 'white', stroke: 'black', strokeWidth: outline*2};
         params.onmousedown = "dragStart(evt, this);";
@@ -427,12 +429,15 @@ and open the template in the editor.
         if (!text) {
           text = "";
         }
+        if (name) {
+          obj.name = name;
+        }
         makeText(gr, x + w/2, y + h/2);
         setNotesText(obj, text);
         return obj;
       }
 
-      function makeCircle(x, y, r, text, isfixed)
+      function makeCircle(x, y, r, text, isfixed, name)
       {
         var params = {fill: 'white', stroke: 'black', strokeWidth: outline*2};
         params.onmousedown = "dragStart(evt, this);";
@@ -441,12 +446,14 @@ and open the template in the editor.
         if (isfixed) {
           params.fixed = true;
         }
-
         var gr = svgObj.group();
         var obj = svgObj.circle(gr, x, y, r, params);
 
         if (!text) {
           text = "";
+        }
+        if (name) {
+          obj.name = name;
         }
         
         makeText(gr, x, y);
@@ -576,12 +583,12 @@ and open the template in the editor.
       function translate(obj, dx, dy)
       {
         if ((obj.tagName == "rect") || (obj.tagName == "text")) {
-          var x = parseInt(obj.getAttribute("x"));
-          var y = parseInt(obj.getAttribute("y"));
+          var x = parseFloat(obj.getAttribute("x"));
+          var y = parseFloat(obj.getAttribute("y"));
           svgObj.change(obj, {x: x + dx, y: y + dy});
         } else if (obj.tagName == "circle") {
-          var x = parseInt(obj.getAttribute("cx"));
-          var y = parseInt(obj.getAttribute("cy"));
+          var x = parseFloat(obj.getAttribute("cx"));
+          var y = parseFloat(obj.getAttribute("cy"));
           svgObj.change(obj, {cx: x + dx, cy: y + dy});
         }
 
@@ -593,14 +600,14 @@ and open the template in the editor.
       function getCenter(obj)
       {
         if ((obj.tagName == "rect")) {
-          var x = parseInt(obj.getAttribute("x"));
-          var y = parseInt(obj.getAttribute("y"));
-          var width = parseInt(obj.getAttribute("width"));
-          var height = parseInt(obj.getAttribute("height"));
-          return {x: x + width/2, y: y + height/2};
+          var x = parseFloat(obj.getAttribute("x"));
+          var y = parseFloat(obj.getAttribute("y"));
+          var width = parseFloat(obj.getAttribute("width"));
+          var height = parseFloat(obj.getAttribute("height"));
+          return {x: x + width/2.0, y: y + height/2.0};
         } else if (obj.tagName == "circle") {
-          var x = parseInt(obj.getAttribute("cx"));
-          var y = parseInt(obj.getAttribute("cy"));
+          var x = parseFloat(obj.getAttribute("cx"));
+          var y = parseFloat(obj.getAttribute("cy"));
           return {x: x, y: y};
         }
       }
@@ -608,25 +615,25 @@ and open the template in the editor.
       function getBounds(obj)
       {
         if ((obj.tagName == "rect")) {
-          var x = parseInt(obj.getAttribute("x"));
-          var y = parseInt(obj.getAttribute("y"));
-          var width = parseInt(obj.getAttribute("width")) - 1;
-          var height = parseInt(obj.getAttribute("height")) - 1;
+          var x = parseFloat(obj.getAttribute("x"));
+          var y = parseFloat(obj.getAttribute("y"));
+          var width = parseFloat(obj.getAttribute("width")) - 1;
+          var height = parseFloat(obj.getAttribute("height")) - 1;
           return {left: x,
             right: x + width,
             top: y,
             bottom: y + height,
-            center: {x: x + width/2, y: y + height/2}
+            center: {x: x + width/2.0, y: y + height/2.0}
           };
 
         } else if (obj.tagName == "circle") {
-          var cx = parseInt(obj.getAttribute("cx"));
-          var cy = parseInt(obj.getAttribute("cy"));
-          var r = parseInt(obj.getAttribute("r"));
+          var cx = parseFloat(obj.getAttribute("cx"));
+          var cy = parseFloat(obj.getAttribute("cy"));
+          var r = parseFloat(obj.getAttribute("r"));
           return {left: cx - r,
-            right: cx + r - 1,
+            right: cx + r - 1.0,
             top: cy - r,
-            bottom: cy + r - 1,
+            bottom: cy + r - 1.0,
             center: {x: cx, y: cy},
             radius: r
           };
@@ -678,10 +685,10 @@ and open the template in the editor.
       function buildWalls(svg) {
         var divDimens = getSvgDimens();
 
-        walls.top = makeRect(outline, outline, divDimens.width - outline*2, thickness, "", true);
-        walls.bottom = makeRect(outline, divDimens.height - outline - thickness, divDimens.width - outline*2, thickness, "", true);
-        walls.left = makeRect(outline, outline, thickness, divDimens.height - 2*outline, "", true);
-        walls.right = makeRect(divDimens.width - outline - thickness, outline, thickness, divDimens.height - 2*outline, "", true);
+        walls.top = makeRect(outline, outline, divDimens.width - outline*2, thickness, "", true, "top");
+        walls.bottom = makeRect(outline, divDimens.height - outline - thickness, divDimens.width - outline*2, thickness, "", true, "bottom");
+        walls.left = makeRect(outline, outline, thickness, divDimens.height - 2*outline, "", true, "left");
+        walls.right = makeRect(divDimens.width - outline - thickness, outline, thickness, divDimens.height - 2*outline, "", true, "right");
 
         listAdd(walls.top);
         listAdd(walls.bottom);
@@ -852,8 +859,8 @@ and open the template in the editor.
       </table>
     </div>
     <div id="velControls">
-      X: <input id="velX" type="text" value="1"/>
-      Y: <input id="velY "type="text" value="1"/>
+      X: <input id="velX" type="text" value="2"/>
+      Y: <input id="velY" type="text" value="5"/>
       <br/>Bounce Speed<input id="timeInc" type="text" value="10"/>
       <input type="button" value="Change" onclick="changeSlopeSpeed()"/>
     </div>
@@ -862,6 +869,7 @@ and open the template in the editor.
       <input type="button" value="Pause/Unpause" onclick="togglePause()"/>
       <input type="button" value="Reset Bouncer" onclick="resetBouncer()"/>
     </div>
+    <br/>
     <div id="soundApplet">
       <applet code="music.midi.PlayerApplet"
               name="midiPlayer"

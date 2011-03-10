@@ -75,6 +75,22 @@ public class PlayerApplet extends javax.swing.JApplet implements Runnable
     doSetLowC();
   }
 
+  @Override
+  public void stop()
+  {
+    if (player != null) {
+      player.stopAll();
+    }
+  }
+
+  @Override
+  public void finalize()
+  {
+    if (player != null) {
+      player.stopAll();
+    }
+  }
+
 //  public String[] parseNotes(String string)
 //  {
 //    Note[] notes = new StringParser(string).parseNoteListArray();
