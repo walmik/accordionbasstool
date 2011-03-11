@@ -18,7 +18,6 @@ import javax.swing.JList;
 import javax.swing.UIManager;
 import music.core.Chord;
 import music.core.Note;
-import music.core.StringParser;
 
 /**
  *

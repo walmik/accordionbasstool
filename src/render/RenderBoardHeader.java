@@ -10,7 +10,6 @@
  */
 package render;
 
-import com.sun.awt.AWTUtilities;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -57,7 +56,8 @@ public class RenderBoardHeader extends javax.swing.JPanel implements ActionListe
     this.renderBoard = renderBoard;
     this.boardScrollPane = pane;
    
-    doGradient = AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.PERPIXEL_TRANSLUCENT);
+    //doGradient = AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.PERPIXEL_TRANSLUCENT);
+    doGradient = true;
   }
 
   public void setColumnModel(SeqColumnModel model)
