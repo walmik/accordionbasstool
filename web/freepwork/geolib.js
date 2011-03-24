@@ -110,7 +110,7 @@ var geolib = (function() {
     google.maps.event.addListener(mapMarker, "click", function()
     {
       if (mapMarker.getTitle() != "") {
-		errorSet = true;
+        errorSet = true;
         clearErrorStatus();
       }
 
