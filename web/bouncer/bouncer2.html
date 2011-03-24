@@ -16,12 +16,14 @@ and open the template in the editor.
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js">
     </script>
 
+    <script type="text/javascript" src="midi.js"></script>
+
     <script type="text/javascript" src="jquery.svg.js"></script>
 
     <style type="text/css">
       #thesvg {
         width: 600px;
-        height: 400px;
+        height: 600px;
         display: block;
         margin-left: 24px;
         /*background-color: #888;*/
@@ -261,6 +263,133 @@ and open the template in the editor.
       }
 
       //=======================================================================
+      //Audio
+      //=======================================================================
+      function NoAudio()
+      {
+        this.init = function(instrument) {}
+        this.playNote = function(note, dur) {}
+      }
+      
+      function AppletAudio()
+      {
+        this.init = function(instrument)
+        {
+          var appletHtml = '<applet code="music.midi.PlayerApplet" ' +
+                           'name="midiApplet" ' +
+                           'alt="Java 6 or later is requested" ' +
+                           'mayscript="true" ' +
+                           'archive="../AccordTools.jar" ' +
+                           'width="300" height="120"></applet>';
+
+          var div = document.getElementById("audioDiv");
+          div.innerHTML = appletHtml;
+
+          if (document.midiApplet) {
+            document.midiApplet.setInstrument(instrument);
+          }
+        }
+
+        this.playNote = function(note, dur)
+        {
+          if (document.midiApplet) {
+            document.midiApplet.playNote(note, dur, 0);
+          }
+        }
+      }
+
+
+      function JsAudio()
+      {
+        var halfSteps =
+          {"C": 0,
+          "C#": 1,
+          "Db": 1,
+          "D": 2,
+          "D#": 3,
+          "Eb": 3,
+          "E": 4,
+          "F": 5,
+          "F#": 6,
+          "Gb": 6,
+          "G": 7,
+          "G#": 8,
+          "Ab": 8,
+          "A": 9,
+          "A#": 10,
+          "Bb": 10,
+          "B": 11
+        };
+
+        function getNoteStr(note, dur)
+        {
+          var noteEvents = [];
+          var noteobj = {pitch: 60 + note, duration: dur, channel: note % 8};
+          Array.prototype.push.apply(noteEvents, MidiEvent.createNote(noteobj));
+
+          // Create a track that contains the events to play the notes above
+          var track = new MidiTrack({ events: noteEvents });
+          //track.setTempo(200);
+          //track.setInstrument("Trumpet");
+
+          // Creates an object that contains the final MIDI track in base64 and some
+          // useful methods.
+          var song  = MidiWriter({ tracks: [track] });
+
+          return "data:audio/midi;base64," + song.b64;
+        }
+
+        function getHtml(src, idStr)
+        {
+          //return '<object classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B"' +
+          // 'codebase="http://www.apple.com/qtactivex/qtplugin.cab" id="' + idStr +
+          // '" height="100" width="100"> <param name="src" value="' + src +
+          // '"/> <param name="autoplay" value="false"/> <embed src="' + src + '" name="' + idStr +
+          // '" enablejavascript="true" type="audio/midi" autoplay="false" height="100" width="100"/> </object> ';
+
+          return "<embed src='" + src + "' name='" + idStr + "' id='" + idStr +
+            "' enablejavascript='true' type='audio/midi' autoplay='false'/>";
+        }
+
+        this.init = function(instrument)
+        {
+          var div = document.getElementById("audioDiv");
+
+          for (var i = 0; i < 12; i++)
+          {
+            div.innerHTML += getHtml(getNoteStr(i, 200), "Note" + i);
+            /*var object = document.createElement("object");
+          var embed = document.createElement("embed");
+          embed.setAttribute("id", "Note" + i);
+          embed.setAttribute("name", "Note" + i);
+          embed.setAttribute("enablejavascript", "true");
+          embed.setAttribute("type", "audio/midi");
+          embed.setAttribute("width", "1px");
+          embed.setAttribute("height", "1px");
+          embed.setAttribute("src", midiGetNoteStr(i, 100));
+          div.appendChild(embed);*/
+          }
+        }
+
+        this.playNote = function(note, dur)
+        {
+          note = $.trim(note);
+          if (note == "") {
+            return;
+          }
+          var index = halfSteps[note];
+          var id = "Note" + index;
+          var elem = document[id];
+
+          if (elem) {
+            elem.Play();
+          } else {
+            alert('"' + note + '"');
+          }
+        }
+      }
+
+      //=======================================================================
       // Simulation
       //=======================================================================
 
@@ -280,8 +409,8 @@ and open the template in the editor.
           velocity.y = nextVel.y;
           $("#velY").val(velocity.y);
           $("#velX").val(velocity.x);
-//          if (typeof(velocity) != "number")
-//          alert((typeof(velocity.y) + " " + typeof(velocity.x)));
+          //          if (typeof(velocity) != "number")
+          //          alert((typeof(velocity.y) + " " + typeof(velocity.x)));
           nextVel = null;
         }
 
@@ -322,7 +451,7 @@ and open the template in the editor.
       {
         var note = incNote(obj);
         if (note != null) {
-          document.midiPlayer.playNote(note, 500, 0);
+          midi.playNote(note, 500);
         }
       }
 
@@ -377,8 +506,12 @@ and open the template in the editor.
         }
       }
 
+      var midi;
+
       function init(svg)
       {
+        midi = new AppletAudio();
+
         svgObj = svg;
         svgObj.root().setAttribute("onmousemove", "dragChange(evt, this);");
         svgObj.root().setAttribute("onmouseup", "dragEnd(evt, this);");
@@ -392,11 +525,12 @@ and open the template in the editor.
         
         velocity = new Vec2(4, 4);
 
-        document.midiPlayer.setInstrument("Trumpet");
-        setNotesText(walls.left, "A,C, E");
-        setNotesText(walls.top, "D, F, A");
-        setNotesText(walls.right, "A,C,E");
-        setNotesText(walls.bottom, "E,G#,B");
+        midi.init("Trumpet");
+
+        setNotesText(walls.left, "A");
+        setNotesText(walls.top, "D");
+        setNotesText(walls.right, "E");
+        setNotesText(walls.bottom, "C");
 
         var dim = getSvgDimens();
         theBouncer = makeCircle(dim.width / 2 + 10, dim.height / 2 + 20, $("#circleRadius").val());
@@ -615,11 +749,12 @@ and open the template in the editor.
       function getBounds(obj)
       {
         if ((obj.tagName == "rect")) {
-          var x = parseFloat(obj.getAttribute("x"));
-          var y = parseFloat(obj.getAttribute("y"));
-          var width = parseFloat(obj.getAttribute("width")) - 1;
-          var height = parseFloat(obj.getAttribute("height")) - 1;
-          return {left: x,
+          var x = parseFloat(obj.getAttribute("x")) - outline;
+          var y = parseFloat(obj.getAttribute("y")) - outline;
+          var width = parseFloat(obj.getAttribute("width")) + outline;
+          var height = parseFloat(obj.getAttribute("height")) + outline;
+          return {
+            left: x,
             right: x + width,
             top: y,
             bottom: y + height,
@@ -629,11 +764,12 @@ and open the template in the editor.
         } else if (obj.tagName == "circle") {
           var cx = parseFloat(obj.getAttribute("cx"));
           var cy = parseFloat(obj.getAttribute("cy"));
-          var r = parseFloat(obj.getAttribute("r"));
-          return {left: cx - r,
-            right: cx + r - 1.0,
+          var r = parseFloat(obj.getAttribute("r")) + outline;
+          return {
+            left: cx - r,
+            right: cx + r,
             top: cy - r,
-            bottom: cy + r - 1.0,
+            bottom: cy + r,
             center: {x: cx, y: cy},
             radius: r
           };
@@ -870,14 +1006,7 @@ and open the template in the editor.
       <input type="button" value="Reset Bouncer" onclick="resetBouncer()"/>
     </div>
     <br/>
-    <div id="soundApplet" style="float: left">
-      <applet code="music.midi.PlayerApplet"
-              name="midiPlayer"
-              alt="Java 6 or later is requested"
-              mayscript="true"
-              archive="../AccordTools.jar"
-              width="300" height="120">
-      </applet>
+    <div id="audioDiv" style="float: left">
     </div>
 
   </body>
