@@ -50,7 +50,7 @@ function init()
     mapDivName: 'map_canvas',
     formAddressName: 'address',
     formPosName: 'posLatlng',
-    alwaysLookUpUserAddress: true,
+    alwaysLookUpUserAddress: false,
     acceptPosChange: acceptPosChange,
     markerPosChanged: onMarkerPosChanged,
     markerAddrChanged: onMarkerAddrChanged,
@@ -236,6 +236,10 @@ function computeMarkerDist()
   {
     var place = DATA.Markers[i];
 
+    if (!place.marker) {
+      continue;
+    }
+
     var pos = place.marker.getPosition();
     place.dist = google.maps.geometry.spherical.computeDistanceBetween(orig, pos);
 
@@ -254,8 +258,10 @@ function toggleFilterCheck(name, state)
   for (i = 0; i < DATA.Markers.length; i++)
   {
     var place = DATA.Markers[i];
-    
-    place.marker.setVisible(isPlaceVisible(place));
+
+    if (place.marker) {
+      place.marker.setVisible(isPlaceVisible(place));
+    }
   }
 
   updateVisiblePlaceList();
@@ -264,8 +270,10 @@ function toggleFilterCheck(name, state)
 function selectMarker(i, elem)
 {
   var marker = DATA.Markers[i].marker;
-  google.maps.event.trigger(marker, "click");
-  geolib.getMap().setCenter(marker.getPosition());
+  if (marker) {
+    google.maps.event.trigger(marker, "click");
+    geolib.getMap().setCenter(marker.getPosition());
+  }
 }
 
 /*
@@ -292,8 +300,9 @@ function selectMarker(i, elem)
 function getAddressString(place, lineBr)
 {
   var full = place.address;
-  if (place.address != "")
+  if (place.address != "") {
     full += ", ";
+  }
 
   full += lineBr;
   
@@ -361,6 +370,9 @@ function getPlaceHtml(place, isInInfoWin)
     dirLink = "<br/><a href='#' onclick='zoomTo(this.parentNode, 15)'>Zoom Here</a>";
     dirLink += "<br/><a href='#' onclick='showDirections(this.parentNode)'>Directions</a>";
     descText += getSpanString("placeDist", place.distDesc + dirLink);
+    
+  } else if (place.address == "") {
+    descText += getSpanString("placeDist", "Citywide Service<br/>Call For Info");
   }
 
   if (place.name) {
@@ -579,6 +591,11 @@ function loadAllMarkers()
   {
     var place = DATA.Markers[i];
 
+    // Skip Markers with No Address
+    if (place.address == "") {
+      continue;
+    }
+
     place.marker = new google.maps.Marker(
     {
       map: map,
@@ -628,22 +645,37 @@ function fixSizes()
 
 var currDirId;
 
+var globalDirPaths;
+var globalDirTexts;
+
+var dirBounds = null;
+
+function overrideGoogleDefaults()
+{
+  var icons = $("img", $("table.adp-placemark", $("#jsts")));
+  $(icons[0]).attr("jsvalues", ".src:globalDirPaths[$waypointIndex]");
+  $(icons[0]).removeAttr("jstcache");
+
+  var texts = $(".adp-text", $("#jsts"));
+  $(texts).attr("jscontent", "globalDirTexts[$waypointIndex]");
+  $(texts).removeAttr("jstcache");
+}
+
 function showDirections(elem)
 {
   var idStr = $(elem).parent().attr("id");
 
   var place = getPlaceInfo(idStr);
 
-  if (!place) {
+  if (!place || !place.marker) {
     return;
   }
-
-  theInfoWin.close();
 
   currDirId = idStr;
 
   var start = geolib.getMarker().getTitle();
-  var end = getAddressString(place, "");
+  //var end = getAddressString(place, "");
+  var end = place.marker.getPosition();
 
   var request = {
     origin: start,
@@ -651,32 +683,36 @@ function showDirections(elem)
     travelMode: google.maps.DirectionsTravelMode.DRIVING
   };
 
-  var globalMarkerPaths;
-
   dirService.route(request, function(result, status) {
     if (status == google.maps.DirectionsStatus.OK) {
 
-      globalMarkerPaths = [getImageStr("UserLoc"), getImageStr(getFilterName(place))];
+      var startHtml = "<img src=\"" + getImageStr("UserLoc") + "\"/>";
+      startHtml += geolib.getMarker().getTitle();
 
-      //var icons = $("img", $("table.adp-placemark", $("#jsts")));
-      //$(icons[0]).attr("jsvalues", ".src:alert(globalMarkerPaths); globalMarkerPaths[$waypointIndex]");
-      //$(icons[0]).removeAttr("jstcache");
-      
+      var endHtml = "";
+      endHtml += "<img src=\"" + getImageStr(getFilterName(place)) + "\"/>";
+      endHtml += "<b>" + place.name + "</b><br/>";
+      endHtml += getAddressString(place, "<br/>");
+      //endHtml += "<br/><br/><br/>" + "<span style='font-size: small'>" + result.routes[0].copyrights + "</span>";
+
+      //globalDirPaths = [getImageStr("UserLoc"), getImageStr(getFilterName(place))];
+      //globalDirTexts = [geolib.getMarker().getTitle(), endHtml];
+      //overrideGoogleDefaults();
+
       dirDisplay.setDirections(result);
       dirDisplay.setMap(geolib.getMap());
 
+      if (result.routes && result.routes[0]) {
+        dirBounds = result.routes[0].bounds;
+      } else {
+        dirBounds = null;
+      }
+
       //$("img", $("table.adp-placemark", $("#dirDivContent"))).attr("jsvalues", ".src:'" + getImageStr("UserLoc") + "'");
 
-      var startHtml = "<img src=\"" + getImageStr("UserLoc") + "\"/>";
-      startHtml += geolib.getMarker().getTitle();
       $("#dirDivStartMark").html(startHtml);
-
-      var endHtml = "<img src=\"" + getImageStr(getFilterName(place)) + "\"/>";
-      endHtml += "<b>" + place.name + "</b><br/>";
-      endHtml += getAddressString(place, "<br/>");
-
       $("#dirDivEndMark").html(endHtml);
-
+      
       $("#dirDiv").removeClass("hidden");
       $("#keyHeader").addClass("hidden");
       $("#data_list").addClass("hidden");
@@ -690,8 +726,16 @@ function showDirections(elem)
       {
         $(elem).addClass("hidden");
       });
+
+      theInfoWin.close();
     }
   });
+}
+function zoomDirections()
+{
+  if (dirBounds) {
+    geolib.getMap().fitBounds(dirBounds);
+  }
 }
 
 function hideDirections()
