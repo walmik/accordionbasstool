@@ -20,7 +20,7 @@ Licensed Under Creative Commons License
 
     <script type="text/javascript" src="splitter.js"></script>
     <script type="text/javascript" src="geolib.js"></script>
-    
+
     <script type="text/javascript" src="FreeServicesAllInOne.json"></script>
 
     <link rel="stylesheet" type="text/css" href="./freeservices.css"/>
@@ -46,15 +46,24 @@ Licensed Under Creative Commons License
           </script>
           <span id="statusAddr"></span>
           <div id="markerFilters"></div>
-          <span class="filterDesc hidden" id="filterPantry">Pantry - Provides free groceries.</span>
+          <!--<span class="filterDesc hidden" id="filterPantry">Pantry - Provides free groceries.</span>
           <span class="filterDesc hidden" id="filterEats">Eats - Provides free hot food to be eaten.</span>
+          -->
           <br/>
         </div>
         <div style="overflow: auto; height: 400px" id="data_list" class="datalist"></div>
+        <div class="hidden" style="overflow: auto; height: 100%" id="dirDiv">
+          <span style="float: right; padding-right: 8px; font-size: larger">
+            <a href="#" onclick="hideDirections()">Hide Directions</a>
+          </span>
+          <div id="dirDivStartMark" style="clear: both"  onmouseover = 'hoverListItem(true, this)' onmouseout='hoverListItem(false, this)' ></div>
+          <br/>
+          <div id="dirDivContent"></div>
+          <div id="dirDivEndMark"  onclick="zoomToId(currDirId, 15)" onmouseover = 'hoverListItem(true, this)' onmouseout='hoverListItem(false, this)' ></div>
+        </div>
       </div>
 
       <div id="map_canvas" style="width: 60%; height: 100%"></div>
     </div>
-
   </body>
 </html>

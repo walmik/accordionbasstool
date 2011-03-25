@@ -17,8 +17,27 @@ var selectedPlaceId;
 
 var DATA;
 
+var dirService;
+var dirRender;
+
+function testDir()
+{
+  var request = {
+    origin: "San Francisco, CA",
+    destination: "San Francisco, CA",
+    travelMode: google.maps.DirectionsTravelMode.DRIVING
+  };
+
+  dirService.route(request, function(result, status) {
+    if (status == google.maps.DirectionsStatus.OK) {
+      dirDisplay.setDirections(result);
+    }
+  });
+}
+
 function init()
 {
+  // Init JSON Data
   DATA = servicesData();
   
   // Init SF Bounds
@@ -39,6 +58,18 @@ function init()
   });
 
   theInfoWin = new google.maps.InfoWindow();
+
+  //Init Directions
+  dirService = new google.maps.DirectionsService();
+  dirDisplay = new google.maps.DirectionsRenderer();
+  dirDisplay.setOptions(
+  {
+    infoWindow: theInfoWin,
+    panel: document.getElementById("dirDivContent"),
+    suppressMarkers: true
+  });
+
+  testDir();
 
   google.maps.event.addListener(geolib.getMap(), "bounds_changed", updateVisiblePlaceList);
 
@@ -106,7 +137,7 @@ var FilterData =
   "Both" :
   {
     imageQuery: "d_map_spin",
-    imageCode:  "0.7|0|FF42FF|12|b|PE",
+    imageCode:  "0.7|0|FF42FF|12|b|P/E",
     imageColor: ""
   },
 
@@ -117,31 +148,6 @@ var FilterData =
     imageColor: "00FF00"
   }
 }
-
-
-//var imageUrls2D =
-//{
-//  "Pantry": "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=P|0099FF",
-//  "Eats" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=E|FF3300",
-//  "Shelter" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=S|FFFF00",
-//  "MyLoc" : "http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=location|00FF00"
-//};
-//
-//var imageUrls3D =
-//{
-//  "Pantry": "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=P|0099FF",
-//  "Eats" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=E|FF3300",
-//  "Shelter" : "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=S|FFFF00",
-//  "MyLoc" : "http://chart.apis.google.com/chart?chst=d_map_pin_icon_withshadow&chld=location|00FF00"
-//};
-//
-//var filterColors =
-//{
-//  "Pantry" : "0099FF",
-//  "Eats" : "FF3300",
-//  "Shelter" : "FFCC00",
-//  "MyLoc" : "00FF00"
-//};
 
 function getFilterName(place)
 {
@@ -283,12 +289,14 @@ function selectMarker(i, elem)
         }
       }
  */
-function getAddressString(place)
+function getAddressString(place, lineBr)
 {
   var full = place.address;
   if (place.address != "")
     full += ", ";
-  full += "<br/>";
+
+  full += lineBr;
+  
   if (place.city != "") {
     full += place.city + ", " + place.state;
   }
@@ -310,14 +318,22 @@ function zoomTo(elem, zoom)
 {
   var idStr = $(elem).parent().attr("id");
 
+  zoomToId(idStr, zoom);
+}
+
+function zoomToId(idStr, zoom)
+{
   var place = getPlaceInfo(idStr);
-  if (place) {
-    geolib.getMap().setCenter(place.marker.getPosition());
+
+  if (!place) {
+    return;
   }
+  
+  geolib.getMap().setCenter(place.marker.getPosition());
   geolib.getMap().setZoom(zoom);
 }
 
-function getPlaceHtml(place, i, isInInfoWin)
+function getPlaceHtml(place, isInInfoWin)
 {
   var descText = "";
 
@@ -327,25 +343,23 @@ function getPlaceHtml(place, i, isInInfoWin)
   }
 
   var imgStr = "<img src=\"" + getImageStr(getFilterName(place)) + "\"/>";
-//  if ((place.hasPantry == "True")) {
-//    imgStr += "<img src=\"" + getImageStr("Pantry") + "\"/>";
-//    // To avoid setting the icon twice...
-//    if (place.hasMeal != "True") {
-//      place.marker.setIcon(getImageStr("Pantry", true));
-//    }
-//  }
-//  if ((place.hasMeal == "True")) {
-//    imgStr += "<img src=\"" + getImageStr("Eats") + "\"/>";
-//    place.marker.setIcon(getImageStr("Eats", true));
-//  }
+  //  if ((place.hasPantry == "True")) {
+  //    imgStr += "<img src=\"" + getImageStr("Pantry") + "\"/>";
+  //    // To avoid setting the icon twice...
+  //    if (place.hasMeal != "True") {
+  //      place.marker.setIcon(getImageStr("Pantry", true));
+  //    }
+  //  }
+  //  if ((place.hasMeal == "True")) {
+  //    imgStr += "<img src=\"" + getImageStr("Eats") + "\"/>";
+  //    place.marker.setIcon(getImageStr("Eats", true));
+  //  }
 
-  if (place.distDesc) {
+  if (place.distDesc && (place.address != "")) {
     var dirLink = "";
-    if (isInInfoWin) {
-    //dirLink = "<br/><a href='#'>Directions</a>";
-    }
 
     dirLink = "<br/><a href='#' onclick='zoomTo(this.parentNode, 15)'>Zoom Here</a>";
+    dirLink += "<br/><a href='#' onclick='showDirections(this.parentNode)'>Directions</a>";
     descText += getSpanString("placeDist", place.distDesc + dirLink);
   }
 
@@ -361,7 +375,7 @@ function getPlaceHtml(place, i, isInInfoWin)
   //descText += "<br/>";
 
   if (place.address) {
-    descText += getSpanString("placeAddress", getAddressString(place));
+    descText += getSpanString("placeAddress", getAddressString(place, "<br/>"));
     descText += "<br/>";
   }
 
@@ -400,7 +414,7 @@ function createLI(place, i)
   onclickSelectMarker += id + ", this)\"";
   onclickSelectMarker += " onmouseover = 'hoverListItem(true, this)' onmouseout='hoverListItem(false, this)' ";
 
-  var descText = getPlaceHtml(place, i, false);
+  var descText = getPlaceHtml(place, false);
 
   //newLI.innerHTML = "<a " + onclickSelectMarker + "href='#'>" + descText + "</a>";
   $(newLI).html("<div id='" + id + "' " + onclickSelectMarker + ">" + descText + "</div>");
@@ -457,13 +471,13 @@ function isPlaceVisible(place, bounds)
     return false;
   }
 
-  if (bounds && !bounds.contains(place.marker.getPosition())) {
+  if (bounds && (place.address != "") && !bounds.contains(place.marker.getPosition())) {
     return false;
   }
 
-//  if (!place.marker.getVisible()) {
-//    return false;
-//  }
+  //  if (!place.marker.getVisible()) {
+  //    return false;
+  //  }
 
   return true;
 }
@@ -570,7 +584,7 @@ function loadAllMarkers()
       map: map,
       position: geolib.parseLatLong(place.Point.coordinates, true),
       draggable: false,
-      title: place.name + "\n" + getAddressString(place),
+      title: place.name + "\n" + getAddressString(place, "\n"),
       icon: getImageStr(getFilterName(place), true)
     });
 
@@ -579,7 +593,7 @@ function loadAllMarkers()
       return function()
       {
         var idStr = i;
-        var divWrap = "<div id='" + idStr + "'> " + getPlaceHtml(place, i, true) + "</div>";
+        var divWrap = "<div id='" + idStr + "'> " + getPlaceHtml(place, true) + "</div>";
         win.setContent(divWrap);
         win.open(map, place.marker);
 
@@ -595,6 +609,7 @@ function loadAllMarkers()
 
 function showClicked()
 {
+  hideDirections();
   $("addressError").text("");
   if (!geolib.syncToEnteredAddress()) {
     geolib.getMap().setCenter(geolib.getPos());
@@ -609,6 +624,83 @@ function fixSizes()
   var margin = parseInt($(document.body).css("marginBottom"));
   $("#floatSplitter").height($(window).height() - margin - $('#floatSplitter').position().top);
   $("#data_list").height($("#leftDiv").height() - $("#data_list").position().top);
+}
+
+var currDirId;
+
+function showDirections(elem)
+{
+  var idStr = $(elem).parent().attr("id");
+
+  var place = getPlaceInfo(idStr);
+
+  if (!place) {
+    return;
+  }
+
+  theInfoWin.close();
+
+  currDirId = idStr;
+
+  var start = geolib.getMarker().getTitle();
+  var end = getAddressString(place, "");
+
+  var request = {
+    origin: start,
+    destination: end,
+    travelMode: google.maps.DirectionsTravelMode.DRIVING
+  };
+
+  var globalMarkerPaths;
+
+  dirService.route(request, function(result, status) {
+    if (status == google.maps.DirectionsStatus.OK) {
+
+      globalMarkerPaths = [getImageStr("UserLoc"), getImageStr(getFilterName(place))];
+
+      //var icons = $("img", $("table.adp-placemark", $("#jsts")));
+      //$(icons[0]).attr("jsvalues", ".src:alert(globalMarkerPaths); globalMarkerPaths[$waypointIndex]");
+      //$(icons[0]).removeAttr("jstcache");
+      
+      dirDisplay.setDirections(result);
+      dirDisplay.setMap(geolib.getMap());
+
+      //$("img", $("table.adp-placemark", $("#dirDivContent"))).attr("jsvalues", ".src:'" + getImageStr("UserLoc") + "'");
+
+      var startHtml = "<img src=\"" + getImageStr("UserLoc") + "\"/>";
+      startHtml += geolib.getMarker().getTitle();
+      $("#dirDivStartMark").html(startHtml);
+
+      var endHtml = "<img src=\"" + getImageStr(getFilterName(place)) + "\"/>";
+      endHtml += "<b>" + place.name + "</b><br/>";
+      endHtml += getAddressString(place, "<br/>");
+
+      $("#dirDivEndMark").html(endHtml);
+
+      $("#dirDiv").removeClass("hidden");
+      $("#keyHeader").addClass("hidden");
+      $("#data_list").addClass("hidden");
+
+      $("table.adp-placemark").each(function(index, elem)
+      {
+        $(elem).addClass("hidden");
+      });
+
+      $(".adp-legal").each(function(index, elem)
+      {
+        $(elem).addClass("hidden");
+      });
+    }
+  });
+}
+
+function hideDirections()
+{
+  currDirId = "";
+  $("#dirDiv").addClass("hidden");
+  $("#keyHeader").removeClass("hidden");
+  $("#data_list").removeClass("hidden");
+  dirDisplay.setMap(null);
 }
 
 $(document).ready(function()

@@ -10,7 +10,7 @@ function servicesData()
              "name":"All Saints Episcopal Church",
              "hasMeal":"True",
              "hasPantry":"False",
-             "Point":""
+             "Point":
                 {"coordinates":"-122.446107,37.76925"}},
             {"description":"487-3240. Sign up Thur 8:30am; groceries given out 9am. Must live in 94110 or 94103 zipcode. ID required.",
              "phone":"(415) 487-3240",
@@ -564,7 +564,7 @@ function servicesData()
                 {"coordinates":"-122.476977,37.748719"}},
             {"description":"CALL 211 (HELPLINK) to get on waiting list for one 35-lb box of dry &amp; canned goods per month. For SF residents age 60+ &amp; non-WIC families with children under 6. Must provide proof of age &amp; income.",
              "phone":"",
-             "address":"Call 211",
+             "address":"",
              "city":"San Francisco",
              "state":"CA",
              "zip":"94115-4164",
