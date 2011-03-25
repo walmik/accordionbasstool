@@ -373,7 +373,7 @@ function getPlaceHtml(place, isInInfoWin)
     var dirLink = "";
 
     dirLink = "<br/><a href='#' onclick='zoomTo(this.parentNode, 15)'>Zoom Here</a>";
-    dirLink += "<br/><a href='#' onclick='showDirections(this.parentNode)'>Directions</a>";
+    dirLink += "<br/><a href='#' onclick='showDirections($(this).parent().parent().attr(\"id\"))'>Directions</a>";
     descText += getSpanString("placeDist", place.distDesc + dirLink);
     
   } else if (place.address == "") {
@@ -667,10 +667,10 @@ function overrideGoogleDefaults()
   $(texts).removeAttr("jstcache");
 }
 
-function showDirections(elem)
-{
-  var idStr = $(elem).parent().attr("id");
+var directionsMode = null;
 
+function showDirections(idStr, newDirMode)
+{
   var place = getPlaceInfo(idStr);
 
   if (!place || !place.marker) {
@@ -679,6 +679,18 @@ function showDirections(elem)
 
   currDirId = idStr;
 
+  if (newDirMode) {
+    if (newDirMode == "Drive")
+      directionsMode = google.maps.DirectionsTravelMode.DRIVING;
+    else if (newDirMode == "Walk")
+      directionsMode = google.maps.DirectionsTravelMode.WALKING;
+    else if (newDirMode == "Bike")
+      directionsMode = google.maps.DirectionsTravelMode.BICYCLING;
+  }
+  if (directionsMode == null) {
+    directionsMode = google.maps.DirectionsTravelMode.DRIVING;
+  }
+  
   var start = geolib.getMarker().getTitle();
   //var end = getAddressString(place, "");
   var end = place.marker.getPosition();
@@ -686,7 +698,7 @@ function showDirections(elem)
   var request = {
     origin: start,
     destination: end,
-    travelMode: google.maps.DirectionsTravelMode.DRIVING
+    travelMode: directionsMode
   };
 
   dirService.route(request, function(result, status) {

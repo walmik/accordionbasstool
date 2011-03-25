@@ -59,6 +59,17 @@ Licensed Under Creative Commons License
           <span style="float: right; padding-right: 16px; font-size: larger">
             <a href="#" onclick="zoomDirections()">Zoom to Directions</a>
           </span>
+          <br/>
+
+          <div style="clear: both; float: right; padding-right: 16px" id="dirType">
+            Directions to:
+            <input type="radio" name="dirSelect" value="Drive" checked="checked" onclick="showDirections(currDirId, 'Drive')"/>
+            Drive
+            <input type="radio" name="dirSelect" value="Walk" onclick="showDirections(currDirId, 'Walk')"/>
+            Walk
+            <input type="radio" name="dirSelect" value="Bike" onclick="showDirections(currDirId, 'Bike')"/>
+            Bike
+          </div>
           <div id="dirDivStartMark" style="clear: both"  onmouseover = 'hoverListItem(true, this)' onmouseout='hoverListItem(false, this)' ></div>
           <br/>
           <div id="dirDivContent"></div>
