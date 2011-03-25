@@ -184,7 +184,7 @@ function getImageStr(filter, is3D)
 }
 
 
-function addFilterCheck(filterName)
+function addFilterCheck(filterName, displayOnly)
 {
   var root = document.getElementById("markerFilters");
 
@@ -194,6 +194,11 @@ function addFilterCheck(filterName)
   var img = document.createElement("img");
   img.src = getImageStr(filterName);
   span.appendChild(img);
+
+  if (displayOnly) {
+    span.appendChild(document.createTextNode(filterName));
+    return;
+  }
 
   var input = document.createElement("input");
   input.type = "checkbox";
@@ -586,6 +591,7 @@ function loadAllMarkers()
 
   addFilterCheck("Pantry");
   addFilterCheck("Eats");
+  addFilterCheck("Both", true);
 
   for (i = 0; i < DATA.Markers.length; i++)
   {
