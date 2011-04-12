@@ -67,6 +67,7 @@ and open the template in the editor.
         obj.prev = null;
         obj.next = firstShape;
         firstShape = obj;
+        return obj;
       }
 
       function listRemove(obj)
@@ -276,11 +277,11 @@ and open the template in the editor.
         this.init = function(instrument)
         {
           var appletHtml = '<applet code="music.midi.PlayerApplet" ' +
-                           'name="midiApplet" ' +
-                           'alt="Java 6 or later is requested" ' +
-                           'mayscript="true" ' +
-                           'archive="../AccordTools.jar" ' +
-                           'width="300" height="120"></applet>';
+            'name="midiApplet" ' +
+            'alt="Java 6 or later is requested" ' +
+            'mayscript="true" ' +
+            'archive="../AccordTools.jar" ' +
+            'width="300" height="120"></applet>';
 
           var div = document.getElementById("audioDiv");
           div.innerHTML = appletHtml;
@@ -466,7 +467,7 @@ and open the template in the editor.
       function resetBouncer()
       {
         var dim = getSvgDimens();
-        svgObj.change(theBouncer, {cx: dim.width/2.0, cy: dim.height/2.0});
+        svgObj.change(theBouncer, {cx: snapToGrid(dim.width/2.0), cy: snapToGrid(dim.height/2.0)});
       }
 
       function changeSlopeSpeed()
@@ -511,7 +512,8 @@ and open the template in the editor.
       function init(svg)
       {
         midi = new AppletAudio();
-
+        fixDimens();
+        
         svgObj = svg;
         svgObj.root().setAttribute("onmousemove", "dragChange(evt, this);");
         svgObj.root().setAttribute("onmouseup", "dragEnd(evt, this);");
@@ -521,19 +523,20 @@ and open the template in the editor.
         svgObj.root().setAttribute("width", "100%");
         svgObj.root().setAttribute("height", "100%");
 
-        buildWalls(svg);
+        buildGrid();
+        buildWalls();
         
         velocity = new Vec2(4, 4);
 
         midi.init("Trumpet");
 
-        setNotesText(walls.left, "A");
-        setNotesText(walls.top, "D");
-        setNotesText(walls.right, "E");
-        setNotesText(walls.bottom, "C");
+//        setNotesText(walls.left, "A");
+//        setNotesText(walls.top, "D");
+//        setNotesText(walls.right, "E");
+//        setNotesText(walls.bottom, "C");
 
         var dim = getSvgDimens();
-        theBouncer = makeCircle(dim.width / 2 + 10, dim.height / 2 + 20, $("#circleRadius").val());
+        theBouncer = makeCircle(snapToGrid(dim.width / 2), snapToGrid(dim.height / 2), $("#circleRadius").val());
         theBouncer.setAttribute("fill", "#080");
 
         changeSlopeSpeed()
@@ -543,9 +546,38 @@ and open the template in the editor.
         run();
       }
 
+      var gridGroup = null;
+
+      function buildGrid()
+      {
+        var divDimens = getSvgDimens();
+
+        if (gridGroup) {
+          gridGroup.parentNode.removeChild(gridGroup);
+        }
+
+        gridGroup = svgObj.group({id: 'grid', stroke: 'gray', strokeWidth: 1});
+
+        for (var x = 0; x < divDimens.width; x += gridSize)
+        {
+          svgObj.line(gridGroup, x, 0, x, divDimens.height);
+        }
+
+        for (var y = 0; y < divDimens.height; y += gridSize)
+        {
+          svgObj.line(gridGroup, 0, y, divDimens.width, y);
+        }
+      }
+
+      function snapToGrid(val)
+      {
+        return Math.floor(val / gridSize) * gridSize;
+      }
+
       function doResize(evt)
       {
         resizeWalls();
+        buildGrid();
       }
 
       function makeRect(x, y, w, h, text, isfixed, name)
@@ -599,6 +631,8 @@ and open the template in the editor.
       {
         var obj = svgObj.text(gr, x, y, "", {"text-anchor" : "middle",
           "alignment-baseline" : "middle",
+          "pointer-events" : "none",
+          "cursor" : "pointer",
           "onmousedown" : "dragStart(evt, this.previousSibling)"});
       }
 
@@ -646,7 +680,9 @@ and open the template in the editor.
 
       function getMousePos(evt)
       {
-        return {x: evt.clientX, y: evt.clientY};
+        var topOff = $(document).scrollTop();
+        var leftOff = $(document).scrollLeft();
+        return {x: snapToGrid(evt.clientX + leftOff), y: snapToGrid(evt.clientY + topOff)};
       }
 
       function selectShape(obj)
@@ -666,18 +702,23 @@ and open the template in the editor.
       function emptyClick(evt)
       {
         draggedObj = null;
-        var off = $("#thesvg").offset();
-        addNew(evt.clientX - off.left, evt.clientY - off.top);
+        clearSelection();
+
+        var pos = getMousePos(evt)
+        var obj = addNew(pos.x, pos.y);
+        
+        dragStart(evt, obj);
       }
 
       function addNew(x, y)
       {
         if (currShapeType == "circle") {
-          listAdd(addCircle(x, y));
+          return listAdd(addCircle(x, y));
         } else if (currShapeType == "rect") {
-          listAdd(addRect(x, y));
+          return listAdd(addRect(x, y));
         } else {
           selectShape(null);
+          return null;
         }
       }
 
@@ -691,7 +732,10 @@ and open the template in the editor.
         selectShape(obj);
         if (!isFixed(obj)) {
           draggedObj = obj;
+          var bounds = getBounds(draggedObj);
           lastDragOffset = getMousePos(evt);
+          lastDragOffset.x -= snapToGrid(bounds.left) - bounds.left;
+          lastDragOffset.y -= snapToGrid(bounds.top) - bounds.top;
         }
         evt.stopPropagation();
       }
@@ -705,6 +749,18 @@ and open the template in the editor.
           var dy = newPos.y - lastDragOffset.y;
           translate(obj, dx, dy);
           lastDragOffset = newPos;
+          clearSelection();
+
+          evt.stopPropagation();
+        }
+      }
+
+      function clearSelection()
+      {
+        if (window.getSelection) {
+          window.getSelection().removeAllRanges();
+        } else if (document.selection) {
+          document.selection.empty();
         }
       }
 
@@ -719,11 +775,11 @@ and open the template in the editor.
         if ((obj.tagName == "rect") || (obj.tagName == "text")) {
           var x = parseFloat(obj.getAttribute("x"));
           var y = parseFloat(obj.getAttribute("y"));
-          svgObj.change(obj, {x: x + dx, y: y + dy});
+          svgObj.change(obj, {x: (x + dx), y: (y + dy)});
         } else if (obj.tagName == "circle") {
           var x = parseFloat(obj.getAttribute("cx"));
           var y = parseFloat(obj.getAttribute("cy"));
-          svgObj.change(obj, {cx: x + dx, cy: y + dy});
+          svgObj.change(obj, {cx: (x + dx), cy: (y + dy)});
         }
 
         if (obj.nextSibling != null) {
@@ -776,6 +832,14 @@ and open the template in the editor.
         }
       }
 
+      function fixDimens()
+      {
+        var dim = getSvgDimens();
+        dim.width = snapToGrid(dim.width + 2 * gridSize);
+        dim.height = snapToGrid(dim.height + 2 * gridSize);
+        $('#thesvg').css(dim);
+      }
+
       function getSvgDimens()
       {
         return {width:  $('#thesvg').outerWidth(),
@@ -786,7 +850,8 @@ and open the template in the editor.
       // Walls
       //======================================================================
       var walls = {};
-      var thickness = 20;
+      var gridSize = 24;
+      var thickness = gridSize;
 
       function updateTextPos(obj)
       {
@@ -845,6 +910,9 @@ and open the template in the editor.
         }
 
         var radius = $('#circleRadius').val();
+        x -= (x - radius - outline) - snapToGrid(x - radius - outline);
+        y -= (y - radius - outline) - snapToGrid(y - radius - outline);
+
         var notes = $('#notes').val();
         var obj = makeCircle(x, y, radius, notes);
         selectShape(obj);
@@ -861,7 +929,7 @@ and open the template in the editor.
         var width = $('#rectWidth').val();
         var height = $('#rectHeight').val();
         var notes = $('#notes').val();
-        var obj = makeRect(x - width / 2, y - height / 2, width, height, notes);
+        var obj = makeRect(snapToGrid(x - width / 2), snapToGrid(y - height / 2), width, height, notes);
         selectShape(obj);
         return obj;
       }
@@ -941,7 +1009,7 @@ and open the template in the editor.
       
       $(document).ready(function()
       {
-        $('#thesvg').resizable({resize: doResize});
+        $('#thesvg').resizable({resize: doResize, grid: gridSize});
 
         $("#thesvg").keydown(keyDown);
 
@@ -972,14 +1040,14 @@ and open the template in the editor.
             <input type="radio" id="radioCircle" name="shape" value="Circle" onclick="setCurrShape('circle')"/>Circle
           </td>
           <td>
-            Circle Radius: <input type="text" id="circleRadius" value="40"/>
+            Circle Radius: <input type="text" id="circleRadius" value="48"/>
           </td>
         </tr>
         <tr>
           <td><input type="radio" id="radioRect" name="shape" value="Rect" onclick="setCurrShape('rect')"/>Rect</td>
 
-          <td>Rect Width: <input type="text" id="rectWidth" value="40"/></td>
-          <td>Rect Height: <input type="text" id="rectHeight" value="40"/></td>
+          <td>Rect Width: <input type="text" id="rectWidth" value="48"/></td>
+          <td>Rect Height: <input type="text" id="rectHeight" value="48"/></td>
         </tr>
         <tr>
           <td>
